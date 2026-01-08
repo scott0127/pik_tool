@@ -100,14 +100,23 @@ export function useCollection() {
 
   // Load from Supabase (if logged in)
   const loadFromCloud = async () => {
-    if (!user.value) return;
+    // Get current session directly from Supabase client
+    const { data: { session } } = await supabase.auth.getSession();
+    
+    if (!session?.user?.id) {
+      console.log('[Collection] No active session, skip loading from cloud');
+      return;
+    }
+    
+    const userId = session.user.id;
+    console.log('[Collection] Loading from cloud for user:', userId);
     
     isSyncing.value = true;
     try {
       const { data, error } = await supabase
         .from('user_collections')
         .select('collected_items')
-        .eq('user_id', user.value.id)
+        .eq('user_id', userId)
         .single();
       
       if (error && error.code !== 'PGRST116') throw error; // PGRST116 = not found
@@ -119,9 +128,12 @@ export function useCollection() {
         });
         collectionState.value.collected = collected;
         saveToLocal(); // Sync to local storage too
+        console.log('[Collection] ✓ Loaded', (data.collected_items as string[]).length, 'items from cloud');
+      } else {
+        console.log('[Collection] No cloud data found for this user');
       }
     } catch (e) {
-      console.error('Failed to load from cloud:', e);
+      console.error('[Collection] Failed to load from cloud:', e);
     } finally {
       isSyncing.value = false;
     }

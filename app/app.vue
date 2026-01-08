@@ -14,10 +14,15 @@
 </template>
 
 <script setup lang="ts">
-// Load collection from localStorage on client side
-const { loadCollection } = useCollection();
+// Load collection from localStorage and cloud
+const { loadCollection, loadFromCloud } = useCollection();
 
-onMounted(() => {
+onMounted(async () => {
+  // First load from localStorage (fast, offline available)
   loadCollection();
+  
+  // Then sync from cloud if logged in (may update with newer data)
+  await loadFromCloud();
 });
 </script>
+
