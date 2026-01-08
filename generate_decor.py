@@ -28,95 +28,151 @@ PIKMIN_TYPE_MAP = {
 
 # 中文名稱對應表
 VARIANT_NAME_ZH = {
+    # 餐廳
     'chef_hat': '廚師帽',
     'chef_hat_rare': '稀有廚師帽',
+    # 咖啡廳
     'coffee_cup': '咖啡杯',
     'coffee_cup_rare': '稀有咖啡杯',
+    # 甜點店
     'macaron': '馬卡龍',
     'donut': '甜甜圈',
+    # 電影院
     'popcorn_snack': '爆米花',
+    # 藥局
     'toothbrush': '牙刷',
+    # 動物園
     'dandelion': '蒲公英',
+    # 森林
     'stag_beetle': '鍬形蟲',
     'acorn': '橡實',
+    # 水邊
     'fishing_lure': '魚餌',
     'fishing_lure_rare': '稀有魚餌',
+    # 郵局
     'stamp': '郵票',
+    # 美術館
     'picture_frame': '相框',
+    # 機場
     'toy_airplane': '玩具飛機',
+    'golden_toy_airplane': '金色玩具飛機',
+    # 車站
     'paper_train': '紙火車',
     'ticket': '車票',
     'gold_ticket': '金車票',
+    # 海灘
     'shell': '貝殼',
+    # 漢堡店
     'burger': '漢堡',
+    # 便利商店
     'bottle_cap': '瓶蓋',
+    # 超市
     'banana': '香蕉',
     'banana_rare': '稀有香蕉',
     'mushroom': '蘑菇',
     'snack': '零食',
+    # 麵包店
     'baguette': '法國麵包',
     'baguette_rare': '稀有法國麵包',
+    # 美髮院
     'scissors': '剪刀',
     'scissors_rare': '稀有剪刀',
     'hair_tie': '髮圈',
+    # 服飾店
     'clover': '三葉草',
+    # 公園
     'four-leaf_clover': '四葉草',
+    'four_leaf_clover': '四葉草',
+    # 圖書館
     'tiny_book': '迷你書',
+    # 壽司店
     'sushi': '壽司',
+    # 山
     'mountain_pin_badge': '山形徽章',
+    # 體育場
     'ball_keychain': '球形鑰匙圈',
-    'theme_park_ticket_1': '遊樂園門票1',
-    'theme_park_ticket_2': '遊樂園門票2',
+    # 遊樂園
+    'theme_park_ticket_1': '遊樂園門票A',
+    'theme_park_ticket_2': '遊樂園門票B',
+    # 公車站
     'bus_papercraft': '紙公車',
+    # 義大利餐廳
     'pizza': '披薩',
+    # 拉麵店
     'ramen_keychain': '拉麵鑰匙圈',
+    # 義大利麵店
     'pasta': '義大利麵',
+    # 橋
     'bridge_pin_badge': '橋形徽章',
+    # 飯店
     'hotel_amenities': '飯店備品',
+    # 美妝店
     'makeup': '化妝品',
-    'fortune_1': '大吉',
-    'fortune_2': '中吉',
-    'fortune_3': '小吉',
-    'fortune_4': '末吉',
-    'fortune_5': '凶',
-    'battery_1': '電池1',
-    'battery_2': '電池2',
-    'battery_3': '電池3',
-    'battery_4': '電池4',
-    'battery_5': '電池5',
-    'battery_6': '電池6',
+    # 神社
+    'fortune_1': '籤-大吉',
+    'fortune_2': '籤-中吉',
+    'fortune_3': '籤-小吉',
+    'fortune_4': '籤-末吉',
+    'fortune_5': '籤-凶',
+    # 電器行
+    'battery_1': '電池A',
+    'battery_2': '電池B',
+    'battery_3': '電池C',
+    'battery_4': '電池D',
+    'battery_5': '電池E',
+    'battery_6': '電池F',
+    # 咖哩店
     'curry_bowl': '咖哩飯',
+    # 五金行
     'tool': '工具',
+    # 大學
     'college_crest_patch': '校徽',
+    # 墨西哥餐廳
     'taco': '塔可',
+    # 洗衣店
     'laundry_item': '洗衣用品',
+    # 韓式餐廳
     'kimchi': '泡菜',
+    # 起司店
     'cheese': '起司',
+    # 水族館
     'coral': '珊瑚',
+    # 藝術工作室
     'paint': '顏料',
+    # 下午茶店
     'afternoon_tea': '下午茶',
+    # 音樂場地
     'tiny_instrument': '迷你樂器',
+    # 衝浪店
     'surfboard_keychain': '衝浪板鑰匙圈',
+    # 刨冰店
     'shaved_ice': '刨冰',
+    # 月餅店
     'mooncake': '月餅',
+    # 照相館
     'photo_button_badge': '照片徽章',
+    # 電玩中心
     'nintendo_consoles_1': '任天堂主機',
+    # 嬰兒用品店
     'pacifier': '奶嘴',
+    # 御節料理店
     'osechi': '御節料理',
-    'lunar_new_year_ornament_1': '農曆新年裝飾1',
-    'lunar_new_year_ornament_2': '農曆新年裝飾2',
-    'chess_piece_1': '西洋棋1',
-    'chess_piece_2': '西洋棋2',
+    
+    # 特殊活動
+    'lunar_new_year_ornament_1': '農曆新年裝飾A',
+    'lunar_new_year_ornament_2': '農曆新年裝飾B',
+    'chess_piece_1': '西洋棋-白',
+    'chess_piece_2': '西洋棋-黑',
     'fingerboard': '指板',
-    'flower_card_1': '花札1',
-    'flower_card_2': '花札2',
-    'flower_card_3': '花札3',
-    'flower_card_4': '花札4',
-    'flower_card_5': '花札5',
-    'flower_card_6': '花札6',
-    'flower_card_7': '花札7',
-    'flower_card_8': '花札8',
-    'jack-o-lantern': '南瓜燈',
+    'flower_card_1': '花札-松',
+    'flower_card_2': '花札-梅',
+    'flower_card_3': '花札-櫻',
+    'flower_card_4': '花札-藤',
+    'flower_card_5': '花札-菖蒲',
+    'flower_card_6': '花札-牡丹',
+    'flower_card_7': '花札-萩',
+    'flower_card_8': '花札-芒',
+    'jack_o_lantern': '南瓜燈',
     'halloween_treat': '萬聖節糖果',
     'halloween_light': '萬聖節燈',
     'first_anniversary_snack': '一週年零食',
@@ -129,22 +185,24 @@ VARIANT_NAME_ZH = {
     'chocolate': '巧克力',
     'easter_egg': '復活節彩蛋',
     'bunny_egg': '兔子蛋',
-    'ice_cream_1': '冰淇淋1',
-    'ice_cream_2': '冰淇淋2',
+    'ice_cream_1': '冰淇淋A',
+    'ice_cream_2': '冰淇淋B',
+    'cream_1': '冰淇淋A',
+    'cream_2': '冰淇淋B',
     'sneaker_keychain': '運動鞋鑰匙圈',
-    'puzzle_1': '拼圖1',
-    'puzzle_2': '拼圖2',
-    'puzzle_3': '拼圖3',
-    'puzzle_4': '拼圖4',
-    'playing_card_1': '撲克牌1',
-    'playing_card_2': '撲克牌2',
-    'playing_card_3': '撲克牌3',
-    'playing_card_4': '撲克牌4',
-    'mahjong_tile_1': '麻將1',
-    'mahjong_tile_2': '麻將2',
-    'mahjong_tile_3': '麻將3',
-    'mahjong_tile_4': '麻將4',
-    'mahjong_tile_5': '麻將5',
+    'puzzle_1': '拼圖A',
+    'puzzle_2': '拼圖B',
+    'puzzle_3': '拼圖C',
+    'puzzle_4': '拼圖D',
+    'playing_card_1': '撲克牌-黑桃',
+    'playing_card_2': '撲克牌-紅心',
+    'playing_card_3': '撲克牌-方塊',
+    'playing_card_4': '撲克牌-梅花',
+    'mahjong_tile_1': '麻將-萬',
+    'mahjong_tile_2': '麻將-筒',
+    'mahjong_tile_3': '麻將-條',
+    'mahjong_tile_4': '麻將-風',
+    'mahjong_tile_5': '麻將-發',
     'spring_sticker': '春季貼紙',
     'summer_sticker': '夏季貼紙',
     'fall_sticker': '秋季貼紙',
@@ -160,27 +218,30 @@ VARIANT_NAME_ZH = {
     'rio_carnival': '里約嘉年華',
     'calavera': '骷髏頭',
     'rosette': '緞帶花飾',
-    'pikmin_badge_1': 'Pikmin徽章1',
-    'pikmin_badge_2': 'Pikmin徽章2',
-    'pikmin_badge_3': 'Pikmin徽章3',
-    'pikmin_badge_4': 'Pikmin徽章4',
-    'pikmin_badge_5': 'Pikmin徽章5',
-    'pikmin_badge_6': 'Pikmin徽章6',
-    'pikmin_badge_7': 'Pikmin徽章7',
-    'fairy_lights_1': '彩燈1',
-    'fairy_lights_2': '彩燈2',
+    'pikmin_badge_1': 'Pikmin徽章A',
+    'pikmin_badge_2': 'Pikmin徽章B',
+    'pikmin_badge_3': 'Pikmin徽章C',
+    'pikmin_badge_4': 'Pikmin徽章D',
+    'pikmin_badge_5': 'Pikmin徽章E',
+    'pikmin_badge_6': 'Pikmin徽章F',
+    'pikmin_badge_7': 'Pikmin徽章G',
+    'fairy_lights_1': '彩燈A',
+    'fairy_lights_2': '彩燈B',
     'pikmin_4_spaceship': 'Pikmin 4太空船',
     'pikmin_4_toy': 'Pikmin 4玩具',
-    'sticker_1': '貼紙A',
-    'sticker_2': '貼紙B',
-    'sticker_3': '貼紙C',
+    
+    # 路邊
+    'sticker_1': '路邊貼紙A',
+    'sticker_2': '路邊貼紙B',
+    'sticker_3': '路邊貼紙C',
     'coin': '金幣',
     'coin_rare': '稀有金幣',
-    'leaf_hat_1': '葉帽1',
-    'leaf_hat_2': '葉帽2',
-    'leaf_hat_3': '葉帽3',
+    
+    # 天氣
+    'leaf_hat_1': '葉帽A',
+    'leaf_hat_2': '葉帽B',
+    'leaf_hat_3': '葉帽C',
     'snow': '雪',
-    'golden_toy_airplane': '金色玩具飛機',
 }
 
 # 飾品分類定義 (按遊戲中的順序)
@@ -373,6 +434,20 @@ def parse_scraped_images():
     
     return decor_items
 
+def get_variant_zh_name(variant_id, variant_en_name):
+    """取得變體的中文名稱"""
+    # 先嘗試直接查找
+    if variant_id in VARIANT_NAME_ZH:
+        return VARIANT_NAME_ZH[variant_id]
+    
+    # 嘗試標準化後查找
+    normalized_id = variant_id.lower().replace('-', '_').replace(' ', '_')
+    if normalized_id in VARIANT_NAME_ZH:
+        return VARIANT_NAME_ZH[normalized_id]
+    
+    # 回傳英文名稱
+    return variant_en_name
+
 def generate_decor_json(decor_items):
     """生成 decor.json 格式"""
     definitions = []
@@ -393,10 +468,14 @@ def generate_decor_json(decor_items):
             # 更新可用的皮克敏類型
             available_types.update(image_urls.keys())
             
+            # 取得中文名稱
+            en_name = var_data['name']
+            zh_name = get_variant_zh_name(var_id, en_name)
+            
             variant = {
                 'id': var_id,
-                'name': var_data['name'],
-                'nameEn': var_data['name'],
+                'name': zh_name,
+                'nameEn': en_name,
                 'imageUrl': list(image_urls.values())[0] if image_urls else '',
                 'imageUrls': image_urls
             }

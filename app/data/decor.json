@@ -14,7 +14,7 @@
       "variants": [
         {
           "id": "chef_hat_rare",
-          "name": "Chef Hat (Rare)",
+          "name": "稀有廚師帽",
           "nameEn": "Chef Hat (Rare)",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/5/5e/Decor_Red_Chef_Hat_%28Rare%29.png/63px-Decor_Red_Chef_Hat_%28Rare%29.png",
           "imageUrls": {
@@ -29,7 +29,7 @@
         },
         {
           "id": "chef_hat",
-          "name": "Chef Hat",
+          "name": "廚師帽",
           "nameEn": "Chef Hat",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/a/a7/Decor_Red_Chef_Hat.png/63px-Decor_Red_Chef_Hat.png",
           "imageUrls": {
@@ -66,7 +66,7 @@
       "variants": [
         {
           "id": "coffee_cup_rare",
-          "name": "Coffee Cup (Rare)",
+          "name": "稀有咖啡杯",
           "nameEn": "Coffee Cup (Rare)",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/5/54/Decor_Red_Coffee_Cup_%28Rare%29.png/98px-Decor_Red_Coffee_Cup_%28Rare%29.png",
           "imageUrls": {
@@ -81,7 +81,7 @@
         },
         {
           "id": "coffee_cup",
-          "name": "Coffee Cup",
+          "name": "咖啡杯",
           "nameEn": "Coffee Cup",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/b/b9/Decor_Red_Coffee_Cup.png/100px-Decor_Red_Coffee_Cup.png",
           "imageUrls": {
@@ -116,7 +116,7 @@
       "variants": [
         {
           "id": "macaron",
-          "name": "Macaron",
+          "name": "馬卡龍",
           "nameEn": "Macaron",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/1/14/Decor_Red_Macaron.png/85px-Decor_Red_Macaron.png",
           "imageUrls": {
@@ -131,7 +131,7 @@
         },
         {
           "id": "donut",
-          "name": "Donut",
+          "name": "甜甜圈",
           "nameEn": "Donut",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/b/b1/Decor_Red_Donut.png/100px-Decor_Red_Donut.png",
           "imageUrls": {
@@ -166,7 +166,7 @@
       "variants": [
         {
           "id": "popcorn_snack",
-          "name": "Popcorn Snack",
+          "name": "爆米花",
           "nameEn": "Popcorn Snack",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/d/d5/Decor_Red_Popcorn_Snack.png/80px-Decor_Red_Popcorn_Snack.png",
           "imageUrls": {
@@ -201,7 +201,7 @@
       "variants": [
         {
           "id": "toothbrush",
-          "name": "Toothbrush",
+          "name": "牙刷",
           "nameEn": "Toothbrush",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/8/8d/Decor_Red_Toothbrush.png/100px-Decor_Red_Toothbrush.png",
           "imageUrls": {
@@ -236,7 +236,7 @@
       "variants": [
         {
           "id": "dandelion",
-          "name": "Dandelion",
+          "name": "蒲公英",
           "nameEn": "Dandelion",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/a/a9/Decor_Red_Dandelion.png/100px-Decor_Red_Dandelion.png",
           "imageUrls": {
@@ -271,7 +271,7 @@
       "variants": [
         {
           "id": "stag_beetle",
-          "name": "Stag Beetle",
+          "name": "鍬形蟲",
           "nameEn": "Stag Beetle",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/0/0b/Decor_Red_Stag_Beetle.png/100px-Decor_Red_Stag_Beetle.png",
           "imageUrls": {
@@ -286,7 +286,7 @@
         },
         {
           "id": "acorn",
-          "name": "Acorn",
+          "name": "橡實",
           "nameEn": "Acorn",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/a/a0/Decor_Red_Acorn.png/77px-Decor_Red_Acorn.png",
           "imageUrls": {
@@ -321,7 +321,7 @@
       "variants": [
         {
           "id": "fishing_lure_rare",
-          "name": "Fishing Lure (Rare)",
+          "name": "稀有魚餌",
           "nameEn": "Fishing Lure (Rare)",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/d/df/Decor_Red_Fishing_Lure_%28Rare%29.png/100px-Decor_Red_Fishing_Lure_%28Rare%29.png",
           "imageUrls": {
@@ -336,7 +336,7 @@
         },
         {
           "id": "fishing_lure",
-          "name": "Fishing Lure",
+          "name": "魚餌",
           "nameEn": "Fishing Lure",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/9/96/Decor_Red_Fishing_Lure.png/100px-Decor_Red_Fishing_Lure.png",
           "imageUrls": {
@@ -371,7 +371,7 @@
       "variants": [
         {
           "id": "stamp",
-          "name": "Stamp",
+          "name": "郵票",
           "nameEn": "Stamp",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/6/69/Decor_Red_Stamp.png/96px-Decor_Red_Stamp.png",
           "imageUrls": {
@@ -406,7 +406,7 @@
       "variants": [
         {
           "id": "picture_frame",
-          "name": "Picture Frame",
+          "name": "相框",
           "nameEn": "Picture Frame",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/9/9b/Decor_Red_Picture_Frame.png/100px-Decor_Red_Picture_Frame.png",
           "imageUrls": {
@@ -441,7 +441,7 @@
       "variants": [
         {
           "id": "toy_airplane",
-          "name": "Toy Airplane",
+          "name": "玩具飛機",
           "nameEn": "Toy Airplane",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/4/48/Decor_Red_Toy_Airplane.png/100px-Decor_Red_Toy_Airplane.png",
           "imageUrls": {
@@ -456,7 +456,7 @@
         },
         {
           "id": "golden_toy_airplane",
-          "name": "Golden Toy Airplane",
+          "name": "金色玩具飛機",
           "nameEn": "Golden Toy Airplane",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/5/5b/Decor_Yellow_Golden_Toy_Airplane.png/100px-Decor_Yellow_Golden_Toy_Airplane.png",
           "imageUrls": {
@@ -485,7 +485,7 @@
       "variants": [
         {
           "id": "paper_train",
-          "name": "Paper Train",
+          "name": "紙火車",
           "nameEn": "Paper Train",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/5/5e/Decor_Red_Paper_Train.png/100px-Decor_Red_Paper_Train.png",
           "imageUrls": {
@@ -500,7 +500,7 @@
         },
         {
           "id": "ticket",
-          "name": "Ticket",
+          "name": "車票",
           "nameEn": "Ticket",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/4/42/Decor_Red_Ticket.png/100px-Decor_Red_Ticket.png",
           "imageUrls": {
@@ -515,7 +515,7 @@
         },
         {
           "id": "gold_ticket",
-          "name": "Gold Ticket",
+          "name": "金車票",
           "nameEn": "Gold Ticket",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/7/7a/Decor_Red_Gold_Ticket.png/100px-Decor_Red_Gold_Ticket.png",
           "imageUrls": {
@@ -524,7 +524,7 @@
         },
         {
           "id": "theme_park_ticket_1",
-          "name": "Theme Park Ticket 1",
+          "name": "遊樂園門票A",
           "nameEn": "Theme Park Ticket 1",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/0/0e/Decor_Red_Theme_Park_Ticket_1.png/100px-Decor_Red_Theme_Park_Ticket_1.png",
           "imageUrls": {
@@ -535,7 +535,7 @@
         },
         {
           "id": "theme_park_ticket_2",
-          "name": "Theme Park Ticket 2",
+          "name": "遊樂園門票B",
           "nameEn": "Theme Park Ticket 2",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/8/88/Decor_Red_Theme_Park_Ticket_2.png/100px-Decor_Red_Theme_Park_Ticket_2.png",
           "imageUrls": {
@@ -566,7 +566,7 @@
       "variants": [
         {
           "id": "shell",
-          "name": "Shell",
+          "name": "貝殼",
           "nameEn": "Shell",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/7/74/Decor_Red_Shell.png/100px-Decor_Red_Shell.png",
           "imageUrls": {
@@ -601,7 +601,7 @@
       "variants": [
         {
           "id": "burger",
-          "name": "Burger",
+          "name": "漢堡",
           "nameEn": "Burger",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/c/c6/Decor_Red_Burger.png/100px-Decor_Red_Burger.png",
           "imageUrls": {
@@ -636,7 +636,7 @@
       "variants": [
         {
           "id": "bottle_cap",
-          "name": "Bottle Cap",
+          "name": "瓶蓋",
           "nameEn": "Bottle Cap",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/3/32/Decor_Red_Bottle_Cap.png/94px-Decor_Red_Bottle_Cap.png",
           "imageUrls": {
@@ -671,7 +671,7 @@
       "variants": [
         {
           "id": "snack",
-          "name": "Snack",
+          "name": "零食",
           "nameEn": "Snack",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/4/49/Decor_Red_Snack.png/100px-Decor_Red_Snack.png",
           "imageUrls": {
@@ -686,7 +686,7 @@
         },
         {
           "id": "banana_rare",
-          "name": "Banana (Rare)",
+          "name": "稀有香蕉",
           "nameEn": "Banana (Rare)",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/5/56/Decor_Red_Banana_%28Rare%29.png/100px-Decor_Red_Banana_%28Rare%29.png",
           "imageUrls": {
@@ -701,7 +701,7 @@
         },
         {
           "id": "mushroom",
-          "name": "Mushroom",
+          "name": "蘑菇",
           "nameEn": "Mushroom",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/6/67/Decor_Red_Mushroom.png/89px-Decor_Red_Mushroom.png",
           "imageUrls": {
@@ -716,7 +716,7 @@
         },
         {
           "id": "banana",
-          "name": "Banana",
+          "name": "香蕉",
           "nameEn": "Banana",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/1/1c/Decor_Red_Banana.png/100px-Decor_Red_Banana.png",
           "imageUrls": {
@@ -731,7 +731,7 @@
         },
         {
           "id": "first_anniversary_snack",
-          "name": "First Anniversary Snack",
+          "name": "一週年零食",
           "nameEn": "First Anniversary Snack",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/f/f5/Decor_Red_First_Anniversary_Snack.png/100px-Decor_Red_First_Anniversary_Snack.png",
           "imageUrls": {
@@ -746,7 +746,7 @@
         },
         {
           "id": "4th_anniversary_snack",
-          "name": "4th Anniversary Snack",
+          "name": "四週年零食",
           "nameEn": "4th Anniversary Snack",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/7/71/Decor_Red_4th_Anniversary_Snack.png/100px-Decor_Red_4th_Anniversary_Snack.png",
           "imageUrls": {
@@ -781,7 +781,7 @@
       "variants": [
         {
           "id": "baguette_rare",
-          "name": "Baguette (Rare)",
+          "name": "稀有法國麵包",
           "nameEn": "Baguette (Rare)",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/1/13/Decor_Red_Baguette_%28Rare%29.png/100px-Decor_Red_Baguette_%28Rare%29.png",
           "imageUrls": {
@@ -796,7 +796,7 @@
         },
         {
           "id": "baguette",
-          "name": "Baguette",
+          "name": "法國麵包",
           "nameEn": "Baguette",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/6/6c/Decor_Red_Baguette.png/100px-Decor_Red_Baguette.png",
           "imageUrls": {
@@ -831,7 +831,7 @@
       "variants": [
         {
           "id": "scissors_rare",
-          "name": "Scissors (Rare)",
+          "name": "稀有剪刀",
           "nameEn": "Scissors (Rare)",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/e/ef/Decor_Red_Scissors_%28Rare%29.png/100px-Decor_Red_Scissors_%28Rare%29.png",
           "imageUrls": {
@@ -846,7 +846,7 @@
         },
         {
           "id": "scissors",
-          "name": "Scissors",
+          "name": "剪刀",
           "nameEn": "Scissors",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/5/5d/Decor_Red_Scissors.png/100px-Decor_Red_Scissors.png",
           "imageUrls": {
@@ -861,7 +861,7 @@
         },
         {
           "id": "hair_tie",
-          "name": "Hair Tie",
+          "name": "髮圈",
           "nameEn": "Hair Tie",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/9/9a/Decor_Red_Hair_Tie.png/100px-Decor_Red_Hair_Tie.png",
           "imageUrls": {
@@ -896,7 +896,7 @@
       "variants": [
         {
           "id": "clover",
-          "name": "Clover",
+          "name": "三葉草",
           "nameEn": "Clover",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/5/5e/Decor_Red_Clover.png/100px-Decor_Red_Clover.png",
           "imageUrls": {
@@ -911,7 +911,7 @@
         },
         {
           "id": "four-leaf_clover",
-          "name": "Four-Leaf Clover",
+          "name": "四葉草",
           "nameEn": "Four-Leaf Clover",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/e/e2/Decor_Red_Four-Leaf_Clover.png/100px-Decor_Red_Four-Leaf_Clover.png",
           "imageUrls": {
@@ -946,7 +946,7 @@
       "variants": [
         {
           "id": "tiny_book",
-          "name": "Tiny Book",
+          "name": "迷你書",
           "nameEn": "Tiny Book",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/7/78/Decor_Red_Tiny_Book.png/100px-Decor_Red_Tiny_Book.png",
           "imageUrls": {
@@ -981,7 +981,7 @@
       "variants": [
         {
           "id": "sushi",
-          "name": "Sushi",
+          "name": "壽司",
           "nameEn": "Sushi",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/7/7d/Decor_Red_Sushi.png/100px-Decor_Red_Sushi.png",
           "imageUrls": {
@@ -1016,7 +1016,7 @@
       "variants": [
         {
           "id": "mountain_pin_badge",
-          "name": "Mountain Pin Badge",
+          "name": "山形徽章",
           "nameEn": "Mountain Pin Badge",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/2/27/Decor_Red_Mountain_Pin_Badge.png/100px-Decor_Red_Mountain_Pin_Badge.png",
           "imageUrls": {
@@ -1051,7 +1051,7 @@
       "variants": [
         {
           "id": "ball_keychain",
-          "name": "Ball Keychain",
+          "name": "球形鑰匙圈",
           "nameEn": "Ball Keychain",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/7/71/Decor_Red_Ball_Keychain.png/100px-Decor_Red_Ball_Keychain.png",
           "imageUrls": {
@@ -1086,7 +1086,7 @@
       "variants": [
         {
           "id": "bus_papercraft",
-          "name": "Bus Papercraft",
+          "name": "紙公車",
           "nameEn": "Bus Papercraft",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/d/dd/Decor_Red_Bus_Papercraft.png/100px-Decor_Red_Bus_Papercraft.png",
           "imageUrls": {
@@ -1121,7 +1121,7 @@
       "variants": [
         {
           "id": "pizza",
-          "name": "Pizza",
+          "name": "披薩",
           "nameEn": "Pizza",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/7/76/Decor_Red_Pizza.png/100px-Decor_Red_Pizza.png",
           "imageUrls": {
@@ -1156,7 +1156,7 @@
       "variants": [
         {
           "id": "ramen_keychain",
-          "name": "Ramen Keychain",
+          "name": "拉麵鑰匙圈",
           "nameEn": "Ramen Keychain",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/b/b9/Decor_Red_Ramen_Keychain.png/100px-Decor_Red_Ramen_Keychain.png",
           "imageUrls": {
@@ -1191,7 +1191,7 @@
       "variants": [
         {
           "id": "pasta",
-          "name": "Pasta",
+          "name": "義大利麵",
           "nameEn": "Pasta",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/0/06/Decor_Red_Pasta.png/100px-Decor_Red_Pasta.png",
           "imageUrls": {
@@ -1226,7 +1226,7 @@
       "variants": [
         {
           "id": "bridge_pin_badge",
-          "name": "Bridge Pin Badge",
+          "name": "橋形徽章",
           "nameEn": "Bridge Pin Badge",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/3/34/Decor_Red_Bridge_Pin_Badge.png/100px-Decor_Red_Bridge_Pin_Badge.png",
           "imageUrls": {
@@ -1261,7 +1261,7 @@
       "variants": [
         {
           "id": "hotel_amenities",
-          "name": "Hotel Amenities",
+          "name": "飯店備品",
           "nameEn": "Hotel Amenities",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/5/5b/Decor_Red_Hotel_Amenities.png/100px-Decor_Red_Hotel_Amenities.png",
           "imageUrls": {
@@ -1296,7 +1296,7 @@
       "variants": [
         {
           "id": "makeup",
-          "name": "Makeup",
+          "name": "化妝品",
           "nameEn": "Makeup",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/2/2d/Decor_Red_Makeup.png/100px-Decor_Red_Makeup.png",
           "imageUrls": {
@@ -1331,7 +1331,7 @@
       "variants": [
         {
           "id": "fortune_1",
-          "name": "Fortune 1",
+          "name": "籤-大吉",
           "nameEn": "Fortune 1",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/4/4a/Decor_Red_Fortune_1.png/100px-Decor_Red_Fortune_1.png",
           "imageUrls": {
@@ -1346,7 +1346,7 @@
         },
         {
           "id": "fortune_2",
-          "name": "Fortune 2",
+          "name": "籤-中吉",
           "nameEn": "Fortune 2",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/8/87/Decor_Red_Fortune_2.png/100px-Decor_Red_Fortune_2.png",
           "imageUrls": {
@@ -1361,7 +1361,7 @@
         },
         {
           "id": "fortune_3",
-          "name": "Fortune 3",
+          "name": "籤-小吉",
           "nameEn": "Fortune 3",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/b/ba/Decor_Red_Fortune_3.png/100px-Decor_Red_Fortune_3.png",
           "imageUrls": {
@@ -1376,7 +1376,7 @@
         },
         {
           "id": "fortune_4",
-          "name": "Fortune 4",
+          "name": "籤-末吉",
           "nameEn": "Fortune 4",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/7/70/Decor_Red_Fortune_4.png/100px-Decor_Red_Fortune_4.png",
           "imageUrls": {
@@ -1391,7 +1391,7 @@
         },
         {
           "id": "fortune_5",
-          "name": "Fortune 5",
+          "name": "籤-凶",
           "nameEn": "Fortune 5",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/2/2f/Decor_Red_Fortune_5.png/100px-Decor_Red_Fortune_5.png",
           "imageUrls": {
@@ -1426,7 +1426,7 @@
       "variants": [
         {
           "id": "battery_1",
-          "name": "Battery 1",
+          "name": "電池A",
           "nameEn": "Battery 1",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/8/84/Decor_Yellow_Battery_1.png/100px-Decor_Yellow_Battery_1.png",
           "imageUrls": {
@@ -1435,7 +1435,7 @@
         },
         {
           "id": "battery_2",
-          "name": "Battery 2",
+          "name": "電池B",
           "nameEn": "Battery 2",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/6/61/Decor_Yellow_Battery_2.png/100px-Decor_Yellow_Battery_2.png",
           "imageUrls": {
@@ -1444,7 +1444,7 @@
         },
         {
           "id": "battery_3",
-          "name": "Battery 3",
+          "name": "電池C",
           "nameEn": "Battery 3",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/a/ae/Decor_Yellow_Battery_3.png/100px-Decor_Yellow_Battery_3.png",
           "imageUrls": {
@@ -1453,7 +1453,7 @@
         },
         {
           "id": "battery_4",
-          "name": "Battery 4",
+          "name": "電池D",
           "nameEn": "Battery 4",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/c/cb/Decor_Yellow_Battery_4.png/100px-Decor_Yellow_Battery_4.png",
           "imageUrls": {
@@ -1462,7 +1462,7 @@
         },
         {
           "id": "battery_5",
-          "name": "Battery 5",
+          "name": "電池E",
           "nameEn": "Battery 5",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/a/a8/Decor_Yellow_Battery_5.png/100px-Decor_Yellow_Battery_5.png",
           "imageUrls": {
@@ -1471,7 +1471,7 @@
         },
         {
           "id": "battery_6",
-          "name": "Battery 6",
+          "name": "電池F",
           "nameEn": "Battery 6",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/5/50/Decor_Yellow_Battery_6.png/100px-Decor_Yellow_Battery_6.png",
           "imageUrls": {
@@ -1494,7 +1494,7 @@
       "variants": [
         {
           "id": "curry_bowl",
-          "name": "Curry Bowl",
+          "name": "咖哩飯",
           "nameEn": "Curry Bowl",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/9/99/Decor_Red_Curry_Bowl.png/92px-Decor_Red_Curry_Bowl.png",
           "imageUrls": {
@@ -1529,7 +1529,7 @@
       "variants": [
         {
           "id": "tool",
-          "name": "Tool",
+          "name": "工具",
           "nameEn": "Tool",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/1/1d/Decor_Red_Tool.png/100px-Decor_Red_Tool.png",
           "imageUrls": {
@@ -1564,7 +1564,7 @@
       "variants": [
         {
           "id": "college_crest_patch",
-          "name": "College Crest Patch",
+          "name": "校徽",
           "nameEn": "College Crest Patch",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/e/ee/Decor_Red_College_Crest_Patch.png/98px-Decor_Red_College_Crest_Patch.png",
           "imageUrls": {
@@ -1591,7 +1591,7 @@
       "variants": [
         {
           "id": "taco",
-          "name": "Taco",
+          "name": "塔可",
           "nameEn": "Taco",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/9/9e/Decor_Red_Taco.png/100px-Decor_Red_Taco.png",
           "imageUrls": {
@@ -1626,7 +1626,7 @@
       "variants": [
         {
           "id": "laundry_item",
-          "name": "Laundry Item",
+          "name": "洗衣用品",
           "nameEn": "Laundry Item",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/1/12/Decor_Red_Laundry_Item.png/100px-Decor_Red_Laundry_Item.png",
           "imageUrls": {
@@ -1661,7 +1661,7 @@
       "variants": [
         {
           "id": "kimchi",
-          "name": "Kimchi",
+          "name": "泡菜",
           "nameEn": "Kimchi",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/b/b4/Decor_Purple_Kimchi.png/100px-Decor_Purple_Kimchi.png",
           "imageUrls": {
@@ -1684,7 +1684,7 @@
       "variants": [
         {
           "id": "cheese",
-          "name": "Cheese",
+          "name": "起司",
           "nameEn": "Cheese",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/e/e2/Decor_Red_Cheese.png/100px-Decor_Red_Cheese.png",
           "imageUrls": {
@@ -1719,7 +1719,7 @@
       "variants": [
         {
           "id": "coral",
-          "name": "Coral",
+          "name": "珊瑚",
           "nameEn": "Coral",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/c/cc/Decor_Red_Coral.png/100px-Decor_Red_Coral.png",
           "imageUrls": {
@@ -1754,7 +1754,7 @@
       "variants": [
         {
           "id": "paint",
-          "name": "Paint",
+          "name": "顏料",
           "nameEn": "Paint",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/d/da/Decor_Red_Paint.png/100px-Decor_Red_Paint.png",
           "imageUrls": {
@@ -1789,7 +1789,7 @@
       "variants": [
         {
           "id": "afternoon_tea",
-          "name": "Afternoon Tea",
+          "name": "下午茶",
           "nameEn": "Afternoon Tea",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/d/d6/Decor_Red_Afternoon_Tea.png/63px-Decor_Red_Afternoon_Tea.png",
           "imageUrls": {
@@ -1824,7 +1824,7 @@
       "variants": [
         {
           "id": "tiny_instrument",
-          "name": "Tiny Instrument",
+          "name": "迷你樂器",
           "nameEn": "Tiny Instrument",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/1/19/Decor_Red_Tiny_Instrument.png/100px-Decor_Red_Tiny_Instrument.png",
           "imageUrls": {
@@ -1859,7 +1859,7 @@
       "variants": [
         {
           "id": "surfboard_keychain",
-          "name": "Surfboard Keychain",
+          "name": "衝浪板鑰匙圈",
           "nameEn": "Surfboard Keychain",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/2/22/Decor_Red_Surfboard_Keychain.png/100px-Decor_Red_Surfboard_Keychain.png",
           "imageUrls": {
@@ -1894,7 +1894,7 @@
       "variants": [
         {
           "id": "shaved_ice",
-          "name": "Shaved Ice",
+          "name": "刨冰",
           "nameEn": "Shaved Ice",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/7/7f/Decor_Red_Shaved_Ice.png/100px-Decor_Red_Shaved_Ice.png",
           "imageUrls": {
@@ -1929,7 +1929,7 @@
       "variants": [
         {
           "id": "mooncake",
-          "name": "Mooncake",
+          "name": "月餅",
           "nameEn": "Mooncake",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/5/5d/Decor_Red_Mooncake.png/100px-Decor_Red_Mooncake.png",
           "imageUrls": {
@@ -1964,7 +1964,7 @@
       "variants": [
         {
           "id": "photo_button_badge",
-          "name": "Photo Button Badge",
+          "name": "照片徽章",
           "nameEn": "Photo Button Badge",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/1/1f/Decor_Red_Photo_Button_Badge.png/100px-Decor_Red_Photo_Button_Badge.png",
           "imageUrls": {
@@ -1987,7 +1987,7 @@
       "variants": [
         {
           "id": "nintendo_consoles_1",
-          "name": "Nintendo Consoles 1",
+          "name": "任天堂主機",
           "nameEn": "Nintendo Consoles 1",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/b/b9/Decor_Red_Nintendo_Consoles_1.png/100px-Decor_Red_Nintendo_Consoles_1.png",
           "imageUrls": {
@@ -2022,7 +2022,7 @@
       "variants": [
         {
           "id": "pacifier",
-          "name": "Pacifier",
+          "name": "奶嘴",
           "nameEn": "Pacifier",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/a/a0/Decor_Red_Pacifier.png/100px-Decor_Red_Pacifier.png",
           "imageUrls": {
@@ -2045,7 +2045,7 @@
       "variants": [
         {
           "id": "osechi",
-          "name": "Osechi",
+          "name": "御節料理",
           "nameEn": "Osechi",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/5/53/Decor_Red_Osechi.png/100px-Decor_Red_Osechi.png",
           "imageUrls": {
@@ -2082,7 +2082,7 @@
       "variants": [
         {
           "id": "lunar_new_year_ornament_1",
-          "name": "Lunar New Year Ornament 1",
+          "name": "農曆新年裝飾A",
           "nameEn": "Lunar New Year Ornament 1",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/b/b7/Decor_Red_Lunar_New_Year_Ornament_1.png/100px-Decor_Red_Lunar_New_Year_Ornament_1.png",
           "imageUrls": {
@@ -2097,7 +2097,7 @@
         },
         {
           "id": "lunar_new_year_ornament_2",
-          "name": "Lunar New Year Ornament 2",
+          "name": "農曆新年裝飾B",
           "nameEn": "Lunar New Year Ornament 2",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/9/9d/Decor_Red_Lunar_New_Year_Ornament_2.png/100px-Decor_Red_Lunar_New_Year_Ornament_2.png",
           "imageUrls": {
@@ -2132,7 +2132,7 @@
       "variants": [
         {
           "id": "chess_piece_1",
-          "name": "Chess Piece 1",
+          "name": "西洋棋-白",
           "nameEn": "Chess Piece 1",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/b/b6/Decor_Red_Chess_Piece_1.png/36px-Decor_Red_Chess_Piece_1.png",
           "imageUrls": {
@@ -2147,7 +2147,7 @@
         },
         {
           "id": "chess_piece_2",
-          "name": "Chess Piece 2",
+          "name": "西洋棋-黑",
           "nameEn": "Chess Piece 2",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/2/2d/Decor_Red_Chess_Piece_2.png/36px-Decor_Red_Chess_Piece_2.png",
           "imageUrls": {
@@ -2182,7 +2182,7 @@
       "variants": [
         {
           "id": "fingerboard",
-          "name": "Fingerboard",
+          "name": "指板",
           "nameEn": "Fingerboard",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/d/dc/Decor_Red_Fingerboard.png/100px-Decor_Red_Fingerboard.png",
           "imageUrls": {
@@ -2217,7 +2217,7 @@
       "variants": [
         {
           "id": "flower_card_2",
-          "name": "Flower Card 2",
+          "name": "花札-梅",
           "nameEn": "Flower Card 2",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/2/2b/Decor_Red_Flower_Card_2.png/94px-Decor_Red_Flower_Card_2.png",
           "imageUrls": {
@@ -2232,7 +2232,7 @@
         },
         {
           "id": "flower_card_1",
-          "name": "Flower Card 1",
+          "name": "花札-松",
           "nameEn": "Flower Card 1",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/5/5a/Decor_Red_Flower_Card_1.png/94px-Decor_Red_Flower_Card_1.png",
           "imageUrls": {
@@ -2247,7 +2247,7 @@
         },
         {
           "id": "flower_card_6",
-          "name": "Flower Card 6",
+          "name": "花札-牡丹",
           "nameEn": "Flower Card 6",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/0/06/Decor_Yellow_Flower_Card_6.png/94px-Decor_Yellow_Flower_Card_6.png",
           "imageUrls": {
@@ -2259,7 +2259,7 @@
         },
         {
           "id": "flower_card_5",
-          "name": "Flower Card 5",
+          "name": "花札-菖蒲",
           "nameEn": "Flower Card 5",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/c/cb/Decor_Red_Flower_Card_5.png/100px-Decor_Red_Flower_Card_5.png",
           "imageUrls": {
@@ -2271,7 +2271,7 @@
         },
         {
           "id": "flower_card_4",
-          "name": "Flower Card 4",
+          "name": "花札-藤",
           "nameEn": "Flower Card 4",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/4/48/Decor_Red_Flower_Card_4.png/100px-Decor_Red_Flower_Card_4.png",
           "imageUrls": {
@@ -2283,7 +2283,7 @@
         },
         {
           "id": "flower_card_3",
-          "name": "Flower Card 3",
+          "name": "花札-櫻",
           "nameEn": "Flower Card 3",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/4/45/Decor_Red_Flower_Card_3.png/100px-Decor_Red_Flower_Card_3.png",
           "imageUrls": {
@@ -2297,7 +2297,7 @@
         },
         {
           "id": "flower_card_8",
-          "name": "Flower Card 8",
+          "name": "花札-芒",
           "nameEn": "Flower Card 8",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/a/a1/Decor_Red_Flower_Card_8.png/94px-Decor_Red_Flower_Card_8.png",
           "imageUrls": {
@@ -2309,7 +2309,7 @@
         },
         {
           "id": "flower_card_7",
-          "name": "Flower Card 7",
+          "name": "花札-萩",
           "nameEn": "Flower Card 7",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/6/62/Decor_Yellow_Flower_Card_7.png/94px-Decor_Yellow_Flower_Card_7.png",
           "imageUrls": {
@@ -2341,7 +2341,7 @@
       "variants": [
         {
           "id": "jack-o-lantern",
-          "name": "Jack-o'-Lantern",
+          "name": "南瓜燈",
           "nameEn": "Jack-o'-Lantern",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/d/d2/Decor_Red_Jack-o%27-Lantern.png/100px-Decor_Red_Jack-o%27-Lantern.png",
           "imageUrls": {
@@ -2356,7 +2356,7 @@
         },
         {
           "id": "halloween_treat",
-          "name": "Halloween Treat",
+          "name": "萬聖節糖果",
           "nameEn": "Halloween Treat",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/4/4f/Decor_Red_Halloween_Treat.png/100px-Decor_Red_Halloween_Treat.png",
           "imageUrls": {
@@ -2371,7 +2371,7 @@
         },
         {
           "id": "halloween_light",
-          "name": "Halloween Light",
+          "name": "萬聖節燈",
           "nameEn": "Halloween Light",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/2/25/Decor_Red_Halloween_Light.png/83px-Decor_Red_Halloween_Light.png",
           "imageUrls": {
@@ -2406,7 +2406,7 @@
       "variants": [
         {
           "id": "3rd_anniversary_cupcake",
-          "name": "3rd Anniversary Cupcake",
+          "name": "三週年杯子蛋糕",
           "nameEn": "3rd Anniversary Cupcake",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/2/2b/Decor_Red_3rd_Anniversary_Cupcake.png/100px-Decor_Red_3rd_Anniversary_Cupcake.png",
           "imageUrls": {
@@ -2421,7 +2421,7 @@
         },
         {
           "id": "4th_anniversary_flower_box",
-          "name": "4th Anniversary Flower Box",
+          "name": "四週年花盒",
           "nameEn": "4th Anniversary Flower Box",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/e/ee/Decor_Red_4th_Anniversary_Flower_Box.png/100px-Decor_Red_4th_Anniversary_Flower_Box.png",
           "imageUrls": {
@@ -2458,7 +2458,7 @@
       "variants": [
         {
           "id": "valentine_sticker",
-          "name": "Valentine Sticker",
+          "name": "情人節貼紙",
           "nameEn": "Valentine Sticker",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/3/38/Decor_Red_Valentine_Sticker.png/94px-Decor_Red_Valentine_Sticker.png",
           "imageUrls": {
@@ -2473,7 +2473,7 @@
         },
         {
           "id": "reverse_valentines_day_sticker",
-          "name": "Reverse Valentine's Day Sticker",
+          "name": "白色情人節貼紙",
           "nameEn": "Reverse Valentine's Day Sticker",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/a/a8/Decor_Red_Reverse_Valentine%27s_Day_Sticker.png/94px-Decor_Red_Reverse_Valentine%27s_Day_Sticker.png",
           "imageUrls": {
@@ -2488,7 +2488,7 @@
         },
         {
           "id": "present_sticker_gold",
-          "name": "Present Sticker (Gold)",
+          "name": "金色禮物貼紙",
           "nameEn": "Present Sticker (Gold)",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/8/85/Decor_Red_Present_Sticker_%28Gold%29.png/94px-Decor_Red_Present_Sticker_%28Gold%29.png",
           "imageUrls": {
@@ -2502,7 +2502,7 @@
         },
         {
           "id": "chocolate",
-          "name": "Chocolate",
+          "name": "巧克力",
           "nameEn": "Chocolate",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/c/c3/Decor_Red_Chocolate.png/83px-Decor_Red_Chocolate.png",
           "imageUrls": {
@@ -2537,7 +2537,7 @@
       "variants": [
         {
           "id": "easter_egg",
-          "name": "Easter Egg",
+          "name": "復活節彩蛋",
           "nameEn": "Easter Egg",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/5/56/Decor_Red_Easter_Egg.png/87px-Decor_Red_Easter_Egg.png",
           "imageUrls": {
@@ -2552,7 +2552,7 @@
         },
         {
           "id": "bunny_egg",
-          "name": "Bunny Egg",
+          "name": "兔子蛋",
           "nameEn": "Bunny Egg",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/4/4a/Decor_Red_Bunny_Egg.png/97px-Decor_Red_Bunny_Egg.png",
           "imageUrls": {
@@ -2587,7 +2587,7 @@
       "variants": [
         {
           "id": "sneaker_keychain",
-          "name": "Sneaker Keychain",
+          "name": "運動鞋鑰匙圈",
           "nameEn": "Sneaker Keychain",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/1/12/Decor_Red_Sneaker_Keychain.png/100px-Decor_Red_Sneaker_Keychain.png",
           "imageUrls": {
@@ -2602,7 +2602,7 @@
         },
         {
           "id": "ice_cream_1",
-          "name": "Ice Cream 1",
+          "name": "冰淇淋A",
           "nameEn": "Ice Cream 1",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/1/1b/Decor_Red_Ice_Cream_1.png/100px-Decor_Red_Ice_Cream_1.png",
           "imageUrls": {
@@ -2618,7 +2618,7 @@
         },
         {
           "id": "ice_cream_2",
-          "name": "Ice Cream 2",
+          "name": "冰淇淋B",
           "nameEn": "Ice Cream 2",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/1/12/Decor_Red_Ice_Cream_2.png/100px-Decor_Red_Ice_Cream_2.png",
           "imageUrls": {
@@ -2654,7 +2654,7 @@
       "variants": [
         {
           "id": "puzzle_1",
-          "name": "Puzzle 1",
+          "name": "拼圖A",
           "nameEn": "Puzzle 1",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/c/c1/Decor_Red_Puzzle_1.png/100px-Decor_Red_Puzzle_1.png",
           "imageUrls": {
@@ -2669,7 +2669,7 @@
         },
         {
           "id": "puzzle_2",
-          "name": "Puzzle 2",
+          "name": "拼圖B",
           "nameEn": "Puzzle 2",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/c/c4/Decor_Red_Puzzle_2.png/100px-Decor_Red_Puzzle_2.png",
           "imageUrls": {
@@ -2684,7 +2684,7 @@
         },
         {
           "id": "puzzle_4",
-          "name": "Puzzle 4",
+          "name": "拼圖D",
           "nameEn": "Puzzle 4",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/0/05/Decor_Red_Puzzle_4.png/100px-Decor_Red_Puzzle_4.png",
           "imageUrls": {
@@ -2699,7 +2699,7 @@
         },
         {
           "id": "puzzle_3",
-          "name": "Puzzle 3",
+          "name": "拼圖C",
           "nameEn": "Puzzle 3",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/0/06/Decor_Red_Puzzle_3.png/100px-Decor_Red_Puzzle_3.png",
           "imageUrls": {
@@ -2734,7 +2734,7 @@
       "variants": [
         {
           "id": "playing_card_3",
-          "name": "Playing Card 3",
+          "name": "撲克牌-方塊",
           "nameEn": "Playing Card 3",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/c/cf/Decor_Red_Playing_Card_3.png/100px-Decor_Red_Playing_Card_3.png",
           "imageUrls": {
@@ -2749,7 +2749,7 @@
         },
         {
           "id": "playing_card_4",
-          "name": "Playing Card 4",
+          "name": "撲克牌-梅花",
           "nameEn": "Playing Card 4",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/5/5c/Decor_Red_Playing_Card_4.png/100px-Decor_Red_Playing_Card_4.png",
           "imageUrls": {
@@ -2763,7 +2763,7 @@
         },
         {
           "id": "playing_card_1",
-          "name": "Playing Card 1",
+          "name": "撲克牌-黑桃",
           "nameEn": "Playing Card 1",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/4/45/Decor_Red_Playing_Card_1.png/100px-Decor_Red_Playing_Card_1.png",
           "imageUrls": {
@@ -2778,7 +2778,7 @@
         },
         {
           "id": "playing_card_2",
-          "name": "Playing Card 2",
+          "name": "撲克牌-紅心",
           "nameEn": "Playing Card 2",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/e/e3/Decor_Red_Playing_Card_2.png/100px-Decor_Red_Playing_Card_2.png",
           "imageUrls": {
@@ -2813,7 +2813,7 @@
       "variants": [
         {
           "id": "mahjong_tile_2",
-          "name": "Mahjong Tile 2",
+          "name": "麻將-筒",
           "nameEn": "Mahjong Tile 2",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/d/de/Decor_Red_Mahjong_Tile_2.png/79px-Decor_Red_Mahjong_Tile_2.png",
           "imageUrls": {
@@ -2828,7 +2828,7 @@
         },
         {
           "id": "mahjong_tile_1",
-          "name": "Mahjong Tile 1",
+          "name": "麻將-萬",
           "nameEn": "Mahjong Tile 1",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/b/bd/Decor_White_Mahjong_Tile_1.png/77px-Decor_White_Mahjong_Tile_1.png",
           "imageUrls": {
@@ -2843,7 +2843,7 @@
         },
         {
           "id": "mahjong_tile_3",
-          "name": "Mahjong Tile 3",
+          "name": "麻將-條",
           "nameEn": "Mahjong Tile 3",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/d/dc/Decor_Yellow_Mahjong_Tile_3.png/86px-Decor_Yellow_Mahjong_Tile_3.png",
           "imageUrls": {
@@ -2857,7 +2857,7 @@
         },
         {
           "id": "mahjong_tile_4",
-          "name": "Mahjong Tile 4",
+          "name": "麻將-風",
           "nameEn": "Mahjong Tile 4",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/7/74/Decor_Yellow_Mahjong_Tile_4.png/100px-Decor_Yellow_Mahjong_Tile_4.png",
           "imageUrls": {
@@ -2871,7 +2871,7 @@
         },
         {
           "id": "mahjong_tile_5",
-          "name": "Mahjong Tile 5",
+          "name": "麻將-發",
           "nameEn": "Mahjong Tile 5",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/6/60/Decor_White_Mahjong_Tile_5.png/96px-Decor_White_Mahjong_Tile_5.png",
           "imageUrls": {
@@ -2900,7 +2900,7 @@
       "variants": [
         {
           "id": "spring_sticker",
-          "name": "Spring Sticker",
+          "name": "春季貼紙",
           "nameEn": "Spring Sticker",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/e/e8/Decor_Red_Spring_Sticker.png/94px-Decor_Red_Spring_Sticker.png",
           "imageUrls": {
@@ -2935,7 +2935,7 @@
       "variants": [
         {
           "id": "summer_sticker",
-          "name": "Summer Sticker",
+          "name": "夏季貼紙",
           "nameEn": "Summer Sticker",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/f/f7/Decor_Red_Summer_Sticker.png/94px-Decor_Red_Summer_Sticker.png",
           "imageUrls": {
@@ -2970,7 +2970,7 @@
       "variants": [
         {
           "id": "fall_sticker",
-          "name": "Fall Sticker",
+          "name": "秋季貼紙",
           "nameEn": "Fall Sticker",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/3/3e/Decor_Red_Fall_Sticker.png/94px-Decor_Red_Fall_Sticker.png",
           "imageUrls": {
@@ -3005,7 +3005,7 @@
       "variants": [
         {
           "id": "mitten",
-          "name": "Mitten",
+          "name": "手套",
           "nameEn": "Mitten",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/d/da/Decor_Red_Mitten.png/96px-Decor_Red_Mitten.png",
           "imageUrls": {
@@ -3020,7 +3020,7 @@
         },
         {
           "id": "winter_sticker",
-          "name": "Winter Sticker",
+          "name": "冬季貼紙",
           "nameEn": "Winter Sticker",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/3/3f/Decor_Red_Winter_Sticker.png/94px-Decor_Red_Winter_Sticker.png",
           "imageUrls": {
@@ -3055,7 +3055,7 @@
       "variants": [
         {
           "id": "pikmin_4_spaceship",
-          "name": "Pikmin 4 Spaceship",
+          "name": "Pikmin 4太空船",
           "nameEn": "Pikmin 4 Spaceship",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/e/e1/Decor_Red_Pikmin_4_Spaceship.png/100px-Decor_Red_Pikmin_4_Spaceship.png",
           "imageUrls": {
@@ -3070,7 +3070,7 @@
         },
         {
           "id": "pikmin_4_toy",
-          "name": "Pikmin 4 Toy",
+          "name": "Pikmin 4玩具",
           "nameEn": "Pikmin 4 Toy",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/2/2d/Decor_Red_Pikmin_4_Toy.png/100px-Decor_Red_Pikmin_4_Toy.png",
           "imageUrls": {
@@ -3107,7 +3107,7 @@
       "variants": [
         {
           "id": "2023_glasses",
-          "name": "2023 Glasses",
+          "name": "2023眼鏡",
           "nameEn": "2023 Glasses",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/4/42/Decor_Red_2023_Glasses.png/100px-Decor_Red_2023_Glasses.png",
           "imageUrls": {
@@ -3122,7 +3122,7 @@
         },
         {
           "id": "2024_glasses",
-          "name": "2024 Glasses",
+          "name": "2024眼鏡",
           "nameEn": "2024 Glasses",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/1/1e/Decor_Red_2024_Glasses.png/100px-Decor_Red_2024_Glasses.png",
           "imageUrls": {
@@ -3137,7 +3137,7 @@
         },
         {
           "id": "ball_ornament",
-          "name": "Ball Ornament",
+          "name": "圓形裝飾",
           "nameEn": "Ball Ornament",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/0/0d/Decor_Red_Ball_Ornament.png/100px-Decor_Red_Ball_Ornament.png",
           "imageUrls": {
@@ -3152,7 +3152,7 @@
         },
         {
           "id": "party_popper_2025",
-          "name": "Party Popper 2025",
+          "name": "2025派對彩帶",
           "nameEn": "Party Popper 2025",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/2/20/Decor_Red_Party_Popper_2025.png/64px-Decor_Red_Party_Popper_2025.png",
           "imageUrls": {
@@ -3167,7 +3167,7 @@
         },
         {
           "id": "2025_ornament",
-          "name": "2025 Ornament",
+          "name": "2025裝飾",
           "nameEn": "2025 Ornament",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/7/73/Decor_Red_2025_Ornament.png/100px-Decor_Red_2025_Ornament.png",
           "imageUrls": {
@@ -3204,7 +3204,7 @@
       "variants": [
         {
           "id": "koppaite_space_suit",
-          "name": "Koppaite Space Suit",
+          "name": "Koppaite太空衣",
           "nameEn": "Koppaite Space Suit",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/c/c3/Decor_Red_Koppaite_Space_Suit.png/70px-Decor_Red_Koppaite_Space_Suit.png",
           "imageUrls": {
@@ -3231,7 +3231,7 @@
       "variants": [
         {
           "id": "mario_hat",
-          "name": "Mario Hat",
+          "name": "瑪利歐帽",
           "nameEn": "Mario Hat",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/7/7d/Decor_Blue_Mario_Hat.png/100px-Decor_Blue_Mario_Hat.png",
           "imageUrls": {
@@ -3254,7 +3254,7 @@
       "variants": [
         {
           "id": "rio_carnival",
-          "name": "Rio Carnival",
+          "name": "里約嘉年華",
           "nameEn": "Rio Carnival",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/0/07/Decor_Red_Rio_Carnival.png/100px-Decor_Red_Rio_Carnival.png",
           "imageUrls": {
@@ -3289,7 +3289,7 @@
       "variants": [
         {
           "id": "calavera",
-          "name": "Calavera",
+          "name": "骷髏頭",
           "nameEn": "Calavera",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/c/c0/Decor_Red_Calavera.png/100px-Decor_Red_Calavera.png",
           "imageUrls": {
@@ -3324,7 +3324,7 @@
       "variants": [
         {
           "id": "rosette",
-          "name": "Rosette",
+          "name": "緞帶花飾",
           "nameEn": "Rosette",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/c/c3/Decor_Red_Rosette.png/100px-Decor_Red_Rosette.png",
           "imageUrls": {
@@ -3349,7 +3349,7 @@
       "variants": [
         {
           "id": "fairy_lights_1",
-          "name": "Fairy Lights 1",
+          "name": "彩燈A",
           "nameEn": "Fairy Lights 1",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/4/4c/Decor_Yellow_Fairy_Lights_1.png/100px-Decor_Yellow_Fairy_Lights_1.png",
           "imageUrls": {
@@ -3358,7 +3358,7 @@
         },
         {
           "id": "fairy_lights_2",
-          "name": "Fairy Lights 2",
+          "name": "彩燈B",
           "nameEn": "Fairy Lights 2",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/0/04/Decor_Yellow_Fairy_Lights_2.png/100px-Decor_Yellow_Fairy_Lights_2.png",
           "imageUrls": {
@@ -3381,7 +3381,7 @@
       "variants": [
         {
           "id": "sticker_1",
-          "name": "Sticker 1",
+          "name": "路邊貼紙A",
           "nameEn": "Sticker 1",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/0/08/Decor_Red_Sticker_1.png/94px-Decor_Red_Sticker_1.png",
           "imageUrls": {
@@ -3397,7 +3397,7 @@
         },
         {
           "id": "sticker_2",
-          "name": "Sticker 2",
+          "name": "路邊貼紙B",
           "nameEn": "Sticker 2",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/e/ea/Decor_Red_Sticker_2.png/94px-Decor_Red_Sticker_2.png",
           "imageUrls": {
@@ -3413,7 +3413,7 @@
         },
         {
           "id": "sticker_3",
-          "name": "Sticker 3",
+          "name": "路邊貼紙C",
           "nameEn": "Sticker 3",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/8/8f/Decor_Red_Sticker_3.png/94px-Decor_Red_Sticker_3.png",
           "imageUrls": {
@@ -3450,7 +3450,7 @@
       "variants": [
         {
           "id": "coin_rare",
-          "name": "Coin (Rare)",
+          "name": "稀有金幣",
           "nameEn": "Coin (Rare)",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/d/d8/Decor_Red_Coin_%28Rare%29.png/94px-Decor_Red_Coin_%28Rare%29.png",
           "imageUrls": {
@@ -3466,7 +3466,7 @@
         },
         {
           "id": "coin",
-          "name": "Coin",
+          "name": "金幣",
           "nameEn": "Coin",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/9/97/Decor_Red_Coin.png/95px-Decor_Red_Coin.png",
           "imageUrls": {
@@ -3503,7 +3503,7 @@
       "variants": [
         {
           "id": "leaf_hat_1",
-          "name": "Leaf Hat 1",
+          "name": "葉帽A",
           "nameEn": "Leaf Hat 1",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/0/0b/Decor_Blue_Leaf_Hat_1.png/95px-Decor_Blue_Leaf_Hat_1.png",
           "imageUrls": {
@@ -3512,7 +3512,7 @@
         },
         {
           "id": "leaf_hat_2",
-          "name": "Leaf Hat 2",
+          "name": "葉帽B",
           "nameEn": "Leaf Hat 2",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/3/3e/Decor_Blue_Leaf_Hat_2.png/93px-Decor_Blue_Leaf_Hat_2.png",
           "imageUrls": {
@@ -3521,7 +3521,7 @@
         },
         {
           "id": "leaf_hat_3",
-          "name": "Leaf Hat 3",
+          "name": "葉帽C",
           "nameEn": "Leaf Hat 3",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/b/bc/Decor_Blue_Leaf_Hat_3.png/100px-Decor_Blue_Leaf_Hat_3.png",
           "imageUrls": {
@@ -3544,7 +3544,7 @@
       "variants": [
         {
           "id": "snow",
-          "name": "Snow",
+          "name": "雪",
           "nameEn": "Snow",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/a/a8/Decor_Blue_Snow.png/74px-Decor_Blue_Snow.png",
           "imageUrls": {
