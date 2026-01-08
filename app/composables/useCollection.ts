@@ -48,25 +48,53 @@ export function useCollection() {
 
   // Save to Supabase (if logged in)
   const saveToCloud = async () => {
-    if (!user.value) return;
+    // Get current session directly from Supabase client
+    const { data: { session } } = await supabase.auth.getSession();
+    
+    if (!session?.user?.id) {
+      console.log('[Collection] No active session, skip cloud sync');
+      return;
+    }
+    
+    const userId = session.user.id;
     
     try {
       const collectedItems = Object.keys(collectionState.value.collected)
         .filter(id => collectionState.value.collected[id]);
       
-      const { error } = await supabase
+      console.log('[Collection] Saving to cloud for user:', userId, '-', collectedItems.length, 'items');
+      
+      // Try upsert first
+      const { error: upsertError } = await supabase
         .from('user_collections')
         .upsert({
-          user_id: user.value.id,
+          user_id: userId,
           collected_items: collectedItems,
           updated_at: new Date().toISOString(),
         }, {
           onConflict: 'user_id',
         });
       
-      if (error) throw error;
+      if (upsertError) {
+        console.error('[Collection] Upsert failed:', upsertError);
+        
+        // Try insert if upsert failed (might be first time)
+        const { error: insertError } = await supabase
+          .from('user_collections')
+          .insert({
+            user_id: userId,
+            collected_items: collectedItems,
+            updated_at: new Date().toISOString(),
+          });
+        
+        if (insertError && insertError.code !== '23505') { // 23505 = unique violation (already exists)
+          throw insertError;
+        }
+      }
+      
+      console.log('[Collection] ✓ Saved to cloud successfully');
     } catch (e) {
-      console.error('Failed to save to cloud:', e);
+      console.error('[Collection] Failed to save to cloud:', e);
     }
   };
 
