@@ -100,7 +100,8 @@
 
           <div class="flex justify-end">
             <button
-              type="submit"
+              type="button"
+              @click="submitPost"
               :disabled="submitting || !isValidFriendCode"
               class="btn-primary flex items-center gap-2"
             >
@@ -324,7 +325,11 @@ onMounted(async () => {
   
   // Pre-fill username from user metadata
   if (user.value) {
-    newPost.value.username = user.value.user_metadata?.username || user.value.email?.split('@')[0] || '';
+    // user 可能是 JWT payload，結構可能不同
+    const metadata = user.value.user_metadata || user.value;
+    const email = user.value.email || metadata?.email || '';
+    newPost.value.username = metadata?.username || metadata?.name || email.split('@')[0] || '';
+    console.log('[Friends] Pre-filled username:', newPost.value.username);
   }
 });
 
@@ -346,31 +351,85 @@ const fetchPosts = async () => {
 };
 
 const submitPost = async () => {
-  if (!user.value) return;
-  if (!isValidFriendCode.value) return;
+  console.log('[Friends] submitPost called');
+  console.log('[Friends] user:', user.value);
+  
+  // user 可能是 JWT payload，id 在 sub 或 id 欄位
+  const userId = user.value?.id || user.value?.sub;
+  console.log('[Friends] userId:', userId);
+  console.log('[Friends] isValidFriendCode:', isValidFriendCode.value);
+  console.log('[Friends] friendCode:', newPost.value.friendCode);
+  console.log('[Friends] username:', newPost.value.username);
+  
+  if (!userId) {
+    alert('請先登入');
+    return;
+  }
+  if (!isValidFriendCode.value) {
+    alert('好友代碼必須是 12 位數字');
+    return;
+  }
+  if (!newPost.value.username.trim()) {
+    alert('請輸入顯示名稱');
+    return;
+  }
   
   submitting.value = true;
+  console.log('[Friends] Starting insert...');
+  
   try {
     // 儲存時移除空格
     const cleanCode = newPost.value.friendCode.replace(/\s/g, '');
     
-    const { error } = await supabase.from('friend_posts').insert({
-      user_id: user.value.id,
+    const postData = {
+      user_id: userId,
       username: newPost.value.username.trim(),
       friend_code: cleanCode,
       message: newPost.value.message.trim() || null,
-    });
+    };
     
-    if (error) throw error;
+    console.log('[Friends] Submitting post:', postData);
+    
+    // 檢查 Supabase 認為的當前用戶是誰
+    const { data: sessionData } = await supabase.auth.getSession();
+    console.log('[Friends] Supabase session user id:', sessionData?.session?.user?.id);
+    console.log('[Friends] Our userId:', userId);
+    console.log('[Friends] Match:', sessionData?.session?.user?.id === userId);
+    
+    // 使用 session 中的 user id
+    const actualUserId = sessionData?.session?.user?.id;
+    if (!actualUserId) {
+      throw new Error('No authenticated session found');
+    }
+    
+    const finalPostData = {
+      user_id: actualUserId,  // 使用 session 的 user id
+      username: newPost.value.username.trim(),
+      friend_code: cleanCode,
+      message: newPost.value.message.trim() || null,
+    };
+    
+    console.log('[Friends] Final post data:', finalPostData);
+    const { data, error } = await supabase.from('friend_posts').insert(finalPostData).select();
+    
+    console.log('[Friends] Response - error:', error);
+    
+    if (error) {
+      console.error('[Friends] Insert error:', error);
+      throw error;
+    }
+    
+    console.log('[Friends] Insert success!');
     
     // Reset form and refresh
     newPost.value.message = '';
     await fetchPosts();
-  } catch (e) {
+  } catch (e: any) {
     console.error('Failed to submit post:', e);
-    alert('發布失敗，請稍後再試');
+    alert(`發布失敗：${e.message || '請稍後再試'}`);
   } finally {
     submitting.value = false;
+    console.log('[Friends] Done, submitting set to false');
   }
 };
 

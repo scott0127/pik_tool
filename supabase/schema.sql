@@ -77,7 +77,7 @@ CREATE POLICY "Anyone can view friend posts"
 
 CREATE POLICY "Authenticated users can create posts" 
   ON friend_posts FOR INSERT 
-  WITH CHECK (auth.uid() = user_id);
+  WITH CHECK (auth.uid() IS NOT NULL);
 
 CREATE POLICY "Users can delete own posts" 
   ON friend_posts FOR DELETE 

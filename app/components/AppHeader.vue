@@ -259,10 +259,59 @@ const navLinks = [
   { to: '/friends', name: '好友', icon: '🤝' },
 ];
 
+const isLoggingOut = ref(false);
+
 const handleLogout = async () => {
+  // 防止重複點擊
+  if (isLoggingOut.value) {
+    console.log('[Header] Already logging out, skipping...');
+    return;
+  }
+  
+  isLoggingOut.value = true;
+  console.log('[Header] === LOGOUT START ===');
   showMobileMenu.value = false;
-  await supabase.auth.signOut({ scope: 'global' });
-  router.push('/auth');
+  
+  // 1. 先清除 Supabase 的 cookie（這是關鍵！）
+  const supabaseCookieName = 'sb-lfhldxtbzqagqcofseom-auth-token';
+  console.log('[Header] Clearing Supabase cookie:', supabaseCookieName);
+  
+  // 清除 cookie（設定過期時間為過去）- 嘗試多種方式
+  document.cookie = `${supabaseCookieName}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+  document.cookie = `${supabaseCookieName}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=${window.location.hostname};`;
+  document.cookie = `${supabaseCookieName}=; max-age=0; path=/;`;
+  
+  // 清除所有 sb- 開頭的 cookies
+  document.cookie.split(";").forEach((c) => {
+    const cookieName = c.split("=")[0].trim();
+    if (cookieName.startsWith('sb-')) {
+      console.log('[Header] Clearing cookie:', cookieName);
+      document.cookie = `${cookieName}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+      document.cookie = `${cookieName}=; max-age=0; path=/;`;
+    }
+  });
+  
+  // 2. 清除 localStorage 中的 Supabase 相關資料
+  console.log('[Header] Clearing localStorage...');
+  Object.keys(localStorage).forEach(key => {
+    if (key.startsWith('sb-') || key.includes('supabase')) {
+      console.log('[Header] Removing localStorage key:', key);
+      localStorage.removeItem(key);
+    }
+  });
+  
+  // 3. 清除 sessionStorage
+  sessionStorage.clear();
+  
+  // 4. 嘗試呼叫 signOut（但不等待，因為它會卡住）
+  console.log('[Header] Calling signOut (non-blocking)...');
+  supabase.auth.signOut().catch(err => {
+    console.log('[Header] signOut error (ignored):', err);
+  });
+  
+  // 5. 立即重新載入頁面到登入頁
+  console.log('[Header] Redirecting to /auth...');
+  window.location.href = '/auth';
 };
 
 const handleSearch = () => {

@@ -89,23 +89,34 @@ const user = useSupabaseUser();
 const isInitializing = ref(true);
 
 onMounted(async () => {
+  console.log('[App] Starting initialization...');
   try {
-    // 檢查是否有登入
-    const { data: { session } } = await supabase.auth.getSession();
+    // 先嘗試載入本地資料（快速）
+    loadCollection();
     
-    if (session?.user) {
-      // 已登入：先載入本地快取，再從雲端同步
-      loadCollection();
-      await loadFromCloud();
-    } else {
-      // 未登入：確保清除任何殘留資料
-      clearLocalData();
-    }
+    // 檢查是否有登入（不阻塞）
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
+      console.log('[App] Session check - session:', !!session);
+      if (session?.user) {
+        // 已登入：從雲端同步
+        console.log('[App] User logged in, syncing from cloud...');
+        try {
+          await loadFromCloud();
+        } catch (e) {
+          console.warn('[App] Cloud sync failed:', e);
+        }
+      }
+    }).catch(e => {
+      console.warn('[App] Session check failed:', e);
+    });
+  } catch (e) {
+    console.error('[App] Initialization error:', e);
   } finally {
-    // Small delay for smooth transition
+    // 快速顯示頁面
+    console.log('[App] Finishing initialization...');
     setTimeout(() => {
       isInitializing.value = false;
-    }, 500);
+    }, 300);
   }
 });
 
