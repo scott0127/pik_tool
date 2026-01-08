@@ -351,15 +351,8 @@ const fetchPosts = async () => {
 };
 
 const submitPost = async () => {
-  console.log('[Friends] submitPost called');
-  console.log('[Friends] user:', user.value);
-  
   // user 可能是 JWT payload，id 在 sub 或 id 欄位
   const userId = user.value?.id || user.value?.sub;
-  console.log('[Friends] userId:', userId);
-  console.log('[Friends] isValidFriendCode:', isValidFriendCode.value);
-  console.log('[Friends] friendCode:', newPost.value.friendCode);
-  console.log('[Friends] username:', newPost.value.username);
   
   if (!userId) {
     alert('請先登入');
@@ -375,51 +368,28 @@ const submitPost = async () => {
   }
   
   submitting.value = true;
-  console.log('[Friends] Starting insert...');
   
   try {
     // 儲存時移除空格
     const cleanCode = newPost.value.friendCode.replace(/\s/g, '');
     
-    const postData = {
-      user_id: userId,
-      username: newPost.value.username.trim(),
-      friend_code: cleanCode,
-      message: newPost.value.message.trim() || null,
-    };
-    
-    console.log('[Friends] Submitting post:', postData);
-    
-    // 檢查 Supabase 認為的當前用戶是誰
-    const { data: sessionData } = await supabase.auth.getSession();
-    console.log('[Friends] Supabase session user id:', sessionData?.session?.user?.id);
-    console.log('[Friends] Our userId:', userId);
-    console.log('[Friends] Match:', sessionData?.session?.user?.id === userId);
-    
     // 使用 session 中的 user id
+    const { data: sessionData } = await supabase.auth.getSession();
     const actualUserId = sessionData?.session?.user?.id;
     if (!actualUserId) {
       throw new Error('No authenticated session found');
     }
     
-    const finalPostData = {
-      user_id: actualUserId,  // 使用 session 的 user id
+    const { data, error } = await supabase.from('friend_posts').insert({
+      user_id: actualUserId,
       username: newPost.value.username.trim(),
       friend_code: cleanCode,
       message: newPost.value.message.trim() || null,
-    };
-    
-    console.log('[Friends] Final post data:', finalPostData);
-    const { data, error } = await supabase.from('friend_posts').insert(finalPostData).select();
-    
-    console.log('[Friends] Response - error:', error);
+    }).select();
     
     if (error) {
-      console.error('[Friends] Insert error:', error);
       throw error;
     }
-    
-    console.log('[Friends] Insert success!');
     
     // Reset form and refresh
     newPost.value.message = '';
