@@ -10,7 +10,7 @@ export default {
     theme: {
         extend: {
             fontFamily: {
-                sans: ['Noto Sans TC', 'sans-serif'],
+                sans: ['Nunito', 'Noto Sans TC', 'sans-serif'],
             },
             colors: {
                 // Pikmin type colors
@@ -19,11 +19,12 @@ export default {
                     yellow: '#ECC94B',
                     blue: '#3182CE',
                     purple: '#805AD5',
-                    white: '#E2E8F0',
+                    white: '#F7FAFC',
                     rock: '#718096',
                     winged: '#ED64A6',
+                    ice: '#0BC5EA',
                 },
-                // App theme colors
+                // App theme colors - Emerald/Teal nature palette
                 primary: {
                     50: '#ecfdf5',
                     100: '#d1fae5',
@@ -52,6 +53,14 @@ export default {
             animation: {
                 'bounce-slow': 'bounce 2s infinite',
                 'pulse-slow': 'pulse 3s infinite',
+                'spin-slow': 'spin 3s linear infinite',
+            },
+            boxShadow: {
+                'glow': '0 0 20px rgba(16, 185, 129, 0.3)',
+                'glow-lg': '0 0 40px rgba(16, 185, 129, 0.4)',
+            },
+            borderRadius: {
+                '4xl': '2rem',
             },
         },
     },

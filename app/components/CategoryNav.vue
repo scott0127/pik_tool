@@ -1,14 +1,14 @@
 <template>
-  <div class="overflow-x-auto scrollbar-hide -mx-4 px-4">
-    <div class="flex gap-2 pb-2">
+  <div class="overflow-x-auto scrollbar-hide -mx-4 px-4 py-2">
+    <div class="flex gap-2">
       <!-- All Categories -->
       <button
         @click="$emit('select', null)"
         class="category-tag"
         :class="[selected === null ? 'category-tag-active' : 'category-tag-inactive']"
       >
-        <span class="mr-1">📋</span>
-        全部
+        <span class="text-lg">📋</span>
+        <span>全部</span>
       </button>
 
       <!-- Category Type Filters -->
@@ -19,8 +19,8 @@
         class="category-tag"
         :class="[selected === type.id ? 'category-tag-active' : 'category-tag-inactive']"
       >
-        <span class="mr-1">{{ type.icon }}</span>
-        {{ type.name }}
+        <span class="text-lg">{{ type.icon }}</span>
+        <span>{{ type.name }}</span>
       </button>
     </div>
   </div>

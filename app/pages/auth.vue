@@ -1,80 +1,140 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-leaf-50 via-white to-primary-50 flex items-center justify-center p-4">
-    <div class="w-full max-w-md">
+  <div class="min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
+    <!-- Background Decorations -->
+    <div class="fixed inset-0 pointer-events-none -z-10">
+      <div class="absolute inset-0 bg-gradient-to-br from-emerald-50 via-white to-teal-50"></div>
+      <div class="absolute top-20 left-10 text-8xl opacity-10 animate-float">🌸</div>
+      <div class="absolute bottom-20 right-10 text-7xl opacity-10 animate-float" style="animation-delay: 1s;">🍃</div>
+      <div class="absolute top-1/2 left-1/4 text-6xl opacity-5 animate-float" style="animation-delay: 2s;">🌱</div>
+      
+      <!-- Gradient Orbs -->
+      <div class="absolute top-0 right-0 w-96 h-96 bg-emerald-200 rounded-full blur-3xl opacity-30"></div>
+      <div class="absolute bottom-0 left-0 w-80 h-80 bg-teal-200 rounded-full blur-3xl opacity-30"></div>
+    </div>
+
+    <div class="w-full max-w-md animate-slide-up">
       <!-- Logo -->
       <div class="text-center mb-8">
-        <div class="w-20 h-20 mx-auto bg-primary-500 rounded-2xl flex items-center justify-center shadow-lg mb-4">
-          <span class="text-4xl">🌸</span>
+        <div class="w-24 h-24 mx-auto bg-gradient-to-br from-emerald-400 to-teal-500 rounded-3xl flex items-center justify-center shadow-2xl shadow-emerald-200 mb-6 animate-float">
+          <span class="text-5xl">🌸</span>
         </div>
-        <h1 class="text-2xl font-bold text-gray-800">Pikmin Bloom 飾品圖鑑</h1>
-        <p class="text-gray-500 mt-2">登入以同步您的收藏進度</p>
+        <h1 class="text-3xl font-extrabold gradient-text mb-2">Pikmin Bloom 飾品圖鑑</h1>
+        <p class="text-gray-500">登入以同步您的收藏進度</p>
       </div>
 
       <!-- Auth Card -->
-      <div class="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl p-6">
+      <div class="glass rounded-3xl p-8 shadow-2xl">
         <!-- Tabs -->
-        <div class="flex mb-6 bg-gray-100 rounded-lg p-1">
+        <div class="flex mb-8 bg-gray-100/80 rounded-2xl p-1.5">
           <button
             @click="mode = 'login'"
-            class="flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all"
-            :class="mode === 'login' ? 'bg-white shadow-sm text-primary-600' : 'text-gray-500 hover:text-gray-700'"
+            class="flex-1 py-3 px-4 rounded-xl text-sm font-bold transition-all duration-300"
+            :class="mode === 'login' 
+              ? 'bg-white shadow-lg text-emerald-600' 
+              : 'text-gray-500 hover:text-gray-700'"
           >
             登入
           </button>
           <button
             @click="mode = 'register'"
-            class="flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all"
-            :class="mode === 'register' ? 'bg-white shadow-sm text-primary-600' : 'text-gray-500 hover:text-gray-700'"
+            class="flex-1 py-3 px-4 rounded-xl text-sm font-bold transition-all duration-300"
+            :class="mode === 'register' 
+              ? 'bg-white shadow-lg text-emerald-600' 
+              : 'text-gray-500 hover:text-gray-700'"
           >
             註冊
           </button>
         </div>
 
         <!-- Error Message -->
-        <div v-if="error" class="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm">
-          {{ error }}
-        </div>
+        <Transition
+          enter-active-class="transition duration-200 ease-out"
+          enter-from-class="opacity-0 -translate-y-2"
+          enter-to-class="opacity-100 translate-y-0"
+          leave-active-class="transition duration-150 ease-in"
+          leave-from-class="opacity-100 translate-y-0"
+          leave-to-class="opacity-0 -translate-y-2"
+        >
+          <div v-if="error" class="mb-6 p-4 bg-red-50 border border-red-200 rounded-2xl text-red-600 text-sm flex items-start gap-3">
+            <span class="text-lg">⚠️</span>
+            <span>{{ error }}</span>
+          </div>
+        </Transition>
 
         <!-- Success Message -->
-        <div v-if="success" class="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg text-green-600 text-sm">
-          {{ success }}
-        </div>
+        <Transition
+          enter-active-class="transition duration-200 ease-out"
+          enter-from-class="opacity-0 -translate-y-2"
+          enter-to-class="opacity-100 translate-y-0"
+          leave-active-class="transition duration-150 ease-in"
+          leave-from-class="opacity-100 translate-y-0"
+          leave-to-class="opacity-0 -translate-y-2"
+        >
+          <div v-if="success" class="mb-6 p-4 bg-emerald-50 border border-emerald-200 rounded-2xl text-emerald-600 text-sm flex items-start gap-3">
+            <span class="text-lg">✅</span>
+            <span>{{ success }}</span>
+          </div>
+        </Transition>
 
         <!-- Form -->
-        <form @submit.prevent="handleSubmit" class="space-y-4">
+        <form @submit.prevent="handleSubmit" class="space-y-5">
           <!-- Username (Register only) -->
-          <div v-if="mode === 'register'">
-            <label class="block text-sm font-medium text-gray-700 mb-1">用戶名</label>
-            <input
-              v-model="username"
-              type="text"
-              required
-              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
-              placeholder="Pikmin_Player"
-            >
-          </div>
+          <Transition
+            enter-active-class="transition duration-300 ease-out"
+            enter-from-class="opacity-0 -translate-y-4"
+            enter-to-class="opacity-100 translate-y-0"
+            leave-active-class="transition duration-200 ease-in"
+            leave-from-class="opacity-100 translate-y-0"
+            leave-to-class="opacity-0 -translate-y-4"
+          >
+            <div v-if="mode === 'register'">
+              <label class="block text-sm font-semibold text-gray-700 mb-2">
+                <span class="flex items-center gap-2">
+                  <span>👤</span>
+                  用戶名
+                </span>
+              </label>
+              <input
+                v-model="username"
+                type="text"
+                required
+                class="input-field"
+                placeholder="Pikmin_Player"
+              >
+            </div>
+          </Transition>
 
           <!-- Email -->
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+            <label class="block text-sm font-semibold text-gray-700 mb-2">
+              <span class="flex items-center gap-2">
+                <span>📧</span>
+                Email
+              </span>
+            </label>
             <input
               v-model="email"
               type="email"
               required
-              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
+              class="input-field"
               placeholder="player@example.com"
             >
           </div>
 
           <!-- Password -->
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">密碼</label>
+            <label class="block text-sm font-semibold text-gray-700 mb-2">
+              <span class="flex items-center gap-2">
+                <span>🔐</span>
+                密碼
+              </span>
+            </label>
             <input
               v-model="password"
               type="password"
               required
               minlength="6"
-              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
+              class="input-field"
               placeholder="••••••••"
             >
           </div>
@@ -83,34 +143,35 @@
           <button
             type="submit"
             :disabled="loading"
-            class="w-full py-3 bg-primary-500 text-white font-semibold rounded-lg hover:bg-primary-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            class="btn-primary w-full py-4 text-base flex items-center justify-center gap-2"
           >
             <svg v-if="loading" class="animate-spin h-5 w-5" viewBox="0 0 24 24">
               <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none" />
               <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
             </svg>
-            {{ loading ? '處理中...' : (mode === 'login' ? '登入' : '註冊') }}
+            <span>{{ loading ? '處理中...' : (mode === 'login' ? '登入' : '註冊') }}</span>
           </button>
         </form>
 
         <!-- Divider -->
-        <div class="my-6 flex items-center">
-          <div class="flex-1 border-t border-gray-200"></div>
-          <span class="px-4 text-sm text-gray-400">或</span>
-          <div class="flex-1 border-t border-gray-200"></div>
+        <div class="my-8 flex items-center gap-4">
+          <div class="flex-1 h-px bg-gradient-to-r from-transparent via-gray-300 to-transparent"></div>
+          <span class="text-sm text-gray-400 font-medium">或</span>
+          <div class="flex-1 h-px bg-gradient-to-r from-transparent via-gray-300 to-transparent"></div>
         </div>
 
         <!-- Continue as Guest -->
         <NuxtLink
           to="/"
-          class="block w-full py-3 text-center text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-all"
+          class="btn-secondary w-full py-4 text-base flex items-center justify-center gap-2"
         >
-          以訪客身份繼續
+          <span>🌱</span>
+          <span>以訪客身份繼續</span>
         </NuxtLink>
       </div>
 
       <!-- Footer -->
-      <p class="text-center text-sm text-gray-400 mt-6">
+      <p class="text-center text-sm text-gray-400 mt-8 px-4">
         登入後可同步收藏進度到雲端，並在留言板分享好友代碼
       </p>
     </div>

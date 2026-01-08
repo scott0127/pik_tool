@@ -4,10 +4,10 @@
     <button
       @click="$emit('select', null)"
       class="pikmin-filter-btn"
-      :class="[selected === null ? 'ring-2 ring-gray-400' : '']"
+      :class="[selected === null ? 'ring-2 ring-emerald-400 ring-offset-2' : '']"
     >
-      <span class="w-6 h-6 rounded-full bg-gradient-to-br from-red-400 via-blue-400 to-purple-400"></span>
-      <span class="text-xs">全部</span>
+      <div class="w-8 h-8 rounded-full bg-gradient-to-br from-red-400 via-blue-400 to-purple-400 shadow-md"></div>
+      <span class="text-xs font-semibold">全部</span>
     </button>
 
     <!-- Individual Pikmin Types -->
@@ -16,13 +16,13 @@
       :key="type"
       @click="$emit('select', type)"
       class="pikmin-filter-btn"
-      :class="[selected === type ? `ring-2 ${getRingColor(type)}` : '']"
+      :class="[selected === type ? `ring-2 ring-offset-2 ${getRingColor(type)}` : '']"
     >
-      <span 
-        class="w-6 h-6 rounded-full"
+      <div 
+        class="w-8 h-8 rounded-full shadow-md transition-transform group-hover:scale-110"
         :class="PIKMIN_TYPE_COLORS[type]"
-      ></span>
-      <span class="text-xs">{{ PIKMIN_TYPE_NAMES[type] }}</span>
+      ></div>
+      <span class="text-xs font-semibold">{{ PIKMIN_TYPE_NAMES[type] }}</span>
     </button>
   </div>
 </template>
@@ -40,20 +40,21 @@ defineEmits<{
 
 const getRingColor = (type: PikminType): string => {
   const colors: Record<PikminType, string> = {
-    red: 'ring-pikmin-red',
-    yellow: 'ring-pikmin-yellow',
-    blue: 'ring-pikmin-blue',
-    purple: 'ring-pikmin-purple',
+    red: 'ring-red-400',
+    yellow: 'ring-yellow-400',
+    blue: 'ring-blue-400',
+    purple: 'ring-purple-400',
     white: 'ring-gray-400',
-    rock: 'ring-pikmin-rock',
-    winged: 'ring-pikmin-winged',
+    rock: 'ring-gray-500',
+    winged: 'ring-pink-400',
+    ice: 'ring-cyan-400',
   };
-  return colors[type];
+  return colors[type] || 'ring-emerald-400';
 };
 </script>
 
 <style scoped>
 .pikmin-filter-btn {
-  @apply flex flex-col items-center gap-1 p-2 rounded-lg bg-white/70 hover:bg-white transition-all duration-200 cursor-pointer min-w-[50px];
+  @apply flex flex-col items-center gap-1.5 p-2.5 rounded-xl bg-white/80 hover:bg-white transition-all duration-200 cursor-pointer min-w-[56px] border-2 border-transparent hover:border-gray-200;
 }
 </style>

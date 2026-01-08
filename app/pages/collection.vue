@@ -1,22 +1,43 @@
 <template>
-  <div class="space-y-6">
-    <!-- Page Title -->
-    <div>
-      <h1 class="text-2xl font-bold text-gray-800">📖 飾品圖鑑</h1>
-      <p class="text-gray-600">點擊飾品來標記蒐集狀態</p>
+  <div class="space-y-6 pb-8">
+    <!-- Page Header -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div>
+        <h1 class="text-3xl font-extrabold text-gray-800 flex items-center gap-3">
+          <span class="text-4xl">📖</span>
+          <span class="text-gradient">飾品圖鑑</span>
+        </h1>
+        <p class="text-gray-500 mt-1">點擊飾品來標記蒐集狀態</p>
+      </div>
+      
+      <!-- Quick stats -->
+      <div class="flex items-center gap-4 bg-white/60 rounded-2xl px-4 py-2">
+        <div class="text-right">
+          <p class="text-xs text-gray-500">目前顯示</p>
+          <p class="text-lg font-bold text-emerald-600">{{ filteredItems.length }} 件</p>
+        </div>
+        <div class="w-px h-8 bg-gray-200"></div>
+        <div class="text-right">
+          <p class="text-xs text-gray-500">已蒐集</p>
+          <p class="text-lg font-bold text-emerald-600">{{ collectedCount }}</p>
+        </div>
+      </div>
     </div>
 
     <!-- Filters Section -->
-    <div class="card space-y-4">
+    <div class="card space-y-5">
       <!-- Search -->
-      <SearchBar 
-        v-model="searchQuery"
-        placeholder="搜尋飾品名稱..."
-      />
+      <div>
+        <label class="text-sm font-semibold text-gray-600 mb-2 block">🔍 搜尋</label>
+        <SearchBar 
+          v-model="searchQuery"
+          placeholder="搜尋飾品名稱... (支援中文！)"
+        />
+      </div>
 
       <!-- Category Type Filter -->
       <div>
-        <p class="text-sm text-gray-600 mb-2">飾品分類</p>
+        <label class="text-sm font-semibold text-gray-600 mb-2 block">📁 飾品分類</label>
         <CategoryNav 
           :selected="selectedCategoryType"
           @select="selectedCategoryType = $event"
@@ -25,7 +46,7 @@
 
       <!-- Pikmin Type Filter -->
       <div>
-        <p class="text-sm text-gray-600 mb-2">皮克敏類型</p>
+        <label class="text-sm font-semibold text-gray-600 mb-2 block">🌈 皮克敏類型</label>
         <PikminFilter 
           :selected="selectedPikminType"
           @select="selectedPikminType = $event"
@@ -33,76 +54,141 @@
       </div>
 
       <!-- Collection Status Filter -->
-      <div class="flex flex-wrap gap-2">
-        <button
-          @click="collectionFilter = 'all'"
-          class="category-tag"
-          :class="[collectionFilter === 'all' ? 'category-tag-active' : 'category-tag-inactive']"
-        >
-          全部
-        </button>
-        <button
-          @click="collectionFilter = 'collected'"
-          class="category-tag"
-          :class="[collectionFilter === 'collected' ? 'category-tag-active' : 'category-tag-inactive']"
-        >
-          ✅ 已蒐集
-        </button>
-        <button
-          @click="collectionFilter = 'uncollected'"
-          class="category-tag"
-          :class="[collectionFilter === 'uncollected' ? 'category-tag-active' : 'category-tag-inactive']"
-        >
-          ⬜ 未蒐集
-        </button>
-      </div>
-
-      <!-- Current Filter Stats -->
-      <div class="flex items-center justify-between text-sm bg-gray-50 rounded-lg p-3">
-        <span class="text-gray-600">符合條件的飾品</span>
-        <span class="font-medium text-primary-600">{{ filteredItems.length }} 件</span>
-      </div>
-    </div>
-
-    <!-- Category Sections -->
-    <div v-if="!searchQuery && !selectedPikminType && !selectedCategoryType && collectionFilter === 'all'">
-      <!-- Show grouped by category when no filters -->
-      <div 
-        v-for="def in getDecorDefinitions()" 
-        :key="def.category.id"
-        class="space-y-4"
-      >
-        <div class="flex items-center gap-2 mt-6 mb-3">
-          <span class="text-xl">{{ def.category.icon }}</span>
-          <h2 class="text-lg font-bold text-gray-800">{{ def.category.name }}</h2>
-          <span class="text-sm text-gray-500">({{ def.category.nameEn }})</span>
-          <span class="ml-auto text-sm text-gray-500">
-            {{ getCategoryProgress(def.category.id) }}
-          </span>
+      <div>
+        <label class="text-sm font-semibold text-gray-600 mb-2 block">✅ 蒐集狀態</label>
+        <div class="flex flex-wrap gap-2">
+          <button
+            v-for="filter in collectionFilters"
+            :key="filter.value"
+            @click="collectionFilter = filter.value"
+            class="category-tag"
+            :class="[collectionFilter === filter.value ? 'category-tag-active' : 'category-tag-inactive']"
+          >
+            <span>{{ filter.icon }}</span>
+            <span>{{ filter.label }}</span>
+          </button>
         </div>
-        <DecorGrid :items="getItemsForCategory(def.category.id)" />
       </div>
+
+      <!-- Active Filters Summary & Clear -->
+      <Transition
+        enter-active-class="transition duration-200"
+        enter-from-class="opacity-0 -translate-y-2"
+        enter-to-class="opacity-100 translate-y-0"
+        leave-active-class="transition duration-150"
+        leave-from-class="opacity-100 translate-y-0"
+        leave-to-class="opacity-0 -translate-y-2"
+      >
+        <div 
+          v-if="hasActiveFilters"
+          class="flex items-center justify-between bg-emerald-50 rounded-xl p-3"
+        >
+          <div class="flex items-center gap-2 flex-wrap">
+            <span class="text-sm text-emerald-700 font-medium">已套用篩選:</span>
+            <span v-if="searchQuery" class="inline-flex items-center gap-1 px-2 py-1 bg-emerald-100 text-emerald-700 rounded-lg text-xs font-medium">
+              🔍 {{ searchQuery }}
+              <button @click="searchQuery = ''" class="hover:text-emerald-900">×</button>
+            </span>
+            <span v-if="selectedCategoryType" class="inline-flex items-center gap-1 px-2 py-1 bg-emerald-100 text-emerald-700 rounded-lg text-xs font-medium">
+              📁 {{ getCategoryTypeName(selectedCategoryType) }}
+              <button @click="selectedCategoryType = null" class="hover:text-emerald-900">×</button>
+            </span>
+            <span v-if="selectedPikminType" class="inline-flex items-center gap-1 px-2 py-1 bg-emerald-100 text-emerald-700 rounded-lg text-xs font-medium">
+              🌈 {{ PIKMIN_TYPE_NAMES[selectedPikminType] }}
+              <button @click="selectedPikminType = null" class="hover:text-emerald-900">×</button>
+            </span>
+            <span v-if="collectionFilter !== 'all'" class="inline-flex items-center gap-1 px-2 py-1 bg-emerald-100 text-emerald-700 rounded-lg text-xs font-medium">
+              ✅ {{ collectionFilters.find(f => f.value === collectionFilter)?.label }}
+              <button @click="collectionFilter = 'all'" class="hover:text-emerald-900">×</button>
+            </span>
+          </div>
+          <button 
+            @click="clearAllFilters"
+            class="text-sm text-emerald-600 hover:text-emerald-800 font-medium whitespace-nowrap"
+          >
+            清除全部
+          </button>
+        </div>
+      </Transition>
     </div>
-    <div v-else>
-      <!-- Show flat grid when filters are applied -->
-      <DecorGrid :items="filteredItems" />
+
+    <!-- Results Section -->
+    <div>
+      <!-- Category Grouped View (when no filters) -->
+      <template v-if="!hasActiveFilters">
+        <div 
+          v-for="def in getDecorDefinitions()" 
+          :key="def.category.id"
+          class="mb-8"
+        >
+          <!-- Category Header -->
+          <div class="flex items-center gap-3 mb-4 sticky top-[120px] z-10 bg-gradient-to-r from-emerald-50/95 to-teal-50/95 backdrop-blur-sm -mx-4 px-4 py-3 rounded-xl">
+            <span class="text-2xl">{{ def.category.icon }}</span>
+            <div class="flex-1">
+              <h2 class="text-lg font-bold text-gray-800">{{ def.category.name }}</h2>
+              <p class="text-xs text-gray-500">{{ def.category.nameEn }}</p>
+            </div>
+            <div class="text-right">
+              <p class="text-sm font-bold text-emerald-600">{{ getCategoryProgress(def.category.id) }}</p>
+              <p class="text-xs text-gray-400">已蒐集</p>
+            </div>
+          </div>
+          
+          <DecorGrid 
+            :items="getItemsForCategory(def.category.id)" 
+            @clear-filters="clearAllFilters"
+          />
+        </div>
+      </template>
+
+      <!-- Flat Grid View (when filters active) -->
+      <template v-else>
+        <DecorGrid 
+          :items="filteredItems" 
+          @clear-filters="clearAllFilters"
+        />
+      </template>
     </div>
+
+    <!-- Scroll to top button -->
+    <Transition
+      enter-active-class="transition duration-300"
+      enter-from-class="opacity-0 translate-y-4"
+      enter-to-class="opacity-100 translate-y-0"
+      leave-active-class="transition duration-200"
+      leave-from-class="opacity-100 translate-y-0"
+      leave-to-class="opacity-0 translate-y-4"
+    >
+      <button
+        v-if="showScrollTop"
+        @click="scrollToTop"
+        class="fixed bottom-6 right-6 w-12 h-12 bg-emerald-500 hover:bg-emerald-600 text-white rounded-full shadow-lg hover:shadow-xl transition-all flex items-center justify-center text-xl z-40"
+      >
+        ↑
+      </button>
+    </Transition>
   </div>
 </template>
 
 <script setup lang="ts">
-import type { PikminType, DecorCategoryType, DecorItem } from '~/types/decor';
+import { DECOR_CATEGORY_TYPES, PIKMIN_TYPE_NAMES, type PikminType, type DecorCategoryType, type DecorItem } from '~/types/decor';
 
 const route = useRoute();
-
 const { isCollected } = useCollection();
-const { getAllDecorItems, getDecorDefinitions, getItemsByCategoryType, getItemsByPikminType, searchItems, getItemsByCategory } = useDecorData();
+const { getAllDecorItems, getDecorDefinitions, getItemsByCategoryType, searchItems, getItemsByCategory } = useDecorData();
 
 // Filter state
 const searchQuery = ref('');
 const selectedCategoryType = ref<DecorCategoryType | null>(null);
 const selectedPikminType = ref<PikminType | null>(null);
 const collectionFilter = ref<'all' | 'collected' | 'uncollected'>('all');
+const showScrollTop = ref(false);
+
+const collectionFilters = [
+  { value: 'all' as const, label: '全部', icon: '📋' },
+  { value: 'collected' as const, label: '已蒐集', icon: '✅' },
+  { value: 'uncollected' as const, label: '未蒐集', icon: '⬜' },
+];
 
 // Initialize from query params
 onMounted(() => {
@@ -112,6 +198,29 @@ onMounted(() => {
   if (route.query.search) {
     searchQuery.value = route.query.search as string;
   }
+  if (route.query.pikmin) {
+    selectedPikminType.value = route.query.pikmin as PikminType;
+  }
+  
+  // Scroll listener
+  window.addEventListener('scroll', handleScroll);
+});
+
+onUnmounted(() => {
+  window.removeEventListener('scroll', handleScroll);
+});
+
+const handleScroll = () => {
+  showScrollTop.value = window.scrollY > 500;
+};
+
+const scrollToTop = () => {
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+};
+
+// Check if any filters are active
+const hasActiveFilters = computed(() => {
+  return searchQuery.value || selectedCategoryType.value || selectedPikminType.value || collectionFilter.value !== 'all';
 });
 
 // Filtered items
@@ -144,6 +253,10 @@ const filteredItems = computed(() => {
   return items;
 });
 
+const collectedCount = computed(() => {
+  return filteredItems.value.filter(item => isCollected(item.id)).length;
+});
+
 const getItemsForCategory = (categoryId: string): DecorItem[] => {
   return getItemsByCategory(categoryId);
 };
@@ -152,5 +265,16 @@ const getCategoryProgress = (categoryId: string): string => {
   const items = getItemsByCategory(categoryId);
   const collected = items.filter(item => isCollected(item.id)).length;
   return `${collected}/${items.length}`;
+};
+
+const getCategoryTypeName = (typeId: string): string => {
+  return DECOR_CATEGORY_TYPES.find(t => t.id === typeId)?.name || typeId;
+};
+
+const clearAllFilters = () => {
+  searchQuery.value = '';
+  selectedCategoryType.value = null;
+  selectedPikminType.value = null;
+  collectionFilter.value = 'all';
 };
 </script>

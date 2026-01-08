@@ -1,79 +1,103 @@
 <template>
   <div 
     @click="handleClick"
-    class="relative group cursor-pointer transition-all duration-300"
-    :class="[
-      isCollected ? 'ring-2 ring-primary-500 ring-offset-2' : 'grayscale opacity-70 hover:grayscale-0 hover:opacity-100'
-    ]"
+    class="relative group cursor-pointer pop-in"
+    :style="{ animationDelay: `${animationDelay}ms` }"
   >
-    <div class="bg-white/90 backdrop-blur-sm rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-all duration-300">
+    <div 
+      class="relative bg-white/80 backdrop-blur rounded-2xl overflow-hidden transition-all duration-300 shadow-lg"
+      :class="[
+        isCollected 
+          ? 'ring-4 ring-emerald-400 ring-offset-2 shadow-emerald-100' 
+          : 'grayscale-[40%] opacity-70 hover:grayscale-0 hover:opacity-100'
+      ]"
+    >
       <!-- Image Container -->
-      <div class="relative aspect-square bg-gradient-to-br from-gray-50 to-gray-100 p-2">
+      <div class="relative aspect-square bg-gradient-to-br from-gray-50 via-white to-gray-100 p-3 overflow-hidden">
+        <!-- Background pattern -->
+        <div class="absolute inset-0 opacity-5">
+          <div class="absolute inset-0" style="background-image: radial-gradient(circle, #22c55e 1px, transparent 1px); background-size: 20px 20px;"></div>
+        </div>
+
+        <!-- Image -->
         <img 
           v-if="imageUrl && !hasError"
           :src="imageUrl"
           :alt="`${variant?.nameEn} ${pikminType} Pikmin`"
-          class="w-full h-full object-contain"
+          class="relative w-full h-full object-contain transform group-hover:scale-110 transition-transform duration-300"
           loading="lazy"
-            referrerpolicy="no-referrer"
+          referrerpolicy="no-referrer"
           @error="handleImageError"
         >
         <div 
           v-else 
-          class="w-full h-full flex items-center justify-center text-4xl"
+          class="w-full h-full flex items-center justify-center text-5xl"
         >
           {{ category?.icon || '🌸' }}
         </div>
 
         <!-- Pikmin Type Badge -->
         <div 
-          class="absolute top-1 right-1 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shadow-md"
+          class="absolute top-2 right-2 w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold shadow-lg transform group-hover:scale-110 transition-transform"
           :class="pikminBadgeClass"
         >
           {{ pikminTypeShort }}
         </div>
 
+        <!-- Rare Sparkle -->
+        <div 
+          v-if="variant?.isRare"
+          class="absolute top-2 left-2 text-yellow-400 text-lg sparkle"
+        >
+          ✨
+        </div>
+
         <!-- Collected Checkmark -->
         <Transition
-          enter-active-class="transition duration-200 ease-out"
-          enter-from-class="scale-0 opacity-0"
-          enter-to-class="scale-100 opacity-100"
-          leave-active-class="transition duration-150 ease-in"
-          leave-from-class="scale-100 opacity-100"
-          leave-to-class="scale-0 opacity-0"
+          enter-active-class="transition duration-300 ease-out"
+          enter-from-class="scale-0 rotate-180 opacity-0"
+          enter-to-class="scale-100 rotate-0 opacity-100"
+          leave-active-class="transition duration-200 ease-in"
+          leave-from-class="scale-100 rotate-0 opacity-100"
+          leave-to-class="scale-0 rotate-180 opacity-0"
         >
           <div 
             v-if="isCollected"
-            class="absolute bottom-1 right-1 w-6 h-6 bg-primary-500 rounded-full flex items-center justify-center shadow-md"
+            class="absolute bottom-2 right-2 w-8 h-8 bg-emerald-500 rounded-xl flex items-center justify-center shadow-lg"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white" viewBox="0 0 20 20" fill="currentColor">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" viewBox="0 0 20 20" fill="currentColor">
               <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
             </svg>
           </div>
         </Transition>
 
-        <!-- Rare Sparkle -->
-        <div 
-          v-if="variant?.isRare"
-          class="absolute top-1 left-1 text-yellow-400 animate-pulse"
-        >
-          ✨
-        </div>
+        <!-- Hover overlay -->
+        <div class="absolute inset-0 bg-emerald-500/0 group-hover:bg-emerald-500/10 transition-colors duration-300 rounded-lg pointer-events-none"></div>
       </div>
 
       <!-- Info Section -->
-      <div class="p-2 text-center">
-        <p class="text-xs font-medium text-gray-700 truncate" :title="variant?.name">
+      <div class="p-3 text-center border-t border-gray-100">
+        <p class="text-sm font-bold text-gray-700 truncate" :title="variant?.name">
           {{ variant?.name || 'Unknown' }}
         </p>
-        <p class="text-[10px] text-gray-400 truncate" :title="variant?.nameEn">
+        <p class="text-xs text-gray-400 truncate mt-0.5" :title="variant?.nameEn">
           {{ variant?.nameEn || '' }}
         </p>
       </div>
     </div>
 
-    <!-- Hover Overlay -->
-    <div class="absolute inset-0 bg-primary-500/10 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
+    <!-- Click ripple effect -->
+    <Transition
+      enter-active-class="transition duration-500"
+      enter-from-class="scale-0 opacity-100"
+      enter-to-class="scale-150 opacity-0"
+      leave-active-class="transition duration-0"
+    >
+      <div 
+        v-if="showRipple"
+        class="absolute inset-0 bg-emerald-400/30 rounded-2xl pointer-events-none"
+      ></div>
+    </Transition>
   </div>
 </template>
 
@@ -81,12 +105,15 @@
 import type { PikminType } from '~/types/decor';
 import { PIKMIN_TYPE_COLORS } from '~/types/decor';
 
-const props = defineProps<{
+const props = withDefaults(defineProps<{
   itemId: string;
   categoryId: string;
   variantId: string;
   pikminType: PikminType;
-}>();
+  animationDelay?: number;
+}>(), {
+  animationDelay: 0
+});
 
 const emit = defineEmits<{
   toggle: [itemId: string];
@@ -100,6 +127,7 @@ const category = computed(() => getCategory(props.categoryId));
 const isCollected = computed(() => checkCollected(props.itemId));
 const imageUrl = computed(() => getImageUrl(props.categoryId, props.variantId, props.pikminType));
 const hasError = ref(false);
+const showRipple = ref(false);
 
 const pikminTypeShort = computed(() => {
   const shorts: Record<PikminType, string> = {
@@ -122,6 +150,12 @@ const pikminBadgeClass = computed(() => {
 });
 
 const handleClick = () => {
+  // Trigger ripple effect
+  showRipple.value = true;
+  setTimeout(() => {
+    showRipple.value = false;
+  }, 500);
+  
   toggleCollected(props.itemId);
   emit('toggle', props.itemId);
 };

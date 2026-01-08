@@ -34,6 +34,40 @@ export interface Database {
           }
         ]
       }
+      friend_posts: {
+        Row: {
+          id: string
+          user_id: string
+          username: string
+          friend_code: string
+          message: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          username: string
+          friend_code: string
+          message?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          username?: string
+          friend_code?: string
+          message?: string | null
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "friend_posts_user_id_fkey"
+            columns: ["user_id"]
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
     }
     Views: {
       [_ in never]: never
