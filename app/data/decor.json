@@ -1,0 +1,2073 @@
+{
+  "version": 1,
+  "lastUpdated": "2026-01-08",
+  "source": "https://www.pikminwiki.com/Decor_Pikmin (Images: pikmin.wiki.gallery, CC BY-SA 4.0)",
+  "definitions": [
+    {
+      "category": {
+        "id": "restaurant",
+        "name": "餐廳",
+        "nameEn": "Restaurant",
+        "type": "regular",
+        "icon": "🍽️"
+      },
+      "variants": [
+        {
+          "id": "chef-hat",
+          "name": "廚師帽",
+          "nameEn": "Chef Hat",
+          "imageUrl": "https://pikmin.wiki.gallery/images/thumb/a/a7/Decor_Red_Chef_Hat.png/200px-Decor_Red_Chef_Hat.png",
+          "imageUrls": {
+            "red": "https://pikmin.wiki.gallery/images/thumb/a/a7/Decor_Red_Chef_Hat.png/63px-Decor_Red_Chef_Hat.png",
+            "yellow": "https://pikmin.wiki.gallery/images/thumb/3/33/Decor_Yellow_Chef_Hat.png/51px-Decor_Yellow_Chef_Hat.png",
+            "blue": "https://pikmin.wiki.gallery/images/thumb/e/ef/Decor_Blue_Chef_Hat.png/61px-Decor_Blue_Chef_Hat.png",
+            "white": "https://pikmin.wiki.gallery/images/thumb/9/93/Decor_White_Chef_Hat.png/67px-Decor_White_Chef_Hat.png",
+            "purple": "https://pikmin.wiki.gallery/images/thumb/6/66/Decor_Purple_Chef_Hat.png/51px-Decor_Purple_Chef_Hat.png",
+            "rock": "https://pikmin.wiki.gallery/images/thumb/7/79/Decor_Rock_Chef_Hat.png/78px-Decor_Rock_Chef_Hat.png",
+            "winged": "https://pikmin.wiki.gallery/images/thumb/7/74/Decor_Winged_Chef_Hat.png/63px-Decor_Winged_Chef_Hat.png"
+          }
+        }
+      ],
+      "availablePikminTypes": [
+        "red",
+        "yellow",
+        "blue",
+        "purple",
+        "white",
+        "rock",
+        "winged"
+      ]
+    },
+    {
+      "category": {
+        "id": "cafe",
+        "name": "咖啡廳",
+        "nameEn": "Café",
+        "type": "regular",
+        "icon": "☕"
+      },
+      "variants": [
+        {
+          "id": "coffee-cup",
+          "name": "咖啡杯",
+          "nameEn": "Coffee Cup",
+          "imageUrl": "https://pikmin.wiki.gallery/images/thumb/b/b9/Decor_Red_Coffee_Cup.png/200px-Decor_Red_Coffee_Cup.png",
+          "imageUrls": {
+            "red": "https://pikmin.wiki.gallery/images/thumb/b/b9/Decor_Red_Coffee_Cup.png/100px-Decor_Red_Coffee_Cup.png",
+            "yellow": "https://pikmin.wiki.gallery/images/thumb/1/1d/Decor_Yellow_Coffee_Cup.png/100px-Decor_Yellow_Coffee_Cup.png",
+            "blue": "https://pikmin.wiki.gallery/images/thumb/b/ba/Decor_Blue_Coffee_Cup.png/100px-Decor_Blue_Coffee_Cup.png",
+            "white": "https://pikmin.wiki.gallery/images/thumb/b/bf/Decor_White_Coffee_Cup.png/100px-Decor_White_Coffee_Cup.png",
+            "purple": "https://pikmin.wiki.gallery/images/thumb/3/37/Decor_Purple_Coffee_Cup.png/99px-Decor_Purple_Coffee_Cup.png",
+            "rock": "https://pikmin.wiki.gallery/images/thumb/1/1c/Decor_Rock_Coffee_Cup.png/97px-Decor_Rock_Coffee_Cup.png",
+            "winged": "https://pikmin.wiki.gallery/images/thumb/2/29/Decor_Winged_Coffee_Cup.png/100px-Decor_Winged_Coffee_Cup.png"
+          }
+        }
+      ],
+      "availablePikminTypes": [
+        "red",
+        "yellow",
+        "blue",
+        "purple",
+        "white",
+        "rock",
+        "winged"
+      ]
+    },
+    {
+      "category": {
+        "id": "sweetshop",
+        "name": "甜點店",
+        "nameEn": "Sweetshop",
+        "type": "regular",
+        "icon": "🍰"
+      },
+      "variants": [
+        {
+          "id": "macaron",
+          "name": "馬卡龍",
+          "nameEn": "Macaron",
+          "imageUrl": "https://pikmin.wiki.gallery/images/thumb/1/14/Decor_Red_Macaron.png/200px-Decor_Red_Macaron.png",
+          "imageUrls": {
+            "red": "https://pikmin.wiki.gallery/images/thumb/1/14/Decor_Red_Macaron.png/85px-Decor_Red_Macaron.png",
+            "yellow": "https://pikmin.wiki.gallery/images/thumb/8/8e/Decor_Yellow_Macaron.png/97px-Decor_Yellow_Macaron.png",
+            "blue": "https://pikmin.wiki.gallery/images/thumb/3/3a/Decor_Blue_Macaron.png/97px-Decor_Blue_Macaron.png",
+            "white": "https://pikmin.wiki.gallery/images/thumb/6/6a/Decor_White_Macaron.png/66px-Decor_White_Macaron.png",
+            "purple": "https://pikmin.wiki.gallery/images/thumb/d/de/Decor_Purple_Macaron.png/95px-Decor_Purple_Macaron.png",
+            "rock": "https://pikmin.wiki.gallery/images/thumb/1/1d/Decor_Rock_Macaron.png/77px-Decor_Rock_Macaron.png",
+            "winged": "https://pikmin.wiki.gallery/images/thumb/f/fb/Decor_Winged_Macaron.png/69px-Decor_Winged_Macaron.png"
+          }
+        }
+      ],
+      "availablePikminTypes": [
+        "red",
+        "yellow",
+        "blue",
+        "purple",
+        "white",
+        "rock",
+        "winged"
+      ]
+    },
+    {
+      "category": {
+        "id": "movie-theater",
+        "name": "電影院",
+        "nameEn": "Movie Theater",
+        "type": "regular",
+        "icon": "🎬"
+      },
+      "variants": [
+        {
+          "id": "popcorn",
+          "name": "爆米花",
+          "nameEn": "Popcorn",
+          "imageUrl": "https://pikmin.wiki.gallery/images/thumb/d/d5/Decor_Red_Popcorn_Snack.png/200px-Decor_Red_Popcorn_Snack.png",
+          "imageUrls": {
+            "red": "https://pikmin.wiki.gallery/images/thumb/d/d5/Decor_Red_Popcorn_Snack.png/80px-Decor_Red_Popcorn_Snack.png",
+            "yellow": "https://pikmin.wiki.gallery/images/thumb/a/ad/Decor_Yellow_Popcorn_Snack.png/100px-Decor_Yellow_Popcorn_Snack.png",
+            "blue": "https://pikmin.wiki.gallery/images/thumb/a/ab/Decor_Blue_Popcorn_Snack.png/100px-Decor_Blue_Popcorn_Snack.png",
+            "white": "https://pikmin.wiki.gallery/images/thumb/b/ba/Decor_White_Popcorn_Snack.png/100px-Decor_White_Popcorn_Snack.png",
+            "purple": "https://pikmin.wiki.gallery/images/thumb/f/f1/Decor_Purple_Popcorn_Snack.png/95px-Decor_Purple_Popcorn_Snack.png",
+            "rock": "https://pikmin.wiki.gallery/images/thumb/a/a3/Decor_Rock_Popcorn_Snack.png/100px-Decor_Rock_Popcorn_Snack.png",
+            "winged": "https://pikmin.wiki.gallery/images/thumb/1/1c/Decor_Winged_Popcorn_Snack.png/100px-Decor_Winged_Popcorn_Snack.png"
+          }
+        }
+      ],
+      "availablePikminTypes": [
+        "red",
+        "yellow",
+        "blue",
+        "purple",
+        "white",
+        "rock",
+        "winged"
+      ]
+    },
+    {
+      "category": {
+        "id": "pharmacy",
+        "name": "藥局",
+        "nameEn": "Pharmacy",
+        "type": "regular",
+        "icon": "💊"
+      },
+      "variants": [
+        {
+          "id": "toothbrush",
+          "name": "牙刷",
+          "nameEn": "Toothbrush",
+          "imageUrl": "https://pikmin.wiki.gallery/images/thumb/8/8d/Decor_Red_Toothbrush.png/200px-Decor_Red_Toothbrush.png",
+          "imageUrls": {
+            "red": "https://pikmin.wiki.gallery/images/thumb/8/8d/Decor_Red_Toothbrush.png/100px-Decor_Red_Toothbrush.png",
+            "yellow": "https://pikmin.wiki.gallery/images/thumb/4/4a/Decor_Yellow_Toothbrush.png/100px-Decor_Yellow_Toothbrush.png",
+            "blue": "https://pikmin.wiki.gallery/images/thumb/8/85/Decor_Blue_Toothbrush.png/100px-Decor_Blue_Toothbrush.png",
+            "white": "https://pikmin.wiki.gallery/images/thumb/a/a4/Decor_White_Toothbrush.png/100px-Decor_White_Toothbrush.png",
+            "purple": "https://pikmin.wiki.gallery/images/thumb/a/a5/Decor_Purple_Toothbrush.png/95px-Decor_Purple_Toothbrush.png",
+            "rock": "https://pikmin.wiki.gallery/images/thumb/3/3d/Decor_Rock_Toothbrush.png/100px-Decor_Rock_Toothbrush.png",
+            "winged": "https://pikmin.wiki.gallery/images/thumb/9/93/Decor_Winged_Toothbrush.png/100px-Decor_Winged_Toothbrush.png"
+          }
+        }
+      ],
+      "availablePikminTypes": [
+        "red",
+        "yellow",
+        "blue",
+        "purple",
+        "white",
+        "rock",
+        "winged"
+      ]
+    },
+    {
+      "category": {
+        "id": "zoo",
+        "name": "動物園",
+        "nameEn": "Zoo",
+        "type": "regular",
+        "icon": "🦁"
+      },
+      "variants": [
+        {
+          "id": "zoo-badge",
+          "name": "動物園徽章",
+          "nameEn": "Zoo Badge",
+          "imageUrl": "https://pikmin.wiki.gallery/images/thumb/5/5e/Decor_Red_Clover.png/200px-Decor_Red_Clover.png",
+          "imageUrls": {
+            "red": "https://pikmin.wiki.gallery/images/thumb/0/0b/Decor_Red_Stag_Beetle.png/100px-Decor_Red_Stag_Beetle.png",
+            "yellow": "https://pikmin.wiki.gallery/images/thumb/a/a7/Decor_Yellow_Stag_Beetle.png/100px-Decor_Yellow_Stag_Beetle.png",
+            "blue": "https://pikmin.wiki.gallery/images/thumb/9/9e/Decor_Blue_Stag_Beetle.png/100px-Decor_Blue_Stag_Beetle.png",
+            "white": "https://pikmin.wiki.gallery/images/thumb/b/bc/Decor_White_Stag_Beetle.png/100px-Decor_White_Stag_Beetle.png",
+            "purple": "https://pikmin.wiki.gallery/images/thumb/0/0e/Decor_Purple_Stag_Beetle.png/96px-Decor_Purple_Stag_Beetle.png",
+            "rock": "https://pikmin.wiki.gallery/images/thumb/c/c6/Decor_Rock_Stag_Beetle.png/85px-Decor_Rock_Stag_Beetle.png",
+            "winged": "https://pikmin.wiki.gallery/images/thumb/4/4c/Decor_Winged_Stag_Beetle.png/100px-Decor_Winged_Stag_Beetle.png"
+          }
+        }
+      ],
+      "availablePikminTypes": [
+        "red",
+        "yellow",
+        "blue",
+        "purple",
+        "white",
+        "rock",
+        "winged"
+      ]
+    },
+    {
+      "category": {
+        "id": "forest",
+        "name": "森林",
+        "nameEn": "Forest",
+        "type": "regular",
+        "icon": "🌲"
+      },
+      "variants": [
+        {
+          "id": "acorn",
+          "name": "橡果",
+          "nameEn": "Acorn",
+          "imageUrl": "https://pikmin.wiki.gallery/images/thumb/a/a0/Decor_Red_Acorn.png/200px-Decor_Red_Acorn.png",
+          "imageUrls": {
+            "red": "https://pikmin.wiki.gallery/images/thumb/a/a0/Decor_Red_Acorn.png/77px-Decor_Red_Acorn.png",
+            "yellow": "https://pikmin.wiki.gallery/images/thumb/c/c9/Decor_Yellow_Acorn.png/83px-Decor_Yellow_Acorn.png",
+            "blue": "https://pikmin.wiki.gallery/images/thumb/c/c2/Decor_Blue_Acorn.png/85px-Decor_Blue_Acorn.png",
+            "white": "https://pikmin.wiki.gallery/images/thumb/e/e8/Decor_White_Acorn.png/80px-Decor_White_Acorn.png",
+            "purple": "https://pikmin.wiki.gallery/images/thumb/4/4d/Decor_Purple_Acorn.png/96px-Decor_Purple_Acorn.png",
+            "rock": "https://pikmin.wiki.gallery/images/thumb/f/f5/Decor_Rock_Acorn.png/100px-Decor_Rock_Acorn.png",
+            "winged": "https://pikmin.wiki.gallery/images/thumb/9/94/Decor_Winged_Acorn.png/76px-Decor_Winged_Acorn.png"
+          }
+        },
+        {
+          "id": "stag-beetle",
+          "name": "鍬形蟲",
+          "nameEn": "Stag Beetle",
+          "imageUrl": "https://pikmin.wiki.gallery/images/thumb/0/0b/Decor_Red_Stag_Beetle.png/200px-Decor_Red_Stag_Beetle.png",
+          "imageUrls": {
+            "red": "https://pikmin.wiki.gallery/images/thumb/0/0b/Decor_Red_Stag_Beetle.png/100px-Decor_Red_Stag_Beetle.png",
+            "yellow": "https://pikmin.wiki.gallery/images/thumb/a/a7/Decor_Yellow_Stag_Beetle.png/100px-Decor_Yellow_Stag_Beetle.png",
+            "blue": "https://pikmin.wiki.gallery/images/thumb/9/9e/Decor_Blue_Stag_Beetle.png/100px-Decor_Blue_Stag_Beetle.png",
+            "white": "https://pikmin.wiki.gallery/images/thumb/b/bc/Decor_White_Stag_Beetle.png/100px-Decor_White_Stag_Beetle.png",
+            "purple": "https://pikmin.wiki.gallery/images/thumb/0/0e/Decor_Purple_Stag_Beetle.png/96px-Decor_Purple_Stag_Beetle.png",
+            "rock": "https://pikmin.wiki.gallery/images/thumb/c/c6/Decor_Rock_Stag_Beetle.png/85px-Decor_Rock_Stag_Beetle.png",
+            "winged": "https://pikmin.wiki.gallery/images/thumb/4/4c/Decor_Winged_Stag_Beetle.png/100px-Decor_Winged_Stag_Beetle.png"
+          }
+        }
+      ],
+      "availablePikminTypes": [
+        "red",
+        "yellow",
+        "blue",
+        "purple",
+        "white",
+        "rock",
+        "winged"
+      ]
+    },
+    {
+      "category": {
+        "id": "waterside",
+        "name": "水邊",
+        "nameEn": "Waterside",
+        "type": "regular",
+        "icon": "🌊"
+      },
+      "variants": [
+        {
+          "id": "fishing-lure",
+          "name": "魚餌",
+          "nameEn": "Fishing Lure",
+          "imageUrl": "https://pikmin.wiki.gallery/images/thumb/9/96/Decor_Red_Fishing_Lure.png/200px-Decor_Red_Fishing_Lure.png",
+          "imageUrls": {
+            "red": "https://pikmin.wiki.gallery/images/thumb/9/96/Decor_Red_Fishing_Lure.png/100px-Decor_Red_Fishing_Lure.png",
+            "yellow": "https://pikmin.wiki.gallery/images/thumb/2/25/Decor_Yellow_Fishing_Lure.png/100px-Decor_Yellow_Fishing_Lure.png",
+            "blue": "https://pikmin.wiki.gallery/images/thumb/9/9a/Decor_Blue_Fishing_Lure.png/100px-Decor_Blue_Fishing_Lure.png",
+            "white": "https://pikmin.wiki.gallery/images/thumb/7/75/Decor_White_Fishing_Lure.png/100px-Decor_White_Fishing_Lure.png",
+            "purple": "https://pikmin.wiki.gallery/images/thumb/8/89/Decor_Purple_Fishing_Lure.png/100px-Decor_Purple_Fishing_Lure.png",
+            "rock": "https://pikmin.wiki.gallery/images/thumb/f/f6/Decor_Rock_Fishing_Lure.png/100px-Decor_Rock_Fishing_Lure.png",
+            "winged": "https://pikmin.wiki.gallery/images/thumb/7/79/Decor_Winged_Fishing_Lure.png/100px-Decor_Winged_Fishing_Lure.png"
+          }
+        }
+      ],
+      "availablePikminTypes": [
+        "red",
+        "yellow",
+        "blue",
+        "purple",
+        "white",
+        "rock",
+        "winged"
+      ]
+    },
+    {
+      "category": {
+        "id": "post-office",
+        "name": "郵局",
+        "nameEn": "Post Office",
+        "type": "regular",
+        "icon": "✉️"
+      },
+      "variants": [
+        {
+          "id": "stamp",
+          "name": "郵票",
+          "nameEn": "Stamp",
+          "imageUrl": "https://pikmin.wiki.gallery/images/thumb/6/69/Decor_Red_Stamp.png/200px-Decor_Red_Stamp.png",
+          "imageUrls": {
+            "red": "https://pikmin.wiki.gallery/images/thumb/6/69/Decor_Red_Stamp.png/96px-Decor_Red_Stamp.png",
+            "yellow": "https://pikmin.wiki.gallery/images/thumb/d/da/Decor_Yellow_Stamp.png/100px-Decor_Yellow_Stamp.png",
+            "blue": "https://pikmin.wiki.gallery/images/thumb/8/88/Decor_Blue_Stamp.png/99px-Decor_Blue_Stamp.png",
+            "white": "https://pikmin.wiki.gallery/images/thumb/3/3d/Decor_White_Stamp.png/95px-Decor_White_Stamp.png",
+            "purple": "https://pikmin.wiki.gallery/images/thumb/e/e1/Decor_Purple_Stamp.png/90px-Decor_Purple_Stamp.png",
+            "rock": "https://pikmin.wiki.gallery/images/thumb/9/97/Decor_Rock_Stamp.png/100px-Decor_Rock_Stamp.png",
+            "winged": "https://pikmin.wiki.gallery/images/thumb/2/2b/Decor_Winged_Stamp.png/100px-Decor_Winged_Stamp.png"
+          }
+        }
+      ],
+      "availablePikminTypes": [
+        "red",
+        "yellow",
+        "blue",
+        "purple",
+        "white",
+        "rock",
+        "winged"
+      ]
+    },
+    {
+      "category": {
+        "id": "art-gallery",
+        "name": "美術館",
+        "nameEn": "Art Gallery",
+        "type": "regular",
+        "icon": "🎨"
+      },
+      "variants": [
+        {
+          "id": "picture-frame",
+          "name": "畫框",
+          "nameEn": "Picture Frame",
+          "imageUrl": "https://pikmin.wiki.gallery/images/thumb/9/9b/Decor_Red_Picture_Frame.png/200px-Decor_Red_Picture_Frame.png",
+          "imageUrls": {
+            "red": "https://pikmin.wiki.gallery/images/thumb/9/9b/Decor_Red_Picture_Frame.png/100px-Decor_Red_Picture_Frame.png",
+            "yellow": "https://pikmin.wiki.gallery/images/thumb/a/a1/Decor_Yellow_Picture_Frame.png/100px-Decor_Yellow_Picture_Frame.png",
+            "blue": "https://pikmin.wiki.gallery/images/thumb/e/ee/Decor_Blue_Picture_Frame.png/100px-Decor_Blue_Picture_Frame.png",
+            "white": "https://pikmin.wiki.gallery/images/thumb/d/db/Decor_White_Picture_Frame.png/100px-Decor_White_Picture_Frame.png",
+            "purple": "https://pikmin.wiki.gallery/images/thumb/6/6d/Decor_Purple_Picture_Frame.png/97px-Decor_Purple_Picture_Frame.png",
+            "rock": "https://pikmin.wiki.gallery/images/thumb/6/6d/Decor_Rock_Picture_Frame.png/100px-Decor_Rock_Picture_Frame.png",
+            "winged": "https://pikmin.wiki.gallery/images/thumb/d/dc/Decor_Winged_Picture_Frame.png/100px-Decor_Winged_Picture_Frame.png"
+          }
+        }
+      ],
+      "availablePikminTypes": [
+        "red",
+        "yellow",
+        "blue",
+        "purple",
+        "white",
+        "rock",
+        "winged"
+      ]
+    },
+    {
+      "category": {
+        "id": "airport",
+        "name": "機場",
+        "nameEn": "Airport",
+        "type": "regular",
+        "icon": "✈️"
+      },
+      "variants": [
+        {
+          "id": "paper-airplane",
+          "name": "紙飛機",
+          "nameEn": "Paper Airplane",
+          "imageUrl": "https://pikmin.wiki.gallery/images/thumb/4/48/Decor_Red_Toy_Airplane.png/200px-Decor_Red_Toy_Airplane.png",
+          "imageUrls": {
+            "red": "https://pikmin.wiki.gallery/images/thumb/4/48/Decor_Red_Toy_Airplane.png/100px-Decor_Red_Toy_Airplane.png",
+            "yellow": "https://pikmin.wiki.gallery/images/thumb/2/23/Decor_Yellow_Toy_Airplane.png/100px-Decor_Yellow_Toy_Airplane.png",
+            "blue": "https://pikmin.wiki.gallery/images/thumb/7/73/Decor_Blue_Toy_Airplane.png/100px-Decor_Blue_Toy_Airplane.png",
+            "white": "https://pikmin.wiki.gallery/images/thumb/d/d0/Decor_White_Toy_Airplane.png/100px-Decor_White_Toy_Airplane.png",
+            "purple": "https://pikmin.wiki.gallery/images/thumb/b/b6/Decor_Purple_Toy_Airplane.png/100px-Decor_Purple_Toy_Airplane.png",
+            "rock": "https://pikmin.wiki.gallery/images/thumb/8/88/Decor_Rock_Toy_Airplane.png/100px-Decor_Rock_Toy_Airplane.png",
+            "winged": "https://pikmin.wiki.gallery/images/thumb/f/fd/Decor_Winged_Toy_Airplane.png/100px-Decor_Winged_Toy_Airplane.png"
+          }
+        }
+      ],
+      "availablePikminTypes": [
+        "red",
+        "yellow",
+        "blue",
+        "purple",
+        "white",
+        "rock",
+        "winged"
+      ]
+    },
+    {
+      "category": {
+        "id": "train-station",
+        "name": "車站",
+        "nameEn": "Train Station",
+        "type": "regular",
+        "icon": "🚂"
+      },
+      "variants": [
+        {
+          "id": "ticket",
+          "name": "車票",
+          "nameEn": "Ticket",
+          "imageUrl": "https://pikmin.wiki.gallery/images/thumb/4/42/Decor_Red_Ticket.png/200px-Decor_Red_Ticket.png",
+          "imageUrls": {
+            "red": "https://pikmin.wiki.gallery/images/thumb/4/42/Decor_Red_Ticket.png/100px-Decor_Red_Ticket.png",
+            "yellow": "https://pikmin.wiki.gallery/images/thumb/f/fc/Decor_Yellow_Ticket.png/100px-Decor_Yellow_Ticket.png",
+            "blue": "https://pikmin.wiki.gallery/images/thumb/7/78/Decor_Blue_Ticket.png/100px-Decor_Blue_Ticket.png",
+            "white": "https://pikmin.wiki.gallery/images/thumb/b/be/Decor_White_Ticket.png/100px-Decor_White_Ticket.png",
+            "purple": "https://pikmin.wiki.gallery/images/thumb/f/f9/Decor_Purple_Ticket.png/90px-Decor_Purple_Ticket.png",
+            "rock": "https://pikmin.wiki.gallery/images/thumb/4/42/Decor_Rock_Ticket.png/100px-Decor_Rock_Ticket.png",
+            "winged": "https://pikmin.wiki.gallery/images/thumb/d/dc/Decor_Winged_Ticket.png/100px-Decor_Winged_Ticket.png"
+          }
+        }
+      ],
+      "availablePikminTypes": [
+        "red",
+        "yellow",
+        "blue",
+        "purple",
+        "white",
+        "rock",
+        "winged"
+      ]
+    },
+    {
+      "category": {
+        "id": "beach",
+        "name": "海灘",
+        "nameEn": "Beach",
+        "type": "regular",
+        "icon": "🏖️"
+      },
+      "variants": [
+        {
+          "id": "shell",
+          "name": "貝殼",
+          "nameEn": "Shell",
+          "imageUrl": "https://pikmin.wiki.gallery/images/thumb/7/74/Decor_Red_Shell.png/200px-Decor_Red_Shell.png",
+          "imageUrls": {
+            "red": "https://pikmin.wiki.gallery/images/thumb/7/74/Decor_Red_Shell.png/100px-Decor_Red_Shell.png",
+            "yellow": "https://pikmin.wiki.gallery/images/thumb/6/6e/Decor_Yellow_Shell.png/99px-Decor_Yellow_Shell.png",
+            "blue": "https://pikmin.wiki.gallery/images/thumb/d/de/Decor_Blue_Shell.png/100px-Decor_Blue_Shell.png",
+            "white": "https://pikmin.wiki.gallery/images/thumb/0/0f/Decor_White_Shell.png/100px-Decor_White_Shell.png",
+            "purple": "https://pikmin.wiki.gallery/images/thumb/c/c6/Decor_Purple_Shell.png/95px-Decor_Purple_Shell.png",
+            "rock": "https://pikmin.wiki.gallery/images/thumb/3/3a/Decor_Rock_Shell.png/100px-Decor_Rock_Shell.png",
+            "winged": "https://pikmin.wiki.gallery/images/thumb/d/d4/Decor_Winged_Shell.png/100px-Decor_Winged_Shell.png"
+          }
+        }
+      ],
+      "availablePikminTypes": [
+        "red",
+        "yellow",
+        "blue",
+        "purple",
+        "white",
+        "rock",
+        "winged"
+      ]
+    },
+    {
+      "category": {
+        "id": "hamburger-shop",
+        "name": "漢堡店",
+        "nameEn": "Hamburger Shop",
+        "type": "regular",
+        "icon": "🍔"
+      },
+      "variants": [
+        {
+          "id": "burger",
+          "name": "漢堡",
+          "nameEn": "Burger",
+          "imageUrl": "https://pikmin.wiki.gallery/images/thumb/c/c6/Decor_Red_Burger.png/200px-Decor_Red_Burger.png",
+          "imageUrls": {
+            "red": "https://pikmin.wiki.gallery/images/thumb/c/c6/Decor_Red_Burger.png/100px-Decor_Red_Burger.png",
+            "yellow": "https://pikmin.wiki.gallery/images/thumb/1/1b/Decor_Yellow_Burger.png/100px-Decor_Yellow_Burger.png",
+            "blue": "https://pikmin.wiki.gallery/images/thumb/b/b2/Decor_Blue_Burger.png/92px-Decor_Blue_Burger.png",
+            "white": "https://pikmin.wiki.gallery/images/thumb/c/c8/Decor_White_Burger.png/100px-Decor_White_Burger.png",
+            "purple": "https://pikmin.wiki.gallery/images/thumb/2/28/Decor_Purple_Burger.png/100px-Decor_Purple_Burger.png",
+            "rock": "https://pikmin.wiki.gallery/images/thumb/a/a8/Decor_Rock_Burger.png/100px-Decor_Rock_Burger.png",
+            "winged": "https://pikmin.wiki.gallery/images/thumb/7/78/Decor_Winged_Burger.png/87px-Decor_Winged_Burger.png"
+          }
+        }
+      ],
+      "availablePikminTypes": [
+        "red",
+        "yellow",
+        "blue",
+        "purple",
+        "white",
+        "rock",
+        "winged"
+      ]
+    },
+    {
+      "category": {
+        "id": "convenience-store",
+        "name": "便利商店",
+        "nameEn": "Convenience Store",
+        "type": "regular",
+        "icon": "🏪"
+      },
+      "variants": [
+        {
+          "id": "bottle-cap",
+          "name": "瓶蓋",
+          "nameEn": "Bottle Cap",
+          "imageUrl": "https://pikmin.wiki.gallery/images/thumb/3/32/Decor_Red_Bottle_Cap.png/200px-Decor_Red_Bottle_Cap.png",
+          "imageUrls": {
+            "red": "https://pikmin.wiki.gallery/images/thumb/3/32/Decor_Red_Bottle_Cap.png/94px-Decor_Red_Bottle_Cap.png",
+            "yellow": "https://pikmin.wiki.gallery/images/thumb/1/10/Decor_Yellow_Bottle_Cap.png/100px-Decor_Yellow_Bottle_Cap.png",
+            "blue": "https://pikmin.wiki.gallery/images/thumb/a/a1/Decor_Blue_Bottle_Cap.png/99px-Decor_Blue_Bottle_Cap.png",
+            "white": "https://pikmin.wiki.gallery/images/thumb/2/2e/Decor_White_Bottle_Cap.png/81px-Decor_White_Bottle_Cap.png",
+            "purple": "https://pikmin.wiki.gallery/images/thumb/b/be/Decor_Purple_Bottle_Cap.png/90px-Decor_Purple_Bottle_Cap.png",
+            "rock": "https://pikmin.wiki.gallery/images/thumb/e/eb/Decor_Rock_Bottle_Cap.png/100px-Decor_Rock_Bottle_Cap.png",
+            "winged": "https://pikmin.wiki.gallery/images/thumb/5/58/Decor_Winged_Bottle_Cap.png/88px-Decor_Winged_Bottle_Cap.png"
+          }
+        }
+      ],
+      "availablePikminTypes": [
+        "red",
+        "yellow",
+        "blue",
+        "purple",
+        "white",
+        "rock",
+        "winged"
+      ]
+    },
+    {
+      "category": {
+        "id": "supermarket",
+        "name": "超市",
+        "nameEn": "Supermarket",
+        "type": "regular",
+        "icon": "🛒"
+      },
+      "variants": [
+        {
+          "id": "banana",
+          "name": "香蕉",
+          "nameEn": "Banana",
+          "imageUrl": "https://pikmin.wiki.gallery/images/thumb/1/1c/Decor_Red_Banana.png/200px-Decor_Red_Banana.png",
+          "imageUrls": {
+            "red": "https://pikmin.wiki.gallery/images/thumb/1/1c/Decor_Red_Banana.png/100px-Decor_Red_Banana.png",
+            "yellow": "https://pikmin.wiki.gallery/images/thumb/f/f7/Decor_Yellow_Banana.png/67px-Decor_Yellow_Banana.png",
+            "blue": "https://pikmin.wiki.gallery/images/thumb/d/d1/Decor_Blue_Banana.png/70px-Decor_Blue_Banana.png",
+            "white": "https://pikmin.wiki.gallery/images/thumb/b/b9/Decor_White_Banana.png/60px-Decor_White_Banana.png",
+            "purple": "https://pikmin.wiki.gallery/images/thumb/9/98/Decor_Purple_Banana.png/89px-Decor_Purple_Banana.png",
+            "rock": "https://pikmin.wiki.gallery/images/thumb/b/b3/Decor_Rock_Banana.png/100px-Decor_Rock_Banana.png",
+            "winged": "https://pikmin.wiki.gallery/images/thumb/7/72/Decor_Winged_Banana.png/100px-Decor_Winged_Banana.png"
+          }
+        },
+        {
+          "id": "mushroom",
+          "name": "蘑菇",
+          "nameEn": "Mushroom",
+          "imageUrl": "https://pikmin.wiki.gallery/images/thumb/6/67/Decor_Red_Mushroom.png/200px-Decor_Red_Mushroom.png",
+          "imageUrls": {
+            "red": "https://pikmin.wiki.gallery/images/thumb/6/67/Decor_Red_Mushroom.png/89px-Decor_Red_Mushroom.png",
+            "yellow": "https://pikmin.wiki.gallery/images/thumb/c/ce/Decor_Yellow_Mushroom.png/73px-Decor_Yellow_Mushroom.png",
+            "blue": "https://pikmin.wiki.gallery/images/thumb/d/db/Decor_Blue_Mushroom.png/66px-Decor_Blue_Mushroom.png",
+            "white": "https://pikmin.wiki.gallery/images/thumb/1/10/Decor_White_Mushroom.png/87px-Decor_White_Mushroom.png",
+            "purple": "https://pikmin.wiki.gallery/images/thumb/b/b0/Decor_Purple_Mushroom.png/96px-Decor_Purple_Mushroom.png",
+            "rock": "https://pikmin.wiki.gallery/images/thumb/0/0f/Decor_Rock_Mushroom.png/84px-Decor_Rock_Mushroom.png",
+            "winged": "https://pikmin.wiki.gallery/images/thumb/7/7f/Decor_Winged_Mushroom.png/89px-Decor_Winged_Mushroom.png"
+          }
+        }
+      ],
+      "availablePikminTypes": [
+        "red",
+        "yellow",
+        "blue",
+        "purple",
+        "white",
+        "rock",
+        "winged"
+      ]
+    },
+    {
+      "category": {
+        "id": "bakery",
+        "name": "麵包店",
+        "nameEn": "Bakery",
+        "type": "regular",
+        "icon": "🥐"
+      },
+      "variants": [
+        {
+          "id": "baguette",
+          "name": "法國麵包",
+          "nameEn": "Baguette",
+          "imageUrl": "https://pikmin.wiki.gallery/images/thumb/6/6c/Decor_Red_Baguette.png/200px-Decor_Red_Baguette.png",
+          "imageUrls": {
+            "red": "https://pikmin.wiki.gallery/images/thumb/6/6c/Decor_Red_Baguette.png/100px-Decor_Red_Baguette.png",
+            "yellow": "https://pikmin.wiki.gallery/images/thumb/b/be/Decor_Yellow_Baguette.png/100px-Decor_Yellow_Baguette.png",
+            "blue": "https://pikmin.wiki.gallery/images/thumb/9/95/Decor_Blue_Baguette.png/100px-Decor_Blue_Baguette.png",
+            "white": "https://pikmin.wiki.gallery/images/thumb/5/5b/Decor_White_Baguette.png/100px-Decor_White_Baguette.png",
+            "purple": "https://pikmin.wiki.gallery/images/thumb/f/f9/Decor_Purple_Baguette.png/100px-Decor_Purple_Baguette.png",
+            "rock": "https://pikmin.wiki.gallery/images/thumb/a/a2/Decor_Rock_Baguette.png/100px-Decor_Rock_Baguette.png",
+            "winged": "https://pikmin.wiki.gallery/images/thumb/2/20/Decor_Winged_Baguette.png/100px-Decor_Winged_Baguette.png"
+          }
+        }
+      ],
+      "availablePikminTypes": [
+        "red",
+        "yellow",
+        "blue",
+        "purple",
+        "white",
+        "rock",
+        "winged"
+      ]
+    },
+    {
+      "category": {
+        "id": "hair-salon",
+        "name": "理髮店",
+        "nameEn": "Hair Salon",
+        "type": "regular",
+        "icon": "💇"
+      },
+      "variants": [
+        {
+          "id": "scissors",
+          "name": "剪刀",
+          "nameEn": "Scissors",
+          "imageUrl": "https://pikmin.wiki.gallery/images/thumb/5/5d/Decor_Red_Scissors.png/200px-Decor_Red_Scissors.png",
+          "imageUrls": {
+            "red": "https://pikmin.wiki.gallery/images/thumb/5/5d/Decor_Red_Scissors.png/100px-Decor_Red_Scissors.png",
+            "yellow": "https://pikmin.wiki.gallery/images/thumb/3/31/Decor_Yellow_Scissors.png/100px-Decor_Yellow_Scissors.png",
+            "blue": "https://pikmin.wiki.gallery/images/thumb/e/e2/Decor_Blue_Scissors.png/100px-Decor_Blue_Scissors.png",
+            "white": "https://pikmin.wiki.gallery/images/thumb/c/cd/Decor_White_Scissors.png/100px-Decor_White_Scissors.png",
+            "purple": "https://pikmin.wiki.gallery/images/thumb/1/16/Decor_Purple_Scissors.png/100px-Decor_Purple_Scissors.png",
+            "rock": "https://pikmin.wiki.gallery/images/thumb/8/80/Decor_Rock_Scissors.png/100px-Decor_Rock_Scissors.png",
+            "winged": "https://pikmin.wiki.gallery/images/thumb/3/3c/Decor_Winged_Scissors.png/100px-Decor_Winged_Scissors.png"
+          }
+        }
+      ],
+      "availablePikminTypes": [
+        "red",
+        "yellow",
+        "blue",
+        "purple",
+        "white",
+        "rock",
+        "winged"
+      ]
+    },
+    {
+      "category": {
+        "id": "clothes-store",
+        "name": "服飾店",
+        "nameEn": "Clothes Store",
+        "type": "regular",
+        "icon": "👔"
+      },
+      "variants": [
+        {
+          "id": "mini-t-shirt",
+          "name": "迷你T恤",
+          "nameEn": "Mini T-Shirt",
+          "imageUrl": "https://pikmin.wiki.gallery/images/thumb/5/5e/Decor_Red_Clover.png/200px-Decor_Red_Clover.png"
+        }
+      ],
+      "availablePikminTypes": [
+        "red",
+        "yellow",
+        "blue",
+        "purple",
+        "white",
+        "rock",
+        "winged"
+      ]
+    },
+    {
+      "category": {
+        "id": "park",
+        "name": "公園",
+        "nameEn": "Park",
+        "type": "regular",
+        "icon": "🌳"
+      },
+      "variants": [
+        {
+          "id": "clover",
+          "name": "四葉草",
+          "nameEn": "Four-Leaf Clover",
+          "imageUrl": "https://pikmin.wiki.gallery/images/thumb/e/e2/Decor_Red_Four-Leaf_Clover.png/200px-Decor_Red_Four-Leaf_Clover.png",
+          "imageUrls": {
+            "red": "https://pikmin.wiki.gallery/images/thumb/e/e2/Decor_Red_Four-Leaf_Clover.png/100px-Decor_Red_Four-Leaf_Clover.png",
+            "yellow": "https://pikmin.wiki.gallery/images/thumb/d/dd/Decor_Yellow_Four-Leaf_Clover.png/100px-Decor_Yellow_Four-Leaf_Clover.png",
+            "blue": "https://pikmin.wiki.gallery/images/thumb/2/2d/Decor_Blue_Four-Leaf_Clover.png/100px-Decor_Blue_Four-Leaf_Clover.png",
+            "white": "https://pikmin.wiki.gallery/images/thumb/c/cf/Decor_White_Four-Leaf_Clover.png/100px-Decor_White_Four-Leaf_Clover.png",
+            "purple": "https://pikmin.wiki.gallery/images/thumb/e/e4/Decor_Purple_Four-Leaf_Clover.png/100px-Decor_Purple_Four-Leaf_Clover.png",
+            "rock": "https://pikmin.wiki.gallery/images/thumb/8/8f/Decor_Rock_Four-Leaf_Clover.png/100px-Decor_Rock_Four-Leaf_Clover.png",
+            "winged": "https://pikmin.wiki.gallery/images/thumb/1/13/Decor_Winged_Four-Leaf_Clover.png/100px-Decor_Winged_Four-Leaf_Clover.png"
+          }
+        }
+      ],
+      "availablePikminTypes": [
+        "red",
+        "yellow",
+        "blue",
+        "purple",
+        "white",
+        "rock",
+        "winged"
+      ]
+    },
+    {
+      "category": {
+        "id": "library",
+        "name": "圖書館",
+        "nameEn": "Library",
+        "type": "regular",
+        "icon": "📚"
+      },
+      "variants": [
+        {
+          "id": "picture-book",
+          "name": "繪本",
+          "nameEn": "Picture Book",
+          "imageUrl": "https://pikmin.wiki.gallery/images/thumb/7/78/Decor_Red_Tiny_Book.png/200px-Decor_Red_Tiny_Book.png",
+          "imageUrls": {
+            "red": "https://pikmin.wiki.gallery/images/thumb/7/78/Decor_Red_Tiny_Book.png/100px-Decor_Red_Tiny_Book.png",
+            "yellow": "https://pikmin.wiki.gallery/images/thumb/6/6a/Decor_Yellow_Tiny_Book.png/100px-Decor_Yellow_Tiny_Book.png",
+            "blue": "https://pikmin.wiki.gallery/images/thumb/f/f0/Decor_Blue_Tiny_Book.png/100px-Decor_Blue_Tiny_Book.png",
+            "white": "https://pikmin.wiki.gallery/images/thumb/b/bd/Decor_White_Tiny_Book.png/100px-Decor_White_Tiny_Book.png",
+            "purple": "https://pikmin.wiki.gallery/images/thumb/e/ed/Decor_Purple_Tiny_Book.png/93px-Decor_Purple_Tiny_Book.png",
+            "rock": "https://pikmin.wiki.gallery/images/thumb/4/46/Decor_Rock_Tiny_Book.png/100px-Decor_Rock_Tiny_Book.png",
+            "winged": "https://pikmin.wiki.gallery/images/thumb/d/d8/Decor_Winged_Tiny_Book.png/95px-Decor_Winged_Tiny_Book.png"
+          }
+        }
+      ],
+      "availablePikminTypes": [
+        "red",
+        "yellow",
+        "blue",
+        "purple",
+        "white",
+        "rock",
+        "winged"
+      ]
+    },
+    {
+      "category": {
+        "id": "sushi-restaurant",
+        "name": "壽司店",
+        "nameEn": "Sushi Restaurant",
+        "type": "regular",
+        "icon": "🍣"
+      },
+      "variants": [
+        {
+          "id": "sushi",
+          "name": "壽司",
+          "nameEn": "Sushi",
+          "imageUrl": "https://pikmin.wiki.gallery/images/thumb/7/7d/Decor_Red_Sushi.png/200px-Decor_Red_Sushi.png",
+          "imageUrls": {
+            "red": "https://pikmin.wiki.gallery/images/thumb/7/7d/Decor_Red_Sushi.png/100px-Decor_Red_Sushi.png",
+            "yellow": "https://pikmin.wiki.gallery/images/thumb/3/3d/Decor_Yellow_Sushi.png/100px-Decor_Yellow_Sushi.png",
+            "blue": "https://pikmin.wiki.gallery/images/thumb/7/7b/Decor_Blue_Sushi.png/100px-Decor_Blue_Sushi.png",
+            "white": "https://pikmin.wiki.gallery/images/thumb/8/80/Decor_White_Sushi.png/100px-Decor_White_Sushi.png",
+            "purple": "https://pikmin.wiki.gallery/images/thumb/e/ee/Decor_Purple_Sushi.png/98px-Decor_Purple_Sushi.png",
+            "rock": "https://pikmin.wiki.gallery/images/thumb/4/4d/Decor_Rock_Sushi.png/100px-Decor_Rock_Sushi.png",
+            "winged": "https://pikmin.wiki.gallery/images/thumb/4/42/Decor_Winged_Sushi.png/100px-Decor_Winged_Sushi.png"
+          }
+        }
+      ],
+      "availablePikminTypes": [
+        "red",
+        "yellow",
+        "blue",
+        "purple",
+        "white",
+        "rock",
+        "winged"
+      ]
+    },
+    {
+      "category": {
+        "id": "mountain",
+        "name": "山頂",
+        "nameEn": "Mountain",
+        "type": "regular",
+        "icon": "⛰️"
+      },
+      "variants": [
+        {
+          "id": "mountain-badge",
+          "name": "山徽章",
+          "nameEn": "Mountain Badge",
+          "imageUrl": "https://pikmin.wiki.gallery/images/thumb/2/27/Decor_Red_Mountain_Pin_Badge.png/200px-Decor_Red_Mountain_Pin_Badge.png",
+          "imageUrls": {
+            "red": "https://pikmin.wiki.gallery/images/thumb/2/27/Decor_Red_Mountain_Pin_Badge.png/100px-Decor_Red_Mountain_Pin_Badge.png",
+            "yellow": "https://pikmin.wiki.gallery/images/thumb/a/aa/Decor_Yellow_Mountain_Pin_Badge.png/100px-Decor_Yellow_Mountain_Pin_Badge.png",
+            "blue": "https://pikmin.wiki.gallery/images/thumb/3/3d/Decor_Blue_Mountain_Pin_Badge.png/100px-Decor_Blue_Mountain_Pin_Badge.png",
+            "white": "https://pikmin.wiki.gallery/images/thumb/5/5a/Decor_White_Mountain_Pin_Badge.png/100px-Decor_White_Mountain_Pin_Badge.png",
+            "purple": "https://pikmin.wiki.gallery/images/thumb/7/72/Decor_Purple_Mountain_Pin_Badge.png/100px-Decor_Purple_Mountain_Pin_Badge.png",
+            "rock": "https://pikmin.wiki.gallery/images/thumb/c/cf/Decor_Rock_Mountain_Pin_Badge.png/100px-Decor_Rock_Mountain_Pin_Badge.png",
+            "winged": "https://pikmin.wiki.gallery/images/thumb/5/52/Decor_Winged_Mountain_Pin_Badge.png/100px-Decor_Winged_Mountain_Pin_Badge.png"
+          }
+        }
+      ],
+      "availablePikminTypes": [
+        "red",
+        "yellow",
+        "blue",
+        "purple",
+        "white",
+        "rock",
+        "winged"
+      ]
+    },
+    {
+      "category": {
+        "id": "stadium",
+        "name": "體育場",
+        "nameEn": "Stadium",
+        "type": "regular",
+        "icon": "🏟️"
+      },
+      "variants": [
+        {
+          "id": "helmet",
+          "name": "頭盔",
+          "nameEn": "Helmet",
+          "imageUrl": "https://pikmin.wiki.gallery/images/thumb/7/71/Decor_Red_Ball_Keychain.png/200px-Decor_Red_Ball_Keychain.png",
+          "imageUrls": {
+            "red": "https://pikmin.wiki.gallery/images/thumb/7/71/Decor_Red_Ball_Keychain.png/100px-Decor_Red_Ball_Keychain.png",
+            "yellow": "https://pikmin.wiki.gallery/images/thumb/1/19/Decor_Yellow_Ball_Keychain.png/100px-Decor_Yellow_Ball_Keychain.png",
+            "blue": "https://pikmin.wiki.gallery/images/thumb/d/d3/Decor_Blue_Ball_Keychain.png/100px-Decor_Blue_Ball_Keychain.png",
+            "white": "https://pikmin.wiki.gallery/images/thumb/a/a8/Decor_White_Ball_Keychain.png/100px-Decor_White_Ball_Keychain.png",
+            "purple": "https://pikmin.wiki.gallery/images/thumb/3/31/Decor_Purple_Ball_Keychain.png/100px-Decor_Purple_Ball_Keychain.png",
+            "rock": "https://pikmin.wiki.gallery/images/thumb/6/6e/Decor_Rock_Ball_Keychain.png/93px-Decor_Rock_Ball_Keychain.png",
+            "winged": "https://pikmin.wiki.gallery/images/thumb/4/44/Decor_Winged_Ball_Keychain.png/100px-Decor_Winged_Ball_Keychain.png"
+          }
+        }
+      ],
+      "availablePikminTypes": [
+        "red",
+        "yellow",
+        "blue",
+        "purple",
+        "white",
+        "rock",
+        "winged"
+      ]
+    },
+    {
+      "category": {
+        "id": "theme-park",
+        "name": "主題樂園",
+        "nameEn": "Theme Park",
+        "type": "regular",
+        "icon": "🎢"
+      },
+      "variants": [
+        {
+          "id": "amusement-ride",
+          "name": "遊樂設施",
+          "nameEn": "Amusement Ride",
+          "imageUrl": "https://pikmin.wiki.gallery/images/thumb/0/00/Decor_Red_Amusement_Ride.png/200px-Decor_Red_Amusement_Ride.png",
+          "imageUrls": {
+            "red": "https://pikmin.wiki.gallery/images/thumb/0/0e/Decor_Red_Theme_Park_Ticket_1.png/200px-Decor_Red_Theme_Park_Ticket_1.png",
+            "yellow": "https://pikmin.wiki.gallery/images/thumb/e/e2/Decor_Yellow_Theme_Park_Ticket_1.png/200px-Decor_Yellow_Theme_Park_Ticket_1.png",
+            "blue": "https://pikmin.wiki.gallery/images/thumb/4/40/Decor_Blue_Theme_Park_Ticket_1.png/200px-Decor_Blue_Theme_Park_Ticket_1.png"
+          }
+        }
+      ],
+      "availablePikminTypes": [
+        "red",
+        "yellow",
+        "blue",
+        "purple",
+        "white",
+        "rock",
+        "winged"
+      ]
+    },
+    {
+      "category": {
+        "id": "bus-stop",
+        "name": "公車站",
+        "nameEn": "Bus Stop",
+        "type": "regular",
+        "icon": "🚌"
+      },
+      "variants": [
+        {
+          "id": "bus-ticket",
+          "name": "公車票",
+          "nameEn": "Bus Ticket",
+          "imageUrl": "https://pikmin.wiki.gallery/images/thumb/d/dd/Decor_Red_Bus_Papercraft.png/200px-Decor_Red_Bus_Papercraft.png",
+          "imageUrls": {
+            "red": "https://pikmin.wiki.gallery/images/thumb/d/dd/Decor_Red_Bus_Papercraft.png/100px-Decor_Red_Bus_Papercraft.png",
+            "yellow": "https://pikmin.wiki.gallery/images/thumb/8/8b/Decor_Yellow_Bus_Papercraft.png/100px-Decor_Yellow_Bus_Papercraft.png",
+            "blue": "https://pikmin.wiki.gallery/images/thumb/0/0f/Decor_Blue_Bus_Papercraft.png/95px-Decor_Blue_Bus_Papercraft.png",
+            "white": "https://pikmin.wiki.gallery/images/thumb/2/27/Decor_White_Bus_Papercraft.png/86px-Decor_White_Bus_Papercraft.png",
+            "purple": "https://pikmin.wiki.gallery/images/thumb/a/a2/Decor_Purple_Bus_Papercraft.png/85px-Decor_Purple_Bus_Papercraft.png",
+            "rock": "https://pikmin.wiki.gallery/images/thumb/2/2d/Decor_Rock_Bus_Papercraft.png/100px-Decor_Rock_Bus_Papercraft.png",
+            "winged": "https://pikmin.wiki.gallery/images/thumb/7/7d/Decor_Winged_Bus_Papercraft.png/91px-Decor_Winged_Bus_Papercraft.png"
+          }
+        }
+      ],
+      "availablePikminTypes": [
+        "red",
+        "yellow",
+        "blue",
+        "purple",
+        "white",
+        "rock",
+        "winged"
+      ]
+    },
+    {
+      "category": {
+        "id": "pizza-restaurant",
+        "name": "披薩店",
+        "nameEn": "Italian Restaurant",
+        "type": "regular",
+        "icon": "🍕"
+      },
+      "variants": [
+        {
+          "id": "pizza-slice",
+          "name": "披薩片",
+          "nameEn": "Pizza Slice",
+          "imageUrl": "https://pikmin.wiki.gallery/images/thumb/7/76/Decor_Red_Pizza.png/200px-Decor_Red_Pizza.png",
+          "imageUrls": {
+            "red": "https://pikmin.wiki.gallery/images/thumb/7/76/Decor_Red_Pizza.png/100px-Decor_Red_Pizza.png",
+            "yellow": "https://pikmin.wiki.gallery/images/thumb/a/af/Decor_Yellow_Pizza.png/100px-Decor_Yellow_Pizza.png",
+            "blue": "https://pikmin.wiki.gallery/images/thumb/b/b7/Decor_Blue_Pizza.png/100px-Decor_Blue_Pizza.png",
+            "white": "https://pikmin.wiki.gallery/images/thumb/3/33/Decor_White_Pizza.png/100px-Decor_White_Pizza.png",
+            "purple": "https://pikmin.wiki.gallery/images/thumb/6/60/Decor_Purple_Pizza.png/100px-Decor_Purple_Pizza.png",
+            "rock": "https://pikmin.wiki.gallery/images/thumb/d/dd/Decor_Rock_Pizza.png/100px-Decor_Rock_Pizza.png",
+            "winged": "https://pikmin.wiki.gallery/images/thumb/8/84/Decor_Winged_Pizza.png/87px-Decor_Winged_Pizza.png"
+          }
+        }
+      ],
+      "availablePikminTypes": [
+        "red",
+        "yellow",
+        "blue",
+        "purple",
+        "white",
+        "rock",
+        "winged"
+      ]
+    },
+    {
+      "category": {
+        "id": "chinese-restaurant",
+        "name": "中華餐廳",
+        "nameEn": "Chinese Restaurant",
+        "type": "regular",
+        "icon": "🥡"
+      },
+      "variants": [
+        {
+          "id": "gyoza",
+          "name": "餃子",
+          "nameEn": "Gyoza",
+          "imageUrl": "https://pikmin.wiki.gallery/images/thumb/9/99/Decor_Red_Curry_Bowl.png/200px-Decor_Red_Curry_Bowl.png",
+          "imageUrls": {
+            "red": "https://pikmin.wiki.gallery/images/thumb/9/99/Decor_Red_Curry_Bowl.png/92px-Decor_Red_Curry_Bowl.png",
+            "yellow": "https://pikmin.wiki.gallery/images/thumb/5/57/Decor_Yellow_Curry_Bowl.png/86px-Decor_Yellow_Curry_Bowl.png",
+            "blue": "https://pikmin.wiki.gallery/images/thumb/3/3c/Decor_Blue_Curry_Bowl.png/100px-Decor_Blue_Curry_Bowl.png",
+            "white": "https://pikmin.wiki.gallery/images/thumb/8/87/Decor_White_Curry_Bowl.png/98px-Decor_White_Curry_Bowl.png",
+            "purple": "https://pikmin.wiki.gallery/images/thumb/9/96/Decor_Purple_Curry_Bowl.png/100px-Decor_Purple_Curry_Bowl.png",
+            "rock": "https://pikmin.wiki.gallery/images/thumb/6/63/Decor_Rock_Curry_Bowl.png/98px-Decor_Rock_Curry_Bowl.png",
+            "winged": "https://pikmin.wiki.gallery/images/thumb/e/e1/Decor_Winged_Curry_Bowl.png/82px-Decor_Winged_Curry_Bowl.png"
+          }
+        }
+      ],
+      "availablePikminTypes": [
+        "red",
+        "yellow",
+        "blue",
+        "purple",
+        "white",
+        "rock",
+        "winged"
+      ]
+    },
+    {
+      "category": {
+        "id": "ramen-shop",
+        "name": "拉麵店",
+        "nameEn": "Ramen Shop",
+        "type": "regular",
+        "icon": "🍜"
+      },
+      "variants": [
+        {
+          "id": "ramen",
+          "name": "拉麵",
+          "nameEn": "Ramen",
+          "imageUrl": "https://pikmin.wiki.gallery/images/thumb/b/b9/Decor_Red_Ramen_Keychain.png/200px-Decor_Red_Ramen_Keychain.png",
+          "imageUrls": {
+            "red": "https://pikmin.wiki.gallery/images/thumb/b/b9/Decor_Red_Ramen_Keychain.png/100px-Decor_Red_Ramen_Keychain.png",
+            "yellow": "https://pikmin.wiki.gallery/images/thumb/6/6f/Decor_Yellow_Ramen_Keychain.png/100px-Decor_Yellow_Ramen_Keychain.png",
+            "blue": "https://pikmin.wiki.gallery/images/thumb/a/ad/Decor_Blue_Ramen_Keychain.png/100px-Decor_Blue_Ramen_Keychain.png",
+            "white": "https://pikmin.wiki.gallery/images/thumb/6/69/Decor_White_Ramen_Keychain.png/100px-Decor_White_Ramen_Keychain.png",
+            "purple": "https://pikmin.wiki.gallery/images/thumb/5/5d/Decor_Purple_Ramen_Keychain.png/100px-Decor_Purple_Ramen_Keychain.png",
+            "rock": "https://pikmin.wiki.gallery/images/thumb/9/97/Decor_Rock_Ramen_Keychain.png/100px-Decor_Rock_Ramen_Keychain.png",
+            "winged": "https://pikmin.wiki.gallery/images/thumb/7/7c/Decor_Winged_Ramen_Keychain.png/100px-Decor_Winged_Ramen_Keychain.png"
+          }
+        }
+      ],
+      "availablePikminTypes": [
+        "red",
+        "yellow",
+        "blue",
+        "purple",
+        "white",
+        "rock",
+        "winged"
+      ]
+    },
+    {
+      "category": {
+        "id": "bridge",
+        "name": "橋",
+        "nameEn": "Bridge",
+        "type": "regular",
+        "icon": "🌉"
+      },
+      "variants": [
+        {
+          "id": "suspension-bridge",
+          "name": "吊橋",
+          "nameEn": "Suspension Bridge",
+          "imageUrl": "https://pikmin.wiki.gallery/images/thumb/3/34/Decor_Red_Bridge_Pin_Badge.png/200px-Decor_Red_Bridge_Pin_Badge.png",
+          "imageUrls": {
+            "red": "https://pikmin.wiki.gallery/images/thumb/3/34/Decor_Red_Bridge_Pin_Badge.png/100px-Decor_Red_Bridge_Pin_Badge.png",
+            "yellow": "https://pikmin.wiki.gallery/images/thumb/4/4e/Decor_Yellow_Bridge_Pin_Badge.png/100px-Decor_Yellow_Bridge_Pin_Badge.png",
+            "blue": "https://pikmin.wiki.gallery/images/thumb/f/f9/Decor_Blue_Bridge_Pin_Badge.png/100px-Decor_Blue_Bridge_Pin_Badge.png",
+            "white": "https://pikmin.wiki.gallery/images/thumb/6/6b/Decor_White_Bridge_Pin_Badge.png/100px-Decor_White_Bridge_Pin_Badge.png",
+            "purple": "https://pikmin.wiki.gallery/images/thumb/a/ad/Decor_Purple_Bridge_Pin_Badge.png/100px-Decor_Purple_Bridge_Pin_Badge.png",
+            "rock": "https://pikmin.wiki.gallery/images/thumb/a/aa/Decor_Rock_Bridge_Pin_Badge.png/100px-Decor_Rock_Bridge_Pin_Badge.png",
+            "winged": "https://pikmin.wiki.gallery/images/thumb/f/ff/Decor_Winged_Bridge_Pin_Badge.png/100px-Decor_Winged_Bridge_Pin_Badge.png"
+          }
+        }
+      ],
+      "availablePikminTypes": [
+        "red",
+        "yellow",
+        "blue",
+        "purple",
+        "white",
+        "rock",
+        "winged"
+      ]
+    },
+    {
+      "category": {
+        "id": "hotel",
+        "name": "旅館",
+        "nameEn": "Hotel",
+        "type": "regular",
+        "icon": "🏨"
+      },
+      "variants": [
+        {
+          "id": "key",
+          "name": "鑰匙",
+          "nameEn": "Key",
+          "imageUrl": "https://pikmin.wiki.gallery/images/thumb/0/00/Decor_Red_Key.png/200px-Decor_Red_Key.png"
+        }
+      ],
+      "availablePikminTypes": [
+        "red",
+        "yellow",
+        "blue",
+        "purple",
+        "white",
+        "rock",
+        "winged"
+      ]
+    },
+    {
+      "category": {
+        "id": "mario-hat",
+        "name": "瑪利歐帽",
+        "nameEn": "Mario Hat",
+        "type": "special",
+        "icon": "🎮"
+      },
+      "variants": [
+        {
+          "id": "mario-cap",
+          "name": "瑪利歐帽",
+          "nameEn": "Mario Cap",
+          "imageUrl": "https://pikmin.wiki.gallery/images/thumb/7/7d/Decor_Blue_Mario_Hat.png/100px-Decor_Blue_Mario_Hat.png",
+          "imageUrls": {
+            "blue": "https://pikmin.wiki.gallery/images/thumb/7/7d/Decor_Blue_Mario_Hat.png/200px-Decor_Blue_Mario_Hat.png"
+          }
+        }
+      ],
+      "availablePikminTypes": [
+        "blue"
+      ]
+    },
+    {
+      "category": {
+        "id": "lunar-new-year",
+        "name": "農曆新年",
+        "nameEn": "Lunar New Year Ornament",
+        "type": "special",
+        "icon": "🧧"
+      },
+      "variants": [
+        {
+          "id": "red-ornament",
+          "name": "紅色吊飾",
+          "nameEn": "Red Ornament",
+          "imageUrl": "https://pikmin.wiki.gallery/images/thumb/0/00/Decor_Red_Red_Ornament.png/200px-Decor_Red_Red_Ornament.png",
+          "imageUrls": {
+            "red": "https://pikmin.wiki.gallery/images/thumb/b/b7/Decor_Red_Lunar_New_Year_Ornament_1.png/200px-Decor_Red_Lunar_New_Year_Ornament_1.png",
+            "yellow": "https://pikmin.wiki.gallery/images/thumb/0/06/Decor_Yellow_Lunar_New_Year_Ornament_1.png/200px-Decor_Yellow_Lunar_New_Year_Ornament_1.png",
+            "blue": "https://pikmin.wiki.gallery/images/thumb/4/45/Decor_Blue_Lunar_New_Year_Ornament_1.png/200px-Decor_Blue_Lunar_New_Year_Ornament_1.png",
+            "white": "https://pikmin.wiki.gallery/images/thumb/a/aa/Decor_White_Lunar_New_Year_Ornament_1.png/200px-Decor_White_Lunar_New_Year_Ornament_1.png",
+            "purple": "https://pikmin.wiki.gallery/images/thumb/a/a4/Decor_Purple_Lunar_New_Year_Ornament_1.png/200px-Decor_Purple_Lunar_New_Year_Ornament_1.png",
+            "rock": "https://pikmin.wiki.gallery/images/thumb/5/5e/Decor_Rock_Lunar_New_Year_Ornament_1.png/200px-Decor_Rock_Lunar_New_Year_Ornament_1.png",
+            "winged": "https://pikmin.wiki.gallery/images/thumb/2/27/Decor_Winged_Lunar_New_Year_Ornament_1.png/200px-Decor_Winged_Lunar_New_Year_Ornament_1.png"
+          }
+        },
+        {
+          "id": "gold-ornament",
+          "name": "金色吊飾",
+          "nameEn": "Gold Ornament",
+          "imageUrl": "https://pikmin.wiki.gallery/images/thumb/0/00/Decor_Red_Gold_Ornament.png/200px-Decor_Red_Gold_Ornament.png",
+          "imageUrls": {
+            "red": "https://pikmin.wiki.gallery/images/thumb/b/b7/Decor_Red_Lunar_New_Year_Ornament_1.png/200px-Decor_Red_Lunar_New_Year_Ornament_1.png",
+            "yellow": "https://pikmin.wiki.gallery/images/thumb/0/06/Decor_Yellow_Lunar_New_Year_Ornament_1.png/200px-Decor_Yellow_Lunar_New_Year_Ornament_1.png",
+            "blue": "https://pikmin.wiki.gallery/images/thumb/4/45/Decor_Blue_Lunar_New_Year_Ornament_1.png/200px-Decor_Blue_Lunar_New_Year_Ornament_1.png",
+            "white": "https://pikmin.wiki.gallery/images/thumb/a/aa/Decor_White_Lunar_New_Year_Ornament_1.png/200px-Decor_White_Lunar_New_Year_Ornament_1.png",
+            "purple": "https://pikmin.wiki.gallery/images/thumb/a/a4/Decor_Purple_Lunar_New_Year_Ornament_1.png/200px-Decor_Purple_Lunar_New_Year_Ornament_1.png",
+            "rock": "https://pikmin.wiki.gallery/images/thumb/5/5e/Decor_Rock_Lunar_New_Year_Ornament_1.png/200px-Decor_Rock_Lunar_New_Year_Ornament_1.png",
+            "winged": "https://pikmin.wiki.gallery/images/thumb/2/27/Decor_Winged_Lunar_New_Year_Ornament_1.png/200px-Decor_Winged_Lunar_New_Year_Ornament_1.png"
+          }
+        }
+      ],
+      "availablePikminTypes": [
+        "red",
+        "yellow",
+        "blue",
+        "purple",
+        "white",
+        "rock",
+        "winged"
+      ]
+    },
+    {
+      "category": {
+        "id": "chess-piece",
+        "name": "西洋棋",
+        "nameEn": "Chess Piece",
+        "type": "special",
+        "icon": "♟️"
+      },
+      "variants": [
+        {
+          "id": "chess-black",
+          "name": "黑棋",
+          "nameEn": "Black Chess Piece",
+          "imageUrl": "https://pikmin.wiki.gallery/images/thumb/0/00/Decor_Red_Black_Chess_Piece.png/200px-Decor_Red_Black_Chess_Piece.png",
+          "imageUrls": {
+            "red": "https://pikmin.wiki.gallery/images/thumb/b/b6/Decor_Red_Chess_Piece_1.png/200px-Decor_Red_Chess_Piece_1.png",
+            "yellow": "https://pikmin.wiki.gallery/images/thumb/7/75/Decor_Yellow_Chess_Piece_1.png/200px-Decor_Yellow_Chess_Piece_1.png",
+            "blue": "https://pikmin.wiki.gallery/images/thumb/2/2a/Decor_Blue_Chess_Piece_1.png/200px-Decor_Blue_Chess_Piece_1.png",
+            "white": "https://pikmin.wiki.gallery/images/thumb/3/36/Decor_White_Chess_Piece_1.png/200px-Decor_White_Chess_Piece_1.png",
+            "purple": "https://pikmin.wiki.gallery/images/thumb/8/89/Decor_Purple_Chess_Piece_1.png/200px-Decor_Purple_Chess_Piece_1.png",
+            "rock": "https://pikmin.wiki.gallery/images/thumb/9/95/Decor_Rock_Chess_Piece_1.png/200px-Decor_Rock_Chess_Piece_1.png",
+            "winged": "https://pikmin.wiki.gallery/images/thumb/2/21/Decor_Winged_Chess_Piece_1.png/200px-Decor_Winged_Chess_Piece_1.png"
+          }
+        },
+        {
+          "id": "chess-white",
+          "name": "白棋",
+          "nameEn": "White Chess Piece",
+          "imageUrl": "https://pikmin.wiki.gallery/images/thumb/0/00/Decor_Red_White_Chess_Piece.png/200px-Decor_Red_White_Chess_Piece.png",
+          "imageUrls": {
+            "red": "https://pikmin.wiki.gallery/images/thumb/b/b6/Decor_Red_Chess_Piece_1.png/200px-Decor_Red_Chess_Piece_1.png",
+            "yellow": "https://pikmin.wiki.gallery/images/thumb/7/75/Decor_Yellow_Chess_Piece_1.png/200px-Decor_Yellow_Chess_Piece_1.png",
+            "blue": "https://pikmin.wiki.gallery/images/thumb/2/2a/Decor_Blue_Chess_Piece_1.png/200px-Decor_Blue_Chess_Piece_1.png",
+            "white": "https://pikmin.wiki.gallery/images/thumb/3/36/Decor_White_Chess_Piece_1.png/200px-Decor_White_Chess_Piece_1.png",
+            "purple": "https://pikmin.wiki.gallery/images/thumb/8/89/Decor_Purple_Chess_Piece_1.png/200px-Decor_Purple_Chess_Piece_1.png",
+            "rock": "https://pikmin.wiki.gallery/images/thumb/9/95/Decor_Rock_Chess_Piece_1.png/200px-Decor_Rock_Chess_Piece_1.png",
+            "winged": "https://pikmin.wiki.gallery/images/thumb/2/21/Decor_Winged_Chess_Piece_1.png/200px-Decor_Winged_Chess_Piece_1.png"
+          }
+        }
+      ],
+      "availablePikminTypes": [
+        "red",
+        "yellow",
+        "blue",
+        "purple",
+        "white",
+        "rock",
+        "winged"
+      ]
+    },
+    {
+      "category": {
+        "id": "fingerboard",
+        "name": "指板",
+        "nameEn": "Fingerboard",
+        "type": "special",
+        "icon": "🛹"
+      },
+      "variants": [
+        {
+          "id": "fingerboard",
+          "name": "指板",
+          "nameEn": "Fingerboard",
+          "imageUrl": "https://pikmin.wiki.gallery/images/thumb/d/dc/Decor_Red_Fingerboard.png/200px-Decor_Red_Fingerboard.png",
+          "imageUrls": {
+            "red": "https://pikmin.wiki.gallery/images/thumb/d/dc/Decor_Red_Fingerboard.png/100px-Decor_Red_Fingerboard.png",
+            "yellow": "https://pikmin.wiki.gallery/images/thumb/9/92/Decor_Yellow_Fingerboard.png/100px-Decor_Yellow_Fingerboard.png",
+            "blue": "https://pikmin.wiki.gallery/images/thumb/2/29/Decor_Blue_Fingerboard.png/100px-Decor_Blue_Fingerboard.png",
+            "white": "https://pikmin.wiki.gallery/images/thumb/c/ca/Decor_White_Fingerboard.png/100px-Decor_White_Fingerboard.png",
+            "purple": "https://pikmin.wiki.gallery/images/thumb/6/69/Decor_Purple_Fingerboard.png/100px-Decor_Purple_Fingerboard.png",
+            "rock": "https://pikmin.wiki.gallery/images/thumb/e/ef/Decor_Rock_Fingerboard.png/100px-Decor_Rock_Fingerboard.png",
+            "winged": "https://pikmin.wiki.gallery/images/thumb/1/19/Decor_Winged_Fingerboard.png/100px-Decor_Winged_Fingerboard.png"
+          }
+        }
+      ],
+      "availablePikminTypes": [
+        "red",
+        "yellow",
+        "blue",
+        "purple",
+        "white",
+        "rock",
+        "winged"
+      ]
+    },
+    {
+      "category": {
+        "id": "flower-card",
+        "name": "花札",
+        "nameEn": "Flower Card",
+        "type": "special",
+        "icon": "🎴"
+      },
+      "variants": [
+        {
+          "id": "volume-1",
+          "name": "第一彈",
+          "nameEn": "Volume 1",
+          "imageUrl": "https://pikmin.wiki.gallery/images/thumb/0/00/Decor_Red_Volume_1.png/200px-Decor_Red_Volume_1.png",
+          "imageUrls": {
+            "red": "https://pikmin.wiki.gallery/images/thumb/2/2b/Decor_Red_Flower_Card_2.png/200px-Decor_Red_Flower_Card_2.png",
+            "yellow": "https://pikmin.wiki.gallery/images/thumb/0/06/Decor_Yellow_Flower_Card_6.png/200px-Decor_Yellow_Flower_Card_6.png",
+            "blue": "https://pikmin.wiki.gallery/images/thumb/d/de/Decor_Blue_Flower_Card_1.png/200px-Decor_Blue_Flower_Card_1.png",
+            "white": "https://pikmin.wiki.gallery/images/thumb/f/fb/Decor_White_Flower_Card_2.png/200px-Decor_White_Flower_Card_2.png",
+            "purple": "https://pikmin.wiki.gallery/images/thumb/c/c3/Decor_Purple_Flower_Card_6.png/200px-Decor_Purple_Flower_Card_6.png",
+            "rock": "https://pikmin.wiki.gallery/images/thumb/1/17/Decor_Rock_Flower_Card_1.png/200px-Decor_Rock_Flower_Card_1.png",
+            "winged": "https://pikmin.wiki.gallery/images/thumb/2/2b/Decor_Winged_Flower_Card_3.png/200px-Decor_Winged_Flower_Card_3.png"
+          }
+        },
+        {
+          "id": "volume-2",
+          "name": "第二彈",
+          "nameEn": "Volume 2",
+          "imageUrl": "https://pikmin.wiki.gallery/images/thumb/0/00/Decor_Red_Volume_2.png/200px-Decor_Red_Volume_2.png",
+          "imageUrls": {
+            "red": "https://pikmin.wiki.gallery/images/thumb/2/2b/Decor_Red_Flower_Card_2.png/200px-Decor_Red_Flower_Card_2.png",
+            "yellow": "https://pikmin.wiki.gallery/images/thumb/0/06/Decor_Yellow_Flower_Card_6.png/200px-Decor_Yellow_Flower_Card_6.png",
+            "blue": "https://pikmin.wiki.gallery/images/thumb/d/de/Decor_Blue_Flower_Card_1.png/200px-Decor_Blue_Flower_Card_1.png",
+            "white": "https://pikmin.wiki.gallery/images/thumb/f/fb/Decor_White_Flower_Card_2.png/200px-Decor_White_Flower_Card_2.png",
+            "purple": "https://pikmin.wiki.gallery/images/thumb/c/c3/Decor_Purple_Flower_Card_6.png/200px-Decor_Purple_Flower_Card_6.png",
+            "rock": "https://pikmin.wiki.gallery/images/thumb/1/17/Decor_Rock_Flower_Card_1.png/200px-Decor_Rock_Flower_Card_1.png",
+            "winged": "https://pikmin.wiki.gallery/images/thumb/2/2b/Decor_Winged_Flower_Card_3.png/200px-Decor_Winged_Flower_Card_3.png"
+          }
+        }
+      ],
+      "availablePikminTypes": [
+        "red",
+        "yellow",
+        "blue",
+        "purple",
+        "white",
+        "rock",
+        "winged"
+      ]
+    },
+    {
+      "category": {
+        "id": "jack-o-lantern",
+        "name": "南瓜燈",
+        "nameEn": "Jack-o'-Lantern",
+        "type": "special",
+        "icon": "🎃"
+      },
+      "variants": [
+        {
+          "id": "pumpkin",
+          "name": "南瓜",
+          "nameEn": "Pumpkin",
+          "imageUrl": "https://pikmin.wiki.gallery/images/thumb/0/00/Decor_Red_Pumpkin.png/200px-Decor_Red_Pumpkin.png"
+        }
+      ],
+      "availablePikminTypes": [
+        "red",
+        "yellow",
+        "blue",
+        "purple",
+        "white",
+        "rock",
+        "winged"
+      ]
+    },
+    {
+      "category": {
+        "id": "halloween-treat",
+        "name": "萬聖糖果",
+        "nameEn": "Halloween Treat",
+        "type": "special",
+        "icon": "🍬"
+      },
+      "variants": [
+        {
+          "id": "candy",
+          "name": "糖果",
+          "nameEn": "Candy",
+          "imageUrl": "https://pikmin.wiki.gallery/images/thumb/4/4f/Decor_Red_Halloween_Treat.png/100px-Decor_Red_Halloween_Treat.png",
+          "imageUrls": {
+            "red": "https://pikmin.wiki.gallery/images/thumb/4/4f/Decor_Red_Halloween_Treat.png/200px-Decor_Red_Halloween_Treat.png",
+            "yellow": "https://pikmin.wiki.gallery/images/thumb/e/e7/Decor_Yellow_Halloween_Treat.png/200px-Decor_Yellow_Halloween_Treat.png",
+            "blue": "https://pikmin.wiki.gallery/images/thumb/e/ee/Decor_Blue_Halloween_Treat.png/200px-Decor_Blue_Halloween_Treat.png",
+            "white": "https://pikmin.wiki.gallery/images/thumb/d/de/Decor_White_Halloween_Treat.png/200px-Decor_White_Halloween_Treat.png",
+            "purple": "https://pikmin.wiki.gallery/images/thumb/7/7c/Decor_Purple_Halloween_Treat.png/200px-Decor_Purple_Halloween_Treat.png",
+            "rock": "https://pikmin.wiki.gallery/images/thumb/3/37/Decor_Rock_Halloween_Treat.png/200px-Decor_Rock_Halloween_Treat.png",
+            "winged": "https://pikmin.wiki.gallery/images/thumb/4/48/Decor_Winged_Halloween_Treat.png/200px-Decor_Winged_Halloween_Treat.png"
+          }
+        }
+      ],
+      "availablePikminTypes": [
+        "red",
+        "yellow",
+        "blue",
+        "purple",
+        "white",
+        "rock",
+        "winged"
+      ]
+    },
+    {
+      "category": {
+        "id": "1st-anniversary",
+        "name": "一週年",
+        "nameEn": "First Anniversary Snack",
+        "type": "special",
+        "icon": "🎂"
+      },
+      "variants": [
+        {
+          "id": "snack",
+          "name": "點心",
+          "nameEn": "Snack",
+          "imageUrl": "https://pikmin.wiki.gallery/images/thumb/4/49/Decor_Red_Snack.png/200px-Decor_Red_Snack.png",
+          "imageUrls": {
+            "red": "https://pikmin.wiki.gallery/images/thumb/4/49/Decor_Red_Snack.png/100px-Decor_Red_Snack.png",
+            "yellow": "https://pikmin.wiki.gallery/images/thumb/0/0a/Decor_Yellow_Snack.png/100px-Decor_Yellow_Snack.png",
+            "blue": "https://pikmin.wiki.gallery/images/thumb/4/4a/Decor_Blue_Snack.png/100px-Decor_Blue_Snack.png",
+            "white": "https://pikmin.wiki.gallery/images/thumb/4/4b/Decor_White_Snack.png/100px-Decor_White_Snack.png",
+            "purple": "https://pikmin.wiki.gallery/images/thumb/f/fb/Decor_Purple_Snack.png/100px-Decor_Purple_Snack.png",
+            "rock": "https://pikmin.wiki.gallery/images/thumb/e/eb/Decor_Rock_Snack.png/100px-Decor_Rock_Snack.png",
+            "winged": "https://pikmin.wiki.gallery/images/thumb/1/1f/Decor_Winged_Snack.png/100px-Decor_Winged_Snack.png"
+          }
+        }
+      ],
+      "availablePikminTypes": [
+        "red",
+        "yellow",
+        "blue",
+        "purple",
+        "white",
+        "rock",
+        "winged"
+      ]
+    },
+    {
+      "category": {
+        "id": "valentine-sticker",
+        "name": "情人節貼紙",
+        "nameEn": "Valentine Sticker",
+        "type": "special",
+        "icon": "💝"
+      },
+      "variants": [
+        {
+          "id": "heart",
+          "name": "愛心",
+          "nameEn": "Heart",
+          "imageUrl": "https://pikmin.wiki.gallery/images/thumb/3/38/Decor_Red_Valentine_Sticker.png/94px-Decor_Red_Valentine_Sticker.png",
+          "imageUrls": {
+            "red": "https://pikmin.wiki.gallery/images/thumb/3/38/Decor_Red_Valentine_Sticker.png/200px-Decor_Red_Valentine_Sticker.png",
+            "yellow": "https://pikmin.wiki.gallery/images/thumb/8/86/Decor_Yellow_Valentine_Sticker.png/200px-Decor_Yellow_Valentine_Sticker.png",
+            "blue": "https://pikmin.wiki.gallery/images/thumb/c/c9/Decor_Blue_Valentine_Sticker.png/200px-Decor_Blue_Valentine_Sticker.png",
+            "white": "https://pikmin.wiki.gallery/images/thumb/a/a2/Decor_White_Valentine_Sticker.png/200px-Decor_White_Valentine_Sticker.png",
+            "purple": "https://pikmin.wiki.gallery/images/thumb/1/1a/Decor_Purple_Valentine_Sticker.png/200px-Decor_Purple_Valentine_Sticker.png",
+            "rock": "https://pikmin.wiki.gallery/images/thumb/d/d1/Decor_Rock_Valentine_Sticker.png/200px-Decor_Rock_Valentine_Sticker.png",
+            "winged": "https://pikmin.wiki.gallery/images/thumb/8/85/Decor_Winged_Valentine_Sticker.png/200px-Decor_Winged_Valentine_Sticker.png"
+          }
+        }
+      ],
+      "availablePikminTypes": [
+        "red",
+        "yellow",
+        "blue",
+        "purple",
+        "white",
+        "rock",
+        "winged"
+      ]
+    },
+    {
+      "category": {
+        "id": "easter-egg",
+        "name": "復活節彩蛋",
+        "nameEn": "Easter Egg",
+        "type": "special",
+        "icon": "🥚"
+      },
+      "variants": [
+        {
+          "id": "egg",
+          "name": "彩蛋",
+          "nameEn": "Easter Egg",
+          "imageUrl": "https://pikmin.wiki.gallery/images/thumb/5/56/Decor_Red_Easter_Egg.png/200px-Decor_Red_Easter_Egg.png",
+          "imageUrls": {
+            "red": "https://pikmin.wiki.gallery/images/thumb/5/56/Decor_Red_Easter_Egg.png/87px-Decor_Red_Easter_Egg.png",
+            "yellow": "https://pikmin.wiki.gallery/images/thumb/7/71/Decor_Yellow_Easter_Egg.png/89px-Decor_Yellow_Easter_Egg.png",
+            "blue": "https://pikmin.wiki.gallery/images/thumb/3/3e/Decor_Blue_Easter_Egg.png/85px-Decor_Blue_Easter_Egg.png",
+            "white": "https://pikmin.wiki.gallery/images/thumb/a/a6/Decor_White_Easter_Egg.png/83px-Decor_White_Easter_Egg.png",
+            "purple": "https://pikmin.wiki.gallery/images/thumb/2/26/Decor_Purple_Easter_Egg.png/74px-Decor_Purple_Easter_Egg.png",
+            "rock": "https://pikmin.wiki.gallery/images/thumb/f/f9/Decor_Rock_Easter_Egg.png/93px-Decor_Rock_Easter_Egg.png",
+            "winged": "https://pikmin.wiki.gallery/images/thumb/e/e5/Decor_Winged_Easter_Egg.png/92px-Decor_Winged_Easter_Egg.png"
+          }
+        }
+      ],
+      "availablePikminTypes": [
+        "red",
+        "yellow",
+        "blue",
+        "purple",
+        "white",
+        "rock",
+        "winged"
+      ]
+    },
+    {
+      "category": {
+        "id": "ice-cream",
+        "name": "冰淇淋",
+        "nameEn": "Ice Cream",
+        "type": "special",
+        "icon": "🍦"
+      },
+      "variants": [
+        {
+          "id": "classic",
+          "name": "經典口味",
+          "nameEn": "Classic",
+          "imageUrl": "https://pikmin.wiki.gallery/images/thumb/0/00/Decor_Red_Classic.png/200px-Decor_Red_Classic.png",
+          "imageUrls": {
+            "red": "https://pikmin.wiki.gallery/images/thumb/1/1b/Decor_Red_Ice_Cream_1.png/200px-Decor_Red_Ice_Cream_1.png",
+            "yellow": "https://pikmin.wiki.gallery/images/thumb/0/0c/Decor_Yellow_Ice_Cream_1.png/200px-Decor_Yellow_Ice_Cream_1.png",
+            "blue": "https://pikmin.wiki.gallery/images/thumb/e/e6/Decor_Blue_Ice_Cream_1.png/200px-Decor_Blue_Ice_Cream_1.png",
+            "white": "https://pikmin.wiki.gallery/images/thumb/6/62/Decor_White_Ice_Cream_1.png/200px-Decor_White_Ice_Cream_1.png",
+            "purple": "https://pikmin.wiki.gallery/images/thumb/8/8b/Decor_Purple_Ice_Cream_1.png/200px-Decor_Purple_Ice_Cream_1.png",
+            "rock": "https://pikmin.wiki.gallery/images/thumb/9/9a/Decor_Rock_Ice_Cream_1.png/200px-Decor_Rock_Ice_Cream_1.png",
+            "winged": "https://pikmin.wiki.gallery/images/thumb/d/df/Decor_Winged_Ice_Cream_1.png/200px-Decor_Winged_Ice_Cream_1.png"
+          }
+        },
+        {
+          "id": "2024-flavor",
+          "name": "2024口味",
+          "nameEn": "2024 Flavor",
+          "imageUrl": "https://pikmin.wiki.gallery/images/thumb/0/00/Decor_Red_2024_Flavor.png/200px-Decor_Red_2024_Flavor.png",
+          "imageUrls": {
+            "red": "https://pikmin.wiki.gallery/images/thumb/1/1b/Decor_Red_Ice_Cream_1.png/200px-Decor_Red_Ice_Cream_1.png",
+            "yellow": "https://pikmin.wiki.gallery/images/thumb/0/0c/Decor_Yellow_Ice_Cream_1.png/200px-Decor_Yellow_Ice_Cream_1.png",
+            "blue": "https://pikmin.wiki.gallery/images/thumb/e/e6/Decor_Blue_Ice_Cream_1.png/200px-Decor_Blue_Ice_Cream_1.png",
+            "white": "https://pikmin.wiki.gallery/images/thumb/6/62/Decor_White_Ice_Cream_1.png/200px-Decor_White_Ice_Cream_1.png",
+            "purple": "https://pikmin.wiki.gallery/images/thumb/8/8b/Decor_Purple_Ice_Cream_1.png/200px-Decor_Purple_Ice_Cream_1.png",
+            "rock": "https://pikmin.wiki.gallery/images/thumb/9/9a/Decor_Rock_Ice_Cream_1.png/200px-Decor_Rock_Ice_Cream_1.png",
+            "winged": "https://pikmin.wiki.gallery/images/thumb/d/df/Decor_Winged_Ice_Cream_1.png/200px-Decor_Winged_Ice_Cream_1.png"
+          }
+        }
+      ],
+      "availablePikminTypes": [
+        "red",
+        "yellow",
+        "blue",
+        "purple",
+        "white",
+        "rock",
+        "winged"
+      ]
+    },
+    {
+      "category": {
+        "id": "puzzle",
+        "name": "拼圖",
+        "nameEn": "Puzzle",
+        "type": "special",
+        "icon": "🧩"
+      },
+      "variants": [
+        {
+          "id": "fall-2021",
+          "name": "2021秋季",
+          "nameEn": "2021 Fall Memories",
+          "imageUrl": "https://pikmin.wiki.gallery/images/thumb/0/00/Decor_Red_2021_Fall_Memories.png/200px-Decor_Red_2021_Fall_Memories.png",
+          "imageUrls": {
+            "red": "https://pikmin.wiki.gallery/images/thumb/c/c1/Decor_Red_Puzzle_1.png/200px-Decor_Red_Puzzle_1.png",
+            "yellow": "https://pikmin.wiki.gallery/images/thumb/b/b0/Decor_Yellow_Puzzle_1.png/200px-Decor_Yellow_Puzzle_1.png",
+            "blue": "https://pikmin.wiki.gallery/images/thumb/6/6b/Decor_Blue_Puzzle_1.png/200px-Decor_Blue_Puzzle_1.png",
+            "white": "https://pikmin.wiki.gallery/images/thumb/6/64/Decor_White_Puzzle_1.png/200px-Decor_White_Puzzle_1.png",
+            "purple": "https://pikmin.wiki.gallery/images/thumb/f/f9/Decor_Purple_Puzzle_1.png/200px-Decor_Purple_Puzzle_1.png",
+            "rock": "https://pikmin.wiki.gallery/images/thumb/0/08/Decor_Rock_Puzzle_1.png/200px-Decor_Rock_Puzzle_1.png",
+            "winged": "https://pikmin.wiki.gallery/images/thumb/8/8d/Decor_Winged_Puzzle_1.png/200px-Decor_Winged_Puzzle_1.png"
+          }
+        },
+        {
+          "id": "summer-2022",
+          "name": "2022夏季",
+          "nameEn": "2022 Summer Memories",
+          "imageUrl": "https://pikmin.wiki.gallery/images/thumb/0/00/Decor_Red_2022_Summer_Memories.png/200px-Decor_Red_2022_Summer_Memories.png",
+          "imageUrls": {
+            "red": "https://pikmin.wiki.gallery/images/thumb/c/c1/Decor_Red_Puzzle_1.png/200px-Decor_Red_Puzzle_1.png",
+            "yellow": "https://pikmin.wiki.gallery/images/thumb/b/b0/Decor_Yellow_Puzzle_1.png/200px-Decor_Yellow_Puzzle_1.png",
+            "blue": "https://pikmin.wiki.gallery/images/thumb/6/6b/Decor_Blue_Puzzle_1.png/200px-Decor_Blue_Puzzle_1.png",
+            "white": "https://pikmin.wiki.gallery/images/thumb/6/64/Decor_White_Puzzle_1.png/200px-Decor_White_Puzzle_1.png",
+            "purple": "https://pikmin.wiki.gallery/images/thumb/f/f9/Decor_Purple_Puzzle_1.png/200px-Decor_Purple_Puzzle_1.png",
+            "rock": "https://pikmin.wiki.gallery/images/thumb/0/08/Decor_Rock_Puzzle_1.png/200px-Decor_Rock_Puzzle_1.png",
+            "winged": "https://pikmin.wiki.gallery/images/thumb/8/8d/Decor_Winged_Puzzle_1.png/200px-Decor_Winged_Puzzle_1.png"
+          }
+        },
+        {
+          "id": "summer-2023",
+          "name": "2023夏季",
+          "nameEn": "2023 Summer Memories",
+          "imageUrl": "https://pikmin.wiki.gallery/images/thumb/0/00/Decor_Red_2023_Summer_Memories.png/200px-Decor_Red_2023_Summer_Memories.png",
+          "imageUrls": {
+            "red": "https://pikmin.wiki.gallery/images/thumb/c/c1/Decor_Red_Puzzle_1.png/200px-Decor_Red_Puzzle_1.png",
+            "yellow": "https://pikmin.wiki.gallery/images/thumb/b/b0/Decor_Yellow_Puzzle_1.png/200px-Decor_Yellow_Puzzle_1.png",
+            "blue": "https://pikmin.wiki.gallery/images/thumb/6/6b/Decor_Blue_Puzzle_1.png/200px-Decor_Blue_Puzzle_1.png",
+            "white": "https://pikmin.wiki.gallery/images/thumb/6/64/Decor_White_Puzzle_1.png/200px-Decor_White_Puzzle_1.png",
+            "purple": "https://pikmin.wiki.gallery/images/thumb/f/f9/Decor_Purple_Puzzle_1.png/200px-Decor_Purple_Puzzle_1.png",
+            "rock": "https://pikmin.wiki.gallery/images/thumb/0/08/Decor_Rock_Puzzle_1.png/200px-Decor_Rock_Puzzle_1.png",
+            "winged": "https://pikmin.wiki.gallery/images/thumb/8/8d/Decor_Winged_Puzzle_1.png/200px-Decor_Winged_Puzzle_1.png"
+          }
+        }
+      ],
+      "availablePikminTypes": [
+        "red",
+        "yellow",
+        "blue",
+        "purple",
+        "white",
+        "rock",
+        "winged"
+      ]
+    },
+    {
+      "category": {
+        "id": "playing-card",
+        "name": "撲克牌",
+        "nameEn": "Playing Card",
+        "type": "special",
+        "icon": "🃏"
+      },
+      "variants": [
+        {
+          "id": "card",
+          "name": "撲克牌",
+          "nameEn": "Playing Card",
+          "imageUrl": "https://pikmin.wiki.gallery/images/thumb/c/cf/Decor_Red_Playing_Card_3.png/200px-Decor_Red_Playing_Card_3.png",
+          "imageUrls": {
+            "red": "https://pikmin.wiki.gallery/images/thumb/c/cf/Decor_Red_Playing_Card_3.png/200px-Decor_Red_Playing_Card_3.png",
+            "yellow": "https://pikmin.wiki.gallery/images/thumb/2/2a/Decor_Yellow_Playing_Card_3.png/200px-Decor_Yellow_Playing_Card_3.png",
+            "blue": "https://pikmin.wiki.gallery/images/thumb/d/d7/Decor_Blue_Playing_Card_3.png/200px-Decor_Blue_Playing_Card_3.png",
+            "white": "https://pikmin.wiki.gallery/images/thumb/2/2f/Decor_White_Playing_Card_3.png/200px-Decor_White_Playing_Card_3.png",
+            "purple": "https://pikmin.wiki.gallery/images/thumb/d/dd/Decor_Purple_Playing_Card_3.png/200px-Decor_Purple_Playing_Card_3.png",
+            "rock": "https://pikmin.wiki.gallery/images/thumb/9/94/Decor_Rock_Playing_Card_3.png/200px-Decor_Rock_Playing_Card_3.png",
+            "winged": "https://pikmin.wiki.gallery/images/thumb/9/92/Decor_Winged_Playing_Card_3.png/200px-Decor_Winged_Playing_Card_3.png"
+          }
+        }
+      ],
+      "availablePikminTypes": [
+        "red",
+        "yellow",
+        "blue",
+        "purple",
+        "white",
+        "rock",
+        "winged"
+      ]
+    },
+    {
+      "category": {
+        "id": "mahjong-tile",
+        "name": "麻將牌",
+        "nameEn": "Mahjong Tile",
+        "type": "special",
+        "icon": "🀄"
+      },
+      "variants": [
+        {
+          "id": "tile",
+          "name": "麻將牌",
+          "nameEn": "Mahjong Tile",
+          "imageUrl": "https://pikmin.wiki.gallery/images/thumb/d/de/Decor_Red_Mahjong_Tile_2.png/200px-Decor_Red_Mahjong_Tile_2.png",
+          "imageUrls": {
+            "red": "https://pikmin.wiki.gallery/images/thumb/d/de/Decor_Red_Mahjong_Tile_2.png/200px-Decor_Red_Mahjong_Tile_2.png",
+            "yellow": "https://pikmin.wiki.gallery/images/thumb/6/64/Decor_Yellow_Mahjong_Tile_2.png/200px-Decor_Yellow_Mahjong_Tile_2.png",
+            "blue": "https://pikmin.wiki.gallery/images/thumb/d/df/Decor_Blue_Mahjong_Tile_2.png/200px-Decor_Blue_Mahjong_Tile_2.png",
+            "white": "https://pikmin.wiki.gallery/images/thumb/b/bd/Decor_White_Mahjong_Tile_1.png/200px-Decor_White_Mahjong_Tile_1.png",
+            "purple": "https://pikmin.wiki.gallery/images/thumb/e/ef/Decor_Purple_Mahjong_Tile_3.png/200px-Decor_Purple_Mahjong_Tile_3.png",
+            "rock": "https://pikmin.wiki.gallery/images/thumb/f/f5/Decor_Rock_Mahjong_Tile_3.png/200px-Decor_Rock_Mahjong_Tile_3.png",
+            "winged": "https://pikmin.wiki.gallery/images/thumb/1/18/Decor_Winged_Mahjong_Tile_3.png/200px-Decor_Winged_Mahjong_Tile_3.png"
+          }
+        }
+      ],
+      "availablePikminTypes": [
+        "red",
+        "yellow",
+        "blue",
+        "purple",
+        "white",
+        "rock",
+        "winged"
+      ]
+    },
+    {
+      "category": {
+        "id": "spring-sticker",
+        "name": "春季貼紙",
+        "nameEn": "Spring Sticker",
+        "type": "special",
+        "icon": "🌸"
+      },
+      "variants": [
+        {
+          "id": "spring",
+          "name": "春",
+          "nameEn": "Spring",
+          "imageUrl": "https://pikmin.wiki.gallery/images/thumb/e/e8/Decor_Red_Spring_Sticker.png/94px-Decor_Red_Spring_Sticker.png",
+          "imageUrls": {
+            "red": "https://pikmin.wiki.gallery/images/thumb/e/e8/Decor_Red_Spring_Sticker.png/200px-Decor_Red_Spring_Sticker.png",
+            "yellow": "https://pikmin.wiki.gallery/images/thumb/2/2f/Decor_Yellow_Spring_Sticker.png/200px-Decor_Yellow_Spring_Sticker.png",
+            "blue": "https://pikmin.wiki.gallery/images/thumb/e/eb/Decor_Blue_Spring_Sticker.png/200px-Decor_Blue_Spring_Sticker.png",
+            "white": "https://pikmin.wiki.gallery/images/thumb/7/78/Decor_White_Spring_Sticker.png/200px-Decor_White_Spring_Sticker.png",
+            "purple": "https://pikmin.wiki.gallery/images/thumb/4/43/Decor_Purple_Spring_Sticker.png/200px-Decor_Purple_Spring_Sticker.png",
+            "rock": "https://pikmin.wiki.gallery/images/thumb/4/43/Decor_Rock_Spring_Sticker.png/200px-Decor_Rock_Spring_Sticker.png",
+            "winged": "https://pikmin.wiki.gallery/images/thumb/c/cd/Decor_Winged_Spring_Sticker.png/200px-Decor_Winged_Spring_Sticker.png"
+          }
+        }
+      ],
+      "availablePikminTypes": [
+        "red",
+        "yellow",
+        "blue",
+        "purple",
+        "white",
+        "rock",
+        "winged"
+      ]
+    },
+    {
+      "category": {
+        "id": "summer-sticker",
+        "name": "夏季貼紙",
+        "nameEn": "Summer Sticker",
+        "type": "special",
+        "icon": "☀️"
+      },
+      "variants": [
+        {
+          "id": "summer",
+          "name": "夏",
+          "nameEn": "Summer",
+          "imageUrl": "https://pikmin.wiki.gallery/images/thumb/f/f7/Decor_Red_Summer_Sticker.png/94px-Decor_Red_Summer_Sticker.png",
+          "imageUrls": {
+            "red": "https://pikmin.wiki.gallery/images/thumb/f/f7/Decor_Red_Summer_Sticker.png/200px-Decor_Red_Summer_Sticker.png",
+            "yellow": "https://pikmin.wiki.gallery/images/thumb/9/95/Decor_Yellow_Summer_Sticker.png/200px-Decor_Yellow_Summer_Sticker.png",
+            "blue": "https://pikmin.wiki.gallery/images/thumb/6/67/Decor_Blue_Summer_Sticker.png/200px-Decor_Blue_Summer_Sticker.png",
+            "white": "https://pikmin.wiki.gallery/images/thumb/a/ae/Decor_White_Summer_Sticker.png/200px-Decor_White_Summer_Sticker.png",
+            "purple": "https://pikmin.wiki.gallery/images/thumb/6/64/Decor_Purple_Summer_Sticker.png/200px-Decor_Purple_Summer_Sticker.png",
+            "rock": "https://pikmin.wiki.gallery/images/thumb/b/bc/Decor_Rock_Summer_Sticker.png/200px-Decor_Rock_Summer_Sticker.png",
+            "winged": "https://pikmin.wiki.gallery/images/thumb/d/d4/Decor_Winged_Summer_Sticker.png/200px-Decor_Winged_Summer_Sticker.png"
+          }
+        }
+      ],
+      "availablePikminTypes": [
+        "red",
+        "yellow",
+        "blue",
+        "purple",
+        "white",
+        "rock",
+        "winged"
+      ]
+    },
+    {
+      "category": {
+        "id": "fall-sticker",
+        "name": "秋季貼紙",
+        "nameEn": "Fall Sticker",
+        "type": "special",
+        "icon": "🍂"
+      },
+      "variants": [
+        {
+          "id": "fall",
+          "name": "秋",
+          "nameEn": "Fall",
+          "imageUrl": "https://pikmin.wiki.gallery/images/thumb/3/3e/Decor_Red_Fall_Sticker.png/94px-Decor_Red_Fall_Sticker.png",
+          "imageUrls": {
+            "red": "https://pikmin.wiki.gallery/images/thumb/3/3e/Decor_Red_Fall_Sticker.png/200px-Decor_Red_Fall_Sticker.png",
+            "yellow": "https://pikmin.wiki.gallery/images/thumb/8/83/Decor_Yellow_Fall_Sticker.png/200px-Decor_Yellow_Fall_Sticker.png",
+            "blue": "https://pikmin.wiki.gallery/images/thumb/2/28/Decor_Blue_Fall_Sticker.png/200px-Decor_Blue_Fall_Sticker.png",
+            "white": "https://pikmin.wiki.gallery/images/thumb/c/ca/Decor_White_Fall_Sticker.png/200px-Decor_White_Fall_Sticker.png",
+            "purple": "https://pikmin.wiki.gallery/images/thumb/c/cb/Decor_Purple_Fall_Sticker.png/200px-Decor_Purple_Fall_Sticker.png",
+            "rock": "https://pikmin.wiki.gallery/images/thumb/0/0a/Decor_Rock_Fall_Sticker.png/200px-Decor_Rock_Fall_Sticker.png",
+            "winged": "https://pikmin.wiki.gallery/images/thumb/8/87/Decor_Winged_Fall_Sticker.png/200px-Decor_Winged_Fall_Sticker.png"
+          }
+        }
+      ],
+      "availablePikminTypes": [
+        "red",
+        "yellow",
+        "blue",
+        "purple",
+        "white",
+        "rock",
+        "winged"
+      ]
+    },
+    {
+      "category": {
+        "id": "winter-sticker",
+        "name": "冬季貼紙",
+        "nameEn": "Winter Sticker",
+        "type": "special",
+        "icon": "❄️"
+      },
+      "variants": [
+        {
+          "id": "winter",
+          "name": "冬",
+          "nameEn": "Winter",
+          "imageUrl": "https://pikmin.wiki.gallery/images/thumb/3/3f/Decor_Red_Winter_Sticker.png/94px-Decor_Red_Winter_Sticker.png",
+          "imageUrls": {
+            "red": "https://pikmin.wiki.gallery/images/thumb/3/3f/Decor_Red_Winter_Sticker.png/200px-Decor_Red_Winter_Sticker.png",
+            "yellow": "https://pikmin.wiki.gallery/images/thumb/5/59/Decor_Yellow_Winter_Sticker.png/200px-Decor_Yellow_Winter_Sticker.png",
+            "blue": "https://pikmin.wiki.gallery/images/thumb/0/05/Decor_Blue_Winter_Sticker.png/200px-Decor_Blue_Winter_Sticker.png",
+            "white": "https://pikmin.wiki.gallery/images/thumb/8/81/Decor_White_Winter_Sticker.png/200px-Decor_White_Winter_Sticker.png",
+            "purple": "https://pikmin.wiki.gallery/images/thumb/6/67/Decor_Purple_Winter_Sticker.png/200px-Decor_Purple_Winter_Sticker.png",
+            "rock": "https://pikmin.wiki.gallery/images/thumb/8/85/Decor_Rock_Winter_Sticker.png/200px-Decor_Rock_Winter_Sticker.png",
+            "winged": "https://pikmin.wiki.gallery/images/thumb/d/d2/Decor_Winged_Winter_Sticker.png/200px-Decor_Winged_Winter_Sticker.png"
+          }
+        }
+      ],
+      "availablePikminTypes": [
+        "red",
+        "yellow",
+        "blue",
+        "purple",
+        "white",
+        "rock",
+        "winged"
+      ]
+    },
+    {
+      "category": {
+        "id": "roadside-sticker",
+        "name": "路邊貼紙",
+        "nameEn": "Roadside Sticker",
+        "type": "roadside",
+        "icon": "🏷️"
+      },
+      "variants": [
+        {
+          "id": "green",
+          "name": "綠色貼紙",
+          "nameEn": "Green Sticker",
+          "imageUrl": "https://pikmin.wiki.gallery/images/thumb/0/00/Decor_Red_Green_Sticker.png/200px-Decor_Red_Green_Sticker.png"
+        },
+        {
+          "id": "blue",
+          "name": "藍色貼紙",
+          "nameEn": "Blue Sticker",
+          "imageUrl": "https://pikmin.wiki.gallery/images/thumb/0/00/Decor_Red_Blue_Sticker.png/200px-Decor_Red_Blue_Sticker.png"
+        },
+        {
+          "id": "orange",
+          "name": "橘色貼紙",
+          "nameEn": "Orange Sticker",
+          "imageUrl": "https://pikmin.wiki.gallery/images/thumb/0/00/Decor_Red_Orange_Sticker.png/200px-Decor_Red_Orange_Sticker.png"
+        }
+      ],
+      "availablePikminTypes": [
+        "red",
+        "yellow",
+        "blue",
+        "purple",
+        "white",
+        "rock",
+        "winged"
+      ]
+    },
+    {
+      "category": {
+        "id": "roadside-coin",
+        "name": "路邊硬幣",
+        "nameEn": "Roadside Coin",
+        "type": "roadside",
+        "icon": "🪙"
+      },
+      "variants": [
+        {
+          "id": "coin",
+          "name": "硬幣",
+          "nameEn": "Coin",
+          "imageUrl": "https://pikmin.wiki.gallery/images/thumb/9/97/Decor_Red_Coin.png/200px-Decor_Red_Coin.png",
+          "imageUrls": {
+            "red": "https://pikmin.wiki.gallery/images/thumb/9/97/Decor_Red_Coin.png/95px-Decor_Red_Coin.png",
+            "yellow": "https://pikmin.wiki.gallery/images/thumb/4/46/Decor_Yellow_Coin.png/100px-Decor_Yellow_Coin.png",
+            "blue": "https://pikmin.wiki.gallery/images/thumb/f/f8/Decor_Blue_Coin.png/100px-Decor_Blue_Coin.png",
+            "white": "https://pikmin.wiki.gallery/images/thumb/e/ea/Decor_White_Coin.png/99px-Decor_White_Coin.png",
+            "purple": "https://pikmin.wiki.gallery/images/thumb/4/4c/Decor_Purple_Coin.png/93px-Decor_Purple_Coin.png",
+            "rock": "https://pikmin.wiki.gallery/images/thumb/2/2a/Decor_Rock_Coin.png/100px-Decor_Rock_Coin.png",
+            "winged": "https://pikmin.wiki.gallery/images/thumb/0/05/Decor_Winged_Coin.png/100px-Decor_Winged_Coin.png"
+          }
+        }
+      ],
+      "availablePikminTypes": [
+        "red",
+        "yellow",
+        "blue",
+        "purple",
+        "white",
+        "rock",
+        "winged"
+      ]
+    },
+    {
+      "category": {
+        "id": "rainy-day",
+        "name": "雨天",
+        "nameEn": "Rainy Day",
+        "type": "weather",
+        "icon": "🌧️"
+      },
+      "variants": [
+        {
+          "id": "rain",
+          "name": "雨天",
+          "nameEn": "Rainy Day",
+          "imageUrl": "https://pikmin.wiki.gallery/images/thumb/0/00/Decor_Red_Rainy_Day.png/200px-Decor_Red_Rainy_Day.png"
+        }
+      ],
+      "availablePikminTypes": [
+        "red",
+        "yellow",
+        "blue",
+        "purple",
+        "white",
+        "rock",
+        "winged"
+      ]
+    },
+    {
+      "category": {
+        "id": "snowy-day",
+        "name": "雪天",
+        "nameEn": "Snowy Day",
+        "type": "weather",
+        "icon": "🌨️"
+      },
+      "variants": [
+        {
+          "id": "snow",
+          "name": "雪天",
+          "nameEn": "Snowy Day",
+          "imageUrl": "https://pikmin.wiki.gallery/images/thumb/0/00/Decor_Red_Snowy_Day.png/200px-Decor_Red_Snowy_Day.png"
+        }
+      ],
+      "availablePikminTypes": [
+        "red",
+        "yellow",
+        "blue",
+        "purple",
+        "white",
+        "rock",
+        "winged"
+      ]
+    },
+    {
+      "category": {
+        "id": "fortune",
+        "name": "御神籤",
+        "nameEn": "Fortune",
+        "type": "regional",
+        "icon": "🎋"
+      },
+      "variants": [
+        {
+          "id": "daikichi",
+          "name": "大吉",
+          "nameEn": "Daikichi",
+          "imageUrl": "https://pikmin.wiki.gallery/images/thumb/0/00/Decor_Red_Daikichi.png/200px-Decor_Red_Daikichi.png",
+          "imageUrls": {
+            "red": "https://pikmin.wiki.gallery/images/thumb/4/4a/Decor_Red_Fortune_1.png/200px-Decor_Red_Fortune_1.png",
+            "yellow": "https://pikmin.wiki.gallery/images/thumb/8/82/Decor_Yellow_Fortune_1.png/200px-Decor_Yellow_Fortune_1.png",
+            "blue": "https://pikmin.wiki.gallery/images/thumb/9/9b/Decor_Blue_Fortune_1.png/200px-Decor_Blue_Fortune_1.png",
+            "white": "https://pikmin.wiki.gallery/images/thumb/2/2a/Decor_White_Fortune_1.png/200px-Decor_White_Fortune_1.png",
+            "purple": "https://pikmin.wiki.gallery/images/thumb/c/ca/Decor_Purple_Fortune_1.png/200px-Decor_Purple_Fortune_1.png",
+            "rock": "https://pikmin.wiki.gallery/images/thumb/b/b9/Decor_Rock_Fortune_1.png/200px-Decor_Rock_Fortune_1.png",
+            "winged": "https://pikmin.wiki.gallery/images/thumb/4/4e/Decor_Winged_Fortune_1.png/200px-Decor_Winged_Fortune_1.png"
+          }
+        },
+        {
+          "id": "kichi",
+          "name": "吉",
+          "nameEn": "Kichi",
+          "imageUrl": "https://pikmin.wiki.gallery/images/thumb/0/00/Decor_Red_Kichi.png/200px-Decor_Red_Kichi.png",
+          "imageUrls": {
+            "red": "https://pikmin.wiki.gallery/images/thumb/4/4a/Decor_Red_Fortune_1.png/200px-Decor_Red_Fortune_1.png",
+            "yellow": "https://pikmin.wiki.gallery/images/thumb/8/82/Decor_Yellow_Fortune_1.png/200px-Decor_Yellow_Fortune_1.png",
+            "blue": "https://pikmin.wiki.gallery/images/thumb/9/9b/Decor_Blue_Fortune_1.png/200px-Decor_Blue_Fortune_1.png",
+            "white": "https://pikmin.wiki.gallery/images/thumb/2/2a/Decor_White_Fortune_1.png/200px-Decor_White_Fortune_1.png",
+            "purple": "https://pikmin.wiki.gallery/images/thumb/c/ca/Decor_Purple_Fortune_1.png/200px-Decor_Purple_Fortune_1.png",
+            "rock": "https://pikmin.wiki.gallery/images/thumb/b/b9/Decor_Rock_Fortune_1.png/200px-Decor_Rock_Fortune_1.png",
+            "winged": "https://pikmin.wiki.gallery/images/thumb/4/4e/Decor_Winged_Fortune_1.png/200px-Decor_Winged_Fortune_1.png"
+          }
+        },
+        {
+          "id": "chukichi",
+          "name": "中吉",
+          "nameEn": "Chukichi",
+          "imageUrl": "https://pikmin.wiki.gallery/images/thumb/0/00/Decor_Red_Chukichi.png/200px-Decor_Red_Chukichi.png",
+          "imageUrls": {
+            "red": "https://pikmin.wiki.gallery/images/thumb/4/4a/Decor_Red_Fortune_1.png/200px-Decor_Red_Fortune_1.png",
+            "yellow": "https://pikmin.wiki.gallery/images/thumb/8/82/Decor_Yellow_Fortune_1.png/200px-Decor_Yellow_Fortune_1.png",
+            "blue": "https://pikmin.wiki.gallery/images/thumb/9/9b/Decor_Blue_Fortune_1.png/200px-Decor_Blue_Fortune_1.png",
+            "white": "https://pikmin.wiki.gallery/images/thumb/2/2a/Decor_White_Fortune_1.png/200px-Decor_White_Fortune_1.png",
+            "purple": "https://pikmin.wiki.gallery/images/thumb/c/ca/Decor_Purple_Fortune_1.png/200px-Decor_Purple_Fortune_1.png",
+            "rock": "https://pikmin.wiki.gallery/images/thumb/b/b9/Decor_Rock_Fortune_1.png/200px-Decor_Rock_Fortune_1.png",
+            "winged": "https://pikmin.wiki.gallery/images/thumb/4/4e/Decor_Winged_Fortune_1.png/200px-Decor_Winged_Fortune_1.png"
+          }
+        },
+        {
+          "id": "shokichi",
+          "name": "小吉",
+          "nameEn": "Shokichi",
+          "imageUrl": "https://pikmin.wiki.gallery/images/thumb/0/00/Decor_Red_Shokichi.png/200px-Decor_Red_Shokichi.png",
+          "imageUrls": {
+            "red": "https://pikmin.wiki.gallery/images/thumb/4/4a/Decor_Red_Fortune_1.png/200px-Decor_Red_Fortune_1.png",
+            "yellow": "https://pikmin.wiki.gallery/images/thumb/8/82/Decor_Yellow_Fortune_1.png/200px-Decor_Yellow_Fortune_1.png",
+            "blue": "https://pikmin.wiki.gallery/images/thumb/9/9b/Decor_Blue_Fortune_1.png/200px-Decor_Blue_Fortune_1.png",
+            "white": "https://pikmin.wiki.gallery/images/thumb/2/2a/Decor_White_Fortune_1.png/200px-Decor_White_Fortune_1.png",
+            "purple": "https://pikmin.wiki.gallery/images/thumb/c/ca/Decor_Purple_Fortune_1.png/200px-Decor_Purple_Fortune_1.png",
+            "rock": "https://pikmin.wiki.gallery/images/thumb/b/b9/Decor_Rock_Fortune_1.png/200px-Decor_Rock_Fortune_1.png",
+            "winged": "https://pikmin.wiki.gallery/images/thumb/4/4e/Decor_Winged_Fortune_1.png/200px-Decor_Winged_Fortune_1.png"
+          }
+        },
+        {
+          "id": "suekichi",
+          "name": "末吉",
+          "nameEn": "Suekichi",
+          "imageUrl": "https://pikmin.wiki.gallery/images/thumb/0/00/Decor_Red_Suekichi.png/200px-Decor_Red_Suekichi.png",
+          "imageUrls": {
+            "red": "https://pikmin.wiki.gallery/images/thumb/4/4a/Decor_Red_Fortune_1.png/200px-Decor_Red_Fortune_1.png",
+            "yellow": "https://pikmin.wiki.gallery/images/thumb/8/82/Decor_Yellow_Fortune_1.png/200px-Decor_Yellow_Fortune_1.png",
+            "blue": "https://pikmin.wiki.gallery/images/thumb/9/9b/Decor_Blue_Fortune_1.png/200px-Decor_Blue_Fortune_1.png",
+            "white": "https://pikmin.wiki.gallery/images/thumb/2/2a/Decor_White_Fortune_1.png/200px-Decor_White_Fortune_1.png",
+            "purple": "https://pikmin.wiki.gallery/images/thumb/c/ca/Decor_Purple_Fortune_1.png/200px-Decor_Purple_Fortune_1.png",
+            "rock": "https://pikmin.wiki.gallery/images/thumb/b/b9/Decor_Rock_Fortune_1.png/200px-Decor_Rock_Fortune_1.png",
+            "winged": "https://pikmin.wiki.gallery/images/thumb/4/4e/Decor_Winged_Fortune_1.png/200px-Decor_Winged_Fortune_1.png"
+          }
+        }
+      ],
+      "availablePikminTypes": [
+        "red",
+        "yellow",
+        "blue",
+        "purple",
+        "white",
+        "rock",
+        "winged"
+      ]
+    },
+    {
+      "category": {
+        "id": "rare-restaurant",
+        "name": "稀有餐廳",
+        "nameEn": "Rare Restaurant",
+        "type": "rare",
+        "icon": "✨"
+      },
+      "variants": [
+        {
+          "id": "rare-chef",
+          "name": "稀有廚師帽",
+          "nameEn": "Rare Chef Hat",
+          "imageUrl": "https://pikmin.wiki.gallery/images/thumb/0/00/Decor_Red_Rare_Chef_Hat.png/200px-Decor_Red_Rare_Chef_Hat.png",
+          "isRare": true
+        }
+      ],
+      "availablePikminTypes": [
+        "red",
+        "yellow",
+        "blue",
+        "purple",
+        "white",
+        "rock",
+        "winged"
+      ]
+    },
+    {
+      "category": {
+        "id": "rare-cafe",
+        "name": "稀有咖啡廳",
+        "nameEn": "Rare Café",
+        "type": "rare",
+        "icon": "✨"
+      },
+      "variants": [
+        {
+          "id": "rare-coffee",
+          "name": "稀有咖啡杯",
+          "nameEn": "Rare Coffee Cup",
+          "imageUrl": "https://pikmin.wiki.gallery/images/thumb/0/00/Decor_Red_Rare_Coffee_Cup.png/200px-Decor_Red_Rare_Coffee_Cup.png",
+          "isRare": true
+        }
+      ],
+      "availablePikminTypes": [
+        "red",
+        "yellow",
+        "blue",
+        "purple",
+        "white",
+        "rock",
+        "winged"
+      ]
+    }
+  ]
+}
