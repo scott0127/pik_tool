@@ -109,6 +109,9 @@ onMounted(() => {
   if (route.query.type) {
     selectedCategoryType.value = route.query.type as DecorCategoryType;
   }
+  if (route.query.search) {
+    searchQuery.value = route.query.search as string;
+  }
 });
 
 // Filtered items

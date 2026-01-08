@@ -54,6 +54,20 @@
           </NuxtLink>
         </div>
 
+        <!-- Search Bar (Desktop) -->
+        <div class="hidden md:flex items-center ml-4 mr-2">
+          <div class="relative">
+            <input 
+              v-model="headerSearch"
+              @keyup.enter="handleSearch"
+              type="text"
+              placeholder="搜尋飾品..."
+              class="w-40 lg:w-48 pl-8 pr-3 py-1.5 text-sm rounded-full border border-gray-200 focus:border-primary-500 focus:ring-1 focus:ring-primary-500 outline-none transition-all placeholder-gray-400 bg-gray-50/50"
+            />
+            <span class="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400 text-xs">🔍</span>
+          </div>
+        </div>
+
         <!-- Mobile Menu Button -->
         <button 
           @click="showMobileMenu = !showMobileMenu"
@@ -179,6 +193,16 @@ const handleLogout = async () => {
   await supabase.auth.signOut({ scope: 'global' });
   // Navigate to auth page after logout
   router.push('/auth');
+};
+
+const headerSearch = ref('');
+const handleSearch = () => {
+  if (!headerSearch.value.trim()) return;
+  router.push({ 
+    path: '/collection', 
+    query: { search: headerSearch.value } 
+  });
+  headerSearch.value = '';
 };
 </script>
 

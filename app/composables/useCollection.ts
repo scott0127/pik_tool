@@ -198,7 +198,7 @@ export function useCollection() {
     };
 
     // Initialize Pikmin type stats
-    const pikminTypes: PikminType[] = ['red', 'yellow', 'blue', 'purple', 'white', 'rock', 'winged'];
+    const pikminTypes: PikminType[] = ['red', 'yellow', 'blue', 'purple', 'white', 'rock', 'winged', 'ice'];
     pikminTypes.forEach(type => {
       stats.byPikminType[type] = { total: 0, collected: 0 };
     });
@@ -219,9 +219,10 @@ export function useCollection() {
       if (!stats.byCategory[item.categoryId]) {
         stats.byCategory[item.categoryId] = { total: 0, collected: 0 };
       }
-      stats.byCategory[item.categoryId].total++;
+      const catStats = stats.byCategory[item.categoryId]!;
+      catStats.total++;
       if (isItemCollected) {
-        stats.byCategory[item.categoryId].collected++;
+        catStats.collected++;
       }
 
       // By Pikmin type

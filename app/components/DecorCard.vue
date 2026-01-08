@@ -10,11 +10,12 @@
       <!-- Image Container -->
       <div class="relative aspect-square bg-gradient-to-br from-gray-50 to-gray-100 p-2">
         <img 
-          v-if="imageUrl"
+          v-if="imageUrl && !hasError"
           :src="imageUrl"
           :alt="`${variant?.nameEn} ${pikminType} Pikmin`"
           class="w-full h-full object-contain"
           loading="lazy"
+            referrerpolicy="no-referrer"
           @error="handleImageError"
         >
         <div 
@@ -98,6 +99,7 @@ const variant = computed(() => getVariant(props.categoryId, props.variantId));
 const category = computed(() => getCategory(props.categoryId));
 const isCollected = computed(() => checkCollected(props.itemId));
 const imageUrl = computed(() => getImageUrl(props.categoryId, props.variantId, props.pikminType));
+const hasError = ref(false);
 
 const pikminTypeShort = computed(() => {
   const shorts: Record<PikminType, string> = {
@@ -108,6 +110,7 @@ const pikminTypeShort = computed(() => {
     white: 'W',
     rock: '岩',
     winged: '翼',
+    ice: '冰',
   };
   return shorts[props.pikminType];
 });
@@ -123,8 +126,7 @@ const handleClick = () => {
   emit('toggle', props.itemId);
 };
 
-const handleImageError = (e: Event) => {
-  const img = e.target as HTMLImageElement;
-  img.style.display = 'none';
+const handleImageError = () => {
+  hasError.value = true;
 };
 </script>

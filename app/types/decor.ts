@@ -1,7 +1,7 @@
 // Pikmin types available in Pikmin Bloom
-export type PikminType = 'red' | 'yellow' | 'blue' | 'purple' | 'white' | 'rock' | 'winged';
+export type PikminType = 'red' | 'yellow' | 'blue' | 'purple' | 'white' | 'rock' | 'winged' | 'ice';
 
-export const PIKMIN_TYPES: PikminType[] = ['red', 'yellow', 'blue', 'purple', 'white', 'rock', 'winged'];
+export const PIKMIN_TYPES: PikminType[] = ['red', 'yellow', 'blue', 'purple', 'white', 'rock', 'winged', 'ice'];
 
 export const PIKMIN_TYPE_NAMES: Record<PikminType, string> = {
   red: '紅皮克敏',
@@ -11,6 +11,7 @@ export const PIKMIN_TYPE_NAMES: Record<PikminType, string> = {
   white: '白皮克敏',
   rock: '岩皮克敏',
   winged: '翼皮克敏',
+  ice: '冰皮克敏',
 };
 
 export const PIKMIN_TYPE_COLORS: Record<PikminType, string> = {
@@ -21,6 +22,7 @@ export const PIKMIN_TYPE_COLORS: Record<PikminType, string> = {
   white: 'bg-pikmin-white',
   rock: 'bg-pikmin-rock',
   winged: 'bg-pikmin-winged',
+  ice: 'bg-pikmin-ice',
 };
 
 // Decor category types
