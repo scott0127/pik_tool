@@ -34,13 +34,13 @@ export type DecorCategoryType =
   | 'regional'   // Region-exclusive decor
   | 'rare';      // Rare variants
 
-export const DECOR_CATEGORY_TYPES: { id: DecorCategoryType; name: string; icon: string }[] = [
-  { id: 'regular', name: '一般飾品', icon: '🏠' },
-  { id: 'special', name: '活動限定', icon: '⭐' },
-  { id: 'roadside', name: '路邊', icon: '🛤️' },
-  { id: 'weather', name: '天氣', icon: '🌧️' },
-  { id: 'regional', name: '地區限定', icon: '🗾' },
-  { id: 'rare', name: '稀有', icon: '✨' },
+export const DECOR_CATEGORY_TYPES: { id: DecorCategoryType; name: string; description: string }[] = [
+  { id: 'regular', name: '地點飾品', description: '在特定地點種植苗獲得' },
+  { id: 'special', name: '活動限定', description: '限時活動才能取得' },
+  { id: 'roadside', name: '路邊', description: '在路邊種植苗獲得' },
+  { id: 'weather', name: '天氣相關', description: '特定天氣條件下獲得' },
+  { id: 'regional', name: '地區限定', description: '特定國家/地區限定' },
+  { id: 'rare', name: '稀有版本', description: '一般飾品的稀有變體' },
 ];
 
 // Individual decor category (e.g., Restaurant, Café)

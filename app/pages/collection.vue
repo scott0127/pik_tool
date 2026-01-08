@@ -37,7 +37,7 @@
 
       <!-- Category Type Filter -->
       <div>
-        <label class="text-sm font-semibold text-gray-600 mb-2 block">📁 飾品分類</label>
+        <label class="text-sm font-semibold text-gray-600 mb-2 block">🎯 取得方式</label>
         <CategoryNav 
           :selected="selectedCategoryType"
           @select="selectedCategoryType = $event"
@@ -90,7 +90,7 @@
               <button @click="searchQuery = ''" class="hover:text-emerald-900">×</button>
             </span>
             <span v-if="selectedCategoryType" class="inline-flex items-center gap-1 px-2 py-1 bg-emerald-100 text-emerald-700 rounded-lg text-xs font-medium">
-              📁 {{ getCategoryTypeName(selectedCategoryType) }}
+              🎯 {{ getCategoryTypeName(selectedCategoryType) }}
               <button @click="selectedCategoryType = null" class="hover:text-emerald-900">×</button>
             </span>
             <span v-if="selectedPikminType" class="inline-flex items-center gap-1 px-2 py-1 bg-emerald-100 text-emerald-700 rounded-lg text-xs font-medium">
@@ -100,6 +100,14 @@
             <span v-if="collectionFilter !== 'all'" class="inline-flex items-center gap-1 px-2 py-1 bg-emerald-100 text-emerald-700 rounded-lg text-xs font-medium">
               ✅ {{ collectionFilters.find(f => f.value === collectionFilter)?.label }}
               <button @click="collectionFilter = 'all'" class="hover:text-emerald-900">×</button>
+            </span>
+            <span v-if="isLimitedMode" class="inline-flex items-center gap-1 px-2 py-1 bg-amber-100 text-amber-700 rounded-lg text-xs font-medium">
+              ⚠️ 限定飾品
+              <button @click="isLimitedMode = false" class="hover:text-amber-900">×</button>
+            </span>
+            <span v-if="selectedCategoryId" class="inline-flex items-center gap-1 px-2 py-1 bg-purple-100 text-purple-700 rounded-lg text-xs font-medium">
+              📁 {{ getCategoryName(selectedCategoryId) }}
+              <button @click="selectedCategoryId = null" class="hover:text-purple-900">×</button>
             </span>
           </div>
           <button 
@@ -190,13 +198,43 @@ const collectionFilters = [
   { value: 'uncollected' as const, label: '未蒐集', icon: '⬜' },
 ];
 
+// 取得限定類別 IDs
+const limitedCategoryTypes: DecorCategoryType[] = ['regional', 'special'];
+
+// 標記是否為「限定篩選」模式
+const isLimitedMode = ref(false);
+
+// 篩選特定類別 ID
+const selectedCategoryId = ref<string | null>(null);
+
 // Initialize from query params
 onMounted(() => {
+  // 處理 type 參數（取得方式）
   if (route.query.type) {
     selectedCategoryType.value = route.query.type as DecorCategoryType;
   }
+  
+  // 處理 search 參數
   if (route.query.search) {
     searchQuery.value = route.query.search as string;
+  }
+  
+  // 處理 status 參數（蒐集狀態）
+  if (route.query.status) {
+    const status = route.query.status as string;
+    if (status === 'collected' || status === 'uncollected') {
+      collectionFilter.value = status;
+    }
+  }
+  
+  // 處理 limited 參數（限定飾品模式）
+  if (route.query.limited === 'true') {
+    isLimitedMode.value = true;
+  }
+  
+  // 處理 category 參數（特定類別）
+  if (route.query.category) {
+    selectedCategoryId.value = route.query.category as string;
   }
   if (route.query.pikmin) {
     selectedPikminType.value = route.query.pikmin as PikminType;
@@ -220,7 +258,7 @@ const scrollToTop = () => {
 
 // Check if any filters are active
 const hasActiveFilters = computed(() => {
-  return searchQuery.value || selectedCategoryType.value || selectedPikminType.value || collectionFilter.value !== 'all';
+  return searchQuery.value || selectedCategoryType.value || selectedPikminType.value || collectionFilter.value !== 'all' || isLimitedMode.value || selectedCategoryId.value;
 });
 
 // Filtered items
@@ -232,10 +270,21 @@ const filteredItems = computed(() => {
     items = searchItems(searchQuery.value);
   }
 
+  // Apply limited mode filter (地區限定 + 活動限定)
+  if (isLimitedMode.value) {
+    const limitedItems = limitedCategoryTypes.flatMap(type => getItemsByCategoryType(type));
+    items = items.filter(item => limitedItems.some(li => li.id === item.id));
+  }
+
   // Apply category type filter
   if (selectedCategoryType.value) {
     const categoryTypeItems = getItemsByCategoryType(selectedCategoryType.value);
     items = items.filter(item => categoryTypeItems.some(ci => ci.id === item.id));
+  }
+
+  // Apply specific category filter
+  if (selectedCategoryId.value) {
+    items = items.filter(item => item.categoryId === selectedCategoryId.value);
   }
 
   // Apply Pikmin type filter
@@ -271,10 +320,18 @@ const getCategoryTypeName = (typeId: string): string => {
   return DECOR_CATEGORY_TYPES.find(t => t.id === typeId)?.name || typeId;
 };
 
+const getCategoryName = (categoryId: string): string => {
+  const definitions = getDecorDefinitions();
+  const found = definitions.find(d => d.category.id === categoryId);
+  return found?.category.name || categoryId;
+};
+
 const clearAllFilters = () => {
   searchQuery.value = '';
   selectedCategoryType.value = null;
   selectedPikminType.value = null;
   collectionFilter.value = 'all';
+  isLimitedMode.value = false;
+  selectedCategoryId.value = null;
 };
 </script>

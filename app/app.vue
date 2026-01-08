@@ -53,12 +53,26 @@
         <div class="max-w-7xl mx-auto px-4">
           <div class="flex items-center justify-center gap-2 mb-3">
             <span class="text-2xl">🌱</span>
-            <span class="font-bold text-emerald-700">Pikmin Bloom 圖鑑</span>
+            <span class="font-bold text-emerald-700">Pikmin Bloom 飾品圖鑑</span>
           </div>
           <p class="text-sm text-gray-600 mb-2">
-            資料來源：<a href="https://www.pikminwiki.com/Decor_Pikmin" target="_blank" class="text-emerald-600 hover:text-emerald-700 underline underline-offset-2">Pikmin Wiki</a>
+            資料來源：<a href="https://www.pikminwiki.com/Decor_Pikmin" target="blank" rel="noopener noreferrer" class="text-emerald-600 hover:text-emerald-700 underline underline-offset-2">Pikipedia</a>
           </p>
-          <p class="text-xs text-gray-500">僅供私人學術研究使用 • Made with 💚</p>
+          <div class="flex items-center justify-center gap-4 text-xs text-gray-500 mb-2">
+            <a 
+              href="https://www.pikminwiki.com/Pikipedia:General_disclaimer" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              class="hover:text-emerald-600 transition-colors underline underline-offset-2"
+            >
+              版權免責聲明
+            </a>
+            <span>•</span>
+            <NuxtLink to="/feedback" class="hover:text-emerald-600 transition-colors underline underline-offset-2">
+              意見回饋
+            </NuxtLink>
+          </div>
+          <p class="text-xs text-gray-400">Made with 💚 by LKB</p>
         </div>
       </footer>
     </div>
@@ -69,21 +83,49 @@
 </template>
 
 <script setup lang="ts">
-const { loadCollection, loadFromCloud } = useCollection();
+const { loadCollection, loadFromCloud, clearLocalData } = useCollection();
+const supabase = useSupabaseClient();
+const user = useSupabaseUser();
 const isInitializing = ref(true);
 
 onMounted(async () => {
   try {
-    // First load from localStorage (fast, offline available)
-    loadCollection();
+    // 檢查是否有登入
+    const { data: { session } } = await supabase.auth.getSession();
     
-    // Then sync from cloud if logged in (may update with newer data)
-    await loadFromCloud();
+    if (session?.user) {
+      // 已登入：先載入本地快取，再從雲端同步
+      loadCollection();
+      await loadFromCloud();
+    } else {
+      // 未登入：確保清除任何殘留資料
+      clearLocalData();
+    }
   } finally {
     // Small delay for smooth transition
     setTimeout(() => {
       isInitializing.value = false;
     }, 500);
   }
+});
+
+// 監聽 auth 狀態變化
+onMounted(() => {
+  const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+    console.log('[Auth] State changed:', event);
+    
+    if (event === 'SIGNED_OUT') {
+      // 登出時清除所有本地資料
+      clearLocalData();
+    } else if (event === 'SIGNED_IN' && session?.user) {
+      // 登入時從雲端載入資料
+      await loadFromCloud();
+    }
+  });
+
+  // 清理監聽器
+  onUnmounted(() => {
+    subscription.unsubscribe();
+  });
 });
 </script>

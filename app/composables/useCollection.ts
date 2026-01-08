@@ -281,6 +281,26 @@ export function useCollection() {
     saveCollection();
   };
 
+  // 清除本地資料（登出時使用）
+  const clearLocalData = () => {
+    console.log('[Collection] Clearing local data...');
+    // 清除 state
+    collectionState.value = {
+      collected: {},
+      lastUpdated: new Date().toISOString(),
+      version: CURRENT_VERSION,
+    };
+    // 清除 localStorage
+    if (import.meta.client) {
+      try {
+        localStorage.removeItem(STORAGE_KEY);
+        console.log('[Collection] ✓ Local storage cleared');
+      } catch (e) {
+        console.error('[Collection] Failed to clear local storage:', e);
+      }
+    }
+  };
+
   return {
     collectionState: readonly(collectionState),
     isSyncing: readonly(isSyncing),
@@ -295,6 +315,7 @@ export function useCollection() {
     exportCollection,
     importCollection,
     resetCollection,
+    clearLocalData,
   };
 }
 
