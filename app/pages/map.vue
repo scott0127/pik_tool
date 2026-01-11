@@ -98,11 +98,13 @@
 
           <!-- 統計資訊 -->
           <div class="p-3 md:p-4 bg-gray-50 border-b border-gray-200">
-            <div class="flex items-center justify-between text-xs md:text-sm">
+            <div class="flex items-center justify-between text-xs md:text-sm mb-2">
               <div>
                 <span class="text-gray-600">已選擇</span>
-                <span class="font-bold text-emerald-600 ml-1">{{ selectedFilters.length }}</span>
-                <span class="text-gray-400">/ {{ decorRules.length }}</span>
+                <span :class="['font-bold ml-1', selectedFilters.length >= 20 ? 'text-red-500' : 'text-emerald-600']">
+                  {{ selectedFilters.length }}
+                </span>
+                <span class="text-gray-400">/ 20</span>
               </div>
               <div>
                 <span class="text-gray-600">找到</span>
@@ -110,12 +112,21 @@
                 <span class="text-gray-400">個地點</span>
               </div>
             </div>
-            <div class="mt-2 flex gap-2">
+            
+            <!-- 警告訊息 -->
+            <div v-if="selectedFilters.length > 10" class="mb-2 px-2 py-1 rounded bg-orange-50 text-orange-600 text-xs flex items-center gap-1">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+              </svg>
+              {{ selectedFilters.length >= 20 ? '已達上限 (最多20種)' : '超過 10 種查詢會比較慢喔' }}
+            </div>
+
+            <div class="flex gap-2">
               <button
                 @click="selectAll"
                 class="flex-1 px-3 py-2 bg-emerald-100 hover:bg-emerald-200 active:bg-emerald-300 text-emerald-700 rounded-lg text-xs font-medium transition-colors"
               >
-                全選
+                選前20個
               </button>
               <button
                 @click="clearAll"
@@ -137,19 +148,21 @@
               v-for="rule in decorRules"
               :key="rule.id"
               :class="[
-                'flex items-center cursor-pointer transition-all',
+                'flex items-center cursor-pointer transition-all relative',
                 isMobile 
                   ? 'flex-col gap-1 p-2 rounded-xl text-center'
                   : 'gap-3 p-3 rounded-xl hover:bg-gray-100 group',
                 selectedFilters.includes(rule.id) 
                   ? 'bg-emerald-50 border border-emerald-200' 
-                  : isMobile ? 'bg-gray-50' : ''
+                  : isMobile ? 'bg-gray-50' : '',
+                !selectedFilters.includes(rule.id) && selectedFilters.length >= 20 ? 'opacity-50 cursor-not-allowed grayscale' : ''
               ]"
             >
               <input
                 type="checkbox"
                 :value="rule.id"
                 v-model="selectedFilters"
+                :disabled="!selectedFilters.includes(rule.id) && selectedFilters.length >= 20"
                 :class="[
                   'rounded border-gray-300 text-emerald-500 focus:ring-emerald-500 focus:ring-offset-0',
                   isMobile ? 'w-3 h-3 absolute opacity-0' : 'w-4 h-4'
@@ -328,7 +341,7 @@ let leafletMap: any = null; // 不使用 ref，直接用普通變數
 
 // 狀態管理
 const showPanel = ref(true);
-const selectedFilters = ref<string[]>(decorRules.map(r => r.id)); // 預設全選
+const selectedFilters = ref<string[]>(decorRules.slice(0, 3).map(r => r.id)); // 預設只選前三個，避免查詢過重
 
 
 // ⚠️ 使用 shallowRef 來儲存 POI 點位，避免 Vue 對每個點位物件進行深層監聽
@@ -458,9 +471,9 @@ const handleSearch = async () => {
   }
 };
 
-// 全選
+// 全選 (限制 20 個)
 const selectAll = () => {
-  selectedFilters.value = decorRules.map(r => r.id);
+  selectedFilters.value = decorRules.slice(0, 20).map(r => r.id);
 };
 
 // 清除全部
