@@ -255,6 +255,7 @@ const userInitial = computed(() => {
 const navLinks = [
   { to: '/', name: '首頁', icon: '🏠' },
   { to: '/collection', name: '圖鑑', icon: '📖' },
+  { to: '/map', name: '地圖', icon: '🗺️' },
   { to: '/progress', name: '統計', icon: '📊' },
   { to: '/friends', name: '好友', icon: '🤝' },
 ];

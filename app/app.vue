@@ -44,7 +44,7 @@
     <div v-show="!isInitializing" class="relative z-10">
       <AppHeader />
       
-      <main class="max-w-7xl mx-auto px-4 py-6">
+      <main :class="$route.path === '/map' ? 'w-full px-0 py-0' : 'max-w-7xl mx-auto px-4 py-6'">
         <NuxtPage />
       </main>
       
