@@ -3,9 +3,9 @@ import type { DecorRule, MapBounds, OverpassResponse, POIPoint } from '~/types/m
 export function useOverpassAPI() {
   // 多個 Overpass API 伺服器（用於故障切換）
   const OVERPASS_SERVERS = [
+    'https://overpass-api.de/api/interpreter', // 官方伺服器（最穩定，支援 CORS）
     'https://overpass.kumi.systems/api/interpreter',
     'https://maps.mail.ru/osm/tools/overpass/api/interpreter',
-    'https://overpass-api.de/api/interpreter',
   ];
   let currentServerIndex = 0;
   let lastRequestTime = 0;
@@ -42,7 +42,7 @@ export function useOverpassAPI() {
 
     // 組合完整的 Overpass QL
     return `
-[out:json][timeout:25];
+[out:json][timeout:90];
 (
 ${queries.join('\n')}
 );
@@ -127,7 +127,9 @@ out center;
    */
   async function fetchPOIs(
     bounds: MapBounds,
-    selectedRules: DecorRule[]
+    selectedRules: DecorRule[],
+    abortSignal?: AbortSignal,
+    onProgress?: (attempt: number) => void
   ): Promise<POIPoint[]> {
     if (selectedRules.length === 0) {
       return [];
@@ -152,13 +154,20 @@ out center;
         return [];
       }
 
-      // 嘗試不同的伺服器
+      // 嘗試不同的伺服器，共兩輪 (6 次嘗試)
       let lastError: Error | null = null;
-      for (let attempt = 0; attempt < OVERPASS_SERVERS.length; attempt++) {
+      const maxAttempts = OVERPASS_SERVERS.length * 2;
+      
+      for (let attempt = 0; attempt < maxAttempts; attempt++) {
+        // 更新進度
+        if (onProgress) {
+          onProgress(attempt + 1);
+        }
+
         const serverUrl = OVERPASS_SERVERS[(currentServerIndex + attempt) % OVERPASS_SERVERS.length]!;
         
         try {
-          console.log(`[Overpass] Trying server: ${serverUrl}`);
+          console.log(`[Overpass] Trying server (${attempt + 1}/${maxAttempts}): ${serverUrl}`);
           
           const response = await fetch(serverUrl, {
             method: 'POST',
@@ -166,6 +175,7 @@ out center;
             headers: {
               'Content-Type': 'text/plain',
             },
+            signal: abortSignal,
           });
 
           if (response.status === 429) {
@@ -189,6 +199,11 @@ out center;
           console.log(`[Overpass] Success! Got ${points.length} points from ${serverUrl}`);
           return points;
         } catch (err) {
+          // 如果是 AbortError，直接拋出，不再重試
+          if (err instanceof Error && err.name === 'AbortError') {
+            throw err;
+          }
+          
           lastError = err as Error;
           console.warn(`[Overpass] Server ${serverUrl} failed:`, err);
         }
@@ -197,6 +212,9 @@ out center;
       // 所有伺服器都失敗
       throw lastError || new Error('所有 Overpass 伺服器都無法連線');
     } catch (err) {
+      if (err instanceof Error && err.name === 'AbortError') {
+        throw err; // 讓外層處理 AbortError
+      }
       const message = err instanceof Error ? err.message : '未知錯誤';
       error.value = message;
       console.error('Overpass API 查詢失敗:', err);

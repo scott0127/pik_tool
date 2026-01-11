@@ -266,7 +266,7 @@
             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none" />
             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
           </svg>
-          <span class="font-medium">搜尋中...</span>
+          <span class="font-medium">{{ loadingMessage }}</span>
         </div>
       </div>
 
@@ -316,11 +316,11 @@ onMounted(() => {
   window.addEventListener('resize', updateWindowWidth);
 });
 
-// 地圖設定 - 預設台北車站，縮放層級 14 (街道層級，比較容易查詢到結果)
+// 地圖設定 - 預設台北車站，縮放層級 16 (避免 Overpass API 超時)
 const mapCenter = ref<[number, number]>([25.0478, 121.5170]); // 台北車站
-const mapZoom = ref(14);
+const mapZoom = ref(16);
 const mapRef = ref();
-const MIN_ZOOM_FOR_QUERY = 12; // 最小查詢縮放層級
+const MIN_ZOOM_FOR_QUERY = 16; // 最小查詢縮放層級 (提高到 16 以確保第一次查詢成功)
 
 // ⚠️ 重要：使用 shallowRef 避免 Vue 對 Leaflet 物件進行深層響應式監聯
 // 這是 Vue + Leaflet 效能優化的關鍵！
@@ -385,7 +385,18 @@ const canSearch = computed(() => mapZoom.value >= MIN_ZOOM_FOR_QUERY);
 
 // 搜尋結果提示
 const showSearchResult = ref(false);
+const currentAttempt = ref(0);
 let searchResultTimer: ReturnType<typeof setTimeout> | null = null;
+let abortController: AbortController | null = null;
+
+// 載入訊息
+const loadingMessage = computed(() => {
+  const attempt = currentAttempt.value;
+  if (attempt <= 2) return '皮克敏正在努力挖掘...';
+  if (attempt <= 4) return '皮克敏覺得小累...';
+  if (attempt === 5) return '皮克敏快找到了...';
+  return '皮克敏真的快找到了...';
+});
 
 // 手動搜尋
 const handleSearch = async () => {
@@ -403,22 +414,48 @@ const handleSearch = async () => {
     return;
   }
 
+  // 取消之前的請求
+  if (abortController) {
+    abortController.abort();
+  }
+  abortController = new AbortController();
+  currentAttempt.value = 0;
+
   console.log('[Map] Searching POIs...', { bounds: currentBounds, filters: selectedFilters.value.length });
   
-  const selectedRules = decorRules.filter(r => selectedFilters.value.includes(r.id));
-  const points = await fetchPOIs(currentBounds, selectedRules);
-  
-  console.log('[Map] Received', points.length, 'points');
-  
-  // 使用 shallowRef，直接賦值整個陣列來觸發更新
-  fetchedPoints.value = Object.freeze(points) as POIPoint[];
-  
-  // 顯示搜尋結果提示
-  showSearchResult.value = true;
-  if (searchResultTimer) clearTimeout(searchResultTimer);
-  searchResultTimer = setTimeout(() => {
-    showSearchResult.value = false;
-  }, 3000);
+  try {
+    const selectedRules = decorRules.filter(r => selectedFilters.value.includes(r.id));
+    
+    const points = await fetchPOIs(
+      currentBounds, 
+      selectedRules, 
+      abortController.signal,
+      (attempt) => {
+        currentAttempt.value = attempt;
+      }
+    );
+    
+    console.log('[Map] Received', points.length, 'points');
+    
+    // 使用 shallowRef，直接賦值整個陣列來觸發更新
+    fetchedPoints.value = Object.freeze(points) as POIPoint[];
+    
+    // 顯示搜尋結果提示
+    showSearchResult.value = true;
+    if (searchResultTimer) clearTimeout(searchResultTimer);
+    searchResultTimer = setTimeout(() => {
+      showSearchResult.value = false;
+    }, 3000);
+  } catch (err) {
+    if (err instanceof Error && err.name === 'AbortError') {
+      console.log('[Map] Search aborted');
+    } else {
+      console.error('[Map] Search failed:', err);
+    }
+  } finally {
+    abortController = null;
+    currentAttempt.value = 0;
+  }
 };
 
 // 全選
@@ -433,6 +470,9 @@ const clearAll = () => {
 
 // 清理
 onUnmounted(() => {
+  if (abortController) {
+    abortController.abort();
+  }
   if (searchResultTimer) {
     clearTimeout(searchResultTimer);
   }
