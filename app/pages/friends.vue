@@ -163,6 +163,18 @@
           </button>
         </div>
 
+        <!-- Error Message -->
+        <div v-if="error" class="glass rounded-3xl p-6 text-center text-red-600 mb-6 bg-red-50 border border-red-200">
+          <p class="font-bold flex items-center justify-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+            載入失敗
+          </p>
+          <p class="mt-2 text-sm">{{ error }}</p>
+          <button @click="fetchPosts" class="mt-4 text-sm underline hover:text-red-700">重試</button>
+        </div>
+
         <!-- Loading -->
         <div v-if="loading && posts.length === 0" class="glass rounded-3xl p-12 text-center">
           <div class="w-16 h-16 mx-auto border-4 border-emerald-200 border-t-emerald-500 rounded-full animate-spin mb-4"></div>
@@ -266,6 +278,8 @@
 </template>
 
 <script setup lang="ts">
+import { createClient } from '@supabase/supabase-js'
+
 interface FriendPost {
   id: string;
   user_id: string;
@@ -279,7 +293,8 @@ const supabase = useSupabaseClient();
 const user = useSupabaseUser();
 
 const posts = ref<FriendPost[]>([]);
-const loading = ref(true);
+const loading = ref(false); // 預設不載入，等待 onMounted
+const error = ref<string | null>(null);
 const submitting = ref(false);
 const showCopyToast = ref(false);
 
@@ -311,6 +326,7 @@ const formatFriendCode = (e: Event) => {
 
 // 顯示格式化的代碼
 const formatDisplayCode = (code: string) => {
+  if (!code) return '';
   const digits = code.replace(/\D/g, '');
   const parts = [];
   for (let i = 0; i < digits.length; i += 4) {
@@ -325,26 +341,44 @@ onMounted(async () => {
   
   // Pre-fill username from user metadata
   if (user.value) {
-    // user 可能是 JWT payload，結構可能不同
     const metadata = user.value.user_metadata || user.value;
     const email = user.value.email || metadata?.email || '';
     newPost.value.username = metadata?.username || metadata?.name || email.split('@')[0] || '';
-    console.log('[Friends] Pre-filled username:', newPost.value.username);
   }
 });
 
 const fetchPosts = async () => {
   loading.value = true;
+  error.value = null;
+  
   try {
-    const { data, error } = await supabase
+    // 取得 Supabase 設定 (從現有的 Nuxt Client 提取)
+    const sbUrl = (supabase as any).supabaseUrl || (supabase as any).auth?.url;
+    const sbKey = (supabase as any).supabaseKey || (supabase as any).auth?.headers?.['apikey'];
+
+    if (!sbUrl || !sbKey) {
+      throw new Error('無法取得 Supabase 連線設定');
+    }
+
+    // 建立一個獨立的 Client 來繞過 Nuxt 模組可能的狀態死鎖
+    const manualClient = createClient(sbUrl, sbKey, {
+      auth: {
+        persistSession: false,
+        autoRefreshToken: false,
+      }
+    });
+    
+    // 使用手動 Client 查詢
+    const { data, error: err } = await manualClient
       .from('friend_posts')
       .select('*')
       .order('created_at', { ascending: false });
-    
-    if (error) throw error;
+
+    if (err) throw err;
     posts.value = data || [];
-  } catch (e) {
-    console.error('Failed to fetch posts:', e);
+  } catch (e: any) {
+    console.error('[Friends] Failed to fetch posts:', e.message);
+    error.value = e.message || '載入失敗，請稍後再試';
   } finally {
     loading.value = false;
   }
