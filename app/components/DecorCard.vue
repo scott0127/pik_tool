@@ -121,6 +121,7 @@ const emit = defineEmits<{
 
 const { isCollected: checkCollected, toggleCollected } = useCollection();
 const { getVariant, getCategory, getImageUrl } = useDecorData();
+const toast = useToast();
 
 const variant = computed(() => getVariant(props.categoryId, props.variantId));
 const category = computed(() => getCategory(props.categoryId));
@@ -156,7 +157,16 @@ const handleClick = () => {
     showRipple.value = false;
   }, 500);
   
-  toggleCollected(props.itemId);
+  // Toggle and get new state
+  const isNowCollected = toggleCollected(props.itemId);
+  
+  // Show toast notification
+  if (isNowCollected) {
+    toast.success('已儲存 ✓', 1200);
+  } else {
+    toast.info('已移除', 1200);
+  }
+  
   emit('toggle', props.itemId);
 };
 

@@ -1,8 +1,8 @@
 <template>
   <div class="space-y-3">
     <!-- Quick Filter Chips -->
-    <div class="overflow-x-auto scrollbar-hide -mx-4 px-4 py-1">
-      <div class="flex gap-2">
+    <div class="-mx-4 px-4 py-1">
+      <div class="flex flex-wrap gap-2">
         <!-- All -->
         <button
           @click="$emit('select', null)"
@@ -200,7 +200,10 @@ const selectedInfo = computed(() => {
 
 <style scoped>
 .filter-chip {
-  @apply inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-medium transition-all duration-200 cursor-pointer whitespace-nowrap border-2;
+  @apply inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-medium transition-all duration-200 cursor-pointer border-2;
+  /* Allow text wrapping on mobile, prevent on larger screens */
+  @apply break-words;
+  min-width: fit-content;
 }
 
 .filter-chip-active {

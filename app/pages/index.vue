@@ -167,9 +167,6 @@
       <NuxtLink to="/map" class="btn-primary text-base">
         <span class="mr-2">🗺️</span> 飾品地點地圖
       </NuxtLink>
-      <NuxtLink to="/progress" class="btn-secondary text-base">
-        <span class="mr-2">📊</span> 詳細統計報告
-      </NuxtLink>
     </section>
 
     <!-- Near Complete Categories (Expandable) -->

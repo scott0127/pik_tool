@@ -51,7 +51,15 @@
       <AppFooter />
     </div>
 
-    <!-- Toast notifications area -->
+    <!-- Global Toast Notifications -->
+    <Toast 
+      v-if="currentToast && isShowingToast"
+      :message="currentToast.message"
+      :type="currentToast.type"
+      :duration="currentToast.duration"
+    />
+
+    <!-- Toast notifications area (legacy) -->
     <div id="toast-container" class="fixed bottom-4 left-1/2 -translate-x-1/2 z-50"></div>
   </div>
 </template>
@@ -61,6 +69,9 @@ const { loadCollection, loadFromCloud, clearLocalData } = useCollection();
 const supabase = useSupabaseClient();
 const user = useSupabaseUser();
 const isInitializing = ref(true);
+
+// Toast system
+const { currentToast, isShowing: isShowingToast } = useToast();
 
 onMounted(async () => {
   console.log('[App] Starting initialization...');

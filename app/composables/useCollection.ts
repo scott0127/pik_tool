@@ -18,6 +18,7 @@ export function useCollection() {
 
   // Sync status
   const isSyncing = useState('collection-syncing', () => false);
+  const lastSyncTime = useState<string | null>('collection-last-sync', () => null);
 
   // Load from localStorage on client side
   const loadCollection = () => {
@@ -47,13 +48,13 @@ export function useCollection() {
   };
 
   // Save to Supabase (if logged in)
-  const saveToCloud = async () => {
+  const saveToCloud = async (): Promise<boolean> => {
     // Get current session directly from Supabase client
     const { data: { session } } = await supabase.auth.getSession();
     
     if (!session?.user?.id) {
       console.log('[Collection] No active session, skip cloud sync');
-      return;
+      return false;
     }
     
     const userId = session.user.id;
@@ -92,9 +93,12 @@ export function useCollection() {
         }
       }
       
+      lastSyncTime.value = new Date().toISOString();
       console.log('[Collection] ✓ Saved to cloud successfully');
+      return true;
     } catch (e) {
       console.error('[Collection] Failed to save to cloud:', e);
+      return false;
     }
   };
 
@@ -182,10 +186,12 @@ export function useCollection() {
   };
 
   // Toggle collected status for an item
-  const toggleCollected = (itemId: string) => {
+  const toggleCollected = (itemId: string): boolean => {
     const current = collectionState.value.collected[itemId] ?? false;
-    collectionState.value.collected[itemId] = !current;
+    const newValue = !current;
+    collectionState.value.collected[itemId] = newValue;
     saveCollection();
+    return newValue; // Return true if now collected, false if uncollected
   };
 
   // Check if an item is collected
@@ -339,6 +345,7 @@ export function useCollection() {
   return {
     collectionState: readonly(collectionState),
     isSyncing: readonly(isSyncing),
+    lastSyncTime: readonly(lastSyncTime),
     loadCollection,
     loadFromCloud,
     toggleCollected,
