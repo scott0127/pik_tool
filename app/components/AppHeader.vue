@@ -77,6 +77,18 @@
               </div>
             </div>
 
+            <!-- GitHub Star Button (Desktop) -->
+            <a 
+              href="https://github.com/scott0127/pik_tool"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="hidden md:flex items-center gap-2 px-4 h-10 rounded-xl bg-gradient-to-r from-gray-800 to-gray-900 hover:from-gray-700 hover:to-gray-800 text-white transition-all hover:shadow-lg group"
+              title="github幫我按星星"
+            >
+              <span class="text-lg group-hover:scale-110 transition-transform">⭐</span>
+              <span class="text-sm font-semibold hidden lg:inline">Star</span>
+            </a>
+
             <!-- Search Button (Desktop) -->
             <button 
               @click="showSearch = !showSearch"
@@ -196,6 +208,17 @@
                 登入
               </NuxtLink>
             </div>
+
+            <!-- GitHub Star Button (Mobile) -->
+            <a 
+              href="https://github.com/scott0127/pik_tool"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="flex items-center justify-center gap-2 bg-gradient-to-r from-gray-800 to-gray-900 text-white rounded-2xl p-4 hover:from-gray-700 hover:to-gray-800 transition-all"
+            >
+              <span class="text-2xl">⭐</span>
+              <span class="font-semibold">github幫我按星星</span>
+            </a>
 
             <!-- Mobile Search -->
             <div class="relative">
