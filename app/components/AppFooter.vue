@@ -17,28 +17,28 @@
         <div class="h-px bg-gradient-to-r from-transparent via-gray-300 to-transparent"></div>
 
         <!-- Primary Links (Larger) -->
-        <div class="flex flex-wrap items-center justify-center gap-4 text-base">
+        <div class="flex flex-col sm:flex-row flex-wrap items-center justify-center gap-3 sm:gap-4 text-base px-2">
           <a 
             href="https://www.pikminwiki.com/Decor_Pikmin" 
             target="_blank"
             rel="noopener noreferrer"
-            class="text-emerald-600 hover:text-emerald-700 transition-colors font-medium underline underline-offset-2"
+            class="text-emerald-600 hover:text-emerald-700 transition-colors font-medium underline underline-offset-2 py-2 sm:py-0"
           >
             資料來源：Pikipedia
           </a>
-          <span class="text-gray-300">•</span>
+          <span class="hidden sm:inline text-gray-300">•</span>
           <a 
             href="https://www.pikminwiki.com/Pikipedia:General_disclaimer" 
             target="_blank"
             rel="noopener noreferrer"
-            class="text-gray-700 hover:text-emerald-600 transition-colors font-medium"
+            class="text-gray-700 hover:text-emerald-600 transition-colors font-medium py-2 sm:py-0"
           >
             版權免責聲明
           </a>
-          <span class="text-gray-300">•</span>
+          <span class="hidden sm:inline text-gray-300">•</span>
           <a 
             href="https://pik-tool.onrender.com/feedback"
-            class="text-gray-700 hover:text-emerald-600 transition-colors font-medium"
+            class="text-gray-700 hover:text-emerald-600 transition-colors font-medium py-2 sm:py-0"
           >
             問題回饋
           </a>
@@ -77,7 +77,7 @@
             完整版權與授權免責聲明 (Full Copyright Disclaimer)
           </h3>
           
-          <div class="text-left max-w-4xl mx-auto bg-gray-50 rounded-2xl p-6 space-y-6 text-sm">
+          <div class="text-left max-w-4xl mx-auto bg-gray-50 rounded-2xl p-4 sm:p-6 space-y-4 sm:space-y-6 text-xs sm:text-sm">
               <!-- Chinese Disclaimer -->
               <div>
                 <h3 class="text-base font-bold text-gray-800 mb-3">中文聲明 (Chinese Disclaimer)</h3>
