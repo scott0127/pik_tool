@@ -178,7 +178,7 @@
       leave-from-class="opacity-100 translate-y-0"
       leave-to-class="opacity-0 -translate-y-4"
     >
-      <section v-if="showNearCompleteSection" class="max-w-4xl mx-auto">
+      <section v-if="showNearCompleteSection" ref="nearCompleteRef" class="max-w-4xl mx-auto">
         <div class="card">
           <div class="flex items-center justify-between mb-4">
             <div class="flex items-center gap-3">
@@ -314,6 +314,7 @@ const stats = computed(() => getStats());
 // Modal states
 const showPikminModal = ref(false);
 const showNearCompleteSection = ref(false);
+const nearCompleteRef = ref<HTMLElement | null>(null);
 
 // 1. 未蒐集數量
 const uncollectedCount = computed(() => {
@@ -384,6 +385,18 @@ const showUnobtainable = () => {
 
 const showNearComplete = () => {
   showNearCompleteSection.value = !showNearCompleteSection.value;
+  
+  // 如果顯示區塊，自動滾動到該區塊（置中顯示）
+  if (showNearCompleteSection.value) {
+    nextTick(() => {
+      if (nearCompleteRef.value) {
+        nearCompleteRef.value.scrollIntoView({ 
+          behavior: 'smooth', 
+          block: 'center' // 改成置中，避免滑過頭
+        });
+      }
+    });
+  }
 };
 
 const goToPikminType = (type: PikminType) => {
