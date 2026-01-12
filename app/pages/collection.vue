@@ -284,10 +284,11 @@ const { getAllDecorItems, getDecorDefinitions, getItemsByCategoryType, searchIte
 
 // Filter state
 const searchQuery = ref('');
-const selectedCategoryType = ref<DecorCategoryType | null>(null);
+const selectedCategoryType = ref<DecorCategoryType | 'uncollected-regular' | 'anniversary' | null>(null);
 const selectedPikminType = ref<PikminType | null>(null);
 const collectionFilter = ref<'all' | 'collected' | 'uncollected'>('all');
 const showScrollTop = ref(false);
+
 
 const collectionFilters = [
   { value: 'all' as const, label: '全部', icon: '📋' },
@@ -402,8 +403,27 @@ const filteredItems = computed(() => {
 
   // Apply category type filter
   if (selectedCategoryType.value) {
-    const categoryTypeItems = getItemsByCategoryType(selectedCategoryType.value);
-    items = items.filter(item => categoryTypeItems.some(ci => ci.id === item.id));
+    // 處理自定義篩選
+    if (selectedCategoryType.value === 'uncollected-regular') {
+      // 篩選一般分類中尚未收集的
+      const regularItems = getItemsByCategoryType('regular');
+      items = items.filter(item => 
+        regularItems.some(ri => ri.id === item.id) && !isCollected(item.id)
+      );
+    } else if (selectedCategoryType.value === 'anniversary') {
+      // 篩選週年紀念分類
+      const anniversaryCategories = [
+        'first-anniversary-snack',
+        '3rd-anniversary-cupcake',
+        '4th-anniversary-flower-box',
+        '4th-anniversary-snack'
+      ];
+      items = items.filter(item => anniversaryCategories.includes(item.categoryId));
+    } else {
+      // 原有的類型篩選
+      const categoryTypeItems = getItemsByCategoryType(selectedCategoryType.value as DecorCategoryType);
+      items = items.filter(item => categoryTypeItems.some(ci => ci.id === item.id));
+    }
   }
 
   // Apply specific category filter
@@ -441,6 +461,8 @@ const getCategoryProgress = (categoryId: string): string => {
 };
 
 const getCategoryTypeName = (typeId: string): string => {
+  if (typeId === 'uncollected-regular') return '待收集（一般）';
+  if (typeId === 'anniversary') return '週年紀念';
   return DECOR_CATEGORY_TYPES.find(t => t.id === typeId)?.name || typeId;
 };
 

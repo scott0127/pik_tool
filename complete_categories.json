@@ -1,0 +1,419 @@
+[
+  {
+    "id": "airport",
+    "decor_json_id": "airport",
+    "name": "機場",
+    "nameEn": "Airport",
+    "icon": "✈️",
+    "tags": [
+      "aeroway=aerodrome"
+    ]
+  },
+  {
+    "id": "art_gallery",
+    "decor_json_id": "art-gallery",
+    "name": "美術館",
+    "nameEn": "Art Gallery",
+    "icon": "🎨",
+    "tags": [
+      "shop=art"
+    ]
+  },
+  {
+    "id": "bakery",
+    "decor_json_id": "bakery",
+    "name": "麵包店",
+    "nameEn": "Bakery",
+    "icon": "🥐",
+    "tags": [
+      "shop=bakery"
+    ]
+  },
+  {
+    "id": "beach",
+    "decor_json_id": "beach",
+    "name": "海邊",
+    "nameEn": "Beach",
+    "icon": "🏖️",
+    "tags": [
+      "natural=beach"
+    ]
+  },
+  {
+    "id": "bridge",
+    "decor_json_id": "bridge",
+    "name": "橋樑",
+    "nameEn": "Bridge",
+    "icon": "🌉",
+    "tags": [
+      "bridge=yes"
+    ]
+  },
+  {
+    "id": "burger",
+    "decor_json_id": "burger",
+    "name": "漢堡店",
+    "nameEn": "Hamburger Shop",
+    "icon": "🍔",
+    "tags": []
+  },
+  {
+    "id": "bus_stop",
+    "decor_json_id": "bus-stop",
+    "name": "公車站",
+    "nameEn": "Bus Stop",
+    "icon": "🚌",
+    "tags": [
+      "highway=bus_stop"
+    ]
+  },
+  {
+    "id": "cafe",
+    "decor_json_id": "cafe",
+    "name": "咖啡廳",
+    "nameEn": "Café",
+    "icon": "☕",
+    "tags": [
+      "amenity=cafe"
+    ]
+  },
+  {
+    "id": "clothing",
+    "decor_json_id": "clothes-store",
+    "name": "服飾店",
+    "nameEn": "Clothes Store",
+    "icon": "👔",
+    "tags": [
+      "shop=clothes",
+      "shop=shoes"
+    ]
+  },
+  {
+    "id": "convenience",
+    "decor_json_id": "convenience-store",
+    "name": "便利商店",
+    "nameEn": "Convenience Store",
+    "icon": "🏪",
+    "tags": [
+      "shop=convenience"
+    ]
+  },
+  {
+    "id": "cosmetics",
+    "decor_json_id": "cosmetics",
+    "name": "化妝品商店",
+    "nameEn": "Cosmetics Store",
+    "icon": "💄",
+    "tags": []
+  },
+  {
+    "id": "curry",
+    "decor_json_id": "curry",
+    "name": "咖哩餐廳",
+    "nameEn": "Curry Restaurant",
+    "icon": "🍛",
+    "tags": [
+      "cuisine=curry",
+      "cuisine=indian",
+      "cuisine=sri_lankan"
+    ]
+  },
+  {
+    "id": "electronics",
+    "decor_json_id": "electronics",
+    "name": "電器行",
+    "nameEn": "Electronics Store",
+    "icon": "🔌",
+    "tags": []
+  },
+  {
+    "id": "forest",
+    "decor_json_id": "forest",
+    "name": "森林",
+    "nameEn": "Forest",
+    "icon": "🌲",
+    "tags": [
+      "natural=wood",
+      "landuse=forest"
+    ]
+  },
+  {
+    "id": "hair_salon",
+    "decor_json_id": "hair-salon",
+    "name": "美髮院",
+    "nameEn": "Hair Salon",
+    "icon": "💇",
+    "tags": [
+      "shop=hairdresser"
+    ]
+  },
+  {
+    "id": "hardware",
+    "decor_json_id": "hardware",
+    "name": "五金行",
+    "nameEn": "Hardware Store",
+    "icon": "🔧",
+    "tags": []
+  },
+  {
+    "id": "hotel",
+    "decor_json_id": "hotel",
+    "name": "飯店",
+    "nameEn": "Hotel",
+    "icon": "🏨",
+    "tags": [
+      "tourism=hotel"
+    ]
+  },
+  {
+    "id": "italian",
+    "decor_json_id": "italian",
+    "name": "義式餐廳",
+    "nameEn": "Italian Restaurant",
+    "icon": "🍕",
+    "tags": [
+      "cuisine=pizza",
+      "cuisine=mediterranean"
+    ]
+  },
+  {
+    "id": "korean",
+    "decor_json_id": "korean",
+    "name": "韓式餐廳",
+    "nameEn": "Korean Restaurant",
+    "icon": "🇰🇷",
+    "tags": [
+      "cuisine=korean"
+    ]
+  },
+  {
+    "id": "laundry",
+    "decor_json_id": "laundromat",
+    "name": "自主洗衣店&乾洗店",
+    "nameEn": "Laundromat",
+    "icon": "🧺",
+    "tags": [
+      "shop=laundry",
+      "shop=dry_cleaning"
+    ]
+  },
+  {
+    "id": "library",
+    "decor_json_id": "library",
+    "name": "圖書館／書店",
+    "nameEn": "Library",
+    "icon": "📚",
+    "tags": [
+      "amenity=library",
+      "shop=books"
+    ]
+  },
+  {
+    "id": "mountain",
+    "decor_json_id": "mountain",
+    "name": "山丘",
+    "nameEn": "Mountain",
+    "icon": "⛰️",
+    "tags": [
+      "natural=peak"
+    ]
+  },
+  {
+    "id": "movie_theater",
+    "decor_json_id": "movie-theater",
+    "name": "電影院",
+    "nameEn": "Movie Theater",
+    "icon": "🎬",
+    "tags": [
+      "amenity=cinema"
+    ]
+  },
+  {
+    "id": "park",
+    "decor_json_id": "park",
+    "name": "公園",
+    "nameEn": "Park",
+    "icon": "🍀",
+    "tags": [
+      "leisure=park"
+    ]
+  },
+  {
+    "id": "pharmacy",
+    "decor_json_id": "pharmacy",
+    "name": "藥局",
+    "nameEn": "Pharmacy",
+    "icon": "💊",
+    "tags": [
+      "amenity=pharmacy"
+    ]
+  },
+  {
+    "id": "post_office",
+    "decor_json_id": "post-office",
+    "name": "郵局",
+    "nameEn": "Post Office",
+    "icon": "✉️",
+    "tags": [
+      "amenity=post_office"
+    ]
+  },
+  {
+    "id": "ramen",
+    "decor_json_id": "ramen",
+    "name": "拉麵店",
+    "nameEn": "Ramen Shop",
+    "icon": "🥡",
+    "tags": [
+      "cuisine=chinese",
+      "cuisine=noodle",
+      "cuisine=ramen",
+      "cuisine=udon",
+      "cuisine=soba"
+    ]
+  },
+  {
+    "id": "restaurant",
+    "decor_json_id": "restaurant",
+    "name": "餐廳",
+    "nameEn": "Restaurant",
+    "icon": "🍽️",
+    "tags": [
+      "amenity=restaurant"
+    ]
+  },
+  {
+    "id": "roadside",
+    "decor_json_id": "roadside",
+    "name": "路邊",
+    "nameEn": "Roadside",
+    "icon": "🏷️",
+    "tags": []
+  },
+  {
+    "id": "shrine",
+    "decor_json_id": "shrine",
+    "name": "神社",
+    "nameEn": "Shrine",
+    "icon": "⛩️",
+    "tags": [
+      "amenity=place_of_worship"
+    ]
+  },
+  {
+    "id": "stadium",
+    "decor_json_id": "stadium",
+    "name": "體育館",
+    "nameEn": "Stadium",
+    "icon": "🏟️",
+    "tags": [
+      "leisure=stadium"
+    ]
+  },
+  {
+    "id": "station",
+    "decor_json_id": "station",
+    "name": "車站",
+    "nameEn": "Station",
+    "icon": "🚂",
+    "tags": [
+      "railway=station",
+      "building=train_station"
+    ]
+  },
+  {
+    "id": "supermarket",
+    "decor_json_id": "supermarket",
+    "name": "超市",
+    "nameEn": "Supermarket",
+    "icon": "🛒",
+    "tags": [
+      "shop=supermarket"
+    ]
+  },
+  {
+    "id": "sushi",
+    "decor_json_id": "sushi",
+    "name": "壽司店",
+    "nameEn": "Sushi Restaurant",
+    "icon": "🍣",
+    "tags": [
+      "cuisine=sushi"
+    ]
+  },
+  {
+    "id": "sweetshop",
+    "decor_json_id": "sweetshop",
+    "name": "甜點店",
+    "nameEn": "Sweetshop",
+    "icon": "🍰",
+    "tags": [
+      "shop=pastry"
+    ]
+  },
+  {
+    "id": "taco",
+    "decor_json_id": "taco",
+    "name": "墨西哥餐廳",
+    "nameEn": "Taco Restaurant",
+    "icon": "🌮",
+    "tags": []
+  },
+  {
+    "id": "theme_park",
+    "decor_json_id": "theme-park",
+    "name": "主題樂園",
+    "nameEn": "Theme Park",
+    "icon": "🎢",
+    "tags": [
+      "tourism=theme_park"
+    ]
+  },
+  {
+    "id": "university",
+    "decor_json_id": "university",
+    "name": "大學&學院",
+    "nameEn": "University",
+    "icon": "🎓",
+    "tags": [
+      "amenity=university",
+      "amenity=college"
+    ]
+  },
+  {
+    "id": "waterside",
+    "decor_json_id": "waterside",
+    "name": "水邊",
+    "nameEn": "Waterside",
+    "icon": "🌊",
+    "tags": [
+      "natural=water"
+    ]
+  },
+  {
+    "id": "weather_rain",
+    "decor_json_id": "weather-rain",
+    "name": "雨天",
+    "nameEn": "Rainy Weather",
+    "icon": "🌧️",
+    "tags": []
+  },
+  {
+    "id": "weather_snow",
+    "decor_json_id": "weather-snow",
+    "name": "下雪",
+    "nameEn": "Snowy Weather",
+    "icon": "🌨️",
+    "tags": []
+  },
+  {
+    "id": "zoo",
+    "decor_json_id": "zoo",
+    "name": "動物園",
+    "nameEn": "Zoo",
+    "icon": "🦁",
+    "tags": [
+      "tourism=zoo"
+    ]
+  }
+]
