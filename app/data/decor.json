@@ -2239,58 +2239,6 @@
     },
     {
       "category": {
-        "id": "anniversary",
-        "name": "週年紀念",
-        "nameEn": "Anniversary",
-        "type": "special",
-        "icon": "🎂"
-      },
-      "variants": [
-        {
-          "id": "3rd_anniversary_cupcake",
-          "name": "三週年杯子蛋糕",
-          "nameEn": "3rd Anniversary Cupcake",
-          "imageUrl": "https://pikmin.wiki.gallery/images/thumb/2/2b/Decor_Red_3rd_Anniversary_Cupcake.png/100px-Decor_Red_3rd_Anniversary_Cupcake.png",
-          "imageUrls": {
-            "red": "https://pikmin.wiki.gallery/images/thumb/2/2b/Decor_Red_3rd_Anniversary_Cupcake.png/100px-Decor_Red_3rd_Anniversary_Cupcake.png",
-            "yellow": "https://pikmin.wiki.gallery/images/thumb/1/1b/Decor_Yellow_3rd_Anniversary_Cupcake.png/97px-Decor_Yellow_3rd_Anniversary_Cupcake.png",
-            "blue": "https://pikmin.wiki.gallery/images/thumb/0/03/Decor_Blue_3rd_Anniversary_Cupcake.png/100px-Decor_Blue_3rd_Anniversary_Cupcake.png",
-            "white": "https://pikmin.wiki.gallery/images/thumb/5/57/Decor_White_3rd_Anniversary_Cupcake.png/100px-Decor_White_3rd_Anniversary_Cupcake.png",
-            "purple": "https://pikmin.wiki.gallery/images/thumb/c/c7/Decor_Purple_3rd_Anniversary_Cupcake.png/100px-Decor_Purple_3rd_Anniversary_Cupcake.png",
-            "rock": "https://pikmin.wiki.gallery/images/thumb/0/05/Decor_Rock_3rd_Anniversary_Cupcake.png/93px-Decor_Rock_3rd_Anniversary_Cupcake.png",
-            "winged": "https://pikmin.wiki.gallery/images/thumb/f/f8/Decor_Winged_3rd_Anniversary_Cupcake.png/71px-Decor_Winged_3rd_Anniversary_Cupcake.png"
-          }
-        },
-        {
-          "id": "4th_anniversary_flower_box",
-          "name": "四週年花盒",
-          "nameEn": "4th Anniversary Flower Box",
-          "imageUrl": "https://pikmin.wiki.gallery/images/thumb/e/ee/Decor_Red_4th_Anniversary_Flower_Box.png/100px-Decor_Red_4th_Anniversary_Flower_Box.png",
-          "imageUrls": {
-            "red": "https://pikmin.wiki.gallery/images/thumb/e/ee/Decor_Red_4th_Anniversary_Flower_Box.png/100px-Decor_Red_4th_Anniversary_Flower_Box.png",
-            "yellow": "https://pikmin.wiki.gallery/images/thumb/6/66/Decor_Yellow_4th_Anniversary_Flower_Box.png/100px-Decor_Yellow_4th_Anniversary_Flower_Box.png",
-            "blue": "https://pikmin.wiki.gallery/images/thumb/e/e9/Decor_Blue_4th_Anniversary_Flower_Box.png/100px-Decor_Blue_4th_Anniversary_Flower_Box.png",
-            "white": "https://pikmin.wiki.gallery/images/thumb/a/a9/Decor_White_4th_Anniversary_Flower_Box.png/100px-Decor_White_4th_Anniversary_Flower_Box.png",
-            "purple": "https://pikmin.wiki.gallery/images/thumb/8/86/Decor_Purple_4th_Anniversary_Flower_Box.png/100px-Decor_Purple_4th_Anniversary_Flower_Box.png",
-            "rock": "https://pikmin.wiki.gallery/images/thumb/f/f7/Decor_Rock_4th_Anniversary_Flower_Box.png/100px-Decor_Rock_4th_Anniversary_Flower_Box.png",
-            "winged": "https://pikmin.wiki.gallery/images/thumb/2/24/Decor_Winged_4th_Anniversary_Flower_Box.png/100px-Decor_Winged_4th_Anniversary_Flower_Box.png",
-            "ice": "https://pikmin.wiki.gallery/images/thumb/8/88/Decor_Ice_4th_Anniversary_Flower_Box.png/100px-Decor_Ice_4th_Anniversary_Flower_Box.png"
-          }
-        }
-      ],
-      "availablePikminTypes": [
-        "red",
-        "yellow",
-        "blue",
-        "white",
-        "purple",
-        "rock",
-        "winged",
-        "ice"
-      ]
-    },
-    {
-      "category": {
         "id": "koppaite",
         "name": "Koppaite 太空衣",
         "nameEn": "Koppaite Space Suit",
@@ -2737,21 +2685,6 @@
       },
       "variants": [
         {
-          "id": "sneaker_keychain",
-          "name": "運動鞋鑰匙圈",
-          "nameEn": "Sneaker Keychain",
-          "imageUrl": "https://pikmin.wiki.gallery/images/thumb/1/12/Decor_Red_Sneaker_Keychain.png/100px-Decor_Red_Sneaker_Keychain.png",
-          "imageUrls": {
-            "red": "https://pikmin.wiki.gallery/images/thumb/1/12/Decor_Red_Sneaker_Keychain.png/100px-Decor_Red_Sneaker_Keychain.png",
-            "yellow": "https://pikmin.wiki.gallery/images/thumb/d/d8/Decor_Yellow_Sneaker_Keychain.png/100px-Decor_Yellow_Sneaker_Keychain.png",
-            "blue": "https://pikmin.wiki.gallery/images/thumb/d/d9/Decor_Blue_Sneaker_Keychain.png/100px-Decor_Blue_Sneaker_Keychain.png",
-            "white": "https://pikmin.wiki.gallery/images/thumb/5/5f/Decor_White_Sneaker_Keychain.png/100px-Decor_White_Sneaker_Keychain.png",
-            "purple": "https://pikmin.wiki.gallery/images/thumb/2/2f/Decor_Purple_Sneaker_Keychain.png/89px-Decor_Purple_Sneaker_Keychain.png",
-            "rock": "https://pikmin.wiki.gallery/images/thumb/9/95/Decor_Rock_Sneaker_Keychain.png/90px-Decor_Rock_Sneaker_Keychain.png",
-            "winged": "https://pikmin.wiki.gallery/images/thumb/1/1e/Decor_Winged_Sneaker_Keychain.png/100px-Decor_Winged_Sneaker_Keychain.png"
-          }
-        },
-        {
           "id": "ice_cream_1",
           "name": "冰淇淋A",
           "nameEn": "Ice Cream 1",
@@ -2988,21 +2921,6 @@
         "icon": "❄️"
       },
       "variants": [
-        {
-          "id": "mitten",
-          "name": "手套",
-          "nameEn": "Mitten",
-          "imageUrl": "https://pikmin.wiki.gallery/images/thumb/d/da/Decor_Red_Mitten.png/96px-Decor_Red_Mitten.png",
-          "imageUrls": {
-            "red": "https://pikmin.wiki.gallery/images/thumb/d/da/Decor_Red_Mitten.png/96px-Decor_Red_Mitten.png",
-            "yellow": "https://pikmin.wiki.gallery/images/thumb/7/75/Decor_Yellow_Mitten.png/78px-Decor_Yellow_Mitten.png",
-            "blue": "https://pikmin.wiki.gallery/images/thumb/3/3f/Decor_Blue_Mitten.png/94px-Decor_Blue_Mitten.png",
-            "white": "https://pikmin.wiki.gallery/images/thumb/3/3d/Decor_White_Mitten.png/76px-Decor_White_Mitten.png",
-            "purple": "https://pikmin.wiki.gallery/images/thumb/4/4c/Decor_Purple_Mitten.png/69px-Decor_Purple_Mitten.png",
-            "rock": "https://pikmin.wiki.gallery/images/thumb/3/3f/Decor_Rock_Mitten.png/85px-Decor_Rock_Mitten.png",
-            "winged": "https://pikmin.wiki.gallery/images/thumb/1/10/Decor_Winged_Mitten.png/100px-Decor_Winged_Mitten.png"
-          }
-        },
         {
           "id": "winter_sticker",
           "name": "冬季貼紙",
@@ -3259,6 +3177,40 @@
             "purple": "https://pikmin.wiki.gallery/images/thumb/c/c7/Decor_Purple_3rd_Anniversary_Cupcake.png/150px-Decor_Purple_3rd_Anniversary_Cupcake.png",
             "rock": "https://pikmin.wiki.gallery/images/thumb/0/05/Decor_Rock_3rd_Anniversary_Cupcake.png/150px-Decor_Rock_3rd_Anniversary_Cupcake.png",
             "winged": "https://pikmin.wiki.gallery/images/thumb/f/f8/Decor_Winged_3rd_Anniversary_Cupcake.png/106px-Decor_Winged_3rd_Anniversary_Cupcake.png"
+          }
+        }
+      ],
+      "availablePikminTypes": [
+        "red",
+        "yellow",
+        "blue",
+        "white",
+        "purple",
+        "rock",
+        "winged"
+      ]
+    },
+    {
+      "category": {
+        "id": "ball-ornament",
+        "name": "裝飾球",
+        "nameEn": "Ball Ornament",
+        "type": "special",
+        "icon": "🎄"
+      },
+      "variants": [
+        {
+          "id": "ball_ornament",
+          "name": "裝飾球",
+          "nameEn": "Ball Ornament",
+          "imageUrls": {
+            "red": "https://pikmin.wiki.gallery/images/thumb/0/0d/Decor_Red_Ball_Ornament.png/150px-Decor_Red_Ball_Ornament.png",
+            "yellow": "https://pikmin.wiki.gallery/images/thumb/d/d6/Decor_Yellow_Ball_Ornament.png/142px-Decor_Yellow_Ball_Ornament.png",
+            "blue": "https://pikmin.wiki.gallery/images/thumb/7/72/Decor_Blue_Ball_Ornament.png/131px-Decor_Blue_Ball_Ornament.png",
+            "white": "https://pikmin.wiki.gallery/images/thumb/f/f0/Decor_White_Ball_Ornament.png/150px-Decor_White_Ball_Ornament.png",
+            "purple": "https://pikmin.wiki.gallery/images/thumb/3/38/Decor_Purple_Ball_Ornament.png/121px-Decor_Purple_Ball_Ornament.png",
+            "rock": "https://pikmin.wiki.gallery/images/thumb/3/32/Decor_Rock_Ball_Ornament.png/150px-Decor_Rock_Ball_Ornament.png",
+            "winged": "https://pikmin.wiki.gallery/images/thumb/f/f4/Decor_Winged_Ball_Ornament.png/128px-Decor_Winged_Ball_Ornament.png"
           }
         }
       ],
@@ -3822,38 +3774,6 @@
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/5/5b/Decor_Yellow_Golden_Toy_Airplane.png/100px-Decor_Yellow_Golden_Toy_Airplane.png",
           "imageUrls": {
             "yellow": "https://pikmin.wiki.gallery/images/thumb/5/5b/Decor_Yellow_Golden_Toy_Airplane.png/100px-Decor_Yellow_Golden_Toy_Airplane.png"
-          }
-        }
-      ],
-      "availablePikminTypes": [
-        "yellow"
-      ]
-    },
-    {
-      "category": {
-        "id": "fairy-lights",
-        "name": "彩燈",
-        "nameEn": "Fairy Lights",
-        "type": "special",
-        "icon": "💡"
-      },
-      "variants": [
-        {
-          "id": "fairy_lights_1",
-          "name": "彩燈A",
-          "nameEn": "Fairy Lights 1",
-          "imageUrl": "https://pikmin.wiki.gallery/images/thumb/4/4c/Decor_Yellow_Fairy_Lights_1.png/100px-Decor_Yellow_Fairy_Lights_1.png",
-          "imageUrls": {
-            "yellow": "https://pikmin.wiki.gallery/images/thumb/4/4c/Decor_Yellow_Fairy_Lights_1.png/100px-Decor_Yellow_Fairy_Lights_1.png"
-          }
-        },
-        {
-          "id": "fairy_lights_2",
-          "name": "彩燈B",
-          "nameEn": "Fairy Lights 2",
-          "imageUrl": "https://pikmin.wiki.gallery/images/thumb/0/04/Decor_Yellow_Fairy_Lights_2.png/100px-Decor_Yellow_Fairy_Lights_2.png",
-          "imageUrls": {
-            "yellow": "https://pikmin.wiki.gallery/images/thumb/0/04/Decor_Yellow_Fairy_Lights_2.png/100px-Decor_Yellow_Fairy_Lights_2.png"
           }
         }
       ],
