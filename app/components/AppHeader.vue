@@ -77,6 +77,16 @@
               </div>
             </div>
 
+            <!-- Buy Me a Coffee Button (Desktop) -->
+            <button 
+              @click="handleCoffeeClick"
+              class="hidden md:flex items-center gap-2 px-4 h-10 rounded-xl bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 text-white transition-all hover:shadow-lg group"
+              title="請我喝杯咖啡"
+            >
+              <span class="text-lg group-hover:scale-110 transition-transform">☕</span>
+              <span class="text-sm font-semibold hidden lg:inline">支持</span>
+            </button>
+
             <!-- GitHub Star Button (Desktop) -->
             <a 
               href="https://github.com/scott0127/pik_tool"
@@ -209,6 +219,15 @@
               </NuxtLink>
             </div>
 
+            <!-- Buy Me a Coffee Button (Mobile) -->
+            <button 
+              @click="handleCoffeeClick"
+              class="flex items-center justify-center gap-2 bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 text-white rounded-2xl p-4 transition-all"
+            >
+              <span class="text-2xl">☕</span>
+              <span class="font-semibold">請我喝杯咖啡</span>
+            </button>
+
             <!-- GitHub Star Button (Mobile) -->
             <a 
               href="https://github.com/scott0127/pik_tool"
@@ -255,6 +274,97 @@
       </div>
     </div>
   </header>
+
+  <!-- Coffee Support Modal -->
+  <Transition
+    enter-active-class="transition duration-300 ease-out"
+    enter-from-class="opacity-0"
+    enter-to-class="opacity-100"
+    leave-active-class="transition duration-200 ease-in"
+    leave-from-class="opacity-100"
+    leave-to-class="opacity-0"
+  >
+    <div 
+      v-if="showCoffeeModal" 
+      class="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"
+      @click.self="showCoffeeModal = false"
+    >
+      <Transition
+        enter-active-class="transition duration-300 ease-out"
+        enter-from-class="scale-95 opacity-0"
+        enter-to-class="scale-100 opacity-100"
+        leave-active-class="transition duration-200 ease-in"
+        leave-from-class="scale-100 opacity-100"
+        leave-to-class="scale-95 opacity-0"
+      >
+        <div 
+          v-if="showCoffeeModal"
+          class="bg-white rounded-3xl shadow-2xl max-w-md w-full overflow-hidden"
+        >
+          <!-- Header -->
+          <div class="bg-gradient-to-r from-yellow-400 to-orange-500 p-6 text-center">
+            <div class="text-5xl mb-3">☕</div>
+            <h3 class="text-2xl font-bold text-white">感謝你的支持！</h3>
+          </div>
+
+          <!-- Content -->
+          <div class="p-6 space-y-4">
+            <p class="text-gray-700 text-center">
+              即將前往 <strong>Buy Me a Coffee</strong> 贊助頁面
+            </p>
+
+            <!-- Important Notice -->
+            <div class="bg-amber-50 border-l-4 border-amber-500 p-4 rounded-r-lg">
+              <div class="flex items-start gap-3">
+                <span class="text-2xl">⚖️</span>
+                <div class="flex-1">
+                  <h4 class="font-bold text-amber-900 mb-2">重要聲明</h4>
+                  <ul class="space-y-1.5 text-sm text-amber-800">
+                    <li class="flex items-start gap-2">
+                      <span class="text-green-600 mt-0.5">✓</span>
+                      <span>你的贊助是支持「開發者」而非購買遊戲內容</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                      <span class="text-green-600 mt-0.5">✓</span>
+                      <span>本工具是非官方粉絲專案，完全免費使用</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                      <span class="text-green-600 mt-0.5">✓</span>
+                      <span>所有遊戲素材版權歸任天堂所有</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                      <span class="text-green-600 mt-0.5">✓</span>
+                      <span>贊助是對開發工作的支持，不涉及遊戲內容買賣</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <p class="text-center text-gray-600 text-sm">
+              你的每一杯咖啡都是我繼續改進這個工具的最大動力！💪
+            </p>
+          </div>
+
+          <!-- Actions -->
+          <div class="p-6 pt-0 flex gap-3">
+            <button
+              @click="showCoffeeModal = false"
+              class="flex-1 px-6 py-3 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold transition-all"
+            >
+              取消
+            </button>
+            <button
+              @click="confirmCoffee"
+              class="flex-1 px-6 py-3 rounded-xl bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 text-white font-semibold transition-all shadow-lg hover:shadow-xl"
+            >
+              前往贊助 ☕
+            </button>
+          </div>
+        </div>
+      </Transition>
+    </div>
+  </Transition>
 </template>
 
 <script setup lang="ts">
@@ -266,6 +376,7 @@ const { getStats } = useCollection();
 const showMobileMenu = ref(false);
 const showSearch = ref(false);
 const searchQuery = ref('');
+const showCoffeeModal = ref(false);
 
 const stats = computed(() => getStats());
 
@@ -322,6 +433,16 @@ const handleLogout = async () => {
   
   // 重新載入頁面到登入頁
   window.location.href = '/auth';
+};
+
+const handleCoffeeClick = () => {
+  showMobileMenu.value = false;
+  showCoffeeModal.value = true;
+};
+
+const confirmCoffee = () => {
+  showCoffeeModal.value = false;
+  window.open('https://buymeacoffee.com/scott5497', '_blank');
 };
 
 const handleSearch = () => {
