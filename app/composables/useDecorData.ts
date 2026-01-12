@@ -17,12 +17,23 @@ export function useDecorData() {
       const availableTypes = def.availablePikminTypes || PIKMIN_TYPES;
       
       def.variants.forEach(variant => {
-        availableTypes.forEach(pikminType => {
+        const variantImageUrls = (variant as any).imageUrls;
+        let typesToGenerate: PikminType[];
+        
+        if (variantImageUrls && typeof variantImageUrls === 'object') {
+          // 只生成有圖片的顏色
+          typesToGenerate = Object.keys(variantImageUrls) as PikminType[];
+        } else {
+          // Fallback: 如果沒有 imageUrls，使用 availablePikminTypes
+          typesToGenerate = availableTypes as PikminType[];
+        }
+        
+        typesToGenerate.forEach(pikminType => {
           items.push({
             id: `${def.category.id}_${variant.id}_${pikminType}`,
             categoryId: def.category.id,
             variantId: variant.id,
-            pikminType: pikminType as PikminType,
+            pikminType: pikminType,
             available: true,
           });
         });

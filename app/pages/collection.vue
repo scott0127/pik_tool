@@ -124,28 +124,102 @@
     <div>
       <!-- Category Grouped View (when no filters) -->
       <template v-if="!hasActiveFilters">
-        <div 
-          v-for="def in getDecorDefinitions()" 
-          :key="def.category.id"
-          class="mb-8"
-        >
-          <!-- Category Header -->
-          <div class="flex items-center gap-3 mb-4 sticky top-[120px] z-10 bg-gradient-to-r from-emerald-50/95 to-teal-50/95 backdrop-blur-sm -mx-4 px-4 py-3 rounded-xl">
-            <span class="text-2xl">{{ def.category.icon }}</span>
+        <!-- Regular Categories Section -->
+        <div class="mb-12">
+          <div class="flex items-center gap-3 mb-4 pb-3 border-b-2 border-emerald-200">
+            <span class="text-3xl">📍</span>
             <div class="flex-1">
-              <h2 class="text-lg font-bold text-gray-800">{{ def.category.name }}</h2>
-              <p class="text-xs text-gray-500">{{ def.category.nameEn }}</p>
+              <h2 class="text-2xl font-bold text-emerald-700">一般分類 (Regular)</h2>
+              <p class="text-sm text-gray-600 mt-1">從特定地點（如餐廳、公園、車站等）獲得的裝飾</p>
             </div>
             <div class="text-right">
-              <p class="text-sm font-bold text-emerald-600">{{ getCategoryProgress(def.category.id) }}</p>
-              <p class="text-xs text-gray-400">已蒐集</p>
+              <p class="text-sm font-bold text-emerald-600">{{ regularCategoriesCount }} 個分類</p>
             </div>
           </div>
           
-          <DecorGrid 
-            :items="getItemsForCategory(def.category.id)" 
-            @clear-filters="clearAllFilters"
-          />
+          <!-- Info Box -->
+          <div class="bg-emerald-50 border-l-4 border-emerald-500 p-4 mb-6 rounded-r-lg">
+            <div class="flex items-start gap-3">
+              <span class="text-xl">💡</span>
+              <div>
+                <p class="text-sm font-semibold text-emerald-800 mb-1">如何獲得一般裝飾</p>
+                <p class="text-xs text-emerald-700">走訪特定地點類型（如餐廳、咖啡廳、公園等），拾取該地點的幼苗，培養皮克敏至 4 顆心即可獲得對應裝飾。</p>
+              </div>
+            </div>
+          </div>
+          
+          <div 
+            v-for="def in regularCategories" 
+            :key="def.category.id"
+            class="mb-8"
+          >
+            <!-- Category Header -->
+            <div class="flex items-center gap-3 mb-4 sticky top-[120px] z-10 bg-gradient-to-r from-emerald-50/95 to-teal-50/95 backdrop-blur-sm -mx-4 px-4 py-3 rounded-xl">
+              <span class="text-2xl">{{ def.category.icon }}</span>
+              <div class="flex-1">
+                <h2 class="text-lg font-bold text-gray-800">{{ def.category.name }}</h2>
+                <p class="text-xs text-gray-500">{{ def.category.nameEn }}</p>
+              </div>
+              <div class="text-right">
+                <p class="text-sm font-bold text-emerald-600">{{ getCategoryProgress(def.category.id) }}</p>
+                <p class="text-xs text-gray-400">已蒐集</p>
+              </div>
+            </div>
+            
+            <DecorGrid 
+              :items="getItemsForCategory(def.category.id)" 
+              @clear-filters="clearAllFilters"
+            />
+          </div>
+        </div>
+
+        <!-- Special Categories Section -->
+        <div v-if="specialCategories.length > 0" id="special-categories-section">
+          <div class="flex items-center gap-3 mb-4 pb-3 border-b-2 border-purple-200">
+            <span class="text-3xl">⭐</span>
+            <div class="flex-1">
+              <h2 class="text-2xl font-bold text-purple-700">特殊分類 (Special)</h2>
+              <p class="text-sm text-gray-600 mt-1">透過活動、節日慶典、特殊任務等限定方式獲得</p>
+            </div>
+            <div class="text-right">
+              <p class="text-sm font-bold text-purple-600">{{ specialCategoriesCount }} 個分類</p>
+            </div>
+          </div>
+          
+          <!-- Info Box -->
+          <div class="bg-purple-50 border-l-4 border-purple-500 p-4 mb-6 rounded-r-lg">
+            <div class="flex items-start gap-3">
+              <span class="text-xl">✨</span>
+              <div>
+                <p class="text-sm font-semibold text-purple-800 mb-1">如何獲得特殊裝飾</p>
+                <p class="text-xs text-purple-700">參與限時活動、節日慶典、週年紀念、或完成特殊任務。這些裝飾通常只在特定期間內提供，錯過後可能需要等待活動復刻。</p>
+              </div>
+            </div>
+          </div>
+          
+          <div 
+            v-for="def in specialCategories" 
+            :key="def.category.id"
+            class="mb-8"
+          >
+            <!-- Category Header -->
+            <div class="flex items-center gap-3 mb-4 sticky top-[120px] z-10 bg-gradient-to-r from-purple-50/95 to-pink-50/95 backdrop-blur-sm -mx-4 px-4 py-3 rounded-xl">
+              <span class="text-2xl">{{ def.category.icon }}</span>
+              <div class="flex-1">
+                <h2 class="text-lg font-bold text-gray-800">{{ def.category.name }}</h2>
+                <p class="text-xs text-gray-500">{{ def.category.nameEn }}</p>
+              </div>
+              <div class="text-right">
+                <p class="text-sm font-bold text-purple-600">{{ getCategoryProgress(def.category.id) }}</p>
+                <p class="text-xs text-gray-400">已蒐集</p>
+              </div>
+            </div>
+            
+            <DecorGrid 
+              :items="getItemsForCategory(def.category.id)" 
+              @clear-filters="clearAllFilters"
+            />
+          </div>
         </div>
       </template>
 
@@ -158,7 +232,8 @@
       </template>
     </div>
 
-    <!-- Scroll to top button -->
+
+    <!-- Floating Navigation Buttons -->
     <Transition
       enter-active-class="transition duration-300"
       enter-from-class="opacity-0 translate-y-4"
@@ -167,13 +242,35 @@
       leave-from-class="opacity-100 translate-y-0"
       leave-to-class="opacity-0 translate-y-4"
     >
-      <button
-        v-if="showScrollTop"
-        @click="scrollToTop"
-        class="fixed bottom-6 right-6 w-12 h-12 bg-emerald-500 hover:bg-emerald-600 text-white rounded-full shadow-lg hover:shadow-xl transition-all flex items-center justify-center text-xl z-40"
-      >
-        ↑
-      </button>
+      <div v-if="showScrollTop || !hasActiveFilters" class="fixed bottom-6 right-6 flex flex-col gap-3 z-40">
+        <!-- Jump to Special Categories Button -->
+        <button
+          v-if="!hasActiveFilters && specialCategories.length > 0"
+          @click="scrollToSpecialCategories"
+          class="w-14 h-14 bg-purple-500 hover:bg-purple-600 text-white rounded-full shadow-lg hover:shadow-xl transition-all flex items-center justify-center group relative"
+          title="跳到特殊分類"
+        >
+          <span class="text-2xl">⭐</span>
+          <!-- Tooltip -->
+          <div class="absolute right-full mr-3 px-3 py-2 bg-gray-800 text-white text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+            跳到特殊分類
+          </div>
+        </button>
+        
+        <!-- Scroll to Top Button -->
+        <button
+          v-if="showScrollTop"
+          @click="scrollToTop"
+          class="w-14 h-14 bg-emerald-500 hover:bg-emerald-600 text-white rounded-full shadow-lg hover:shadow-xl transition-all flex items-center justify-center text-xl group relative"
+          title="回到頂部"
+        >
+          ↑
+          <!-- Tooltip -->
+          <div class="absolute right-full mr-3 px-3 py-2 bg-gray-800 text-white text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+            回到頂部
+          </div>
+        </button>
+      </div>
     </Transition>
   </div>
 </template>
@@ -256,10 +353,37 @@ const scrollToTop = () => {
   window.scrollTo({ top: 0, behavior: 'smooth' });
 };
 
+// Scroll to special categories section
+const scrollToSpecialCategories = () => {
+  const specialSection = document.getElementById('special-categories-section');
+  if (specialSection) {
+    const offset = 100; // 預留 header 高度
+    const elementPosition = specialSection.getBoundingClientRect().top;
+    const offsetPosition = elementPosition + window.pageYOffset - offset;
+    
+    window.scrollTo({
+      top: offsetPosition,
+      behavior: 'smooth'
+    });
+  }
+};
+
 // Check if any filters are active
 const hasActiveFilters = computed(() => {
   return searchQuery.value || selectedCategoryType.value || selectedPikminType.value || collectionFilter.value !== 'all' || isLimitedMode.value || selectedCategoryId.value;
 });
+
+// Separate regular and special categories
+const regularCategories = computed(() => {
+  return getDecorDefinitions().filter(d => d.category.type === 'regular');
+});
+
+const specialCategories = computed(() => {
+  return getDecorDefinitions().filter(d => d.category.type !== 'regular');
+});
+
+const regularCategoriesCount = computed(() => regularCategories.value.length);
+const specialCategoriesCount = computed(() => specialCategories.value.length);
 
 // Filtered items
 const filteredItems = computed(() => {
