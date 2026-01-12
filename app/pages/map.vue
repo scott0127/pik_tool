@@ -333,7 +333,7 @@ onMounted(() => {
 const mapCenter = ref<[number, number]>([25.0478, 121.5170]); // 台北車站
 const mapZoom = ref(16);
 const mapRef = ref();
-const MIN_ZOOM_FOR_QUERY = 16; // 最小查詢縮放層級 (提高到 16 以確保第一次查詢成功)
+const MIN_ZOOM_FOR_QUERY = 15; // 最小查詢縮放層級
 
 // ⚠️ 重要：使用 shallowRef 避免 Vue 對 Leaflet 物件進行深層響應式監聯
 // 這是 Vue + Leaflet 效能優化的關鍵！
