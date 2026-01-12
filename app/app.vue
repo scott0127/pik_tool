@@ -100,11 +100,13 @@ onMounted(() => {
     console.log('[Auth] State changed:', event);
     
     if (event === 'SIGNED_OUT') {
-      // 登出時清除所有本地資料
-      clearLocalData();
+      // ✅ FIX: 登出時不再清除本地資料，避免未登入使用者的收藏遺失
+      console.log('[Auth] User signed out, but keeping local collection data');
+      // 不再呼叫 clearLocalData()
     } else if (event === 'SIGNED_IN' && session?.user) {
-      // 登入時從雲端載入資料
-      await loadFromCloud();
+      // ✅ FIX: 登入時合併雲端和本地資料（而非覆蓋）
+      console.log('[Auth] User signed in, merging cloud and local data...');
+      await loadFromCloud(); // 現在 loadFromCloud 會自動合併
     }
   });
 

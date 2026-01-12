@@ -98,6 +98,20 @@ export function useCollection() {
     }
   };
 
+  // Merge two collections (union strategy: keep all collected items)
+  const mergeCollections = (local: Record<string, boolean>, cloud: Record<string, boolean>): Record<string, boolean> => {
+    const merged: Record<string, boolean> = { ...local };
+    
+    // Add all cloud items
+    Object.keys(cloud).forEach(id => {
+      if (cloud[id]) {
+        merged[id] = true;
+      }
+    });
+    
+    return merged;
+  };
+
   // Load from Supabase (if logged in)
   const loadFromCloud = async () => {
     // Get current session directly from Supabase client
@@ -122,13 +136,33 @@ export function useCollection() {
       if (error && error.code !== 'PGRST116') throw error; // PGRST116 = not found
       
       if (data?.collected_items) {
-        const collected: Record<string, boolean> = {};
+        const cloudCollected: Record<string, boolean> = {};
         (data.collected_items as string[]).forEach(id => {
-          collected[id] = true;
+          cloudCollected[id] = true;
         });
-        collectionState.value.collected = collected;
-        saveToLocal(); // Sync to local storage too
-        console.log('[Collection] ✓ Loaded', (data.collected_items as string[]).length, 'items from cloud');
+        
+        // 🔄 MERGE instead of OVERWRITE
+        const localCount = Object.keys(collectionState.value.collected).filter(id => collectionState.value.collected[id]).length;
+        const cloudCount = (data.collected_items as string[]).length;
+        
+        collectionState.value.collected = mergeCollections(collectionState.value.collected, cloudCollected);
+        
+        const mergedCount = Object.keys(collectionState.value.collected).filter(id => collectionState.value.collected[id]).length;
+        
+        console.log('[Collection] ✓ Merged collections:', {
+          local: localCount,
+          cloud: cloudCount,
+          merged: mergedCount,
+          gained: mergedCount - localCount
+        });
+        
+        saveToLocal(); // Sync merged data to local storage
+        
+        // If we gained items from merge, sync back to cloud
+        if (mergedCount > cloudCount) {
+          console.log('[Collection] Local had more items, syncing back to cloud...');
+          await saveToCloud();
+        }
       } else {
         console.log('[Collection] No cloud data found for this user');
       }
@@ -281,9 +315,10 @@ export function useCollection() {
     saveCollection();
   };
 
-  // 清除本地資料（登出時使用）
+  // 清除本地資料（僅在使用者明確要求重置時使用）
+  // ⚠️ 不應在登出時自動呼叫，以避免資料遺失
   const clearLocalData = () => {
-    console.log('[Collection] Clearing local data...');
+    console.warn('[Collection] ⚠️ Clearing local data - this should only be called on explicit user reset!');
     // 清除 state
     collectionState.value = {
       collected: {},
