@@ -48,33 +48,7 @@
         <NuxtPage />
       </main>
       
-      <!-- Footer -->
-      <footer class="relative z-10 mt-12 py-8 text-center border-t border-white/30 bg-white/30 backdrop-blur-sm">
-        <div class="max-w-7xl mx-auto px-4">
-          <div class="flex items-center justify-center gap-2 mb-3">
-            <span class="text-2xl">🌱</span>
-            <span class="font-bold text-emerald-700">Pikmin Bloom 飾品圖鑑</span>
-          </div>
-          <p class="text-sm text-gray-600 mb-2">
-            資料來源：<a href="https://www.pikminwiki.com/Decor_Pikmin" target="blank" rel="noopener noreferrer" class="text-emerald-600 hover:text-emerald-700 underline underline-offset-2">Pikipedia</a>
-          </p>
-          <div class="flex items-center justify-center gap-4 text-xs text-gray-500 mb-2">
-            <a 
-              href="https://www.pikminwiki.com/Pikipedia:General_disclaimer" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              class="hover:text-emerald-600 transition-colors underline underline-offset-2"
-            >
-              版權免責聲明
-            </a>
-            <span>•</span>
-            <NuxtLink to="/feedback" class="hover:text-emerald-600 transition-colors underline underline-offset-2">
-              意見回饋
-            </NuxtLink>
-          </div>
-          <p class="text-xs text-gray-400">Made with 💚 by LKB</p>
-        </div>
-      </footer>
+      <AppFooter />
     </div>
 
     <!-- Toast notifications area -->
