@@ -228,8 +228,86 @@
         </svg>
       </NuxtLink>
 
+      <!-- 地點搜尋欄 -->
+      <div class="absolute top-3 md:top-4 left-1/2 -translate-x-1/2 z-[1001] w-[calc(100%-6rem)] md:w-96">
+        <div class="relative">
+          <!-- 搜尋輸入框 -->
+          <div class="bg-white rounded-xl shadow-lg border border-gray-200 flex items-center overflow-hidden">
+            <div class="pl-3 md:pl-4 text-gray-400">
+              <svg v-if="!isSearching" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 md:h-5 md:w-5" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
+              </svg>
+              <svg v-else class="animate-spin h-4 w-4 md:h-5 md:w-5" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none" />
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+              </svg>
+            </div>
+            <input
+              v-model="searchQuery"
+              @input="handleSearchInput"
+              @focus="handleSearchFocus"
+              @keydown="handleSearchKeydown"
+              type="text"
+              placeholder="搜尋地點 (例如：台北車站)"
+              class="flex-1 px-3 py-2 md:py-2.5 text-sm md:text-base outline-none"
+            />
+            <button
+              v-if="searchQuery"
+              @click="clearSearch"
+              class="pr-3 md:pr-4 text-gray-400 hover:text-gray-600 transition-colors"
+              title="清除"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 md:h-5 md:w-5" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+              </svg>
+            </button>
+          </div>
+
+          <!-- 搜尋結果下拉選單 -->
+          <Transition
+            enter-active-class="transition duration-200 ease-out"
+            enter-from-class="opacity-0 -translate-y-2"
+            enter-to-class="opacity-100 translate-y-0"
+            leave-active-class="transition duration-150 ease-in"
+            leave-from-class="opacity-100 translate-y-0"
+            leave-to-class="opacity-0 -translate-y-2"
+          >
+            <div
+              v-if="showSearchResults && (searchResults.length > 0 || searchError)"
+              class="absolute top-full mt-2 w-full bg-white rounded-xl shadow-2xl border border-gray-200 overflow-hidden max-h-80 overflow-y-auto"
+            >
+              <!-- 錯誤訊息 -->
+              <div v-if="searchError" class="p-3 text-sm text-red-600 flex items-center gap-2">
+                <span>⚠️</span>
+                <span>{{ searchError }}</span>
+              </div>
+
+              <!-- 搜尋結果列表 -->
+              <div v-else>
+                <button
+                  v-for="(result, index) in searchResults"
+                  :key="result.place_id"
+                  @click="selectSearchResult(result)"
+                  :class="[
+                    'w-full text-left px-3 md:px-4 py-2 md:py-3 hover:bg-emerald-50 transition-colors border-b border-gray-100 last:border-b-0',
+                    selectedResultIndex === index ? 'bg-emerald-50' : ''
+                  ]"
+                >
+                  <div class="font-medium text-gray-800 text-sm md:text-base mb-1 line-clamp-1">
+                    {{ getLocationName(result.display_name) }}
+                  </div>
+                  <div class="text-xs md:text-sm text-gray-500 line-clamp-1">
+                    {{ result.display_name }}
+                  </div>
+                </button>
+              </div>
+            </div>
+          </Transition>
+        </div>
+      </div>
+
       <!-- 縮放等級 + 搜尋按鈕 (合併在一起) -->
-      <div class="absolute top-3 md:top-4 left-1/2 -translate-x-1/2 flex items-center gap-2 z-[1000]">
+      <div class="absolute top-16 md:top-20 left-1/2 -translate-x-1/2 flex items-center gap-2 z-[1000]">
         <!-- 縮放等級指示器 -->
         <div class="bg-white rounded-xl px-2.5 md:px-3 py-1.5 md:py-2 shadow-lg border border-gray-200">
           <div class="flex items-center gap-1.5 md:gap-2">
@@ -294,7 +372,7 @@
       >
         <div 
           v-if="showSearchResult"
-          class="absolute top-16 md:top-20 left-1/2 -translate-x-1/2 bg-white rounded-xl px-4 py-2 shadow-lg z-[1000] border border-emerald-200"
+          class="absolute top-28 md:top-32 left-1/2 -translate-x-1/2 bg-white rounded-xl px-4 py-2 shadow-lg z-[1000] border border-emerald-200"
         >
           <span class="text-sm text-emerald-600 font-medium">
             🎉 找到 {{ fetchedPoints.length }} 個飾品地點！
@@ -308,13 +386,15 @@
 <script setup lang="ts">
 import { LMap, LTileLayer, LMarker, LPopup, LIcon } from '@vue-leaflet/vue-leaflet';
 import 'leaflet/dist/leaflet.css';
-import type { MapBounds, POIPoint } from '~/types/map';
+import type { MapBounds, POIPoint, GeocodingResult } from '~/types/map';
 import { useDecorRules } from '~/composables/useDecorRules';
 import { useOverpassAPI } from '~/composables/useOverpassAPI';
+import { useGeocoding } from '~/composables/useGeocoding';
 
 // Composables
 const { decorRules } = useDecorRules();
 const { fetchPOIs, isLoading, error } = useOverpassAPI();
+const { searchLocation, isSearching, searchError } = useGeocoding();
 
 // 響應式視窗寬度
 const windowWidth = ref(typeof window !== 'undefined' ? window.innerWidth : 1024);
@@ -342,6 +422,13 @@ let leafletMap: any = null; // 不使用 ref，直接用普通變數
 // 狀態管理
 const showPanel = ref(true);
 const selectedFilters = ref<string[]>(decorRules.slice(0, 3).map(r => r.id)); // 預設只選前三個，避免查詢過重
+
+// 搜尋功能狀態
+const searchQuery = ref('');
+const searchResults = ref<GeocodingResult[]>([]);
+const showSearchResults = ref(false);
+const selectedResultIndex = ref(-1);
+let searchDebounceTimer: ReturnType<typeof setTimeout> | null = null;
 
 
 // ⚠️ 使用 shallowRef 來儲存 POI 點位，避免 Vue 對每個點位物件進行深層監聽
@@ -481,6 +568,107 @@ const clearAll = () => {
   selectedFilters.value = [];
 };
 
+// 地點搜尋功能
+const handleSearchInput = () => {
+  // 清除之前的計時器
+  if (searchDebounceTimer) {
+    clearTimeout(searchDebounceTimer);
+  }
+
+  // 如果輸入為空，清空結果
+  if (!searchQuery.value.trim()) {
+    searchResults.value = [];
+    showSearchResults.value = false;
+    selectedResultIndex.value = -1;
+    return;
+  }
+
+  // 500ms 延遲後執行搜尋
+  searchDebounceTimer = setTimeout(async () => {
+    const results = await searchLocation(searchQuery.value);
+    searchResults.value = results;
+    showSearchResults.value = true;
+    selectedResultIndex.value = -1;
+  }, 500);
+};
+
+const handleSearchFocus = () => {
+  if (searchResults.value.length > 0) {
+    showSearchResults.value = true;
+  }
+};
+
+const handleSearchKeydown = (e: KeyboardEvent) => {
+  if (!showSearchResults.value) return;
+
+  if (e.key === 'ArrowDown') {
+    e.preventDefault();
+    selectedResultIndex.value = Math.min(selectedResultIndex.value + 1, searchResults.value.length - 1);
+  } else if (e.key === 'ArrowUp') {
+    e.preventDefault();
+    selectedResultIndex.value = Math.max(selectedResultIndex.value - 1, -1);
+  } else if (e.key === 'Enter') {
+    e.preventDefault();
+    if (selectedResultIndex.value >= 0) {
+      selectSearchResult(searchResults.value[selectedResultIndex.value]!);
+    } else if (searchResults.value.length > 0) {
+      selectSearchResult(searchResults.value[0]!);
+    }
+  } else if (e.key === 'Escape') {
+    showSearchResults.value = false;
+    selectedResultIndex.value = -1;
+  }
+};
+
+const selectSearchResult = (result: GeocodingResult) => {
+  const lat = parseFloat(result.lat);
+  const lon = parseFloat(result.lon);
+
+  if (leafletMap) {
+    // 移動地圖到選定的位置
+    leafletMap.setView([lat, lon], 17, {
+      animate: true,
+      duration: 1,
+    });
+  }
+
+  // 關閉搜尋結果
+  showSearchResults.value = false;
+  selectedResultIndex.value = -1;
+
+  console.log(`[Map] Navigated to: ${result.display_name}`);
+};
+
+const clearSearch = () => {
+  searchQuery.value = '';
+  searchResults.value = [];
+  showSearchResults.value = false;
+  selectedResultIndex.value = -1;
+};
+
+// 從完整地址中提取主要地點名稱（第一部分）
+const getLocationName = (fullName: string): string => {
+  return fullName.split(',')[0] || fullName;
+};
+
+// 點擊外部關閉搜尋結果
+if (typeof window !== 'undefined') {
+  const handleClickOutside = (e: MouseEvent) => {
+    const target = e.target as HTMLElement;
+    if (!target.closest('.relative')) {
+      showSearchResults.value = false;
+    }
+  };
+
+  onMounted(() => {
+    document.addEventListener('click', handleClickOutside);
+  });
+
+  onUnmounted(() => {
+    document.removeEventListener('click', handleClickOutside);
+  });
+}
+
 // 清理
 onUnmounted(() => {
   if (abortController) {
@@ -488,6 +676,9 @@ onUnmounted(() => {
   }
   if (searchResultTimer) {
     clearTimeout(searchResultTimer);
+  }
+  if (searchDebounceTimer) {
+    clearTimeout(searchDebounceTimer);
   }
   window.removeEventListener('resize', updateWindowWidth);
   leafletMap = null;

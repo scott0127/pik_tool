@@ -42,3 +42,13 @@ export interface OverpassResponse {
   generator: string;
   elements: OverpassElement[];
 }
+
+export interface GeocodingResult {
+  place_id: string;
+  display_name: string;
+  lat: string;
+  lon: string;
+  boundingbox?: [string, string, string, string]; // south, north, west, east
+  type: string;
+  importance: number;
+}
