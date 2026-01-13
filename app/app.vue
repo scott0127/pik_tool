@@ -114,9 +114,9 @@ onMounted(() => {
       // ✅ FIX: 登出時不再清除本地資料，避免未登入使用者的收藏遺失
       console.log('[Auth] User signed out, but keeping local collection data');
       // 不再呼叫 clearLocalData()
-    } else if (event === 'SIGNED_IN' && session?.user) {
-      // ✅ FIX: 登入時合併雲端和本地資料（而非覆蓋）
-      console.log('[Auth] User signed in, merging cloud and local data...');
+    } else if ((event === 'INITIAL_SESSION' || event === 'SIGNED_IN') && session?.user) {
+      // ✅ FIX: 監聽 INITIAL_SESSION（OAuth 回調後的首次 session）和 SIGNED_IN（一般登入）
+      console.log('[Auth] User session detected, merging cloud and local data...');
       await loadFromCloud(); // 現在 loadFromCloud 會自動合併
     }
   });
