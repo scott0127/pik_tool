@@ -1,124 +1,172 @@
 import type { S2CellData, LatLng, S2GridConfig } from '~/types/s2';
 import type { MapBounds } from '~/types/map';
+// @ts-ignore - s2-geometry doesn't have TypeScript definitions
+import { S2 } from 's2-geometry';
 
 /**
- * S2 Grid 系統 - 簡化穩定版
+ * S2 Grid 系統 - 使用真正的 S2 Geometry
  * 
- * 使用整數索引系統，避免浮點數精度問題
+ * S2 Cell Level 17 約為 66-97 公尺（依緯度而異）
+ * Pikmin Bloom 使用 Level 17 作為飾品種類的決定單位
  */
 export function useS2Grid() {
   const DEFAULT_CONFIG: S2GridConfig = {
     enabled: false,
     level: 17,
     maxCells: 200,
-    minZoom: 14, // 允許在較低縮放級別顯示網格
+    minZoom: 16,
   };
 
   const config = ref<S2GridConfig>({ ...DEFAULT_CONFIG });
   const cells = shallowRef<S2CellData[]>([]);
   const isCalculating = ref(false);
-  
-  // Cell size in degrees (L17 約 66 公尺)
-  const CELL_SIZE = 0.0006;
 
   /**
-   * 將經緯度轉換為整數 Cell 索引
-   */
-  function latLngToCellIndex(coord: number): number {
-    return Math.floor(coord / CELL_SIZE);
-  }
-  
-  /**
-   * 將 Cell 索引轉換回經緯度
-   */
-  function cellIndexToLatLng(index: number): number {
-    return index * CELL_SIZE;
-  }
-  
-  /**
-   * 根據經緯度計算 Cell ID
+   * 根據經緯度獲取 S2 Cell ID（Level 17）
    */
   function getCellIdFromLatLng(lat: number, lng: number): string {
-    const latIndex = latLngToCellIndex(lat);
-    const lngIndex = latLngToCellIndex(lng);
-    return `L17_${latIndex}_${lngIndex}`;
+    const key = S2.latLngToKey(lat, lng, config.value.level);
+    return S2.keyToId(key);
   }
 
   /**
-   * 生成覆蓋指定地圖範圍的網格
+   * 根據 S2 Cell ID 獲取 4 個頂點座標
+   * S2 Cell 在地圖上是不規則四邊形
    */
-  function generateGridForBounds(bounds: MapBounds, level: number = 17): S2CellData[] {
+  function getCellVertices(cellId: string): [LatLng, LatLng, LatLng, LatLng] {
+    const key = S2.idToKey(cellId);
+    const corners = S2.S2Cell.FromHilbertQuadKey(key).getCornerLatLngs();
+    
+    // corners 順序：[SW, SE, NE, NW] - 逆時針
+    // 我們需要：[SW, NW, NE, SE] - 順時針（for Leaflet polygon）
+    return [
+      { lat: corners[0].lat, lng: corners[0].lng }, // SW
+      { lat: corners[3].lat, lng: corners[3].lng }, // NW
+      { lat: corners[2].lat, lng: corners[2].lng }, // NE
+      { lat: corners[1].lat, lng: corners[1].lng }, // SE
+    ];
+  }
+
+  /**
+   * 獲取 S2 Cell 的中心點
+   */
+  function getCellCenter(cellId: string): LatLng {
+    const key = S2.idToKey(cellId);
+    const latLng = S2.keyToLatLng(key);
+    return { lat: latLng.lat, lng: latLng.lng };
+  }
+
+  /**
+   * 生成覆蓋指定地圖範圍的 S2 網格
+   */
+  /**
+   * 獲取所有相鄰的 Cell ID
+   */
+  function getNeighborCellIds(cellId: string): string[] {
+    const key = S2.idToKey(cellId);
+    const neighbors = S2.S2Cell.FromHilbertQuadKey(key).getNeighbors();
+    return neighbors.map((n: any) => {
+      // getNeighbors returns { face, ij, level }, need to convert back to cell to get key
+      const neighborCell = S2.S2Cell.FromFaceIJ(n.face, n.ij, n.level);
+      return S2.keyToId(neighborCell.toHilbertQuadkey());
+    });
+  }
+
+  /**
+   * 判斷 Cell 是否與地圖邊界相交
+   */
+  function isCellIntersectingBounds(cellBounds: [LatLng, LatLng, LatLng, LatLng], mapBounds: MapBounds): boolean {
+    const { north, south, east, west } = mapBounds;
+    
+    // 簡單的 AABB 碰撞檢測 (足以應對大多數情況)
+    let minLat = 90, maxLat = -90, minLng = 180, maxLng = -180;
+    
+    cellBounds.forEach(p => {
+      minLat = Math.min(minLat, p.lat);
+      maxLat = Math.max(maxLat, p.lat);
+      minLng = Math.min(minLng, p.lng);
+      maxLng = Math.max(maxLng, p.lng);
+    });
+
+    return !(minLat > north || maxLat < south || minLng > east || maxLng < west);
+  }
+
+  /**
+   * 生成覆蓋指定地圖範圍的 S2 網格
+   * 使用 BFS 從中心向外擴展，確保連續覆蓋
+   */
+  function generateGridForBounds(bounds: MapBounds, level: number = 17, mapZoom: number = 17): S2CellData[] {
     isCalculating.value = true;
     const result: S2CellData[] = [];
-    const cellSet = new Set<string>();
+    const processed = new Set<string>();
+    const queue: string[] = [];
+
+    // 動態調整 maxCells 基於縮放層級
+    // Zoom 17+: 螢幕範圍小，cell 數量少
+    // Zoom 16: 螢幕範圍大，需要更多 cell
+    // Zoom 15: 螢幕範圍更大，需要非常多 cell
+    let maxLimit = 3000;
+    if (mapZoom >= 18) maxLimit = 1500;      // Zoom 18+: 範圍很小，1500 綽綽有餘
+    else if (mapZoom === 17) maxLimit = 3500; // Zoom 17: 一般需要 1000-2000，設 3500 確保大螢幕邊角覆蓋
+    else if (mapZoom === 16) maxLimit = 7000; // Zoom 16: 範圍是 17 的 4 倍，需要約 5000-7000
+    else if (mapZoom <= 15) maxLimit = 10000; // Zoom 15: 範圍極大，設 10000 作為硬上限
+
+    const SAFETY_MAX_CELLS = maxLimit;
 
     try {
       const { north, south, east, west } = bounds;
       
-      // 計算起始和結束的 Cell 索引
-      const startLatIndex = latLngToCellIndex(south);
-      const endLatIndex = latLngToCellIndex(north) + 1;
-      const startLngIndex = latLngToCellIndex(west);
-      const endLngIndex = latLngToCellIndex(east) + 1;
+      // 1. 找到中心點的 Cell 作為種子
+      const centerLat = (north + south) / 2;
+      const centerLng = (west + east) / 2;
+      const seedCellId = getCellIdFromLatLng(centerLat, centerLng);
       
-      const totalCells = (endLatIndex - startLatIndex) * (endLngIndex - startLngIndex);
+      queue.push(seedCellId);
+      processed.add(seedCellId);
       
-      console.log(`[S2Grid] Bounds: ${south.toFixed(5)}°N to ${north.toFixed(5)}°N, ${west.toFixed(5)}°E to ${east.toFixed(5)}°E`);
-      console.log(`[S2Grid] Cell indices: Lat[${startLatIndex} to ${endLatIndex}], Lng[${startLngIndex} to ${endLngIndex}]`);
-      console.log(`[S2Grid] Total cells: ${totalCells} (limit: ${config.value.maxCells})`);
-      
-      // 如果超過限制，提示用戶縮放
-      if (totalCells > config.value.maxCells) {
-        console.warn(`[S2Grid] Too many cells (${totalCells}), skipping generation. Please zoom in.`);
-        return [];
-      }
-      
-      // 遍歷 Cell 索引生成網格
-      for (let latIndex = startLatIndex; latIndex < endLatIndex; latIndex++) {
-        for (let lngIndex = startLngIndex; lngIndex < endLngIndex; lngIndex++) {
-          const cellId = `L17_${latIndex}_${lngIndex}`;
-          
-          // 避免重複
-          if (cellSet.has(cellId)) continue;
-          cellSet.add(cellId);
-          
-          // 計算 Cell 邊界
-          const minLat = cellIndexToLatLng(latIndex);
-          const maxLat = cellIndexToLatLng(latIndex + 1);
-          const minLng = cellIndexToLatLng(lngIndex);
-          const maxLng = cellIndexToLatLng(lngIndex + 1);
-          
-          const cellCorners: [LatLng, LatLng, LatLng, LatLng] = [
-            { lat: minLat, lng: minLng }, // SW
-            { lat: maxLat, lng: minLng }, // NW  
-            { lat: maxLat, lng: maxLng }, // NE
-            { lat: minLat, lng: maxLng }, // SE
-          ];
-          
-          const cellData: S2CellData = {
-            cellId,
-            bounds: cellCorners,
-            center: {
-              lat: (minLat + maxLat) / 2,
-              lng: (minLng + maxLng) / 2,
-            },
-            decorTypes: new Set(),
-            tags: [],
-            poiCount: 0,
-            priority: 'none',
-          };
-          
-          result.push(cellData);
-          
-          // 檢查是否達到限制
-          if (result.length >= config.value.maxCells) {
-            console.warn(`[S2Grid] Reached max cells limit (${config.value.maxCells})`);
-            return result;
+      console.log(`[S2Grid] Generating grid from seed ${seedCellId} for bounds: ${south.toFixed(5)}N-${north.toFixed(5)}N`);
+
+      // 2. BFS 擴展
+      while (queue.length > 0) {
+        if (result.length >= SAFETY_MAX_CELLS) break;
+        
+        const currentId = queue.shift()!;
+        const cellVertices = getCellVertices(currentId);
+        
+        // 檢查是否在視窗內
+        if (!isCellIntersectingBounds(cellVertices, bounds)) {
+          // 如果不在視窗內，不加入結果，但它的鄰居可能在視窗內，
+          // 不過為了避免無限擴展，我們只對 "邊緣" 進行鄰居搜索
+          // 這裡簡單處理：只要處理過就不回頭，但如果完全偏離就不加鄰居
+          // 更好的做法：如果與 bounds 相交或包含，才加鄰居
+          continue; 
+        }
+
+        // 加入結果
+        result.push({
+          cellId: currentId,
+          bounds: cellVertices,
+          center: getCellCenter(currentId),
+          decorTypes: new Set(),
+          tags: [],
+          poiCount: 0,
+          priority: 'none',
+        });
+
+        // 查找鄰居
+        const neighbors = getNeighborCellIds(currentId);
+        for (const neighborId of neighbors) {
+          if (!processed.has(neighborId)) {
+            processed.add(neighborId);
+            
+            // 預先檢查鄰居是否可能在範圍內 (優化性能)
+            // 這裡直接將鄰居加入隊列，由下一次循環的 intersection check 把關
+            queue.push(neighborId);
           }
         }
       }
       
-      console.log(`[S2Grid] Generated ${result.length} cells successfully`);
+      console.log(`[S2Grid] Generated ${result.length} cells`);
       return result;
     } catch (err) {
       console.error('[S2Grid] Error generating grid:', err);
@@ -166,7 +214,7 @@ export function useS2Grid() {
       return;
     }
 
-    const newCells = generateGridForBounds(bounds, config.value.level);
+    const newCells = generateGridForBounds(bounds, config.value.level, currentZoom ?? config.value.level);
     cells.value = newCells;
   }
 

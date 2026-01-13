@@ -66,49 +66,73 @@
             </LPopup>
           </LPolygon>
           
-          <!-- S2 Cell 飾品圖示（Zoom >= 17 時顯示網格內圖示）-->
-          <template v-if="mapZoom >= 17" v-for="cell in s2Cells.filter(c => c.decorTypes.size > 0)" :key="`icons-${cell.cellId}`">
+          <!-- S2 Cell 內容徽章（Zoom >= 16 時顯示） -->
+          <template v-if="mapZoom >= 16" v-for="cell in s2Cells" :key="`badge-${cell.cellId}`">
+            <!-- 只顯示有裝飾品或 POI 的格子 -->
             <LMarker
-              v-for="(decorId, index) in Array.from(cell.decorTypes)"
-              :key="`${cell.cellId}-${decorId}`"
-              :lat-lng="getCellIconPosition(cell, index, cell.decorTypes.size)"
+              v-if="cell.decorTypes.size > 0 || cell.poiCount > 0"
+              :lat-lng="[cell.center.lat, cell.center.lng]"
             >
-              <LIcon 
-                :icon-size="getIconSize()" 
-                :icon-anchor="[getIconSize()[0] / 2, getIconSize()[1] / 2]" 
-                class-name="cell-decor-icon"
+              <LIcon
+                :icon-size="[0, 0]"
+                class-name="cell-badge-container"
               >
-                <div :class="['decor-icon-container', getIconSizeClass()]">
-                  <img 
-                    v-if="getDecorInfo(decorId)?.iconUrl" 
-                    :src="getDecorInfo(decorId)?.iconUrl" 
-                    :alt="getDecorInfo(decorId)?.name"
-                    class="decor-icon-img"
-                  />
-                  <span v-else class="decor-icon-emoji">
-                    {{ getDecorInfo(decorId)?.icon }}
-                  </span>
+                <!-- 自定義 HTML 內容 - 確保點擊事件能穿透到下層 LMarker/LPopup -->
+                <div 
+                  class="absolute -translate-x-1/2 -translate-y-1/2 flex flex-col items-center pointer-events-none"
+                  style="width: 80px;"
+                >
+                  <!-- 飾品圖示群組 -->
+                  <div class="flex items-center justify-center gap-1 mb-0.5 bg-white/90 rounded-full px-1.5 py-1 shadow-sm border border-emerald-100 backdrop-blur-sm">
+                    <div 
+                      v-for="decorId in Array.from(cell.decorTypes).slice(0, 3)" 
+                      :key="decorId"
+                      class="w-5 h-5 md:w-6 md:h-6 flex items-center justify-center"
+                    >
+                      <img 
+                        v-if="getDecorInfo(decorId)?.iconUrl" 
+                        :src="getDecorInfo(decorId)?.iconUrl" 
+                        class="w-full h-full object-contain"
+                      />
+                      <span v-else class="text-sm md:text-base leading-none">
+                        {{ getDecorInfo(decorId)?.icon }}
+                      </span>
+                    </div>
+                  </div>
+                  
+                  <!-- POI 計數徽章 -->
+                  <div v-if="cell.poiCount > 0" class="bg-emerald-600 text-white text-[10px] md:text-xs font-bold px-1.5 py-0.5 rounded-full shadow-sm border border-white">
+                    ×{{ cell.poiCount }}
+                  </div>
                 </div>
               </LIcon>
             </LMarker>
           </template>
           
-          <!-- POI 標記點（Zoom < 17 時顯示傳統標記）-->
+          <!-- POI 標記點（Grid Mode 下 < 16 顯示，Pin Mode 下總是顯示）-->
           <LMarker
-            v-if="mapZoom < 17"
+            v-if="!s2GridEnabled || mapZoom < 16"
             v-for="poi in fetchedPoints"
             :key="poi.id"
             :lat-lng="[poi.lat, poi.lon]"
           >
-            <LIcon :icon-size="[52, 52]" :icon-anchor="[26, 26]" class-name="poi-icon">
-              <div class="poi-marker">
-                <img 
-                  v-if="poi.iconUrl" 
-                  :src="poi.iconUrl" 
-                  :alt="poi.decorName"
-                  class="poi-icon-img"
-                />
-                <span v-else class="poi-icon-emoji">{{ poi.decorIcon }}</span>
+            <LIcon :icon-size="[50, 64]" :icon-anchor="[25, 64]" class-name="poi-icon">
+              <div class="relative w-[50px] h-[64px] transition-transform hover:scale-110 active:scale-95 origin-bottom">
+                <!-- 紅色大頭針形狀 -->
+                <svg viewBox="0 0 50 64" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full drop-shadow-md">
+                  <path d="M25 0C11.1929 0 0 11.1929 0 25C0 42 17 58 25 64C33 58 50 42 50 25C50 11.1929 38.8071 0 25 0Z" fill="#ef4444"/>
+                </svg>
+                
+                <!-- 白色圓形底圖與圖示 -->
+                <div class="absolute top-2 left-1/2 -translate-x-1/2 w-[34px] h-[34px] bg-white rounded-full flex items-center justify-center shadow-inner overflow-hidden">
+                  <img 
+                    v-if="poi.iconUrl" 
+                    :src="poi.iconUrl" 
+                    :alt="poi.decorName"
+                    class="w-[20px] h-[20px] object-contain"
+                  />
+                  <span v-else class="text-lg leading-none">{{ poi.decorIcon }}</span>
+                </div>
               </div>
             </LIcon>
             <LPopup>
@@ -296,34 +320,78 @@
 
       <!-- UI 控制按鈕組 (Mobile-Optimized) -->
       <div class="absolute top-3 md:top-4 right-3 md:right-4 flex flex-col md:flex-row gap-2 z-[1002]">
-        <!-- S2 網格切換 -->
-        <button
-          @click="toggleS2Grid"
-          :class="[
-            'flex items-center gap-1.5 rounded-xl px-3 py-2.5 shadow-lg hover:shadow-xl active:scale-95 transition-all border-2',
-            s2GridEnabled ? 'bg-emerald-500 border-emerald-600 text-white' : 'bg-white border-gray-200 text-gray-700'
-          ]"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM14 5a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM4 15a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1v-4zM14 15a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z" />
-          </svg>
-          <span class="text-sm font-medium whitespace-nowrap">{{ s2GridEnabled ? '網格' : '網格' }}</span>
-        </button>
-
-        <!-- POI 標記切換 -->
-        <button
-          @click="poisVisible = !poisVisible"
-          :class="[
-            'flex items-center gap-1.5 rounded-xl px-3 py-2.5 shadow-lg hover:shadow-xl active:scale-95 transition-all border-2',
-            poisVisible ? 'bg-blue-500 border-blue-600 text-white' : 'bg-white border-gray-200 text-gray-700'
-          ]"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-          </svg>
-          <span class="text-sm font-medium whitespace-nowrap">{{ poisVisible ? '標記' : '標記' }}</span>
-        </button>
+        <div class="flex bg-white rounded-xl shadow-lg border border-gray-200 p-1 gap-1">
+          <!-- 網格模式按鈕 -->
+          <div class="relative group">
+            <button
+              @click="s2GridEnabled = true"
+              :class="[
+                'flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-all',
+                s2GridEnabled ? 'bg-emerald-500 text-white shadow-sm' : 'text-gray-500 hover:bg-gray-50'
+              ]"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM14 5a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM4 15a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1v-4zM14 15a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z" />
+              </svg>
+              網格
+            </button>
+            
+            <!-- 網格模式 Tooltip -->
+            <div class="absolute right-0 top-full mt-2 w-64 bg-gray-900 text-white text-xs rounded-xl p-3 shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-[2000] pointer-events-none translate-y-2 group-hover:translate-y-0">
+              <div class="font-bold mb-2 text-emerald-300">網格模式 (Grid Mode)</div>
+              <div class="flex gap-3 mb-2">
+                <!-- 網格示意圖 -->
+                <div class="w-16 h-16 bg-emerald-900/50 border border-emerald-500/30 rounded grid grid-cols-2 gap-px p-px">
+                  <div class="bg-emerald-500/20 flex items-center justify-center text-[10px]">☕</div>
+                  <div class="bg-emerald-500/20"></div>
+                  <div class="bg-emerald-500/20"></div>
+                  <div class="bg-emerald-500/20 flex items-center justify-center text-[10px]">🍔</div>
+                </div>
+                <div class="flex-1 space-y-1">
+                  <p>• Zoom ≥ 16 : 顯示網格與內容</p>
+                  <p>• Zoom < 16 : 顯示大頭針</p>
+                </div>
+              </div>
+              <div class="text-gray-400 text-[10px]">適合：查看飾品分佈與覆蓋率</div>
+            </div>
+          </div>
+          
+          <!-- 標記模式按鈕 -->
+          <div class="relative group">
+            <button
+              @click="s2GridEnabled = false"
+              :class="[
+                'flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-all',
+                !s2GridEnabled ? 'bg-blue-500 text-white shadow-sm' : 'text-gray-500 hover:bg-gray-50'
+              ]"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+              標記
+            </button>
+            
+            <!-- 標記模式 Tooltip -->
+            <div class="absolute right-0 top-full mt-2 w-64 bg-gray-900 text-white text-xs rounded-xl p-3 shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-[2000] pointer-events-none translate-y-2 group-hover:translate-y-0">
+              <div class="font-bold mb-2 text-blue-300">標記模式 (Pin Mode)</div>
+              <div class="flex gap-3 mb-2">
+                <!-- 大頭針示意圖 -->
+                <div class="w-16 h-16 bg-blue-900/50 border border-blue-500/30 rounded flex items-center justify-center">
+                  <svg viewBox="0 0 50 64" class="w-8 h-8 drop-shadow-lg">
+                    <path d="M25 0C11.1929 0 0 11.1929 0 25C0 42 17 58 25 64C33 58 50 42 50 25C50 11.1929 38.8071 0 25 0Z" fill="#ef4444"/>
+                    <circle cx="25" cy="25" r="10" fill="white"/>
+                  </svg>
+                </div>
+                <div class="flex-1 space-y-1">
+                  <p>• 永遠顯示紅色大頭針</p>
+                  <p>• 隱藏所有網格</p>
+                </div>
+              </div>
+              <div class="text-gray-400 text-[10px]">適合：單純尋找地點，畫面清爽</div>
+            </div>
+          </div>
+        </div>
 
         <!-- 返回首頁 -->
         <NuxtLink
@@ -635,6 +703,16 @@ let searchDebounceTimer: ReturnType<typeof setTimeout> | null = null;
 // S2 網格狀態（預設啟用）
 const s2GridEnabled = ref(true);
 
+// 監聽網格開關，同步更新配置並處理顯示
+watch(s2GridEnabled, (enabled) => {
+  updateS2Config({ enabled });
+  if (!enabled) {
+    clearS2Grid();
+  } else if (currentBounds) {
+    calculateS2Grid(currentBounds, mapZoom.value);
+  }
+});
+
 // POI 標記顯示狀態（預設顯示）
 const poisVisible = ref(true);
 
@@ -896,45 +974,42 @@ const associatePOIsToCells = () => {
   s2Cells.value = updatedCells;
 };
 
-// 計算網格左下角飾品圖示的位置
+// 計算網格中央飾品圖示的位置
 const getCellIconPosition = (cell: S2CellData, iconIndex: number, totalIcons: number): [number, number] => {
-  // Cell bounds: [SW(左下), NW(左上), NE(右上), SE(右下)]
-  const sw = cell.bounds[0]; // 左下角
-  const ne = cell.bounds[2]; // 右上角
+  // 使用 cell 中心點作為基準
+  const centerLat = cell.center.lat;
+  const centerLng = cell.center.lng;
   
-  // 計算網格的寬度和高度（經緯度差值）
+  // 如果只有一個圖示，直接放在中央
+  if (totalIcons === 1) {
+    return [centerLat, centerLng];
+  }
+  
+  // 多個圖示時，水平排列在中央
+  // Cell bounds: [SW, NW, NE, SE]
+  const sw = cell.bounds[0];
+  const ne = cell.bounds[2];
   const cellWidth = ne.lng - sw.lng;
-  const cellHeight = ne.lat - sw.lat;
   
-  // 圖示在網格內的距離邊緣的比例（避免貼邊）
-  const marginRatio = 0.12; // 12% 邊距
+  // 計算偏移量（讓圖示均勻分布在中央區域）
+  const spacing = cellWidth * 0.25; // 每個圖示間距為 cell 寬度的 25%
+  const totalSpan = spacing * (totalIcons - 1);
+  const startOffset = -totalSpan / 2;
   
-  // 圖示實際可用的空間
-  const usableWidth = cellWidth * (1 - marginRatio * 2);
-  const usableHeight = cellHeight * (1 - marginRatio * 2);
-  
-  // 計算單個圖示佔用的空間（橫向排列）
-  const iconSpacing = usableWidth / Math.max(totalIcons, 1);
-  
-  // 基準位置（左下角 + 邊距）
-  const baseLat = sw.lat + (cellHeight * marginRatio);
-  const baseLng = sw.lng + (cellWidth * marginRatio);
-  
-  // 圖示位置（橫向排列，從左到右）
   return [
-    baseLat,
-    baseLng + (iconIndex * iconSpacing)
+    centerLat,
+    centerLng + startOffset + (iconIndex * spacing)
   ];
 };
 
 // 根據 zoom 級別獲取圖示大小
 const getIconSize = (): [number, number] => {
   const zoom = mapZoom.value;
-  if (zoom >= 18) return [44, 44];
-  if (zoom >= 17) return [36, 36];
-  if (zoom >= 16) return [28, 28];
-  if (zoom >= 15) return [22, 22];
-  return [18, 18];
+  if (zoom >= 19) return [56, 56];
+  if (zoom >= 18) return [48, 48];
+  if (zoom >= 17) return [42, 42];
+  if (zoom >= 16) return [32, 32];
+  return [24, 24];
 };
 
 // 獲取圖示大小的 CSS class
