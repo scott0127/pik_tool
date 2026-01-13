@@ -11,11 +11,11 @@ export default defineNuxtConfig({
   },
 
   supabase: {
-    redirect: false, // Disable auto-redirect to prevent infinite loop
+    redirect: false, // Auth is managed by AuthStore
     redirectOptions: {
       login: '/auth',
-      callback: '/auth/confirm',
-      exclude: ['/', '/collection', '/progress', '/friends', '/map', '/auth', '/auth/confirm'],
+      callback: '/auth/callback',
+      exclude: ['/', '/collection', '/progress', '/friends', '/map', '/auth', '/auth/callback'],
     },
   },
   

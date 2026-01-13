@@ -306,52 +306,10 @@
 import { DECOR_CATEGORY_TYPES, PIKMIN_TYPES, PIKMIN_TYPE_NAMES, PIKMIN_TYPE_COLORS, type PikminType, type DecorCategoryType } from '~/types/decor';
 
 const router = useRouter();
-const supabase = useSupabaseClient();
 const { getStats, isCollected } = useCollection();
 const { getDecorDefinitions, getAllDecorItems, getItemsByCategoryType } = useDecorData();
 
-// Wait for auth to initialize (important for OAuth callback)
-const authInitialized = ref(false);
-
-onMounted(async () => {
-  // Listen for auth state changes
-  const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-    if (event === 'SIGNED_IN' && session) {
-      // User just signed in via OAuth, ensure state is fully loaded
-      await new Promise(resolve => setTimeout(resolve, 500));
-      authInitialized.value = true;
-    }
-  });
-
-  // Check current session immediately
-  const { data: { session } } = await supabase.auth.getSession();
-  
-  if (session) {
-    // Already has session, mark as initialized
-    authInitialized.value = true;
-  } else {
-    // No session yet, but if there's a hash (OAuth callback), wait a bit
-    if (window.location.hash) {
-      // Wait max 3 seconds for OAuth to complete
-      const maxWait = 3000;
-      const startTime = Date.now();
-      
-      while (!authInitialized.value && (Date.now() - startTime < maxWait)) {
-        await new Promise(resolve => setTimeout(resolve, 100));
-      }
-    }
-    
-    // If still not initialized after waiting, mark as initialized anyway
-    if (!authInitialized.value) {
-      authInitialized.value = true;
-    }
-  }
-  
-  // Cleanup subscription when component unmounts
-  return () => {
-    subscription.unsubscribe();
-  };
-});
+// Auth is now handled by AuthStore in app.vue
 
 const stats = computed(() => getStats());
 

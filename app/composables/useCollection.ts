@@ -7,7 +7,7 @@ const CURRENT_VERSION = 1;
 export function useCollection() {
   const { getAllDecorItems, getDecorDefinitions } = useDecorData();
   const supabase = useSupabaseClient();
-  const user = useSupabaseUser();
+  const authStore = useAuthStore();
   
   // Reactive collection state
   const collectionState = useState<CollectionState>('collection', () => ({
@@ -180,7 +180,7 @@ export function useCollection() {
   // Save collection (local + cloud)
   const saveCollection = () => {
     saveToLocal();
-    if (user.value) {
+    if (authStore.isAuthenticated.value) {
       saveToCloud();
     }
   };

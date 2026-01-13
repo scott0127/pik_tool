@@ -372,8 +372,7 @@
 </template>
 
 <script setup lang="ts">
-const supabase = useSupabaseClient();
-const user = useSupabaseUser();
+const authStore = useAuthStore();
 const router = useRouter();
 const { getStats } = useCollection();
 
@@ -384,11 +383,9 @@ const showCoffeeModal = ref(false);
 
 const stats = computed(() => getStats());
 
-const userInitial = computed(() => {
-  if (!user.value) return '';
-  const name = user.value.user_metadata?.username || user.value.email?.split('@')[0] || '';
-  return name.charAt(0).toUpperCase();
-});
+// 使用 AuthStore 的计算属性
+const user = computed(() => authStore.user.value);
+const userInitial = computed(() => authStore.userInitial.value);
 
 const navLinks = [
   { to: '/', name: '首頁', icon: '🏠' },
@@ -397,62 +394,15 @@ const navLinks = [
   { to: '/friends', name: '好友', icon: '🤝' },
 ];
 
-// Force check auth state on mount
-onMounted(async () => {
-  console.log('[AppHeader] Mounted, checking auth state...');
-  console.log('[AppHeader] Initial user from composable:', !!user.value);
-  
-  // Actively get session (don't rely on events)
-  const { data: { session } } = await supabase.auth.getSession();
-  console.log('[AppHeader] Session from getSession():', !!session);
-  
-  // Listen for future auth changes
-  const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
-    console.log('[AppHeader] Auth event:', event, 'User now:', !!user.value);
-  });
-  
-  onUnmounted(() => subscription.unsubscribe());
-});
-
 const isLoggingOut = ref(false);
 
 const handleLogout = async () => {
-  // 防止重複點擊
   if (isLoggingOut.value) return;
-  
   isLoggingOut.value = true;
   showMobileMenu.value = false;
   
-  // 清除 Supabase cookie
-  const supabaseCookieName = 'sb-lfhldxtbzqagqcofseom-auth-token';
-  document.cookie = `${supabaseCookieName}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
-  document.cookie = `${supabaseCookieName}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=${window.location.hostname};`;
-  document.cookie = `${supabaseCookieName}=; max-age=0; path=/;`;
-  
-  // 清除所有 sb- 開頭的 cookies
-  document.cookie.split(";").forEach((c) => {
-    const cookieName = c.split("=")[0].trim();
-    if (cookieName.startsWith('sb-')) {
-      document.cookie = `${cookieName}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
-      document.cookie = `${cookieName}=; max-age=0; path=/;`;
-    }
-  });
-  
-  // 清除 localStorage 中的 Supabase 相關資料
-  Object.keys(localStorage).forEach(key => {
-    if (key.startsWith('sb-') || key.includes('supabase')) {
-      localStorage.removeItem(key);
-    }
-  });
-  
-  // 清除 sessionStorage
-  sessionStorage.clear();
-  
-  // 嘗試呼叫 signOut（不等待）
-  supabase.auth.signOut().catch(() => {});
-  
-  // 重新載入頁面到登入頁
-  window.location.href = '/auth';
+  // 使用 AuthStore 登出
+  await authStore.signOut();
 };
 
 const handleCoffeeClick = () => {

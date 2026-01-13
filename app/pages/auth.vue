@@ -194,8 +194,8 @@
 </template>
 
 <script setup lang="ts">
-const supabase = useSupabaseClient();
 const router = useRouter();
+const authStore = useAuthStore();
 
 const mode = ref<'login' | 'register'>('login');
 const email = ref('');
@@ -212,6 +212,8 @@ const handleSubmit = async () => {
 
   try {
     if (mode.value === 'register') {
+      // 注册需要额外的 username，直接用 Supabase
+      const supabase = useSupabaseClient();
       const { error: signUpError } = await supabase.auth.signUp({
         email: email.value,
         password: password.value,
@@ -226,14 +228,8 @@ const handleSubmit = async () => {
       
       success.value = '註冊成功！請檢查您的 Email 確認帳號。';
     } else {
-      const { error: signInError } = await supabase.auth.signInWithPassword({
-        email: email.value,
-        password: password.value,
-      });
-
-      if (signInError) throw signInError;
-      
-      // Redirect to home on successful login
+      // 使用 AuthStore 登入
+      await authStore.signInWithEmail(email.value, password.value);
       router.push('/');
     }
   } catch (e: any) {
@@ -248,41 +244,24 @@ const signInWithGoogle = async () => {
   error.value = '';
   
   try {
-    const { error: signInError } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: `${window.location.origin}/`,
-        queryParams: {
-          access_type: 'offline',
-          prompt: 'consent',
-        },
-      },
-    });
-    
-    if (signInError) throw signInError;
-    // Note: User will be redirected to Google, no need to reset loading here
+    await authStore.signInWithGoogle();
   } catch (e: any) {
     error.value = e.message || '無法使用 Google 登入，請確認已在 Supabase 啟用 Google Provider';
     loading.value = false;
   }
 };
 
-// Redirect if already logged in (on mount only, not on logout -> login)
-const user = useSupabaseUser();
-const hasCheckedAuth = ref(false);
-
-onMounted(() => {
-  // Only redirect if user is already logged in when first visiting page
-  if (user.value) {
+// 已登入则跳转首页
+onMounted(async () => {
+  await authStore.waitForInit();
+  if (authStore.isAuthenticated.value) {
     router.push('/');
   }
-  hasCheckedAuth.value = true;
 });
 
-// Watch for login success (user was null, now has value)
-watch(user, (newUser, oldUser) => {
-  // Only redirect if user just logged in (was null before)
-  if (newUser && !oldUser && hasCheckedAuth.value) {
+// 监听登入成功
+watch(() => authStore.isAuthenticated.value, (isAuth) => {
+  if (isAuth) {
     router.push('/');
   }
 });

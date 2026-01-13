@@ -65,9 +65,9 @@
 </template>
 
 <script setup lang="ts">
-const { loadCollection, loadFromCloud, clearLocalData } = useCollection();
-const supabase = useSupabaseClient();
-const user = useSupabaseUser();
+// 使用新的 AuthStore
+const authStore = useAuthStore();
+const { loadCollection, loadFromCloud } = useCollection();
 const isInitializing = ref(true);
 
 // Toast system
@@ -75,55 +75,44 @@ const { currentToast, isShowing: isShowingToast } = useToast();
 
 onMounted(async () => {
   console.log('[App] Starting initialization...');
+  
   try {
-    // 先嘗試載入本地資料（快速）
+    // 1. 先载入本地收藏资料（快速）
     loadCollection();
     
-    // 檢查是否有登入（不阻塞）
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
-      console.log('[App] Session check - session:', !!session);
-      if (session?.user) {
-        // 已登入：從雲端同步
-        console.log('[App] User logged in, syncing from cloud...');
-        try {
-          await loadFromCloud();
-        } catch (e) {
-          console.warn('[App] Cloud sync failed:', e);
-        }
+    // 2. 初始化 AuthStore（会获取 session 并监听变化）
+    await authStore.initialize();
+    
+    // 3. 如果已登入，从云端同步
+    if (authStore.isAuthenticated.value) {
+      console.log('[App] User logged in, syncing from cloud...');
+      try {
+        await loadFromCloud();
+      } catch (e) {
+        console.warn('[App] Cloud sync failed:', e);
       }
-    }).catch(e => {
-      console.warn('[App] Session check failed:', e);
-    });
+    }
   } catch (e) {
     console.error('[App] Initialization error:', e);
   } finally {
-    // 快速顯示頁面
     console.log('[App] Finishing initialization...');
+    // 快速显示页面
     setTimeout(() => {
       isInitializing.value = false;
     }, 300);
   }
 });
 
-// 監聽 auth 狀態變化
-onMounted(() => {
-  const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-    console.log('[Auth] State changed:', event);
-    
-    if (event === 'SIGNED_OUT') {
-      // ✅ FIX: 登出時不再清除本地資料，避免未登入使用者的收藏遺失
-      console.log('[Auth] User signed out, but keeping local collection data');
-      // 不再呼叫 clearLocalData()
-    } else if ((event === 'INITIAL_SESSION' || event === 'SIGNED_IN') && session?.user) {
-      // ✅ FIX: 監聽 INITIAL_SESSION（OAuth 回調後的首次 session）和 SIGNED_IN（一般登入）
-      console.log('[Auth] User session detected, merging cloud and local data...');
-      await loadFromCloud(); // 現在 loadFromCloud 會自動合併
+// 监听登入状态变化，自动同步云端数据
+watch(() => authStore.isAuthenticated.value, async (isAuth, wasAuth) => {
+  if (isAuth && !wasAuth) {
+    // 刚刚登入，同步云端数据
+    console.log('[App] User just signed in, syncing from cloud...');
+    try {
+      await loadFromCloud();
+    } catch (e) {
+      console.warn('[App] Cloud sync on login failed:', e);
     }
-  });
-
-  // 清理監聽器
-  onUnmounted(() => {
-    subscription.unsubscribe();
-  });
+  }
 });
 </script>

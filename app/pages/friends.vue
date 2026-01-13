@@ -290,7 +290,8 @@ interface FriendPost {
 }
 
 const supabase = useSupabaseClient();
-const user = useSupabaseUser();
+const authStore = useAuthStore();
+const user = computed(() => authStore.user.value);
 
 const posts = ref<FriendPost[]>([]);
 const loading = ref(false); // 預設不載入，等待 onMounted
