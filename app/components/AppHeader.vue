@@ -111,7 +111,10 @@
             <div class="hidden sm:block">
               <template v-if="user">
                 <div class="flex items-center gap-2">
-                  <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center text-white font-bold text-sm">
+                  <div 
+                    class="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center text-white font-bold text-sm cursor-default"
+                    :title="user.email || ''"
+                  >
                     {{ userInitial }}
                   </div>
                   <button
@@ -209,6 +212,7 @@
                 <div>
                   <p class="font-bold text-gray-700">蒐集進度</p>
                   <p class="text-sm text-gray-500">{{ stats.collected }} / {{ stats.total }} 件</p>
+                  <p v-if="user" class="text-xs text-gray-400 truncate max-w-[150px]" :title="user.email">{{ user.email }}</p>
                 </div>
               </div>
               <template v-if="user">
