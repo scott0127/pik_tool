@@ -2,12 +2,13 @@
   <ClientOnly>
     <div class="relative h-screen w-full overflow-hidden">
       <!-- 地圖容器 -->
-      <div id="map" class="w-full h-full rounded-3xl overflow-hidden shadow-2xl">
+      <div id="map" class="w-full h-full rounded-3xl overflow-hidden shadow-2xl" style="min-height: 100vh;">
         <LMap
           ref="mapRef"
           :zoom="mapZoom"
           :center="mapCenter"
           :use-global-leaflet="false"
+          :zoom-control="false"
           @ready="onMapReady"
           @moveend="onMapMoveEnd"
         >
@@ -17,8 +18,84 @@
             :max-zoom="19"
           />
           
-          <!-- POI 標記點 -->
+          <!-- S2 網格層 -->
+          <LPolygon
+            v-for="cell in s2Cells"
+            :key="cell.cellId"
+            :lat-lngs="cell.bounds.map(p => [p.lat, p.lng])"
+            :color="getCellStyle(cell).strokeColor"
+            :weight="getCellStyle(cell).strokeWeight"
+            :opacity="getCellStyle(cell).strokeOpacity"
+            :fill-color="getCellStyle(cell).fillColor"
+            :fill-opacity="getCellStyle(cell).fillOpacity"
+          >
+            <LPopup>
+              <div class="min-w-[200px] p-2">
+                <div class="font-bold text-gray-800 text-sm mb-2 flex items-center gap-2">
+                  <span>🔲</span>
+                  <span>S2 Cell L17</span>
+                </div>
+                <div class="text-xs text-gray-500 mb-3 font-mono break-all">
+                  {{ cell.cellId }}
+                </div>
+                <div v-if="cell.decorTypes.size > 0" class="space-y-2">
+                  <div class="text-xs font-semibold text-gray-700 mb-1">預測飾品類型：</div>
+                  <div class="flex flex-wrap gap-1">
+                    <span
+                      v-for="decorId in Array.from(cell.decorTypes)"
+                      :key="decorId"
+                      class="inline-flex items-center gap-1 px-2 py-1 bg-emerald-50 text-emerald-700 rounded text-xs"
+                    >
+                      <span>{{ getDecorInfo(decorId)?.icon }}</span>
+                      <span>{{ getDecorInfo(decorId)?.name }}</span>
+                    </span>
+                  </div>
+                  <div class="mt-2 pt-2 border-t border-gray-200">
+                    <div class="text-xs text-gray-600">
+                      <span class="font-medium">{{ cell.decorTypes.size }}</span> 種飾品混合
+                      <span v-if="cell.decorTypes.size === 1" class="text-emerald-600">（精準！）</span>
+                      <span v-else-if="cell.decorTypes.size <= 3" class="text-yellow-600">（中等）</span>
+                      <span v-else class="text-red-600">（混雜）</span>
+                    </div>
+                  </div>
+                </div>
+                <div v-else class="text-xs text-gray-500">
+                  🏷️ 路邊區域（無特定飾品標籤）
+                </div>
+              </div>
+            </LPopup>
+          </LPolygon>
+          
+          <!-- S2 Cell 飾品圖示（Zoom >= 17 時顯示網格內圖示）-->
+          <template v-if="mapZoom >= 17" v-for="cell in s2Cells.filter(c => c.decorTypes.size > 0)" :key="`icons-${cell.cellId}`">
+            <LMarker
+              v-for="(decorId, index) in Array.from(cell.decorTypes)"
+              :key="`${cell.cellId}-${decorId}`"
+              :lat-lng="getCellIconPosition(cell, index, cell.decorTypes.size)"
+            >
+              <LIcon 
+                :icon-size="getIconSize()" 
+                :icon-anchor="[getIconSize()[0] / 2, getIconSize()[1] / 2]" 
+                class-name="cell-decor-icon"
+              >
+                <div :class="['decor-icon-container', getIconSizeClass()]">
+                  <img 
+                    v-if="getDecorInfo(decorId)?.iconUrl" 
+                    :src="getDecorInfo(decorId)?.iconUrl" 
+                    :alt="getDecorInfo(decorId)?.name"
+                    class="decor-icon-img"
+                  />
+                  <span v-else class="decor-icon-emoji">
+                    {{ getDecorInfo(decorId)?.icon }}
+                  </span>
+                </div>
+              </LIcon>
+            </LMarker>
+          </template>
+          
+          <!-- POI 標記點（Zoom < 17 時顯示傳統標記）-->
           <LMarker
+            v-if="mapZoom < 17"
             v-for="poi in fetchedPoints"
             :key="poi.id"
             :lat-lng="[poi.lat, poi.lon]"
@@ -217,19 +294,52 @@
         </svg>
       </button>
 
-      <!-- 返回主頁按鈕 -->
-      <NuxtLink
-        to="/"
-        class="absolute top-3 md:top-4 right-3 md:right-4 bg-white rounded-xl p-2.5 md:p-3 shadow-lg hover:shadow-xl active:scale-95 transition-all z-[1000] border border-gray-200"
-        title="返回首頁"
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 md:h-6 md:w-6 text-gray-600" viewBox="0 0 20 20" fill="currentColor">
-          <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
-        </svg>
-      </NuxtLink>
+      <!-- UI 控制按鈕組 (Mobile-Optimized) -->
+      <div class="absolute top-3 md:top-4 right-3 md:right-4 flex flex-col md:flex-row gap-2 z-[1002]">
+        <!-- S2 網格切換 -->
+        <button
+          @click="toggleS2Grid"
+          :class="[
+            'flex items-center gap-1.5 rounded-xl px-3 py-2.5 shadow-lg hover:shadow-xl active:scale-95 transition-all border-2',
+            s2GridEnabled ? 'bg-emerald-500 border-emerald-600 text-white' : 'bg-white border-gray-200 text-gray-700'
+          ]"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM14 5a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM4 15a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1v-4zM14 15a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z" />
+          </svg>
+          <span class="text-sm font-medium whitespace-nowrap">{{ s2GridEnabled ? '網格' : '網格' }}</span>
+        </button>
+
+        <!-- POI 標記切換 -->
+        <button
+          @click="poisVisible = !poisVisible"
+          :class="[
+            'flex items-center gap-1.5 rounded-xl px-3 py-2.5 shadow-lg hover:shadow-xl active:scale-95 transition-all border-2',
+            poisVisible ? 'bg-blue-500 border-blue-600 text-white' : 'bg-white border-gray-200 text-gray-700'
+          ]"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+          </svg>
+          <span class="text-sm font-medium whitespace-nowrap">{{ poisVisible ? '標記' : '標記' }}</span>
+        </button>
+
+        <!-- 返回首頁 -->
+        <NuxtLink
+          to="/"
+          class="flex items-center gap-1.5 bg-white rounded-xl px-3 py-2.5 shadow-lg hover:shadow-xl active:scale-95 transition-all border-2 border-gray-200 text-gray-700"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor">
+            <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
+          </svg>
+          <span class="text-sm font-medium whitespace-nowrap md:hidden">首頁</span>
+        </NuxtLink>
+      </div>
+
 
       <!-- 地點搜尋欄 -->
-      <div class="absolute top-3 md:top-4 left-1/2 -translate-x-1/2 z-[1001] w-[calc(100%-6rem)] md:w-96">
+      <div class="absolute top-3 md:top-4 left-16 w-64 md:left-1/2 md:right-auto md:-translate-x-1/2 z-[1001] md:w-80">
         <div class="relative">
           <!-- 搜尋輸入框 -->
           <div class="bg-white rounded-xl shadow-lg border border-gray-200 flex items-center overflow-hidden">
@@ -361,6 +471,86 @@
         </div>
       </div>
 
+      <!-- S2 網格圖例面板（可摺疊）-->
+      <Transition
+        enter-active-class="transition duration-300 ease-out"
+        enter-from-class="opacity-0 translate-y-2"
+        enter-to-class="opacity-100 translate-y-0"
+        leave-active-class="transition duration-200 ease-in"
+        leave-from-class="opacity-100 translate-y-0"
+        leave-to-class="opacity-0 translate-y-2"
+      >
+        <div
+          v-if="s2GridEnabled && showGridLegend"
+          :class="[
+            'absolute bg-white rounded-xl shadow-lg z-[999] border border-gray-200',
+            'bottom-3 md:bottom-4 left-3 md:left-4',
+            'max-w-[calc(100vw-1.5rem)] md:max-w-xs'
+          ]"
+        >
+          <!-- 標題列（可點擊摺疊）-->
+          <div 
+            class="flex items-center justify-between p-3 cursor-pointer select-none"
+            @click="showGridLegend = false"
+          >
+            <div class="flex items-center gap-2">
+              <span class="text-sm font-bold text-gray-800">🔲 網格顏色說明</span>
+            </div>
+            <button class="text-gray-400 hover:text-gray-600 transition-colors">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+              </svg>
+            </button>
+          </div>
+          
+          <!-- 內容區 -->
+          <div class="px-3 pb-3 space-y-2">
+            <!-- 說明項目 -->
+            <div class="flex items-center gap-2 text-xs">
+              <div class="w-4 h-4 rounded-sm flex-shrink-0" style="background-color: #10B981; opacity: 0.5;"></div>
+              <span class="text-gray-700"><span class="font-semibold">綠色</span>：單一飾品類型（精準！）</span>
+            </div>
+            <div class="flex items-center gap-2 text-xs">
+              <div class="w-4 h-4 rounded-sm flex-shrink-0" style="background-color: #F59E0B; opacity: 0.5;"></div>
+              <span class="text-gray-700"><span class="font-semibold">黃色</span>：2-3 種飾品混合</span>
+            </div>
+            <div class="flex items-center gap-2 text-xs">
+              <div class="w-4 h-4 rounded-sm flex-shrink-0" style="background-color: #EF4444; opacity: 0.5;"></div>
+              <span class="text-gray-700"><span class="font-semibold">紅色</span>：4+ 種飾品混雜</span>
+            </div>
+            <div class="flex items-center gap-2 text-xs">
+              <div class="w-4 h-4 rounded-sm flex-shrink-0" style="background-color: #9CA3AF; opacity: 0.5;"></div>
+              <span class="text-gray-700"><span class="font-semibold">灰色</span>：路邊區域（無標籤）</span>
+            </div>
+            
+            <div class="pt-2 mt-2 border-t border-gray-200 text-xs text-gray-500">
+              點擊網格可查看詳細資訊
+            </div>
+          </div>
+        </div>
+      </Transition>
+      
+      <!-- 圖例開啟按鈕（當圖例關閉時顯示）-->
+      <Transition
+        enter-active-class="transition duration-300 ease-out"
+        enter-from-class="opacity-0 scale-90"
+        enter-to-class="opacity-100 scale-100"
+        leave-active-class="transition duration-200 ease-in"
+        leave-from-class="opacity-100 scale-100"
+        leave-to-class="opacity-0 scale-90"
+      >
+        <button
+          v-if="s2GridEnabled && !showGridLegend"
+          @click="showGridLegend = true"
+          class="absolute bottom-3 md:bottom-4 right-3 md:right-4 bg-white rounded-xl p-2.5 md:p-3 shadow-lg hover:shadow-xl active:scale-95 transition-all z-[999] border border-gray-200"
+          title="顯示網格顏色說明"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 md:h-6 md:w-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        </button>
+      </Transition>
+
       <!-- 搜尋結果提示 -->
       <Transition
         enter-active-class="transition duration-300 ease-out"
@@ -384,17 +574,29 @@
 </template>
 
 <script setup lang="ts">
-import { LMap, LTileLayer, LMarker, LPopup, LIcon } from '@vue-leaflet/vue-leaflet';
+import { LMap, LTileLayer, LMarker, LPopup, LIcon, LPolygon } from '@vue-leaflet/vue-leaflet';
 import 'leaflet/dist/leaflet.css';
 import type { MapBounds, POIPoint, GeocodingResult } from '~/types/map';
 import { useDecorRules } from '~/composables/useDecorRules';
 import { useOverpassAPI } from '~/composables/useOverpassAPI';
+import { useS2Grid } from '~/composables/useS2Grid';
 import { useGeocoding } from '~/composables/useGeocoding';
 
 // Composables
-const { decorRules } = useDecorRules();
+const { decorRules, getDecorRule } = useDecorRules();
 const { fetchPOIs, isLoading, error } = useOverpassAPI();
 const { searchLocation, isSearching, searchError } = useGeocoding();
+const { 
+  config: s2Config,
+  cells: s2Cells,
+  isCalculating: isS2Calculating,
+  updateConfig: updateS2Config,
+  calculateGrid: calculateS2Grid,
+  clearGrid: clearS2Grid,
+  findCellForPoint,
+  getCellIdFromLatLng,
+  getCellStyle,
+} = useS2Grid();
 
 // 響應式視窗寬度
 const windowWidth = ref(typeof window !== 'undefined' ? window.innerWidth : 1024);
@@ -430,6 +632,14 @@ const showSearchResults = ref(false);
 const selectedResultIndex = ref(-1);
 let searchDebounceTimer: ReturnType<typeof setTimeout> | null = null;
 
+// S2 網格狀態（預設啟用）
+const s2GridEnabled = ref(true);
+
+// POI 標記顯示狀態（預設顯示）
+const poisVisible = ref(true);
+
+// 網格圖例顯示狀態
+const showGridLegend = ref(true);
 
 // ⚠️ 使用 shallowRef 來儲存 POI 點位，避免 Vue 對每個點位物件進行深層監聽
 const fetchedPoints = shallowRef<POIPoint[]>([]);
@@ -454,13 +664,44 @@ const getCountForRule = (ruleId: string) => {
 const onMapReady = (map: any) => {
   // 不使用 ref 儲存 Leaflet 地圖實例！
   leafletMap = map;
-  // 只更新邊界，不自動查詢
+  // 更新邊界
   updateMapBounds();
+  
+  // 初始化 S2 配置（確保狀態同步）
+  updateS2Config({ enabled: s2GridEnabled.value });
+  
+  // 如果 S2 網格啟用，初始化網格
+  if (s2GridEnabled.value && currentBounds) {
+    calculateS2Grid(currentBounds, mapZoom.value);
+  }
 };
+
+// 組件掛載時執行（修復直接進入頁面時地圖不顯示的問題）
+onMounted(() => {
+  // 等待 DOM 完全載入後強制重新計算地圖尺寸
+  nextTick(() => {
+    setTimeout(() => {
+      if (leafletMap) {
+        leafletMap.invalidateSize();
+        console.log('[Map] Forced map resize on mount');
+      }
+    }, 300);
+  });
+});
+
 
 // 地圖移動結束 - 只更新邊界，不自動查詢
 const onMapMoveEnd = () => {
   updateMapBounds();
+  
+  // 如果 S2 網格啟用，重新計算網格
+  if (s2GridEnabled.value && currentBounds) {
+    calculateS2Grid(currentBounds, mapZoom.value);
+    // 如果有 POI 數據，重新關聯
+    if (fetchedPoints.value.length > 0) {
+      associatePOIsToCells();
+    }
+  }
 };
 
 // 更新地圖邊界和縮放層級
@@ -540,6 +781,18 @@ const handleSearch = async () => {
     // 使用 shallowRef，直接賦值整個陣列來觸發更新
     fetchedPoints.value = Object.freeze(points) as POIPoint[];
     
+    // 如果 S2 網格啟用，關聯 POI 到 Cell
+    if (s2GridEnabled.value) {
+      associatePOIsToCells();
+    }
+    
+    // 自動調整 zoom 到 17（最佳網格顯示級別）
+    if (mapZoom.value !== 17 && leafletMap) {
+      mapZoom.value = 17;
+      leafletMap.setZoom(17);
+      console.log('[Map] Auto-zoomed to level 17 for optimal grid view');
+    }
+    
     // 顯示搜尋結果提示
     showSearchResult.value = true;
     if (searchResultTimer) clearTimeout(searchResultTimer);
@@ -566,6 +819,137 @@ const selectAll = () => {
 // 清除全部
 const clearAll = () => {
   selectedFilters.value = [];
+};
+
+// S2 網格功能
+const toggleS2Grid = () => {
+  s2GridEnabled.value = !s2GridEnabled.value;
+  updateS2Config({ enabled: s2GridEnabled.value });
+  
+  if (s2GridEnabled.value && currentBounds) {
+    // 啟用時計算網格
+    calculateS2Grid(currentBounds, mapZoom.value);
+    // 如果有 POI 數據，關聯到 Cell
+    if (fetchedPoints.value.length > 0) {
+      associatePOIsToCells();
+    }
+  } else {
+    // 關閉時清除網格
+    clearS2Grid();
+  }
+};
+
+// 將 POI 與 S2 Cell 關聯
+const associatePOIsToCells = () => {
+  if (!s2Cells.value || s2Cells.value.length === 0) {
+    console.log('[S2Grid] No cells to associate');
+    return;
+  }
+  
+  console.log(`[S2Grid] Associating ${fetchedPoints.value.length} POIs to ${s2Cells.value.length} cells`);
+  
+  // 重置所有 Cell 的數據
+  s2Cells.value.forEach(cell => {
+    cell.decorTypes.clear();
+    cell.poiCount = 0;
+    cell.priority = 'none';
+  });
+  
+  let matchCount = 0;
+  let notFoundCount = 0;
+  
+  // 對每個 POI，找到其所屬的 Cell
+  fetchedPoints.value.forEach((poi, index) => {
+    const cell = findCellForPoint(poi.lat, poi.lon);
+    
+    if (cell) {
+      // 將飾品類型添加到 Cell
+      cell.decorTypes.add(poi.decorType);
+      cell.poiCount++;
+      matchCount++;
+      
+      // 更新優先級
+      if (cell.decorTypes.size === 1) {
+        cell.priority = 'high';
+      } else if (cell.decorTypes.size <= 3) {
+        cell.priority = 'medium';
+      } else {
+        cell.priority = 'low';
+      }
+      
+      if (index < 5) {
+        console.log(`[S2Grid] POI #${index}: "${poi.name}" (${poi.lat.toFixed(5)}, ${poi.lon.toFixed(5)}) -> Cell ${cell.cellId}`);
+      }
+    } else {
+      notFoundCount++;
+      if (notFoundCount <= 3) {
+        console.log(`[S2Grid] POI "${poi.name}" (${poi.lat.toFixed(5)}, ${poi.lon.toFixed(5)}) not found in any cell`);
+      }
+    }
+  });
+  
+  const cellsWithPOIs = s2Cells.value.filter(c => c.poiCount > 0);
+  console.log(`[S2Grid] Associated ${matchCount} POIs, ${notFoundCount} not found. Cells with POIs: ${cellsWithPOIs.length}/${s2Cells.value.length}`);
+  
+  // 強制觸發 Vue 響應式更新
+  const updatedCells = [...s2Cells.value];
+  s2Cells.value = updatedCells;
+};
+
+// 計算網格左下角飾品圖示的位置
+const getCellIconPosition = (cell: S2CellData, iconIndex: number, totalIcons: number): [number, number] => {
+  // Cell bounds: [SW(左下), NW(左上), NE(右上), SE(右下)]
+  const sw = cell.bounds[0]; // 左下角
+  const ne = cell.bounds[2]; // 右上角
+  
+  // 計算網格的寬度和高度（經緯度差值）
+  const cellWidth = ne.lng - sw.lng;
+  const cellHeight = ne.lat - sw.lat;
+  
+  // 圖示在網格內的距離邊緣的比例（避免貼邊）
+  const marginRatio = 0.12; // 12% 邊距
+  
+  // 圖示實際可用的空間
+  const usableWidth = cellWidth * (1 - marginRatio * 2);
+  const usableHeight = cellHeight * (1 - marginRatio * 2);
+  
+  // 計算單個圖示佔用的空間（橫向排列）
+  const iconSpacing = usableWidth / Math.max(totalIcons, 1);
+  
+  // 基準位置（左下角 + 邊距）
+  const baseLat = sw.lat + (cellHeight * marginRatio);
+  const baseLng = sw.lng + (cellWidth * marginRatio);
+  
+  // 圖示位置（橫向排列，從左到右）
+  return [
+    baseLat,
+    baseLng + (iconIndex * iconSpacing)
+  ];
+};
+
+// 根據 zoom 級別獲取圖示大小
+const getIconSize = (): [number, number] => {
+  const zoom = mapZoom.value;
+  if (zoom >= 18) return [44, 44];
+  if (zoom >= 17) return [36, 36];
+  if (zoom >= 16) return [28, 28];
+  if (zoom >= 15) return [22, 22];
+  return [18, 18];
+};
+
+// 獲取圖示大小的 CSS class
+const getIconSizeClass = (): string => {
+  const zoom = mapZoom.value;
+  if (zoom >= 18) return 'size-xl';
+  if (zoom >= 17) return 'size-lg';
+  if (zoom >= 16) return 'size-md';
+  if (zoom >= 15) return 'size-sm';
+  return 'size-xs';
+};
+
+// 獲取飾品資訊
+const getDecorInfo = (decorId: string) => {
+  return getDecorRule(decorId);
 };
 
 // 地點搜尋功能
@@ -738,4 +1122,79 @@ onUnmounted(() => {
 .overflow-y-auto::-webkit-scrollbar-thumb:hover {
   background-color: rgba(16, 185, 129, 0.5);
 }
+
+/* POI 標記樣式（Zoom < 17 時使用）*/
+.poi-marker {
+  width: 52px;
+  height: 52px;
+  background: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3), 0 0 0 3px rgba(16, 185, 129, 0.5);
+  transition: transform 0.2s, box-shadow 0.2s;
+  cursor: pointer;
+}
+
+.poi-marker:hover {
+  transform: scale(1.25);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4), 0 0 0 4px rgba(16, 185, 129, 0.7);
+  z-index: 1000 !important;
+}
+
+.poi-icon-img {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+}
+
+.poi-icon-emoji {
+  font-size: 28px;
+  line-height: 1;
+}
+
+/* Cell 飾品圖示樣式 */
+.decor-icon-container {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2), 0 0 0 2px rgba(16, 185, 129, 0.3);
+  transition: transform 0.2s, box-shadow 0.2s;
+  cursor: pointer;
+}
+
+.decor-icon-container:hover {
+  transform: scale(1.15);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3), 0 0 0 3px rgba(16, 185, 129, 0.5);
+  z-index: 1000 !important;
+}
+
+.decor-icon-img {
+  object-fit: contain;
+}
+
+.decor-icon-emoji {
+  line-height: 1;
+}
+
+/* 響應式圖示大小 */
+.size-xl .decor-icon-img { width: 36px; height: 36px; }
+.size-xl .decor-icon-emoji { font-size: 32px; }
+
+.size-lg .decor-icon-img { width: 30px; height: 30px; }
+.size-lg .decor-icon-emoji { font-size: 26px; }
+
+.size-md .decor-icon-img { width: 24px; height: 24px; }
+.size-md .decor-icon-emoji { font-size: 20px; }
+
+.size-sm .decor-icon-img { width: 18px; height: 18px; }
+.size-sm .decor-icon-emoji { font-size: 14px; }
+
+.size-xs .decor-icon-img { width: 14px; height: 14px; }
+.size-xs .decor-icon-emoji { font-size: 11px; }
 </style>
