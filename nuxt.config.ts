@@ -25,8 +25,21 @@ export default defineNuxtConfig({
       meta: [
         { charset: 'utf-8' },
         { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-        { name: 'description', content: 'Pikmin Bloom 飾品蒐集追蹤器 - 追蹤你的皮克敏飾品收藏進度' },
+        { name: 'description', content: 'Pikmin Bloom 飾品蒐集追蹤器 - 追蹤你的皮克敏飾品收藏進度 (非營利・CC BY-SA 4.0)' },
         { name: 'theme-color', content: '#059669' },
+        
+        // Open Graph / Facebook
+        { property: 'og:type', content: 'website' },
+        { property: 'og:site_name', content: 'Pikmin Bloom 飾品圖鑑' },
+        { property: 'og:title', content: 'Pikmin Bloom 飾品圖鑑' },
+        { property: 'og:description', content: 'Pikmin Bloom 飾品蒐集追蹤器 - 追蹤你的皮克敏飾品收藏進度 (非營利・CC BY-SA 4.0)' },
+        { property: 'og:image', content: '/og-image.png' },
+
+        // Twitter
+        { name: 'twitter:card', content: 'summary_large_image' },
+        { name: 'twitter:title', content: 'Pikmin Bloom 飾品圖鑑' },
+        { name: 'twitter:description', content: 'Pikmin Bloom 飾品蒐集追蹤器 - 追蹤你的皮克敏飾品收藏進度 (非營利・CC BY-SA 4.0)' },
+        { name: 'twitter:image', content: '/og-image.png' },
       ],
       link: [
         { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },

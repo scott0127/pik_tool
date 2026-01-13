@@ -714,11 +714,16 @@ const fetchedPoints = shallowRef<POIPoint[]>([]);
 let currentBounds: MapBounds | null = null;
 
 // SEO
-useHead({
+useSeoMeta({
   title: '飾品地點地圖 - Pikmin Bloom 飾品圖鑑',
-  meta: [
-    { name: 'description', content: '互動式地圖顯示 Pikmin Bloom 飾品皮克敏的潛在生成點，幫助你找到想要的飾品！' }
-  ]
+  description: '互動式地圖顯示 Pikmin Bloom 飾品皮克敏的潛在生成點，幫助你找到想要的飾品！',
+  ogTitle: '飾品地點地圖 - Pikmin Bloom 飾品圖鑑',
+  ogDescription: '互動式地圖顯示 Pikmin Bloom 飾品皮克敏的潛在生成點，幫助你找到想要的飾品！',
+  ogImage: '/og-image.png',
+  twitterTitle: '飾品地點地圖 - Pikmin Bloom 飾品圖鑑',
+  twitterDescription: '互動式地圖顯示 Pikmin Bloom 飾品皮克敏的潛在生成點，幫助你找到想要的飾品！',
+  twitterImage: '/og-image.png',
+  twitterCard: 'summary_large_image'
 });
 
 // 計算每個規則的數量
