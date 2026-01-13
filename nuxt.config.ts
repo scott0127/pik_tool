@@ -11,11 +11,11 @@ export default defineNuxtConfig({
   },
 
   supabase: {
-    redirect: false, // Handle redirects manually
+    redirect: true, // Enable automatic redirects for OAuth
     redirectOptions: {
       login: '/auth',
       callback: '/auth/confirm',
-      exclude: ['/', '/collection', '/progress', '/friends'],
+      exclude: ['/', '/collection', '/progress', '/friends', '/map'],
     },
   },
   
