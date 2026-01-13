@@ -716,12 +716,12 @@ let currentBounds: MapBounds | null = null;
 // SEO
 useSeoMeta({
   title: '飾品地點地圖 - Pikmin Bloom 飾品圖鑑',
-  description: '互動式地圖顯示 Pikmin Bloom 飾品皮克敏的潛在生成點，幫助你找到想要的飾品！',
+  description: '互動式地圖顯示 Pikmin Bloom 飾品皮克敏的潛在生成點，幫助你找到想要的飾品！ (非營利・CC BY-SA 4.0)',
   ogTitle: '飾品地點地圖 - Pikmin Bloom 飾品圖鑑',
-  ogDescription: '互動式地圖顯示 Pikmin Bloom 飾品皮克敏的潛在生成點，幫助你找到想要的飾品！',
+  ogDescription: '互動式地圖顯示 Pikmin Bloom 飾品皮克敏的潛在生成點，幫助你找到想要的飾品！ (非營利・CC BY-SA 4.0)',
   ogImage: '/og-image.png',
   twitterTitle: '飾品地點地圖 - Pikmin Bloom 飾品圖鑑',
-  twitterDescription: '互動式地圖顯示 Pikmin Bloom 飾品皮克敏的潛在生成點，幫助你找到想要的飾品！',
+  twitterDescription: '互動式地圖顯示 Pikmin Bloom 飾品皮克敏的潛在生成點，幫助你找到想要的飾品！ (非營利・CC BY-SA 4.0)',
   twitterImage: '/og-image.png',
   twitterCard: 'summary_large_image'
 });
