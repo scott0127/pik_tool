@@ -339,7 +339,7 @@
 
 
       <!-- 地點搜尋欄 -->
-      <div class="absolute top-3 md:top-4 left-16 w-64 md:left-1/2 md:right-auto md:-translate-x-1/2 z-[1001] md:w-80">
+      <div class="absolute top-3 md:top-4 left-16 w-60 md:left-1/2 md:right-auto md:-translate-x-1/2 z-[1001] md:w-80">
         <div class="relative">
           <!-- 搜尋輸入框 -->
           <div class="bg-white rounded-xl shadow-lg border border-gray-200 flex items-center overflow-hidden">
