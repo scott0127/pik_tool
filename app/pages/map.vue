@@ -319,14 +319,14 @@
       </button>
 
       <!-- UI 控制按鈕組 (Mobile-Optimized) -->
-      <div class="absolute top-3 md:top-4 right-3 md:right-4 flex flex-col md:flex-row gap-2 z-[1002]">
-        <div class="flex bg-white rounded-xl shadow-lg border border-gray-200 p-1 gap-1">
+      <div class="absolute top-3 md:top-4 right-3 md:right-4 flex flex-row gap-2 z-[1002]">
+        <div class="flex h-10 bg-white rounded-xl shadow-lg border border-gray-200 p-1 gap-1">
           <!-- 網格模式按鈕 -->
-          <div class="relative group">
+          <div class="relative group h-full">
             <button
               @click="s2GridEnabled = true"
               :class="[
-                'flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-all',
+                'flex items-center gap-1.5 px-3 h-full rounded-lg text-sm font-medium transition-all',
                 s2GridEnabled ? 'bg-emerald-500 text-white shadow-sm' : 'text-gray-500 hover:bg-gray-50'
               ]"
             >
@@ -336,11 +336,10 @@
               網格
             </button>
             
-            <!-- 網格模式 Tooltip -->
-            <div class="absolute right-0 top-full mt-2 w-64 bg-gray-900 text-white text-xs rounded-xl p-3 shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-[2000] pointer-events-none translate-y-2 group-hover:translate-y-0">
+            <!-- 網格模式 Tooltip (省略內容以保持簡潔，實際應保留) -->
+             <div class="absolute right-0 top-full mt-2 w-64 bg-gray-900 text-white text-xs rounded-xl p-3 shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-[2000] pointer-events-none translate-y-2 group-hover:translate-y-0">
               <div class="font-bold mb-2 text-emerald-300">網格模式 (Grid Mode)</div>
               <div class="flex gap-3 mb-2">
-                <!-- 網格示意圖 -->
                 <div class="w-16 h-16 bg-emerald-900/50 border border-emerald-500/30 rounded grid grid-cols-2 gap-px p-px">
                   <div class="bg-emerald-500/20 flex items-center justify-center text-[10px]">☕</div>
                   <div class="bg-emerald-500/20"></div>
@@ -357,11 +356,11 @@
           </div>
           
           <!-- 標記模式按鈕 -->
-          <div class="relative group">
+          <div class="relative group h-full">
             <button
               @click="s2GridEnabled = false"
               :class="[
-                'flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-all',
+                'flex items-center gap-1.5 px-3 h-full rounded-lg text-sm font-medium transition-all',
                 !s2GridEnabled ? 'bg-blue-500 text-white shadow-sm' : 'text-gray-500 hover:bg-gray-50'
               ]"
             >
@@ -371,12 +370,10 @@
               </svg>
               標記
             </button>
-            
-            <!-- 標記模式 Tooltip -->
+             <!-- 標記模式 Tooltip (省略內容以保持簡潔，實際應保留) -->
             <div class="absolute right-0 top-full mt-2 w-64 bg-gray-900 text-white text-xs rounded-xl p-3 shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-[2000] pointer-events-none translate-y-2 group-hover:translate-y-0">
               <div class="font-bold mb-2 text-blue-300">標記模式 (Pin Mode)</div>
               <div class="flex gap-3 mb-2">
-                <!-- 大頭針示意圖 -->
                 <div class="w-16 h-16 bg-blue-900/50 border border-blue-500/30 rounded flex items-center justify-center">
                   <svg viewBox="0 0 50 64" class="w-8 h-8 drop-shadow-lg">
                     <path d="M25 0C11.1929 0 0 11.1929 0 25C0 42 17 58 25 64C33 58 50 42 50 25C50 11.1929 38.8071 0 25 0Z" fill="#ef4444"/>
@@ -393,24 +390,15 @@
           </div>
         </div>
 
-        <!-- 返回首頁 -->
-        <NuxtLink
-          to="/"
-          class="flex items-center gap-1.5 bg-white rounded-xl px-3 py-2.5 shadow-lg hover:shadow-xl active:scale-95 transition-all border-2 border-gray-200 text-gray-700"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor">
-            <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
-          </svg>
-          <span class="text-sm font-medium whitespace-nowrap md:hidden">首頁</span>
-        </NuxtLink>
+        
       </div>
 
 
       <!-- 地點搜尋欄 -->
-      <div class="absolute top-3 md:top-4 left-16 w-60 md:left-1/2 md:right-auto md:-translate-x-1/2 z-[1001] md:w-80">
+      <div class="absolute top-3 md:top-4 left-16 right-52 w-auto md:w-80 md:left-1/2 md:right-auto md:-translate-x-1/2 z-[1001]">
         <div class="relative">
           <!-- 搜尋輸入框 -->
-          <div class="bg-white rounded-xl shadow-lg border border-gray-200 flex items-center overflow-hidden">
+          <div class="bg-white rounded-xl shadow-lg border border-gray-200 flex items-center overflow-hidden h-10">
             <div class="pl-3 md:pl-4 text-gray-400">
               <svg v-if="!isSearching" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 md:h-5 md:w-5" viewBox="0 0 20 20" fill="currentColor">
                 <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
@@ -426,8 +414,8 @@
               @focus="handleSearchFocus"
               @keydown="handleSearchKeydown"
               type="text"
-              placeholder="搜尋地點 (例如：台北車站)"
-              class="flex-1 px-3 py-2 md:py-2.5 text-sm md:text-base outline-none"
+              placeholder="搜尋地點"
+              class="flex-1 px-3 h-full text-sm md:text-base outline-none"
             />
             <button
               v-if="searchQuery"
@@ -485,7 +473,7 @@
       </div>
 
       <!-- 縮放等級 + 搜尋按鈕 (合併在一起) -->
-      <div class="absolute top-16 md:top-20 left-1/2 -translate-x-1/2 flex items-center gap-2 z-[1000]">
+      <div class="absolute top-16 md:top-20 left-16 md:left-1/2 md:-translate-x-1/2 flex items-center gap-2 z-[1000]">
         <!-- 縮放等級指示器 -->
         <div class="bg-white rounded-xl px-2.5 md:px-3 py-1.5 md:py-2 shadow-lg border border-gray-200">
           <div class="flex items-center gap-1.5 md:gap-2">
