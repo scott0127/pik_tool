@@ -852,13 +852,6 @@ const handleSearch = async () => {
       associatePOIsToCells();
     }
     
-    // 自動調整 zoom 到 17（最佳網格顯示級別）
-    if (mapZoom.value !== 17 && leafletMap) {
-      mapZoom.value = 17;
-      leafletMap.setZoom(17);
-      console.log('[Map] Auto-zoomed to level 17 for optimal grid view');
-    }
-    
     // 顯示搜尋結果提示
     showSearchResult.value = true;
     if (searchResultTimer) clearTimeout(searchResultTimer);
