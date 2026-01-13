@@ -397,6 +397,23 @@ const navLinks = [
   { to: '/friends', name: '好友', icon: '🤝' },
 ];
 
+// Force check auth state on mount
+onMounted(async () => {
+  console.log('[AppHeader] Mounted, checking auth state...');
+  console.log('[AppHeader] Initial user from composable:', !!user.value);
+  
+  // Actively get session (don't rely on events)
+  const { data: { session } } = await supabase.auth.getSession();
+  console.log('[AppHeader] Session from getSession():', !!session);
+  
+  // Listen for future auth changes
+  const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+    console.log('[AppHeader] Auth event:', event, 'User now:', !!user.value);
+  });
+  
+  onUnmounted(() => subscription.unsubscribe());
+});
+
 const isLoggingOut = ref(false);
 
 const handleLogout = async () => {
