@@ -251,11 +251,16 @@ const signInWithGoogle = async () => {
     const { error: signInError } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: `${window.location.origin}/`,
+        redirectTo: `${window.location.origin}/auth/confirm`,
+        queryParams: {
+          access_type: 'offline',
+          prompt: 'consent',
+        },
       },
     });
     
     if (signInError) throw signInError;
+    // Note: User will be redirected to Google, no need to reset loading here
   } catch (e: any) {
     error.value = e.message || '無法使用 Google 登入，請確認已在 Supabase 啟用 Google Provider';
     loading.value = false;

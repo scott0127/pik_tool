@@ -50,16 +50,27 @@
 
 <script setup lang="ts">
 const router = useRouter();
+const supabase = useSupabaseClient();
 const error = ref('');
 
-// The Supabase module handles the token exchange automatically
-// We just need to wait and redirect
 onMounted(async () => {
-  // Wait a moment for Supabase to process
-  await new Promise(resolve => setTimeout(resolve, 1000));
+  // Listen for auth state changes
+  const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+    if (event === 'SIGNED_IN' && session) {
+      // Successfully signed in, redirect to home
+      setTimeout(() => {
+        router.push('/');
+      }, 500);
+    } else if (event === 'SIGNED_OUT') {
+      error.value = '登入失敗，請重試';
+    }
+  });
+
+  // Check current session
+  const { data: { session } } = await supabase.auth.getSession();
   
-  const user = useSupabaseUser();
-  if (user.value) {
+  if (session) {
+    // Already signed in, redirect immediately
     router.push('/');
   } else {
     // Check URL for error
@@ -68,12 +79,20 @@ onMounted(async () => {
     if (errorParam) {
       error.value = errorParam;
     } else {
-      // Wait more for processing
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      if (!user.value) {
+      // Wait a bit more for the callback to process
+      await new Promise(resolve => setTimeout(resolve, 3000));
+      
+      const { data: { session: finalSession } } = await supabase.auth.getSession();
+      if (!finalSession) {
+        // Still no session, redirect to home anyway
         router.push('/');
       }
     }
   }
+
+  // Cleanup subscription
+  return () => {
+    subscription.unsubscribe();
+  };
 });
 </script>
