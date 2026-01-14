@@ -54,7 +54,8 @@ const authStore = useAuthStore();
 const error = ref('');
 
 onMounted(async () => {
-  console.log('[Callback] OAuth callback page mounted');
+  console.log('[Callback] Auth callback page mounted');
+  console.log('[Callback] Full URL:', window.location.href);
   
   try {
     // 检查 URL 是否有错误参数
@@ -67,8 +68,13 @@ onMounted(async () => {
       return;
     }
 
+    // 检查 hash 中的 type 参数（Supabase 会通过 hash 传递参数）
+    // 例如：#access_token=...&type=recovery
+    const hashParams = new URLSearchParams(window.location.hash.substring(1));
+    const authType = hashParams.get('type');
+    console.log('[Callback] Auth type:', authType);
+
     // 等待 Supabase 处理 hash 中的 token
-    // 这是关键：给 Supabase 足够时间完成 token exchange
     console.log('[Callback] Waiting for Supabase to process token...');
     await new Promise(resolve => setTimeout(resolve, 1000));
 
@@ -78,8 +84,16 @@ onMounted(async () => {
 
     // 检查是否成功登入
     if (authStore.isAuthenticated.value) {
-      console.log('[Callback] Successfully authenticated, redirecting to home...');
-      router.push('/');
+      console.log('[Callback] Successfully authenticated');
+      
+      // 如果是密码重置类型，跳转到密码重置页面
+      if (authType === 'recovery') {
+        console.log('[Callback] Recovery type detected, redirecting to reset-password...');
+        router.push('/auth/reset-password');
+      } else {
+        console.log('[Callback] Redirecting to home...');
+        router.push('/');
+      }
     } else {
       // 再等一会儿再试一次
       console.log('[Callback] Not authenticated yet, waiting...');
@@ -90,8 +104,16 @@ onMounted(async () => {
       const { data: { session } } = await supabase.auth.getSession();
       
       if (session) {
-        console.log('[Callback] Found session on retry, redirecting...');
-        router.push('/');
+        console.log('[Callback] Found session on retry');
+        
+        // 再次检查是否是密码重置
+        if (authType === 'recovery') {
+          console.log('[Callback] Recovery type, redirecting to reset-password...');
+          router.push('/auth/reset-password');
+        } else {
+          console.log('[Callback] Redirecting to home...');
+          router.push('/');
+        }
       } else {
         console.log('[Callback] No session found, showing error');
         error.value = '登入驗證失敗，請重新嘗試';

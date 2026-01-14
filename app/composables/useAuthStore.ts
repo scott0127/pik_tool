@@ -136,6 +136,40 @@ export const useAuthStore = () => {
   };
 
   /**
+   * 發送密碼重置郵件
+   */
+  const resetPassword = async (email: string): Promise<void> => {
+    isLoading.value = true;
+    
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/auth/callback`,
+      });
+      
+      if (error) throw error;
+    } finally {
+      isLoading.value = false;
+    }
+  };
+
+  /**
+   * 更新密碼（用於密碼重置流程）
+   */
+  const updatePassword = async (newPassword: string): Promise<void> => {
+    isLoading.value = true;
+    
+    try {
+      const { error } = await supabase.auth.updateUser({
+        password: newPassword,
+      });
+      
+      if (error) throw error;
+    } finally {
+      isLoading.value = false;
+    }
+  };
+
+  /**
    * 登出
    */
   const signOut = async (): Promise<void> => {
@@ -213,5 +247,7 @@ export const useAuthStore = () => {
     signInWithEmail,
     signUp,
     signOut,
+    resetPassword,
+    updatePassword,
   };
 };

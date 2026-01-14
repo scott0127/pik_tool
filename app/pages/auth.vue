@@ -46,6 +46,12 @@
           </button>
         </div>
 
+        <!-- Forgot Password Mode Header -->
+        <div v-if="mode === 'forgot'" class="mb-6 text-center">
+          <h2 class="text-xl font-bold text-gray-800 mb-2">重置密碼</h2>
+          <p class="text-gray-500 text-sm">輸入您的 Email，我們會發送重置連結給您</p>
+        </div>
+
         <!-- Error Message -->
         <Transition
           enter-active-class="transition duration-200 ease-out"
@@ -122,7 +128,7 @@
           </div>
 
           <!-- Password -->
-          <div>
+          <div v-if="mode !== 'forgot'">
             <label class="block text-sm font-semibold text-gray-700 mb-2">
               <span class="flex items-center gap-2">
                 <span>🔐</span>
@@ -149,8 +155,31 @@
               <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none" />
               <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
             </svg>
-            <span>{{ loading ? '處理中...' : (mode === 'login' ? '登入' : '註冊') }}</span>
+            <span>{{ loading ? '處理中...' : submitButtonText }}</span>
           </button>
+
+          <!-- Forgot Password Link -->
+          <div v-if="mode === 'login'" class="text-center">
+            <button
+              type="button"
+              @click="mode = 'forgot'"
+              class="text-sm text-emerald-600 hover:text-emerald-700 hover:underline transition-colors"
+            >
+              忘記密碼？
+            </button>
+          </div>
+
+          <!-- Back to Login Link -->
+          <div v-if="mode === 'forgot'" class="text-center">
+            <button
+              type="button"
+              @click="mode = 'login'"
+              class="text-sm text-gray-500 hover:text-gray-700 hover:underline transition-colors flex items-center justify-center gap-1"
+            >
+              <span>←</span>
+              <span>返回登入</span>
+            </button>
+          </div>
         </form>
 
         <!-- Divider -->
@@ -197,7 +226,7 @@
 const router = useRouter();
 const authStore = useAuthStore();
 
-const mode = ref<'login' | 'register'>('login');
+const mode = ref<'login' | 'register' | 'forgot'>('login');
 const email = ref('');
 const password = ref('');
 const username = ref('');
@@ -205,13 +234,25 @@ const loading = ref(false);
 const error = ref('');
 const success = ref('');
 
+const submitButtonText = computed(() => {
+  switch (mode.value) {
+    case 'login': return '登入';
+    case 'register': return '註冊';
+    case 'forgot': return '發送重置連結';
+  }
+});
+
 const handleSubmit = async () => {
   loading.value = true;
   error.value = '';
   success.value = '';
 
   try {
-    if (mode.value === 'register') {
+    if (mode.value === 'forgot') {
+      // 密碼重置
+      await authStore.resetPassword(email.value);
+      success.value = '重置連結已發送！請檢查您的 Email 信箱。';
+    } else if (mode.value === 'register') {
       // 注册需要额外的 username，直接用 Supabase
       const supabase = useSupabaseClient();
       const { error: signUpError } = await supabase.auth.signUp({

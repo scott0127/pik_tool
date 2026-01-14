@@ -641,6 +641,8 @@
         >
           <span class="text-sm text-emerald-600 font-medium">
             🎉 找到 {{ fetchedPoints.length }} 個飾品地點！
+            <span v-if="dataSource === 'local'" class="ml-1 text-xs bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded-full">📦 本地</span>
+            <span v-else-if="dataSource === 'api'" class="ml-1 text-xs bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded-full">🌐 API</span>
           </span>
         </div>
       </Transition>
@@ -653,13 +655,13 @@ import { LMap, LTileLayer, LMarker, LPopup, LIcon, LPolygon } from '@vue-leaflet
 import 'leaflet/dist/leaflet.css';
 import type { MapBounds, POIPoint, GeocodingResult } from '~/types/map';
 import { useDecorRules } from '~/composables/useDecorRules';
-import { useOverpassAPI } from '~/composables/useOverpassAPI';
+import { useLocalFirstPOI } from '~/composables/useLocalFirstPOI';
 import { useS2Grid } from '~/composables/useS2Grid';
 import { useGeocoding } from '~/composables/useGeocoding';
 
 // Composables
 const { decorRules, getDecorRule } = useDecorRules();
-const { fetchPOIs, isLoading, error } = useOverpassAPI();
+const { fetchPOIs, isLoading, error, dataSource, preloadAllRegions } = useLocalFirstPOI();
 const { searchLocation, isSearching, searchError } = useGeocoding();
 const { 
   config: s2Config,
@@ -773,6 +775,9 @@ const onMapReady = (map: any) => {
 
 // 組件掛載時執行（修復直接進入頁面時地圖不顯示的問題）
 onMounted(() => {
+  // 預先載入區域資料（Local-First 策略）
+  preloadAllRegions();
+  
   // 等待 DOM 完全載入後強制重新計算地圖尺寸
   nextTick(() => {
     setTimeout(() => {
