@@ -333,10 +333,10 @@
               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM14 5a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM4 15a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1v-4zM14 15a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z" />
               </svg>
-              網格
+              <span class="hidden md:inline">網格</span>
             </button>
             
-            <!-- 網格模式 Tooltip (省略內容以保持簡潔，實際應保留) -->
+            <!-- 網格模式 Tooltip -->
              <div class="absolute right-0 top-full mt-2 w-64 bg-gray-900 text-white text-xs rounded-xl p-3 shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-[2000] pointer-events-none translate-y-2 group-hover:translate-y-0">
               <div class="font-bold mb-2 text-emerald-300">網格模式 (Grid Mode)</div>
               <div class="flex gap-3 mb-2">
@@ -368,9 +368,9 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
               </svg>
-              標記
+              <span class="hidden md:inline">標記</span>
             </button>
-             <!-- 標記模式 Tooltip (省略內容以保持簡潔，實際應保留) -->
+             <!-- 標記模式 Tooltip -->
             <div class="absolute right-0 top-full mt-2 w-64 bg-gray-900 text-white text-xs rounded-xl p-3 shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-[2000] pointer-events-none translate-y-2 group-hover:translate-y-0">
               <div class="font-bold mb-2 text-blue-300">標記模式 (Pin Mode)</div>
               <div class="flex gap-3 mb-2">
@@ -389,13 +389,10 @@
             </div>
           </div>
         </div>
-
-        
       </div>
 
-
       <!-- 地點搜尋欄 -->
-      <div class="absolute top-3 md:top-4 left-16 right-52 w-auto md:w-80 md:left-1/2 md:right-auto md:-translate-x-1/2 z-[1001]">
+      <div class="absolute top-3 md:top-4 left-16 right-36 md:right-auto md:w-80 md:left-1/2 md:-translate-x-1/2 z-[1001]">
         <div class="relative">
           <!-- 搜尋輸入框 -->
           <div class="bg-white rounded-xl shadow-lg border border-gray-200 flex items-center overflow-hidden h-10">
@@ -472,10 +469,32 @@
         </div>
       </div>
 
-      <!-- 縮放等級 + 搜尋按鈕 (合併在一起) -->
-      <div class="absolute top-16 md:top-20 left-16 md:left-1/2 md:-translate-x-1/2 flex items-center gap-2 z-[1000]">
+      <!-- 第二行控制列：定位、縮放等級、搜尋按鈕 -->
+      <div class="absolute top-16 md:top-[60px] left-16 md:left-1/2 md:-translate-x-1/2 flex items-center gap-2 z-[1000]">
+        <!-- 定位按鈕 -->
+        <button
+          @click="goToMyLocation"
+          :disabled="isLocating"
+          class="flex items-center justify-center w-10 h-10 bg-white rounded-xl shadow-lg border transition-all hover:shadow-xl active:scale-95"
+          :class="[
+            isLocating ? 'cursor-wait' : 'cursor-pointer',
+            locationError ? 'border-red-300' : 'border-gray-200'
+          ]"
+          :title="locationError || '移動到我的位置'"
+        >
+          <!-- 載入中動畫 -->
+          <svg v-if="isLocating" class="animate-spin h-5 w-5 text-emerald-500" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none" />
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+          </svg>
+          <!-- 定位圖示 (Google Maps 風格) -->
+          <svg v-else xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" :class="locationError ? 'text-red-500' : 'text-emerald-600'" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm8.94 3A8.994 8.994 0 0013 3.06V1h-2v2.06A8.994 8.994 0 003.06 11H1v2h2.06A8.994 8.994 0 0011 20.94V23h2v-2.06A8.994 8.994 0 0020.94 13H23v-2h-2.06zM12 19c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z"/>
+          </svg>
+        </button>
+
         <!-- 縮放等級指示器 -->
-        <div class="bg-white rounded-xl px-2.5 md:px-3 py-1.5 md:py-2 shadow-lg border border-gray-200">
+        <div class="bg-white rounded-xl px-3 shadow-lg border border-gray-200 h-10 flex items-center">
           <div class="flex items-center gap-1.5 md:gap-2">
             <span class="text-[10px] md:text-xs text-gray-500">Lv.</span>
             <span 
@@ -485,7 +504,7 @@
               {{ mapZoom }}
             </span>
             <span 
-              class="text-[10px] md:text-xs px-1.5 py-0.5 rounded-full"
+              class="text-[10px] md:text-xs px-1.5 py-0.5 rounded-full hidden md:inline"
               :class="canSearch ? 'bg-emerald-100 text-emerald-600' : 'bg-orange-100 text-orange-500'"
             >
               {{ canSearch ? '可搜尋' : `需≥${MIN_ZOOM_FOR_QUERY}` }}
@@ -498,7 +517,7 @@
           v-if="!isLoading"
           @click="handleSearch"
           :disabled="!canSearch || selectedFilters.length === 0"
-          class="flex items-center gap-1.5 md:gap-2 px-3 md:px-4 py-1.5 md:py-2 rounded-xl shadow-lg transition-all duration-200 text-sm"
+          class="flex items-center h-10 gap-1.5 md:gap-2 px-3 md:px-4 rounded-xl shadow-lg transition-all duration-200 text-sm"
           :class="canSearch && selectedFilters.length > 0
             ? 'bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 active:scale-95 text-white cursor-pointer'
             : 'bg-gray-100 text-gray-400 cursor-not-allowed border border-gray-200'"
@@ -510,14 +529,14 @@
             {{ !canSearch ? '放大地圖' : selectedFilters.length === 0 ? '選擇類型' : '搜尋此區域' }}
           </span>
           <span class="font-medium md:hidden">
-            {{ !canSearch ? '放大' : selectedFilters.length === 0 ? '選類型' : '搜尋' }}
+            搜尋
           </span>
         </button>
 
         <!-- 載入中狀態 -->
         <div
           v-else
-          class="flex items-center gap-1.5 md:gap-2 px-3 md:px-4 py-1.5 md:py-2 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-xl shadow-lg text-white text-sm"
+          class="flex items-center h-10 gap-1.5 md:gap-2 px-3 md:px-4 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-xl shadow-lg text-white text-sm"
         >
           <svg class="animate-spin h-4 w-4" viewBox="0 0 24 24">
             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none" />
@@ -703,6 +722,11 @@ watch(s2GridEnabled, (enabled) => {
 
 // POI 標記顯示狀態（預設顯示）
 const poisVisible = ref(true);
+
+// 定位功能狀態
+const isLocating = ref(false);
+const locationError = ref<string | null>(null);
+const userLocation = ref<[number, number] | null>(null);
 
 // 網格圖例顯示狀態
 const showGridLegend = ref(true);
@@ -1011,6 +1035,71 @@ const getIconSizeClass = (): string => {
 // 獲取飾品資訊
 const getDecorInfo = (decorId: string) => {
   return getDecorRule(decorId);
+};
+
+// 定位到使用者當前位置
+const goToMyLocation = () => {
+  // 檢查瀏覽器是否支援 Geolocation API
+  if (!navigator.geolocation) {
+    locationError.value = '您的瀏覽器不支援定位功能';
+    console.error('[Map] Geolocation is not supported by this browser');
+    return;
+  }
+
+  isLocating.value = true;
+  locationError.value = null;
+
+  navigator.geolocation.getCurrentPosition(
+    // 成功回調
+    (position) => {
+      const { latitude, longitude } = position.coords;
+      userLocation.value = [latitude, longitude];
+      
+      console.log(`[Map] Got user location: ${latitude.toFixed(5)}, ${longitude.toFixed(5)}`);
+      
+      if (leafletMap) {
+        // 移動地圖到使用者位置，並設定適當的縮放等級
+        leafletMap.setView([latitude, longitude], Math.max(mapZoom.value, 16), {
+          animate: true,
+          duration: 1,
+        });
+      }
+      
+      isLocating.value = false;
+    },
+    // 錯誤回調
+    (error) => {
+      isLocating.value = false;
+      
+      switch (error.code) {
+        case error.PERMISSION_DENIED:
+          locationError.value = '定位權限被拒絕，請在瀏覽器設定中允許定位';
+          break;
+        case error.POSITION_UNAVAILABLE:
+          locationError.value = '無法取得位置資訊';
+          break;
+        case error.TIMEOUT:
+          locationError.value = '定位請求超時，請重試';
+          break;
+        default:
+          locationError.value = '發生未知錯誤';
+          break;
+      }
+      
+      console.error('[Map] Geolocation error:', error.message);
+      
+      // 5 秒後清除錯誤狀態
+      setTimeout(() => {
+        locationError.value = null;
+      }, 5000);
+    },
+    // 選項
+    {
+      enableHighAccuracy: true,
+      timeout: 10000,
+      maximumAge: 60000, // 允許使用 1 分鐘內的快取位置
+    }
+  );
 };
 
 // 地點搜尋功能
