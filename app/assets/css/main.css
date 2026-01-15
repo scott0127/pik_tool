@@ -283,4 +283,28 @@
   .glow-white {
     box-shadow: 0 0 30px rgba(255, 255, 255, 0.6);
   }
+  
+  /* Rare golden glow effect */
+  .rare-golden-glow {
+    box-shadow: 0 0 20px rgba(251, 191, 36, 0.4), 0 4px 12px rgba(251, 191, 36, 0.25);
+  }
+  
+  /* Animated golden border glow for rare variants */
+  .rare-border-glow {
+    background: linear-gradient(
+      90deg,
+      rgba(251, 191, 36, 0.8),
+      rgba(253, 224, 71, 1),
+      rgba(251, 191, 36, 0.8),
+      rgba(253, 224, 71, 1),
+      rgba(251, 191, 36, 0.8)
+    );
+    background-size: 200% 100%;
+    animation: rare-shimmer 2s linear infinite;
+  }
+  
+  @keyframes rare-shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
 }

@@ -4,19 +4,39 @@
     class="relative group cursor-pointer pop-in"
     :style="{ animationDelay: `${animationDelay}ms` }"
   >
+    <!-- Animated golden border for rare variants -->
     <div 
-      class="relative bg-white/80 backdrop-blur rounded-2xl overflow-hidden transition-all duration-300 shadow-lg"
+      v-if="isRareVariant && isCollected" 
+      class="absolute -inset-[3px] rounded-2xl rare-border-glow z-0"
+    ></div>
+    
+    <div 
+      class="relative bg-white/80 backdrop-blur rounded-2xl overflow-hidden transition-all duration-300 shadow-lg z-10"
       :class="[
-        isCollected 
-          ? 'ring-4 ring-emerald-400 ring-offset-2 shadow-emerald-100' 
-          : 'grayscale-[40%] opacity-70 hover:grayscale-0 hover:opacity-100'
+        isRareVariant 
+          ? (isCollected 
+              ? 'ring-[3px] ring-yellow-400 shadow-yellow-300/60 rare-golden-glow' 
+              : 'ring-2 ring-yellow-300/50 grayscale-[40%] opacity-70 hover:grayscale-0 hover:opacity-100')
+          : (isCollected 
+              ? 'ring-4 ring-emerald-400 ring-offset-2 shadow-emerald-100' 
+              : 'grayscale-[40%] opacity-70 hover:grayscale-0 hover:opacity-100')
       ]"
     >
       <!-- Image Container -->
-      <div class="relative aspect-square bg-gradient-to-br from-gray-50 via-white to-gray-100 p-3 overflow-hidden">
+      <div 
+        class="relative aspect-square p-3 overflow-hidden"
+        :class="isRareVariant 
+          ? 'bg-gradient-to-br from-amber-50 via-yellow-50/80 to-orange-50' 
+          : 'bg-gradient-to-br from-gray-50 via-white to-gray-100'"
+      >
         <!-- Background pattern -->
-        <div class="absolute inset-0 opacity-5">
-          <div class="absolute inset-0" style="background-image: radial-gradient(circle, #22c55e 1px, transparent 1px); background-size: 20px 20px;"></div>
+        <div class="absolute inset-0" :class="isRareVariant ? 'opacity-10' : 'opacity-5'">
+          <div 
+            class="absolute inset-0" 
+            :style="isRareVariant 
+              ? 'background-image: radial-gradient(circle, #fbbf24 1px, transparent 1px); background-size: 16px 16px;'
+              : 'background-image: radial-gradient(circle, #22c55e 1px, transparent 1px); background-size: 20px 20px;'"
+          ></div>
         </div>
 
         <!-- Image -->
@@ -127,6 +147,7 @@ const variant = computed(() => getVariant(props.categoryId, props.variantId));
 const category = computed(() => getCategory(props.categoryId));
 const isCollected = computed(() => checkCollected(props.itemId));
 const imageUrl = computed(() => getImageUrl(props.categoryId, props.variantId, props.pikminType));
+const isRareVariant = computed(() => props.variantId.toLowerCase().includes('rare'));
 const hasError = ref(false);
 const showRipple = ref(false);
 

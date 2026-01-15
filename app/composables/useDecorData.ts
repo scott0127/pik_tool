@@ -21,8 +21,9 @@ export function useDecorData() {
         let typesToGenerate: PikminType[];
         
         if (variantImageUrls && typeof variantImageUrls === 'object') {
-          // 只生成有圖片的顏色
-          typesToGenerate = Object.keys(variantImageUrls) as PikminType[];
+          // 只生成有圖片的顏色，按照 PIKMIN_TYPES 的順序排列
+          const availableTypesInVariant = new Set(Object.keys(variantImageUrls) as PikminType[]);
+          typesToGenerate = PIKMIN_TYPES.filter(type => availableTypesInVariant.has(type));
         } else {
           // Fallback: 如果沒有 imageUrls，使用 availablePikminTypes
           typesToGenerate = availableTypes as PikminType[];

@@ -1137,6 +1137,74 @@
     },
     {
       "category": {
+        "id": "weather-rain",
+        "name": "雨天",
+        "nameEn": "Rainy Weather",
+        "type": "regular",
+        "icon": "🌧️"
+      },
+      "variants": [
+        {
+          "id": "leaf_hat_1",
+          "name": "葉帽A",
+          "nameEn": "Leaf Hat 1",
+          "imageUrl": "https://pikmin.wiki.gallery/images/thumb/0/0b/Decor_Blue_Leaf_Hat_1.png/95px-Decor_Blue_Leaf_Hat_1.png",
+          "imageUrls": {
+            "blue": "https://pikmin.wiki.gallery/images/thumb/0/0b/Decor_Blue_Leaf_Hat_1.png/95px-Decor_Blue_Leaf_Hat_1.png"
+          }
+        },
+        {
+          "id": "leaf_hat_2",
+          "name": "葉帽B",
+          "nameEn": "Leaf Hat 2",
+          "imageUrl": "https://pikmin.wiki.gallery/images/thumb/3/3e/Decor_Blue_Leaf_Hat_2.png/93px-Decor_Blue_Leaf_Hat_2.png",
+          "imageUrls": {
+            "blue": "https://pikmin.wiki.gallery/images/thumb/3/3e/Decor_Blue_Leaf_Hat_2.png/93px-Decor_Blue_Leaf_Hat_2.png"
+          }
+        },
+        {
+          "id": "leaf_hat_3",
+          "name": "葉帽C",
+          "nameEn": "Leaf Hat 3",
+          "imageUrl": "https://pikmin.wiki.gallery/images/thumb/b/bc/Decor_Blue_Leaf_Hat_3.png/100px-Decor_Blue_Leaf_Hat_3.png",
+          "imageUrls": {
+            "blue": "https://pikmin.wiki.gallery/images/thumb/b/bc/Decor_Blue_Leaf_Hat_3.png/100px-Decor_Blue_Leaf_Hat_3.png"
+          }
+        }
+      ],
+      "availablePikminTypes": [
+        "blue"
+      ]
+    },
+    {
+      "category": {
+        "id": "weather-snow",
+        "name": "下雪",
+        "nameEn": "Snowy Weather",
+        "type": "regular",
+        "icon": "🌨️"
+      },
+      "variants": [
+        {
+          "id": "snow",
+          "name": "雪",
+          "nameEn": "Snow",
+          "imageUrl": "https://pikmin.wiki.gallery/images/thumb/a/a8/Decor_Blue_Snow.png/74px-Decor_Blue_Snow.png",
+          "imageUrls": {
+            "blue": "https://pikmin.wiki.gallery/images/thumb/a/a8/Decor_Blue_Snow.png/74px-Decor_Blue_Snow.png",
+            "white": "https://pikmin.wiki.gallery/images/thumb/8/82/Decor_White_Snow.png/100px-Decor_White_Snow.png",
+            "ice": "https://pikmin.wiki.gallery/images/thumb/8/8b/Decor_Ice_Snow.png/67px-Decor_Ice_Snow.png"
+          }
+        }
+      ],
+      "availablePikminTypes": [
+        "blue",
+        "white",
+        "ice"
+      ]
+    },
+    {
+      "category": {
         "id": "theme-park",
         "name": "主題樂園",
         "nameEn": "Theme Park",
@@ -1749,74 +1817,6 @@
       ],
       "availablePikminTypes": [
         "purple"
-      ]
-    },
-    {
-      "category": {
-        "id": "weather-rain",
-        "name": "雨天",
-        "nameEn": "Rainy Weather",
-        "type": "regular",
-        "icon": "🌧️"
-      },
-      "variants": [
-        {
-          "id": "leaf_hat_1",
-          "name": "葉帽A",
-          "nameEn": "Leaf Hat 1",
-          "imageUrl": "https://pikmin.wiki.gallery/images/thumb/0/0b/Decor_Blue_Leaf_Hat_1.png/95px-Decor_Blue_Leaf_Hat_1.png",
-          "imageUrls": {
-            "blue": "https://pikmin.wiki.gallery/images/thumb/0/0b/Decor_Blue_Leaf_Hat_1.png/95px-Decor_Blue_Leaf_Hat_1.png"
-          }
-        },
-        {
-          "id": "leaf_hat_2",
-          "name": "葉帽B",
-          "nameEn": "Leaf Hat 2",
-          "imageUrl": "https://pikmin.wiki.gallery/images/thumb/3/3e/Decor_Blue_Leaf_Hat_2.png/93px-Decor_Blue_Leaf_Hat_2.png",
-          "imageUrls": {
-            "blue": "https://pikmin.wiki.gallery/images/thumb/3/3e/Decor_Blue_Leaf_Hat_2.png/93px-Decor_Blue_Leaf_Hat_2.png"
-          }
-        },
-        {
-          "id": "leaf_hat_3",
-          "name": "葉帽C",
-          "nameEn": "Leaf Hat 3",
-          "imageUrl": "https://pikmin.wiki.gallery/images/thumb/b/bc/Decor_Blue_Leaf_Hat_3.png/100px-Decor_Blue_Leaf_Hat_3.png",
-          "imageUrls": {
-            "blue": "https://pikmin.wiki.gallery/images/thumb/b/bc/Decor_Blue_Leaf_Hat_3.png/100px-Decor_Blue_Leaf_Hat_3.png"
-          }
-        }
-      ],
-      "availablePikminTypes": [
-        "blue"
-      ]
-    },
-    {
-      "category": {
-        "id": "weather-snow",
-        "name": "下雪",
-        "nameEn": "Snowy Weather",
-        "type": "regular",
-        "icon": "🌨️"
-      },
-      "variants": [
-        {
-          "id": "snow",
-          "name": "雪",
-          "nameEn": "Snow",
-          "imageUrl": "https://pikmin.wiki.gallery/images/thumb/a/a8/Decor_Blue_Snow.png/74px-Decor_Blue_Snow.png",
-          "imageUrls": {
-            "blue": "https://pikmin.wiki.gallery/images/thumb/a/a8/Decor_Blue_Snow.png/74px-Decor_Blue_Snow.png",
-            "white": "https://pikmin.wiki.gallery/images/thumb/8/82/Decor_White_Snow.png/100px-Decor_White_Snow.png",
-            "ice": "https://pikmin.wiki.gallery/images/thumb/8/8b/Decor_Ice_Snow.png/67px-Decor_Ice_Snow.png"
-          }
-        }
-      ],
-      "availablePikminTypes": [
-        "blue",
-        "white",
-        "ice"
       ]
     },
     {
