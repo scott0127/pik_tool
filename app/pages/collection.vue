@@ -160,6 +160,14 @@
                 <h2 class="text-lg font-bold text-gray-800">{{ def.category.name }}</h2>
                 <p class="text-xs text-gray-500">{{ def.category.nameEn }}</p>
               </div>
+              <button
+                @click="handleCollectAll(def.category.id, def.category.name)"
+                class="px-3 py-1.5 bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-medium rounded-lg transition-colors flex items-center gap-1 shadow-sm hover:shadow"
+                title="收藏此分類的全部皮克敏"
+              >
+                <span>✨</span>
+                <span>收藏全部</span>
+              </button>
               <div class="text-right">
                 <p class="text-sm font-bold text-emerald-600">{{ getCategoryProgress(def.category.id) }}</p>
                 <p class="text-xs text-gray-400">已蒐集</p>
@@ -209,6 +217,14 @@
                 <h2 class="text-lg font-bold text-gray-800">{{ def.category.name }}</h2>
                 <p class="text-xs text-gray-500">{{ def.category.nameEn }}</p>
               </div>
+              <button
+                @click="handleCollectAll(def.category.id, def.category.name)"
+                class="px-3 py-1.5 bg-purple-500 hover:bg-purple-600 text-white text-xs font-medium rounded-lg transition-colors flex items-center gap-1 shadow-sm hover:shadow"
+                title="收藏此分類的全部皮克敏"
+              >
+                <span>✨</span>
+                <span>收藏全部</span>
+              </button>
               <div class="text-right">
                 <p class="text-sm font-bold text-purple-600">{{ getCategoryProgress(def.category.id) }}</p>
                 <p class="text-xs text-gray-400">已蒐集</p>
@@ -279,7 +295,7 @@
 import { DECOR_CATEGORY_TYPES, PIKMIN_TYPE_NAMES, type PikminType, type DecorCategoryType, type DecorItem } from '~/types/decor';
 
 const route = useRoute();
-const { isCollected } = useCollection();
+const { isCollected, collectAllInCategory } = useCollection();
 const { getAllDecorItems, getDecorDefinitions, getItemsByCategoryType, searchItems, getItemsByCategory } = useDecorData();
 
 // Filter state
@@ -479,5 +495,22 @@ const clearAllFilters = () => {
   collectionFilter.value = 'all';
   isLimitedMode.value = false;
   selectedCategoryId.value = null;
+};
+
+// Handle collect all button click with confirmation
+const handleCollectAll = (categoryId: string, categoryName: string) => {
+  const items = getItemsByCategory(categoryId);
+  const uncollectedCount = items.filter(item => !isCollected(item.id)).length;
+  
+  if (uncollectedCount === 0) {
+    alert(`「${categoryName}」已經收藏完畢！`);
+    return;
+  }
+  
+  const confirmed = confirm(`確定要收藏「${categoryName}」的全部 ${items.length} 隻皮克敏嗎？\n（還有 ${uncollectedCount} 隻未收藏）`);
+  
+  if (confirmed) {
+    collectAllInCategory(categoryId);
+  }
 };
 </script>
