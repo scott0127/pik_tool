@@ -50,6 +50,7 @@ const loadingPromises = new Map<SupportedRegion, Promise<RegionData | null>>();
 
 /**
  * 動態載入區域資料
+ * 從 public/data/regions/ 資料夾 fetch JSON，避免 build 時打包進 bundle
  */
 async function loadRegionData(regionId: SupportedRegion): Promise<RegionData | null> {
   // 檢查快取
@@ -65,9 +66,12 @@ async function loadRegionData(regionId: SupportedRegion): Promise<RegionData | n
   // 開始載入
   const loadPromise = (async () => {
     try {
-      // 動態載入 JSON 檔案
-      const data = await import(`~/data/regions/${regionId}.json`);
-      const regionData: RegionData = data.default;
+      // 從 public 資料夾 fetch JSON（運行時載入，不會打包進 bundle）
+      const response = await fetch(`/data/regions/${regionId}.json`);
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+      const regionData: RegionData = await response.json();
       regionCache.set(regionId, regionData);
       console.log(`[LocalFirstPOI] 載入 ${regionData.regionName} 資料成功，共 ${regionData.pois.length} 個 POI`);
       return regionData;
