@@ -88,7 +88,17 @@
     0%, 100% { transform: rotate(-5deg); }
     50% { transform: rotate(5deg); }
   }
-  
+
+  /* Marquee animation */
+  .animate-marquee {
+    animation: marquee 8s linear infinite;
+  }
+
+  @keyframes marquee {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+
   /* Pop in animation */
   .pop-in {
     animation: popIn 0.3s ease-out;
