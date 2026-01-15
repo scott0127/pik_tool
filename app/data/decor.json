@@ -1632,8 +1632,7 @@
           "imageUrls": {
             "yellow": "https://pikmin.wiki.gallery/images/thumb/4/4c/Decor_Yellow_Fairy_Lights_1.png/150px-Decor_Yellow_Fairy_Lights_1.png"
           }
-        }
-        ,
+        },
         {
           "id": "battery_8",
           "name": "仙女燈2",
@@ -2730,15 +2729,15 @@
       "category": {
         "id": "ice-cream",
         "name": "冰淇淋",
-        "nameEn": "Ice Cream",
+        "nameEn": "Ice Cream: Classic",
         "type": "special",
         "icon": "🍦"
       },
       "variants": [
         {
           "id": "ice_cream_1",
-          "name": "冰淇淋A",
-          "nameEn": "Ice Cream 1",
+          "name": "冰淇淋(經典)",
+          "nameEn": "Ice Cream: Classic",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/1/1b/Decor_Red_Ice_Cream_1.png/100px-Decor_Red_Ice_Cream_1.png",
           "imageUrls": {
             "red": "https://pikmin.wiki.gallery/images/thumb/1/1b/Decor_Red_Ice_Cream_1.png/100px-Decor_Red_Ice_Cream_1.png",
@@ -2753,8 +2752,8 @@
         },
         {
           "id": "ice_cream_2",
-          "name": "冰淇淋B",
-          "nameEn": "Ice Cream 2",
+          "name": "冰淇淋2024",
+          "nameEn": "Ice Cream: 2024 Flavor",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/1/12/Decor_Red_Ice_Cream_2.png/100px-Decor_Red_Ice_Cream_2.png",
           "imageUrls": {
             "red": "https://pikmin.wiki.gallery/images/thumb/1/12/Decor_Red_Ice_Cream_2.png/100px-Decor_Red_Ice_Cream_2.png",
@@ -2781,16 +2780,16 @@
     {
       "category": {
         "id": "puzzle",
-        "name": "拼圖",
+        "name": "拼圖(2021、2022、2023、2024)",
         "nameEn": "Puzzle",
         "type": "special",
         "icon": "🧩"
       },
       "variants": [
         {
-          "id": "puzzle_1",
-          "name": "拼圖A",
-          "nameEn": "Puzzle 1",
+          "id": "puzzle_2021 Fall Memories",
+          "name": "拼圖2021冬季回憶",
+          "nameEn": "Puzzle 2021 Fall Memories",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/c/c1/Decor_Red_Puzzle_1.png/100px-Decor_Red_Puzzle_1.png",
           "imageUrls": {
             "red": "https://pikmin.wiki.gallery/images/thumb/c/c1/Decor_Red_Puzzle_1.png/100px-Decor_Red_Puzzle_1.png",
@@ -2803,9 +2802,9 @@
           }
         },
         {
-          "id": "puzzle_2",
-          "name": "拼圖B",
-          "nameEn": "Puzzle 2",
+          "id": "puzzle_2022 Summer Memories",
+          "name": "拼圖2022夏季回憶",
+          "nameEn": "Puzzle 2022 Summer Memories",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/c/c4/Decor_Red_Puzzle_2.png/100px-Decor_Red_Puzzle_2.png",
           "imageUrls": {
             "red": "https://pikmin.wiki.gallery/images/thumb/c/c4/Decor_Red_Puzzle_2.png/100px-Decor_Red_Puzzle_2.png",
@@ -2818,9 +2817,9 @@
           }
         },
         {
-          "id": "puzzle_4",
-          "name": "拼圖D",
-          "nameEn": "Puzzle 4",
+          "id": "puzzle_2023 Summer Memories",
+          "name": "拼圖2023夏季回憶",
+          "nameEn": "Puzzle 2023 Summer Memories",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/0/05/Decor_Red_Puzzle_4.png/100px-Decor_Red_Puzzle_4.png",
           "imageUrls": {
             "red": "https://pikmin.wiki.gallery/images/thumb/0/05/Decor_Red_Puzzle_4.png/100px-Decor_Red_Puzzle_4.png",
@@ -2833,9 +2832,9 @@
           }
         },
         {
-          "id": "puzzle_3",
-          "name": "拼圖C",
-          "nameEn": "Puzzle 3",
+          "id": "puzzle_2024 Fall Memories",
+          "name": "拼圖2024秋季回憶",
+          "nameEn": "Puzzle 2024 Fall Memories",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/0/06/Decor_Red_Puzzle_3.png/100px-Decor_Red_Puzzle_3.png",
           "imageUrls": {
             "red": "https://pikmin.wiki.gallery/images/thumb/0/06/Decor_Red_Puzzle_3.png/100px-Decor_Red_Puzzle_3.png",
