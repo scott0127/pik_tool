@@ -5,6 +5,18 @@ export default defineNuxtConfig({
   
   modules: ['@nuxtjs/tailwindcss', '@nuxtjs/supabase', '@nuxt/icon'],
   
+  // Icon 配置：noto 使用 API 模式（避免打包 24MB 的 emoji 套件）
+  icon: {
+    // 只有 line-md 使用本地套件（1.4MB），其他用 Iconify API
+    serverBundle: {
+      collections: ['line-md'],
+    },
+    // noto icons 透過 CDN API 載入
+    clientBundle: {
+      scan: true, // 掃描使用到的 icons
+    },
+  },
+  
   tailwindcss: {
     cssPath: '~/assets/css/main.css',
     configPath: 'tailwind.config.js',

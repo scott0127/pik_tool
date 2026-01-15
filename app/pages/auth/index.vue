@@ -186,7 +186,10 @@
           <span class="text-sm text-gray-400 font-medium">或</span>
           <div class="flex-1 h-px bg-gradient-to-r from-transparent via-gray-300 to-transparent"></div>
         </div>
-
+        <p class="text-center text-sm text-gray-400 mt-4 px-4 leading-relaxed">
+          ⚠️ 登入後仍需在圖鑑中手動點擊收藏。<br>
+          <span class="text-gray-500">登入功能僅將本網站的收藏資料儲存至雲端，並不會與 Pikmin Bloom 遊戲資料連動。</span>
+        </p>
         <!-- Google Sign In -->
         <button
           @click="signInWithGoogle"
