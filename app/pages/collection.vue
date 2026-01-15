@@ -155,7 +155,7 @@
           >
             <!-- Category Header -->
             <div class="flex items-center gap-3 mb-4 sticky top-[120px] z-10 bg-gradient-to-r from-emerald-50/95 to-teal-50/95 backdrop-blur-sm -mx-4 px-4 py-3 rounded-xl">
-              <span class="text-2xl">{{ def.category.icon }}</span>
+              <Icon :name="def.category.icon" class="text-2xl" />
               <div class="flex-1">
                 <h2 class="text-lg font-bold text-gray-800">{{ def.category.name }}</h2>
                 <p class="text-xs text-gray-500">{{ def.category.nameEn }}</p>
@@ -212,7 +212,7 @@
           >
             <!-- Category Header -->
             <div class="flex items-center gap-3 mb-4 sticky top-[120px] z-10 bg-gradient-to-r from-purple-50/95 to-pink-50/95 backdrop-blur-sm -mx-4 px-4 py-3 rounded-xl">
-              <span class="text-2xl">{{ def.category.icon }}</span>
+              <Icon :name="def.category.icon" class="text-2xl" />
               <div class="flex-1">
                 <h2 class="text-lg font-bold text-gray-800">{{ def.category.name }}</h2>
                 <p class="text-xs text-gray-500">{{ def.category.nameEn }}</p>

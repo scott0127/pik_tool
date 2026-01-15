@@ -53,7 +53,7 @@
           v-else 
           class="w-full h-full flex items-center justify-center text-5xl"
         >
-          {{ category?.icon || '🌸' }}
+          <Icon :name="category?.icon || 'line-md:question-circle'" class="text-4xl" />
         </div>
 
         <!-- Pikmin Type Badge -->

@@ -34,7 +34,7 @@
                 $route.path === link.to ? 'nav-item-active' : 'nav-item-inactive'
               ]"
             >
-              <span class="text-lg">{{ link.icon }}</span>
+              <Icon :name="link.icon" class="text-2xl" />
               <span class="hidden lg:inline">{{ link.name }}</span>
             </NuxtLink>
           </nav>
@@ -299,7 +299,7 @@
                     : 'bg-white/60 text-gray-600 hover:bg-white'
                 ]"
               >
-                <span class="text-2xl">{{ link.icon }}</span>
+                <Icon :name="link.icon" class="text-3xl mb-1" />
                 <span class="text-xs font-semibold">{{ link.name }}</span>
               </NuxtLink>
             </div>
@@ -641,10 +641,10 @@ const user = computed(() => authStore.user.value);
 const userInitial = computed(() => authStore.userInitial.value);
 
 const navLinks = [
-  { to: '/', name: '首頁', icon: '🏠' },
-  { to: '/collection', name: '圖鑑', icon: '📖' },
-  { to: '/map', name: '地圖', icon: '🗺️' },
-  { to: '/friends', name: '好友', icon: '🤝' },
+  { to: '/', name: '首頁', icon: 'line-md:home-md' },
+  { to: '/collection', name: '圖鑑', icon: 'line-md:text-box' },
+  { to: '/map', name: '地圖', icon: 'line-md:map-marker' },
+  { to: '/friends', name: '好友', icon: 'line-md:account' },
 ];
 
 const isLoggingOut = ref(false);

@@ -41,7 +41,7 @@
           class="glass rounded-2xl p-5 text-left transition-all duration-300 hover:shadow-xl hover:scale-[1.02] group"
         >
           <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-orange-400 to-red-500 flex items-center justify-center mb-3 shadow-lg group-hover:scale-110 transition-transform">
-            <span class="text-2xl">❓</span>
+            <Icon name="line-md:question-circle" class="text-3xl text-white" />
           </div>
           <h3 class="font-bold text-gray-800 mb-1">我還缺什麼？</h3>
           <p class="text-sm text-gray-500 mb-2">快速找到未蒐集飾品</p>
@@ -57,7 +57,7 @@
           class="glass rounded-2xl p-5 text-left transition-all duration-300 hover:shadow-xl hover:scale-[1.02] group"
         >
           <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-purple-400 to-indigo-500 flex items-center justify-center mb-3 shadow-lg group-hover:scale-110 transition-transform">
-            <span class="text-2xl">🔒</span>
+            <Icon name="line-md:alert-circle" class="text-3xl text-white" />
           </div>
           <h3 class="font-bold text-gray-800 mb-1">無法取得？</h3>
           <p class="text-sm text-gray-500 mb-2">地區/活動限定飾品</p>
@@ -73,7 +73,7 @@
           class="glass rounded-2xl p-5 text-left transition-all duration-300 hover:shadow-xl hover:scale-[1.02] group"
         >
           <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center mb-3 shadow-lg group-hover:scale-110 transition-transform">
-            <span class="text-2xl">🎯</span>
+            <Icon name="line-md:my-location-loop" class="text-3xl text-white" />
           </div>
           <h3 class="font-bold text-gray-800 mb-1">即將完成！</h3>
           <p class="text-sm text-gray-500 mb-2">差一點就完成的類別</p>
@@ -89,7 +89,7 @@
           class="glass rounded-2xl p-5 text-left transition-all duration-300 hover:shadow-xl hover:scale-[1.02] group"
         >
           <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-pink-400 to-rose-500 flex items-center justify-center mb-3 shadow-lg group-hover:scale-110 transition-transform">
-            <span class="text-2xl">🌈</span>
+            <Icon name="line-md:star-pulsating-loop" class="text-3xl text-white" />
           </div>
           <h3 class="font-bold text-gray-800 mb-1">按類型查看</h3>
           <p class="text-sm text-gray-500 mb-2">選擇皮克敏類型篩選</p>

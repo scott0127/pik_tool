@@ -9,7 +9,7 @@
         "name": "餐廳",
         "nameEn": "Restaurant",
         "type": "regular",
-        "icon": "🍽️"
+        "icon": "noto:man-cook"
       },
       "variants": [
         {
@@ -61,7 +61,7 @@
         "name": "咖啡廳",
         "nameEn": "Café",
         "type": "regular",
-        "icon": "☕"
+        "icon": "noto:hot-beverage"
       },
       "variants": [
         {
@@ -111,7 +111,7 @@
         "name": "甜點店",
         "nameEn": "Sweetshop",
         "type": "regular",
-        "icon": "🍰"
+        "icon": "noto:doughnut"
       },
       "variants": [
         {
@@ -161,7 +161,7 @@
         "name": "電影院",
         "nameEn": "Movie Theater",
         "type": "regular",
-        "icon": "🎬"
+        "icon": "noto:popcorn"
       },
       "variants": [
         {
@@ -196,7 +196,7 @@
         "name": "藥局",
         "nameEn": "Pharmacy",
         "type": "regular",
-        "icon": "💊"
+        "icon": "noto:toothbrush"
       },
       "variants": [
         {
@@ -231,7 +231,7 @@
         "name": "動物園",
         "nameEn": "Zoo",
         "type": "regular",
-        "icon": "🦁"
+        "icon": "noto:blossom"
       },
       "variants": [
         {
@@ -266,7 +266,7 @@
         "name": "森林",
         "nameEn": "Forest",
         "type": "regular",
-        "icon": "🌲"
+        "icon": "noto:deciduous-tree"
       },
       "variants": [
         {
@@ -316,7 +316,7 @@
         "name": "水邊",
         "nameEn": "Waterside",
         "type": "regular",
-        "icon": "🌊"
+        "icon": "noto:fishing-pole"
       },
       "variants": [
         {
@@ -366,7 +366,7 @@
         "name": "郵局",
         "nameEn": "Post Office",
         "type": "regular",
-        "icon": "✉️"
+        "icon": "noto:postbox"
       },
       "variants": [
         {
@@ -401,7 +401,7 @@
         "name": "美術館",
         "nameEn": "Art Gallery",
         "type": "regular",
-        "icon": "🎨"
+        "icon": "noto:framed-picture"
       },
       "variants": [
         {
@@ -436,7 +436,7 @@
         "name": "機場",
         "nameEn": "Airport",
         "type": "regular",
-        "icon": "✈️"
+        "icon": "noto:airplane"
       },
       "variants": [
         {
@@ -471,7 +471,7 @@
         "name": "車站",
         "nameEn": "Station",
         "type": "regular",
-        "icon": "🚂"
+        "icon": "noto:locomotive"
       },
       "variants": [
         {
@@ -530,7 +530,7 @@
         "name": "海邊",
         "nameEn": "Beach",
         "type": "regular",
-        "icon": "🏖️"
+        "icon": "noto:spiral-shell"
       },
       "variants": [
         {
@@ -565,7 +565,7 @@
         "name": "漢堡店",
         "nameEn": "Hamburger Shop",
         "type": "regular",
-        "icon": "🍔"
+        "icon": "noto:hamburger"
       },
       "variants": [
         {
@@ -600,7 +600,7 @@
         "name": "便利商店",
         "nameEn": "Convenience Store",
         "type": "regular",
-        "icon": "🏪"
+        "icon": "noto:beverage-box"
       },
       "variants": [
         {
@@ -650,7 +650,7 @@
         "name": "超市",
         "nameEn": "Supermarket",
         "type": "regular",
-        "icon": "🛒"
+        "icon": "noto:banana"
       },
       "variants": [
         {
@@ -715,7 +715,7 @@
         "name": "麵包店",
         "nameEn": "Bakery",
         "type": "regular",
-        "icon": "🥐"
+        "icon": "noto:baguette-bread"
       },
       "variants": [
         {
@@ -765,7 +765,7 @@
         "name": "美髮院",
         "nameEn": "Hair Salon",
         "type": "regular",
-        "icon": "💇"
+        "icon": "noto:scissors"
       },
       "variants": [
         {
@@ -815,7 +815,7 @@
         "name": "服飾店",
         "nameEn": "Clothes Store",
         "type": "regular",
-        "icon": "👔"
+        "icon": "noto:ribbon"
       },
       "variants": [
         {
@@ -850,7 +850,7 @@
         "name": "公園",
         "nameEn": "Park",
         "type": "regular",
-        "icon": "🍀"
+        "icon": "noto:four-leaf-clover"
       },
       "variants": [
         {
@@ -900,7 +900,7 @@
         "name": "圖書館／書店",
         "nameEn": "Library",
         "type": "regular",
-        "icon": "📚"
+        "icon": "noto:books"
       },
       "variants": [
         {
@@ -935,7 +935,7 @@
         "name": "路邊",
         "nameEn": "Roadside",
         "type": "regular",
-        "icon": "🏷️"
+        "icon": "noto:coin"
       },
       "variants": [
         {
@@ -1036,7 +1036,7 @@
         "name": "壽司店",
         "nameEn": "Sushi Restaurant",
         "type": "regular",
-        "icon": "🍣"
+        "icon": "noto:sushi"
       },
       "variants": [
         {
@@ -1071,7 +1071,7 @@
         "name": "山丘",
         "nameEn": "Mountain",
         "type": "regular",
-        "icon": "⛰️"
+        "icon": "noto:snow-capped-mountain"
       },
       "variants": [
         {
@@ -1106,7 +1106,7 @@
         "name": "體育館",
         "nameEn": "Stadium",
         "type": "regular",
-        "icon": "🏟️"
+        "icon": "noto:soccer-ball"
       },
       "variants": [
         {
@@ -1141,7 +1141,7 @@
         "name": "雨天",
         "nameEn": "Rainy Weather",
         "type": "regular",
-        "icon": "🌧️"
+        "icon": "noto:umbrella"
       },
       "variants": [
         {
@@ -1182,7 +1182,7 @@
         "name": "下雪",
         "nameEn": "Snowy Weather",
         "type": "regular",
-        "icon": "🌨️"
+        "icon": "noto:snowflake"
       },
       "variants": [
         {
@@ -1209,7 +1209,7 @@
         "name": "主題樂園",
         "nameEn": "Theme Park",
         "type": "regular",
-        "icon": "🎢"
+        "icon": "noto:ferris-wheel"
       },
       "variants": [
         {
@@ -1247,7 +1247,7 @@
         "name": "公車站",
         "nameEn": "Bus Stop",
         "type": "regular",
-        "icon": "🚌"
+        "icon": "noto:bus"
       },
       "variants": [
         {
@@ -1282,7 +1282,7 @@
         "name": "義式餐廳",
         "nameEn": "Italian Restaurant",
         "type": "regular",
-        "icon": "🍕"
+        "icon": "noto:pizza"
       },
       "variants": [
         {
@@ -1332,7 +1332,7 @@
         "name": "拉麵店",
         "nameEn": "Ramen Shop",
         "type": "regular",
-        "icon": "🥡"
+        "icon": "noto:steaming-bowl"
       },
       "variants": [
         {
@@ -1367,7 +1367,7 @@
         "name": "橋樑",
         "nameEn": "Bridge",
         "type": "regular",
-        "icon": "🌉"
+        "icon": "noto:bridge-at-night"
       },
       "variants": [
         {
@@ -1402,7 +1402,7 @@
         "name": "飯店",
         "nameEn": "Hotel",
         "type": "regular",
-        "icon": "🏨"
+        "icon": "noto:key"
       },
       "variants": [
         {
@@ -1437,7 +1437,7 @@
         "name": "化妝品商店",
         "nameEn": "Cosmetics Store",
         "type": "regular",
-        "icon": "💄"
+        "icon": "noto:lipstick"
       },
       "variants": [
         {
@@ -1472,7 +1472,7 @@
         "name": "神社",
         "nameEn": "Shrine",
         "type": "regular",
-        "icon": "⛩️"
+        "icon": "noto:shinto-shrine"
       },
       "variants": [
         {
@@ -1567,7 +1567,7 @@
         "name": "電器行",
         "nameEn": "Electronics Store",
         "type": "regular",
-        "icon": "🔌"
+        "icon": "noto:battery"
       },
       "variants": [
         {
@@ -1653,7 +1653,7 @@
         "name": "咖哩餐廳",
         "nameEn": "Curry Restaurant",
         "type": "regular",
-        "icon": "🍛"
+        "icon": "noto:curry-rice"
       },
       "variants": [
         {
@@ -1688,7 +1688,7 @@
         "name": "五金行",
         "nameEn": "Hardware Store",
         "type": "regular",
-        "icon": "🔧"
+        "icon": "noto:hammer"
       },
       "variants": [
         {
@@ -1723,7 +1723,7 @@
         "name": "大學&學院",
         "nameEn": "University",
         "type": "regular",
-        "icon": "🎓"
+        "icon": "noto:graduation-cap"
       },
       "variants": [
         {
@@ -1750,7 +1750,7 @@
         "name": "墨西哥餐廳",
         "nameEn": "Taco Restaurant",
         "type": "regular",
-        "icon": "🌮"
+        "icon": "noto:taco"
       },
       "variants": [
         {
@@ -1785,7 +1785,7 @@
         "name": "自主洗衣店&乾洗店",
         "nameEn": "Laundromat",
         "type": "regular",
-        "icon": "🧺"
+        "icon": "noto:t-shirt"
       },
       "variants": [
         {
@@ -1820,7 +1820,7 @@
         "name": "韓式餐廳",
         "nameEn": "Korean Restaurant",
         "type": "regular",
-        "icon": "🇰🇷"
+        "icon": "noto:pot-of-food"
       },
       "variants": [
         {
@@ -1843,7 +1843,7 @@
         "name": "瑪利歐",
         "nameEn": "Mario",
         "type": "special",
-        "icon": "🍄"
+        "icon": "noto:mushroom"
       },
       "variants": [
         {
@@ -1866,7 +1866,7 @@
         "name": "農曆新年",
         "nameEn": "Lunar New Year",
         "type": "special",
-        "icon": "🧧"
+        "icon": "noto:tangerine"
       },
       "variants": [
         {
@@ -1916,7 +1916,7 @@
         "name": "西洋棋",
         "nameEn": "Chess",
         "type": "special",
-        "icon": "♟️"
+        "icon": "noto:chess-pawn"
       },
       "variants": [
         {
@@ -1966,7 +1966,7 @@
         "name": "指板",
         "nameEn": "Fingerboard",
         "type": "special",
-        "icon": "🛹"
+        "icon": "noto:skateboard"
       },
       "variants": [
         {
@@ -2001,7 +2001,7 @@
         "name": "花札",
         "nameEn": "Hanafuda",
         "type": "special",
-        "icon": "🎴"
+        "icon": "noto:flower-playing-cards"
       },
       "variants": [
         {
@@ -2125,7 +2125,7 @@
         "name": "南瓜燈",
         "nameEn": "Jack-o'-Lantern",
         "type": "special",
-        "icon": "🎃"
+        "icon": "noto:red-paper-lantern"
       },
       "variants": [
         {
@@ -2159,7 +2159,7 @@
         "name": "萬聖節糖果",
         "nameEn": "Halloween Treat",
         "type": "special",
-        "icon": "🍬"
+        "icon": "noto:jack-o-lantern"
       },
       "variants": [
         {
@@ -2193,7 +2193,7 @@
         "name": "萬聖節燈光",
         "nameEn": "Halloween Light",
         "type": "special",
-        "icon": "🔦"
+        "icon": "noto:jack-o-lantern"
       },
       "variants": [
         {
@@ -2227,7 +2227,7 @@
         "name": "一週年紀念零食",
         "nameEn": "First Anniversary Snack",
         "type": "special",
-        "icon": "🎂"
+        "icon": "noto:birthday-cake"
       },
       "variants": [
         {
@@ -2261,7 +2261,7 @@
         "name": "Koppaite 太空衣",
         "nameEn": "Koppaite Space Suit",
         "type": "special",
-        "icon": "👨‍🚀"
+        "icon": "noto:rocket"
       },
       "variants": [
         {
@@ -2288,7 +2288,7 @@
         "name": "連指手套",
         "nameEn": "Mitten",
         "type": "special",
-        "icon": "🧤"
+        "icon": "noto:gloves"
       },
       "variants": [
         {
@@ -2322,7 +2322,7 @@
         "name": "2023年眼鏡",
         "nameEn": "2023 Glasses",
         "type": "special",
-        "icon": "🕶️"
+        "icon": "noto:glasses"
       },
       "variants": [
         {
@@ -2356,7 +2356,7 @@
         "name": "2024年眼鏡",
         "nameEn": "2024 Glasses",
         "type": "special",
-        "icon": "🕶️"
+        "icon": "noto:glasses"
       },
       "variants": [
         {
@@ -2390,7 +2390,7 @@
         "name": "情人節貼紙",
         "nameEn": "Valentine's Day Sticker",
         "type": "special",
-        "icon": "💝"
+        "icon": "noto:heart-with-arrow"
       },
       "variants": [
         {
@@ -2424,7 +2424,7 @@
         "name": "反向情人節貼紙",
         "nameEn": "Reverse Valentine's Day Sticker",
         "type": "special",
-        "icon": "💙"
+        "icon": "noto:revolving-hearts"
       },
       "variants": [
         {
@@ -2458,7 +2458,7 @@
         "name": "禮物貼紙(金色)",
         "nameEn": "Present Sticker (Gold)",
         "type": "special",
-        "icon": "💛"
+        "icon": "noto:wrapped-gift"
       },
       "variants": [
         {
@@ -2490,7 +2490,7 @@
         "name": "復活節彩蛋",
         "nameEn": "Easter Egg",
         "type": "special",
-        "icon": "🥚"
+        "icon": "noto:egg"
       },
       "variants": [
         {
@@ -2524,7 +2524,7 @@
         "name": "兔子蛋",
         "nameEn": "Bunny Egg",
         "type": "special",
-        "icon": "🐰"
+        "icon": "noto:rabbit-face"
       },
       "variants": [
         {
@@ -2558,7 +2558,7 @@
         "name": "運動鞋鑰匙圈",
         "nameEn": "Sneaker Keychain",
         "type": "special",
-        "icon": "👟"
+        "icon": "noto:running-shoe"
       },
       "variants": [
         {
@@ -2592,7 +2592,7 @@
         "name": "Pikmin 4",
         "nameEn": "Pikmin 4",
         "type": "special",
-        "icon": "🚀"
+        "icon": "noto:video-game"
       },
       "variants": [
         {
@@ -2644,7 +2644,7 @@
         "name": "麻將",
         "nameEn": "Mahjong",
         "type": "special",
-        "icon": "🀄"
+        "icon": "noto:mahjong-red-dragon"
       },
       "variants": [
         {
@@ -2731,7 +2731,7 @@
         "name": "冰淇淋",
         "nameEn": "Ice Cream: Classic",
         "type": "special",
-        "icon": "🍦"
+        "icon": "noto:ice-cream"
       },
       "variants": [
         {
@@ -2783,7 +2783,7 @@
         "name": "拼圖(2021、2022、2023、2024)",
         "nameEn": "Puzzle",
         "type": "special",
-        "icon": "🧩"
+        "icon": "noto:sun"
       },
       "variants": [
         {
@@ -2863,7 +2863,7 @@
         "name": "春季貼紙",
         "nameEn": "Spring Sticker",
         "type": "special",
-        "icon": "🌸"
+        "icon": "noto:cherry-blossom"
       },
       "variants": [
         {
@@ -2898,7 +2898,7 @@
         "name": "夏季貼紙",
         "nameEn": "Summer Sticker",
         "type": "special",
-        "icon": "☀️"
+        "icon": "noto:sun"
       },
       "variants": [
         {
@@ -2933,7 +2933,7 @@
         "name": "秋季貼紙",
         "nameEn": "Fall Sticker",
         "type": "special",
-        "icon": "🍂"
+        "icon": "noto:fallen-leaf"
       },
       "variants": [
         {
@@ -2968,7 +2968,7 @@
         "name": "冬季貼紙",
         "nameEn": "Winter Sticker",
         "type": "special",
-        "icon": "❄️"
+        "icon": "noto:snowflake"
       },
       "variants": [
         {
@@ -3003,7 +3003,7 @@
         "name": "撲克牌",
         "nameEn": "Playing Card",
         "type": "special",
-        "icon": "🃏"
+        "icon": "noto:spade-suit"
       },
       "variants": [
         {
@@ -3082,7 +3082,7 @@
         "name": "起司店",
         "nameEn": "Cheese Shop",
         "type": "special",
-        "icon": "🧀"
+        "icon": "noto:cheese-wedge"
       },
       "variants": [
         {
@@ -3117,7 +3117,7 @@
         "name": "水族館",
         "nameEn": "Aquarium",
         "type": "special",
-        "icon": "🐠"
+        "icon": "noto:tropical-fish"
       },
       "variants": [
         {
@@ -3152,7 +3152,7 @@
         "name": "藝術工作室",
         "nameEn": "Art Studio",
         "type": "special",
-        "icon": "🖌️"
+        "icon": "noto:artist-palette"
       },
       "variants": [
         {
@@ -3187,7 +3187,7 @@
         "name": "緞帶花飾",
         "nameEn": "Rosette",
         "type": "special",
-        "icon": "🎀"
+        "icon": "noto:rosette"
       },
       "variants": [
         {
@@ -3212,7 +3212,7 @@
         "name": "三週年紀念紙杯蛋糕",
         "nameEn": "3rd Anniversary Cupcake",
         "type": "special",
-        "icon": "🧁"
+        "icon": "noto:cupcake"
       },
       "variants": [
         {
@@ -3246,7 +3246,7 @@
         "name": "裝飾球",
         "nameEn": "Ball Ornament",
         "type": "special",
-        "icon": "🎄"
+        "icon": "noto:christmas-tree"
       },
       "variants": [
         {
@@ -3280,7 +3280,7 @@
         "name": "派對禮炮 2025",
         "nameEn": "Party Popper 2025",
         "type": "special",
-        "icon": "🎉"
+        "icon": "noto:party-popper"
       },
       "variants": [
         {
@@ -3314,7 +3314,7 @@
         "name": "巧克力",
         "nameEn": "Chocolate",
         "type": "special",
-        "icon": "🍫"
+        "icon": "noto:chocolate-bar"
       },
       "variants": [
         {
@@ -3348,7 +3348,7 @@
         "name": "里約嘉年華",
         "nameEn": "Rio Carnival",
         "type": "special",
-        "icon": "🎭"
+        "icon": "noto:confetti-ball"
       },
       "variants": [
         {
@@ -3383,7 +3383,7 @@
         "name": "下午茶店",
         "nameEn": "Afternoon Tea",
         "type": "special",
-        "icon": "🫖"
+        "icon": "noto:teapot"
       },
       "variants": [
         {
@@ -3418,7 +3418,7 @@
         "name": "任天堂主機",
         "nameEn": "Nintendo Consoles '80-'95",
         "type": "special",
-        "icon": "🎮"
+        "icon": "noto:video-game"
       },
       "variants": [
         {
@@ -3453,7 +3453,7 @@
         "name": "小型樂器",
         "nameEn": "Tiny Instrument",
         "type": "special",
-        "icon": "🎵"
+        "icon": "noto:musical-note"
       },
       "variants": [
         {
@@ -3488,7 +3488,7 @@
         "name": "衝浪店",
         "nameEn": "Surf Shop",
         "type": "special",
-        "icon": "🏄"
+        "icon": "noto:person-surfing"
       },
       "variants": [
         {
@@ -3523,7 +3523,7 @@
         "name": "刨冰店",
         "nameEn": "Shaved Ice Shop",
         "type": "special",
-        "icon": "🍧"
+        "icon": "noto:shaved-ice"
       },
       "variants": [
         {
@@ -3558,7 +3558,7 @@
         "name": "月餅店",
         "nameEn": "Mooncake Shop",
         "type": "special",
-        "icon": "🥮"
+        "icon": "noto:moon-cake"
       },
       "variants": [
         {
@@ -3593,7 +3593,7 @@
         "name": "照相館",
         "nameEn": "Photo Studio",
         "type": "special",
-        "icon": "📷"
+        "icon": "noto:camera-with-flash"
       },
       "variants": [
         {
@@ -3616,7 +3616,7 @@
         "name": "亡靈節",
         "nameEn": "Day of the Dead",
         "type": "special",
-        "icon": "💀"
+        "icon": "noto:skull"
       },
       "variants": [
         {
@@ -3651,7 +3651,7 @@
         "name": "四週年紀念花盒",
         "nameEn": "4th Anniversary Flower Box",
         "type": "special",
-        "icon": "💐"
+        "icon": "noto:bouquet"
       },
       "variants": [
         {
@@ -3687,7 +3687,7 @@
         "name": "四週年紀念零食",
         "nameEn": "4th Anniversary Snack",
         "type": "special",
-        "icon": "🍿"
+        "icon": "noto:birthday-cake"
       },
       "variants": [
         {
@@ -3721,7 +3721,7 @@
         "name": "2025年裝飾品",
         "nameEn": "2025 Ornament",
         "type": "special",
-        "icon": "🎄"
+        "icon": "noto:wrapped-gift"
       },
       "variants": [
         {
@@ -3756,7 +3756,7 @@
         "name": "嬰兒用品店",
         "nameEn": "Baby Store",
         "type": "special",
-        "icon": "👶"
+        "icon": "noto:baby-bottle"
       },
       "variants": [
         {
@@ -3779,7 +3779,7 @@
         "name": "御節料理店",
         "nameEn": "Osechi Shop",
         "type": "special",
-        "icon": "🍱"
+        "icon": "noto:bento-box"
       },
       "variants": [
         {
@@ -3816,7 +3816,7 @@
         "name": "金色飛機玩具",
         "nameEn": "Golden Toy Airplane",
         "type": "special",
-        "icon": "✈️"
+        "icon": "noto:airplane"
       },
       "variants": [
         {
