@@ -15,7 +15,15 @@ export default defineNuxtConfig({
     redirectOptions: {
       login: '/auth',
       callback: '/auth/callback',
-      exclude: ['/', '/collection', '/progress', '/friends', '/map', '/auth', '/auth/callback', '/auth/reset-password'],
+      exclude: ['/', '/collection', '/progress', '/friends', '/map', '/auth', '/auth/callback', '/auth/reset-password', '/auth/update-password'],
+    },
+    // 使用 implicit flow 避免 PKCE code_verifier 問題
+    clientOptions: {
+      auth: {
+        flowType: 'implicit',
+        detectSessionInUrl: true,
+        persistSession: true,
+      },
     },
   },
   

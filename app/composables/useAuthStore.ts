@@ -137,13 +137,15 @@ export const useAuthStore = () => {
 
   /**
    * 發送密碼重置郵件
+   * 按照 Supabase PKCE 流程，redirectTo 直接指向更改密碼頁面
    */
   const resetPassword = async (email: string): Promise<void> => {
     isLoading.value = true;
     
     try {
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/auth/callback`,
+        // 直接導向更改密碼頁面（按照 Supabase 官方文件的 PKCE 流程）
+        redirectTo: `${window.location.origin}/auth/update-password`,
       });
       
       if (error) throw error;

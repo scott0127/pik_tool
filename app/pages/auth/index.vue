@@ -292,17 +292,20 @@ const signInWithGoogle = async () => {
   }
 };
 
-// 已登入则跳转首页
+// 已登入则跳转首页（但排除密碼更新頁面）
+const route = useRoute();
+const isUpdatePasswordPage = computed(() => route.path === '/auth/update-password');
+
 onMounted(async () => {
   await authStore.waitForInit();
-  if (authStore.isAuthenticated.value) {
+  if (authStore.isAuthenticated.value && !isUpdatePasswordPage.value) {
     router.push('/');
   }
 });
 
-// 监听登入成功
+// 监听登入成功（但排除密碼更新頁面）
 watch(() => authStore.isAuthenticated.value, (isAuth) => {
-  if (isAuth) {
+  if (isAuth && !isUpdatePasswordPage.value) {
     router.push('/');
   }
 });
