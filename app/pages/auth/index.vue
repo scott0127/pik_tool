@@ -135,14 +135,12 @@
                 密碼
               </span>
             </label>
-            <input
+            <PasswordInput
               v-model="password"
-              type="password"
-              required
-              minlength="6"
-              class="input-field"
+              :required="true"
+              :minlength="6"
               placeholder="••••••••"
-            >
+            />
           </div>
 
           <!-- Submit Button -->

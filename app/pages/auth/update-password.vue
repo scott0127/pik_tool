@@ -74,14 +74,12 @@
                   新密碼
                 </span>
               </label>
-              <input
+              <PasswordInput
                 v-model="newPassword"
-                type="password"
-                required
-                minlength="6"
-                class="input-field"
+                :required="true"
+                :minlength="6"
                 placeholder="請輸入至少 6 個字元"
-              >
+              />
             </div>
 
             <!-- Confirm Password -->
@@ -92,14 +90,12 @@
                   確認密碼
                 </span>
               </label>
-              <input
+              <PasswordInput
                 v-model="confirmPassword"
-                type="password"
-                required
-                minlength="6"
-                class="input-field"
+                :required="true"
+                :minlength="6"
                 placeholder="再次輸入新密碼"
-              >
+              />
             </div>
 
             <!-- Submit Button -->
@@ -218,7 +214,7 @@ onMounted(async () => {
       pageState.value = 'ready';
     } else {
       console.log('[UpdatePassword] No session found');
-      error.value = '請透過重置密碼郵件中的連結訪問此頁面';
+      error.value = '請透過重置密碼郵件中的連結訪問此頁面，並且驗證信件連結是一次性的，請重新申請密碼重置';
       pageState.value = 'error';
     }
   } catch (e: any) {

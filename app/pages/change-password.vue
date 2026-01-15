@@ -64,13 +64,11 @@
                 現有密碼
               </span>
             </label>
-            <input
+            <PasswordInput
               v-model="currentPassword"
-              type="password"
-              required
-              class="input-field"
+              :required="true"
               placeholder="請輸入現有密碼"
-            >
+            />
           </div>
 
           <!-- New Password -->
@@ -81,14 +79,12 @@
                 新密碼
               </span>
             </label>
-            <input
+            <PasswordInput
               v-model="newPassword"
-              type="password"
-              required
-              minlength="6"
-              class="input-field"
+              :required="true"
+              :minlength="6"
               placeholder="請輸入至少 6 個字元"
-            >
+            />
           </div>
 
           <!-- Confirm Password -->
@@ -99,14 +95,12 @@
                 確認新密碼
               </span>
             </label>
-            <input
+            <PasswordInput
               v-model="confirmPassword"
-              type="password"
-              required
-              minlength="6"
-              class="input-field"
+              :required="true"
+              :minlength="6"
               placeholder="再次輸入新密碼"
-            >
+            />
           </div>
 
           <!-- Submit Button -->
