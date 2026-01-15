@@ -30,12 +30,6 @@ importers:
         specifier: ^4.6.4
         version: 4.6.4(vue@3.5.26)
     devDependencies:
-      '@iconify-json/line-md':
-        specifier: ^1.2.13
-        version: 1.2.13
-      '@iconify-json/noto':
-        specifier: ^1.2.7
-        version: 1.2.7
       '@nuxt/icon':
         specifier: ^2.2.0
         version: 2.2.0(magicast@0.5.1)(vite@7.3.1(@types/node@25.0.3)(jiti@2.6.1)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.2))(vue@3.5.26)
@@ -541,12 +535,6 @@ packages:
     engines: {node: '>=18'}
     cpu: [x64]
     os: [win32]
-
-  '@iconify-json/line-md@1.2.13':
-    resolution: {integrity: sha512-XFXThXsEQ2Wzzn+ze2T1d+JHkkFvI1AxiVKnOox4qFbdR9EVikckZlUK+/DUsV4zSy6pMQAgXpIk+1xG8qFYPQ==}
-
-  '@iconify-json/noto@1.2.7':
-    resolution: {integrity: sha512-2pNHliXnMLpnepNTZwR9hPBSl6GmhIfXPnudFCHY5v9pJhmA7LoVb/pFY0qLDY/k+3ikET8RXRf7XFxc/pHObA==}
 
   '@iconify/collections@1.0.639':
     resolution: {integrity: sha512-lFgPu8Rsgk+HKW4PzmzCjmAEXmDS7J7eH8vlMCFV6Qn/qOMH4esisWLyvf8vEBleAp7fF66nNqVEqXlWSCQihQ==}
@@ -4377,14 +4365,6 @@ snapshots:
 
   '@esbuild/win32-x64@0.27.2':
     optional: true
-
-  '@iconify-json/line-md@1.2.13':
-    dependencies:
-      '@iconify/types': 2.0.0
-
-  '@iconify-json/noto@1.2.7':
-    dependencies:
-      '@iconify/types': 2.0.0
 
   '@iconify/collections@1.0.639':
     dependencies:
