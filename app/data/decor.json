@@ -1623,6 +1623,25 @@
           "imageUrls": {
             "yellow": "https://pikmin.wiki.gallery/images/thumb/5/50/Decor_Yellow_Battery_6.png/100px-Decor_Yellow_Battery_6.png"
           }
+        },
+        {
+          "id": "battery_7",
+          "name": "仙女燈1",
+          "nameEn": "Fairy Lights 1",
+          "imageUrl": "https://pikmin.wiki.gallery/images/thumb/4/4c/Decor_Yellow_Fairy_Lights_1.png/150px-Decor_Yellow_Fairy_Lights_1.png",
+          "imageUrls": {
+            "yellow": "https://pikmin.wiki.gallery/images/thumb/4/4c/Decor_Yellow_Fairy_Lights_1.png/150px-Decor_Yellow_Fairy_Lights_1.png"
+          }
+        }
+        ,
+        {
+          "id": "battery_8",
+          "name": "仙女燈2",
+          "nameEn": "Fairy Lights 2",
+          "imageUrl": "https://pikmin.wiki.gallery/images/thumb/0/04/Decor_Yellow_Fairy_Lights_2.png/150px-Decor_Yellow_Fairy_Lights_2.png",
+          "imageUrls": {
+            "yellow": "https://pikmin.wiki.gallery/images/thumb/0/04/Decor_Yellow_Fairy_Lights_2.png/150px-Decor_Yellow_Fairy_Lights_2.png"
+          }
         }
       ],
       "availablePikminTypes": [
@@ -2431,6 +2450,38 @@
         "white",
         "purple",
         "rock",
+        "winged"
+      ]
+    },
+    {
+      "category": {
+        "id": "Present-Sticker (Gold)",
+        "name": "禮物貼紙(金色)",
+        "nameEn": "Present Sticker (Gold)",
+        "type": "special",
+        "icon": "💛"
+      },
+      "variants": [
+        {
+          "id": "present_sticker_gold",
+          "name": "禮物貼紙(金色)",
+          "nameEn": "Present Sticker (Gold)",
+          "imageUrls": {
+            "red": "https://pikmin.wiki.gallery/images/thumb/8/85/Decor_Red_Present_Sticker_%28Gold%29.png/141px-Decor_Red_Present_Sticker_%28Gold%29.png",
+            "yellow": "https://pikmin.wiki.gallery/images/thumb/3/35/Decor_Yellow_Present_Sticker_%28Gold%29.png/150px-Decor_Yellow_Present_Sticker_%28Gold%29.png",
+            "blue": "https://pikmin.wiki.gallery/images/thumb/e/ee/Decor_Blue_Present_Sticker_%28Gold%29.png/150px-Decor_Blue_Present_Sticker_%28Gold%29.png",
+            "white": "https://pikmin.wiki.gallery/images/thumb/3/33/Decor_White_Present_Sticker_%28Gold%29.png/150px-Decor_White_Present_Sticker_%28Gold%29.png",
+            "purple": "https://pikmin.wiki.gallery/images/thumb/d/db/Decor_Purple_Present_Sticker_%28Gold%29.png/150px-Decor_Purple_Present_Sticker_%28Gold%29.png",
+            "winged": "https://pikmin.wiki.gallery/images/thumb/5/54/Decor_Winged_Present_Sticker_%28Gold%29.png/150px-Decor_Winged_Present_Sticker_%28Gold%29.png"
+          }
+        }
+      ],
+      "availablePikminTypes": [
+        "red",
+        "yellow",
+        "blue",
+        "white",
+        "purple",
         "winged"
       ]
     },
@@ -3615,7 +3666,8 @@
             "white": "https://pikmin.wiki.gallery/images/thumb/a/a9/Decor_White_4th_Anniversary_Flower_Box.png/150px-Decor_White_4th_Anniversary_Flower_Box.png",
             "purple": "https://pikmin.wiki.gallery/images/thumb/8/86/Decor_Purple_4th_Anniversary_Flower_Box.png/150px-Decor_Purple_4th_Anniversary_Flower_Box.png",
             "rock": "https://pikmin.wiki.gallery/images/thumb/f/f7/Decor_Rock_4th_Anniversary_Flower_Box.png/150px-Decor_Rock_4th_Anniversary_Flower_Box.png",
-            "winged": "https://pikmin.wiki.gallery/images/thumb/2/24/Decor_Winged_4th_Anniversary_Flower_Box.png/150px-Decor_Winged_4th_Anniversary_Flower_Box.png"
+            "winged": "https://pikmin.wiki.gallery/images/thumb/2/24/Decor_Winged_4th_Anniversary_Flower_Box.png/150px-Decor_Winged_4th_Anniversary_Flower_Box.png",
+            "ice": "https://pikmin.wiki.gallery/images/thumb/8/88/Decor_Ice_4th_Anniversary_Flower_Box.png/150px-Decor_Ice_4th_Anniversary_Flower_Box.png"
           }
         }
       ],
@@ -3626,7 +3678,8 @@
         "white",
         "purple",
         "rock",
-        "winged"
+        "winged",
+        "ice"
       ]
     },
     {
