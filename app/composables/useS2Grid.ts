@@ -14,7 +14,7 @@ export function useS2Grid() {
     enabled: false,
     level: 17,
     maxCells: 200,
-    minZoom: 16,
+    minZoom: 0,
   };
 
   const config = ref<S2GridConfig>({ ...DEFAULT_CONFIG });
@@ -214,8 +214,36 @@ export function useS2Grid() {
       return;
     }
 
-    const newCells = generateGridForBounds(bounds, config.value.level, currentZoom ?? config.value.level);
-    cells.value = newCells;
+    // Generate new cells based on bounds
+    const newCellsData = generateGridForBounds(bounds, config.value.level, currentZoom ?? config.value.level);
+    
+    // Performance Optimization: Smart Diffing
+    // We want to reuse existing cell objects if they are still in the view.
+    // This prevents Vue from destroying and recreating DOM elements (LPolygon),
+    // which caused the "parentNode is null" crash and visual flashing.
+    
+    if (cells.value.length === 0) {
+      cells.value = newCellsData;
+      return;
+    }
+
+    // Create a map of current cells for O(1) lookup
+    // Using a Map is faster than .find() for large arrays
+    const currentCellsMap = new Map(cells.value.map(c => [c.cellId, c]));
+    
+    // Build the new array
+    const finalCells: S2CellData[] = newCellsData.map(newCell => {
+      // If we already have this cell, reuse the OLD object (preserving Vue identity)
+      if (currentCellsMap.has(newCell.cellId)) {
+        return currentCellsMap.get(newCell.cellId)!;
+      }
+      // Otherwise use the new one
+      return newCell;
+    });
+
+    // Only update if length changed or if we have new cells
+    // (In a perfect world we'd check content, but preserving identity is the main goal here)
+    cells.value = finalCells;
   }
 
   /**
@@ -246,7 +274,7 @@ export function useS2Grid() {
 
   return {
     config: readonly(config),
-    cells: readonly(cells),
+    cells: cells, // Expose mutable ref for direct POI association
     isCalculating: readonly(isCalculating),
     
     // Methods
@@ -255,6 +283,8 @@ export function useS2Grid() {
     clearGrid,
     findCellForPoint,
     getCellIdFromLatLng,
+    getCellVertices,
+    getCellCenter,
     getCellColor,
     getCellStyle,
   };

@@ -67,7 +67,7 @@ const OVERPASS_SERVERS = [
   'https://overpass-api.de/api/interpreter',
   'https://overpass.kumi.systems/api/interpreter',
 ];
-const REQUEST_DELAY_MS = 10000; // 每次請求間隔 10 秒
+const REQUEST_DELAY_MS = 10000; // 每次請求間隔 10 秒（可用 CLI 覆寫）
 const MAX_RETRIES = 3;
 
 // ============ 工具函數 ============
@@ -126,6 +126,15 @@ out center;
  */
 function delay(ms: number): Promise<void> {
   return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+/**
+ * 取得 CLI 參數值
+ */
+function getArgValue(args: string[], key: string): string | undefined {
+  const index = args.indexOf(key);
+  if (index === -1) return undefined;
+  return args[index + 1];
 }
 
 /**
@@ -238,13 +247,60 @@ function transformToPOIs(response: OverpassResponse): POIData[] {
   return pois;
 }
 
+/**
+ * 檢查座標是否在指定 bbox 內
+ */
+function isWithinBbox(lat: number, lon: number, bbox: BoundingBox): boolean {
+  return lat >= bbox.south && lat <= bbox.north && lon >= bbox.west && lon <= bbox.east;
+}
+
+/**
+ * 彙整後資料校正與驗證
+ */
+function validateAggregate(pois: POIData[], bbox: BoundingBox) {
+  const unique = new Map<string, POIData>();
+  let duplicateCount = 0;
+  let outOfBoundsCount = 0;
+  let invalidCoordCount = 0;
+
+  for (const poi of pois) {
+    if (!Number.isFinite(poi.lat) || !Number.isFinite(poi.lon)) {
+      invalidCoordCount++;
+      continue;
+    }
+
+    if (!isWithinBbox(poi.lat, poi.lon, bbox)) {
+      outOfBoundsCount++;
+      continue;
+    }
+
+    if (unique.has(poi.id)) {
+      duplicateCount++;
+      continue;
+    }
+
+    unique.set(poi.id, poi);
+  }
+
+  const normalized = Array.from(unique.values()).sort((a, b) => a.id.localeCompare(b.id));
+
+  return {
+    pois: normalized,
+    duplicateCount,
+    outOfBoundsCount,
+    invalidCoordCount,
+  };
+}
+
 // ============ 主程式 ============
 
 async function main() {
   // 解析命令列參數
   const args = process.argv.slice(2);
-  const regionIndex = args.indexOf('--region');
-  const regionId = regionIndex !== -1 ? args[regionIndex + 1] : 'taipei';
+  const regionId = getArgValue(args, '--region') || 'taipei';
+  const gridOverride = Number(getArgValue(args, '--grid'));
+  const delayOverride = Number(getArgValue(args, '--delay'));
+  const maxSplitDepth = Number(getArgValue(args, '--max-split'));
 
   const region = getRegion(regionId);
   if (!region) {
@@ -256,20 +312,32 @@ async function main() {
   console.log(`\n🗺️  開始抓取 ${region.name} (${region.nameEn}) OSM 資料\n`);
   console.log(`📍 邊界框: ${JSON.stringify(region.bbox)}`);
 
-  const gridSize = region.gridSize || 4;
+  const gridSize = Number.isFinite(gridOverride) ? gridOverride : (region.gridSize || 4);
+  const requestDelayMs = Number.isFinite(delayOverride) ? delayOverride : REQUEST_DELAY_MS;
+  const splitDepthLimit = Number.isFinite(maxSplitDepth) ? maxSplitDepth : 2;
+
   const grids = splitBboxToGrid(region.bbox, gridSize);
-  console.log(`📊 分成 ${grids.length} 個區塊 (${gridSize}×${gridSize})\n`);
+  console.log(`📊 初始分成 ${grids.length} 個區塊 (${gridSize}×${gridSize})`);
+  console.log(`⏱️  請求間隔: ${requestDelayMs} ms，最大分割深度: ${splitDepthLimit}\n`);
 
   const allPOIs: POIData[] = [];
   const seenIds = new Set<string>();
 
-  for (let i = 0; i < grids.length; i++) {
-    const grid = grids[i];
-    console.log(`\n[${i + 1}/${grids.length}] 查詢區塊...`);
-    console.log(`  📍 範圍: S${grid.south.toFixed(4)} N${grid.north.toFixed(4)} W${grid.west.toFixed(4)} E${grid.east.toFixed(4)}`);
+  const queue: Array<{ bbox: BoundingBox; depth: number }> = grids.map(bbox => ({ bbox, depth: 0 }));
+  let processed = 0;
+
+  while (queue.length > 0) {
+    const task = queue.shift();
+    if (!task) break;
+    const { bbox, depth } = task;
+    const total = processed + queue.length + 1;
+    processed += 1;
+
+    console.log(`\n[${processed}/${total}] 查詢區塊...`);
+    console.log(`  📍 範圍: S${bbox.south.toFixed(4)} N${bbox.north.toFixed(4)} W${bbox.west.toFixed(4)} E${bbox.east.toFixed(4)}`);
 
     try {
-      const query = buildOverpassQuery(grid);
+      const query = buildOverpassQuery(bbox);
       const response = await fetchOverpass(query);
       const pois = transformToPOIs(response);
 
@@ -286,14 +354,23 @@ async function main() {
       console.log(`  ✅ 取得 ${pois.length} 個 POI，新增 ${newCount} 個（去重後總計 ${allPOIs.length}）`);
     } catch (err) {
       console.error(`  ❌ 區塊查詢失敗:`, err);
+      if (depth < splitDepthLimit) {
+        const subGrids = splitBboxToGrid(bbox, 2).map(sub => ({ bbox: sub, depth: depth + 1 }));
+        queue.push(...subGrids);
+        console.log(`  🔁 已分割為 ${subGrids.length} 個子區塊，加入隊列重試（深度 ${depth + 1}/${splitDepthLimit}）`);
+      }
     }
 
     // 請求間隔
-    if (i < grids.length - 1) {
-      console.log(`  ⏳ 等待 ${REQUEST_DELAY_MS / 1000} 秒...`);
-      await delay(REQUEST_DELAY_MS);
+    if (queue.length > 0 && requestDelayMs > 0) {
+      console.log(`  ⏳ 等待 ${Math.ceil(requestDelayMs / 1000)} 秒...`);
+      await delay(requestDelayMs);
     }
   }
+
+  // 彙整後資料校正（避免跨格重複與越界資料）
+  const validation = validateAggregate(allPOIs, region.bbox);
+  const validatedPOIs = validation.pois;
 
   // 輸出結果
   const outputData: RegionPOIFile = {
@@ -302,8 +379,8 @@ async function main() {
     regionName: region.name,
     bbox: region.bbox,
     generatedAt: new Date().toISOString(),
-    poiCount: allPOIs.length,
-    pois: allPOIs,
+    poiCount: validatedPOIs.length,
+    pois: validatedPOIs,
   };
 
   // 確保輸出目錄存在
@@ -317,11 +394,14 @@ async function main() {
 
   console.log(`\n✅ 完成！`);
   console.log(`📁 輸出檔案: ${outputPath}`);
-  console.log(`📊 總計 POI 數量: ${allPOIs.length}`);
+  console.log(`📊 彙整後 POI 數量: ${validatedPOIs.length}`);
+  console.log(`🧹 去除重複: ${validation.duplicateCount}`);
+  console.log(`🧭 去除越界: ${validation.outOfBoundsCount}`);
+  console.log(`⚠️  去除無效座標: ${validation.invalidCoordCount}`);
 
   // 統計各類型數量
   const typeCounts: Record<string, number> = {};
-  for (const poi of allPOIs) {
+  for (const poi of validatedPOIs) {
     typeCounts[poi.decorType] = (typeCounts[poi.decorType] || 0) + 1;
   }
   console.log(`\n📊 各類型統計:`);

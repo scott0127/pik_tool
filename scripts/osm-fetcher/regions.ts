@@ -26,6 +26,19 @@ export const REGIONS: Record<string, Region> = {
     gridSize: 4, // 4×4 = 16 區塊
   },
 
+  taiwan_main_island: {
+    id: 'taiwan_main_island',
+    name: '台灣本島',
+    nameEn: 'Taiwan Main Island',
+    bbox: {
+      north: 25.3000,
+      south: 21.7500,
+      east: 122.1000,
+      west: 120.0000,
+    },
+    gridSize: 12, // 12×12 = 144 區塊（避免單次查詢過大）
+  },
+
   // === 預留區域（未來擴充） ===
   // newtaipei: {
   //   id: 'newtaipei',

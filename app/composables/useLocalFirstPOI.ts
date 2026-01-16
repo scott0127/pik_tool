@@ -40,13 +40,38 @@ interface RegionData {
   }>;
 }
 
+interface RegionIndex {
+  regionId: string;
+  regionName: string;
+  bbox: { north: number; south: number; east: number; west: number };
+  tileGridSize: number;
+  tiles: Array<{
+    id: string;
+    bbox: { north: number; south: number; east: number; west: number };
+    file: string;
+    poiCount: number;
+  }>;
+}
+
+interface TileData {
+  bbox: { north: number; south: number; east: number; west: number };
+  pois: RegionData['pois'];
+}
+
 /** 支援的區域列表 */
-const SUPPORTED_REGIONS = ['taipei'] as const;
+const SUPPORTED_REGIONS = ['taipei', 'taiwan_main_island'] as const;
 type SupportedRegion = typeof SUPPORTED_REGIONS[number];
 
 /** 區域資料快取 */
 const regionCache = new Map<SupportedRegion, RegionData | null>();
 const loadingPromises = new Map<SupportedRegion, Promise<RegionData | null>>();
+
+const regionIndexCache = new Map<SupportedRegion, RegionIndex | null>();
+const regionIndexPromises = new Map<SupportedRegion, Promise<RegionIndex | null>>();
+
+const tileCache = new Map<string, TileData>();
+const tileLoadingPromises = new Map<string, Promise<TileData | null>>();
+const MAX_TILE_CACHE = 24;
 
 /**
  * 動態載入區域資料
@@ -83,6 +108,79 @@ async function loadRegionData(regionId: SupportedRegion): Promise<RegionData | n
   })();
 
   loadingPromises.set(regionId, loadPromise);
+  return loadPromise;
+}
+
+/**
+ * 動態載入區域索引（大型區域使用）
+ */
+async function loadRegionIndex(regionId: SupportedRegion): Promise<RegionIndex | null> {
+  if (regionIndexCache.has(regionId)) {
+    return regionIndexCache.get(regionId)!;
+  }
+
+  if (regionIndexPromises.has(regionId)) {
+    return regionIndexPromises.get(regionId)!;
+  }
+
+  const loadPromise = (async () => {
+    try {
+      const response = await fetch(`/data/regions/${regionId}/index.json`);
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+      const regionIndex: RegionIndex = await response.json();
+      regionIndexCache.set(regionId, regionIndex);
+      console.log(`[LocalFirstPOI] 載入 ${regionIndex.regionName} 索引成功，共 ${regionIndex.tiles.length} 個分片`);
+      return regionIndex;
+    } catch (err) {
+      regionIndexCache.set(regionId, null);
+      return null;
+    }
+  })();
+
+  regionIndexPromises.set(regionId, loadPromise);
+  return loadPromise;
+}
+
+function touchTileCache(key: string, data: TileData) {
+  if (tileCache.has(key)) {
+    tileCache.delete(key);
+  }
+  tileCache.set(key, data);
+  if (tileCache.size > MAX_TILE_CACHE) {
+    const oldestKey = tileCache.keys().next().value as string | undefined;
+    if (oldestKey) {
+      tileCache.delete(oldestKey);
+    }
+  }
+}
+
+async function loadTile(regionId: SupportedRegion, tileFile: string): Promise<TileData | null> {
+  const cacheKey = `${regionId}:${tileFile}`;
+  if (tileCache.has(cacheKey)) {
+    return tileCache.get(cacheKey)!;
+  }
+
+  if (tileLoadingPromises.has(cacheKey)) {
+    return tileLoadingPromises.get(cacheKey)!;
+  }
+
+  const loadPromise = (async () => {
+    try {
+      const response = await fetch(`/data/regions/${regionId}/tiles/${tileFile}`);
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+      const tileData: TileData = await response.json();
+      touchTileCache(cacheKey, tileData);
+      return tileData;
+    } catch (err) {
+      return null;
+    }
+  })();
+
+  tileLoadingPromises.set(cacheKey, loadPromise);
   return loadPromise;
 }
 
@@ -151,6 +249,23 @@ function filterLocalPOIs(
     });
 }
 
+function filterTilePOIs(
+  tileData: TileData,
+  bounds: MapBounds,
+  selectedRules: DecorRule[]
+): POIPoint[] {
+  return filterLocalPOIs(
+    {
+      regionId: 'tile',
+      regionName: 'tile',
+      bbox: tileData.bbox,
+      pois: tileData.pois,
+    },
+    bounds,
+    selectedRules
+  );
+}
+
 export function useLocalFirstPOI() {
   const overpassAPI = useOverpassAPI();
   
@@ -179,6 +294,17 @@ export function useLocalFirstPOI() {
       let fullyContained = false;
 
       for (const regionId of SUPPORTED_REGIONS) {
+        const regionIndex = await loadRegionIndex(regionId);
+        if (regionIndex) {
+          if (bboxIntersects(bounds, regionIndex.bbox)) {
+            intersectingRegions.push(regionId);
+            if (bboxFullyContained(bounds, regionIndex.bbox)) {
+              fullyContained = true;
+            }
+          }
+          continue;
+        }
+
         const regionData = await loadRegionData(regionId);
         if (regionData && bboxIntersects(bounds, regionData.bbox)) {
           intersectingRegions.push(regionId);
@@ -191,8 +317,22 @@ export function useLocalFirstPOI() {
       // 2. 如果查詢範圍完全在某個區域內，直接使用本地資料
       if (fullyContained && intersectingRegions.length > 0) {
         const regionId = intersectingRegions[0];
+        const regionIndex = regionIndexCache.get(regionId) || await loadRegionIndex(regionId);
+        if (regionIndex) {
+          const intersectingTiles = regionIndex.tiles.filter(tile => bboxIntersects(bounds, tile.bbox));
+          const tileDataList = await Promise.all(
+            intersectingTiles.map(tile => loadTile(regionId, tile.file))
+          );
+          const localPoints = tileDataList
+            .filter((tile): tile is TileData => Boolean(tile))
+            .flatMap(tile => filterTilePOIs(tile, bounds, selectedRules));
+
+          dataSource.value = 'local';
+          console.log(`[LocalFirstPOI] 使用分片 ${regionIndex.regionName} 資料，找到 ${localPoints.length} 個 POI`);
+          return localPoints;
+        }
+
         const regionData = regionCache.get(regionId);
-        
         if (regionData) {
           const localPoints = filterLocalPOIs(regionData, bounds, selectedRules);
           dataSource.value = 'local';
@@ -224,7 +364,12 @@ export function useLocalFirstPOI() {
    */
   async function preloadAllRegions(): Promise<void> {
     console.log('[LocalFirstPOI] 預先載入所有區域資料...');
-    await Promise.all(SUPPORTED_REGIONS.map(loadRegionData));
+    await Promise.all(SUPPORTED_REGIONS.map(async regionId => {
+      const index = await loadRegionIndex(regionId);
+      if (!index) {
+        await loadRegionData(regionId);
+      }
+    }));
     console.log('[LocalFirstPOI] 預載完成');
   }
 

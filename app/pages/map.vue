@@ -17,101 +17,140 @@
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             :max-zoom="19"
           />
-          
-          <!-- S2 網格層 -->
-          <LPolygon
-            v-for="cell in s2Cells"
-            :key="cell.cellId"
-            :lat-lngs="cell.bounds.map(p => [p.lat, p.lng])"
-            :color="getCellStyle(cell).strokeColor"
-            :weight="getCellStyle(cell).strokeWeight"
-            :opacity="getCellStyle(cell).strokeOpacity"
-            :fill-color="getCellStyle(cell).fillColor"
-            :fill-opacity="getCellStyle(cell).fillOpacity"
+
+          <!-- 使用者位置標記 -->
+          <LMarker
+            v-if="userLocation"
+            :lat-lng="userLocation"
           >
+            <LIcon :icon-size="[22, 22]" :icon-anchor="[11, 11]" class-name="user-location-icon">
+              <div class="w-5 h-5 rounded-full bg-blue-500 ring-4 ring-blue-200 border-2 border-white shadow-md"></div>
+            </LIcon>
             <LPopup>
-              <div class="min-w-[200px] p-2">
-                <div class="font-bold text-gray-800 text-sm mb-2 flex items-center gap-2">
-                  <span>🔲</span>
-                  <span>S2 Cell L17</span>
-                </div>
-                <div class="text-xs text-gray-500 mb-3 font-mono break-all">
-                  {{ cell.cellId }}
-                </div>
-                <div v-if="cell.decorTypes.size > 0" class="space-y-2">
-                  <div class="text-xs font-semibold text-gray-700 mb-1">預測飾品類型：</div>
-                  <div class="flex flex-wrap gap-1">
-                    <span
-                      v-for="decorId in Array.from(cell.decorTypes)"
-                      :key="decorId"
-                      class="inline-flex items-center gap-1 px-2 py-1 bg-emerald-50 text-emerald-700 rounded text-xs"
-                    >
-                      <span>{{ getDecorInfo(decorId)?.icon }}</span>
-                      <span>{{ getDecorInfo(decorId)?.name }}</span>
-                    </span>
-                  </div>
-                  <div class="mt-2 pt-2 border-t border-gray-200">
-                    <div class="text-xs text-gray-600">
-                      <span class="font-medium">{{ cell.decorTypes.size }}</span> 種飾品混合
-                      <span v-if="cell.decorTypes.size === 1" class="text-emerald-600">（精準！）</span>
-                      <span v-else-if="cell.decorTypes.size <= 3" class="text-yellow-600">（中等）</span>
-                      <span v-else class="text-red-600">（混雜）</span>
-                    </div>
-                  </div>
-                </div>
-                <div v-else class="text-xs text-gray-500">
-                  🏷️ 路邊區域（無特定飾品標籤）
-                </div>
-              </div>
+              <div class="text-xs text-gray-600">📍 你的位置</div>
             </LPopup>
-          </LPolygon>
+          </LMarker>
           
-          <!-- S2 Cell 內容徽章（Zoom >= 16 時顯示） -->
-          <template v-if="mapZoom >= 16" v-for="cell in s2Cells" :key="`badge-${cell.cellId}`">
-            <!-- 只顯示有裝飾品或 POI 的格子 -->
-            <LMarker
-              v-if="cell.decorTypes.size > 0 || cell.poiCount > 0"
-              :lat-lng="[cell.center.lat, cell.center.lng]"
+          <!-- S2 網格層（網格/單一格模式共用顯示） -->
+          <template v-if="canRenderGrid && !isPinMode">
+            <LPolygon
+              v-for="cell in displayedGridCells"
+              :key="cell.cellId"
+              :lat-lngs="cell.bounds.map(p => [p.lat, p.lng])"
+              :color="getCellStyle(cell).strokeColor"
+              :weight="getCellStyle(cell).strokeWeight"
+              :opacity="getCellStyle(cell).strokeOpacity"
+              :fill-color="getCellStyle(cell).fillColor"
+              :fill-opacity="getCellStyle(cell).fillOpacity"
             >
-              <LIcon
-                :icon-size="[0, 0]"
-                class-name="cell-badge-container"
-              >
-                <!-- 自定義 HTML 內容 - 確保點擊事件能穿透到下層 LMarker/LPopup -->
-                <div 
-                  class="absolute -translate-x-1/2 -translate-y-1/2 flex flex-col items-center pointer-events-none"
-                  style="width: 80px;"
-                >
-                  <!-- 飾品圖示群組 -->
-                  <div class="flex items-center justify-center gap-1 mb-0.5 bg-white/90 rounded-full px-1.5 py-1 shadow-sm border border-emerald-100 backdrop-blur-sm">
-                    <div 
-                      v-for="decorId in Array.from(cell.decorTypes).slice(0, 3)" 
-                      :key="decorId"
-                      class="w-5 h-5 md:w-6 md:h-6 flex items-center justify-center"
-                    >
-                      <img 
-                        v-if="getDecorInfo(decorId)?.iconUrl" 
-                        :src="getDecorInfo(decorId)?.iconUrl" 
-                        class="w-full h-full object-contain"
-                      />
-                      <span v-else class="text-sm md:text-base leading-none">
-                        {{ getDecorInfo(decorId)?.icon }}
+              <LPopup v-if="isGridMode">
+                <div class="min-w-[200px] p-2">
+                  <div class="font-bold text-gray-800 text-sm mb-2 flex items-center gap-2">
+                    <span>🔲</span>
+                    <span>S2 Cell L17</span>
+                  </div>
+                  <div class="text-xs text-gray-500 mb-3 font-mono break-all">
+                    {{ cell.cellId }}
+                  </div>
+                  <div v-if="cell.decorTypes.size > 0" class="space-y-2">
+                    <div class="text-xs font-semibold text-gray-700 mb-1">預測飾品類型：</div>
+                    <div class="flex flex-wrap gap-1">
+                      <span
+                        v-for="decorId in Array.from(cell.decorTypes)"
+                        :key="decorId"
+                        class="inline-flex items-center gap-1 px-2 py-1 bg-emerald-50 text-emerald-700 rounded text-xs"
+                      >
+                        <span>{{ getDecorInfo(decorId)?.icon }}</span>
+                        <span>{{ getDecorInfo(decorId)?.name }}</span>
                       </span>
                     </div>
+                    <div class="mt-2 pt-2 border-t border-gray-200">
+                      <div class="text-xs text-gray-600">
+                        <span class="font-medium">{{ cell.decorTypes.size }}</span> 種飾品混合
+                        <span v-if="cell.decorTypes.size === 1" class="text-emerald-600">（精準！）</span>
+                        <span v-else-if="cell.decorTypes.size <= 3" class="text-yellow-600">（中等）</span>
+                        <span v-else class="text-red-600">（混雜）</span>
+                      </div>
+                    </div>
                   </div>
-                  
-                  <!-- POI 計數徽章 -->
-                  <div v-if="cell.poiCount > 0" class="bg-emerald-600 text-white text-[10px] md:text-xs font-bold px-1.5 py-0.5 rounded-full shadow-sm border border-white">
-                    ×{{ cell.poiCount }}
+                  <div v-else class="text-xs text-gray-500">
+                    🏷️ 路邊區域（無特定飾品標籤）
                   </div>
                 </div>
-              </LIcon>
-            </LMarker>
+              </LPopup>
+            </LPolygon>
+          </template>
+
+          <!-- 單一格高亮層（只在單一格模式顯示） -->
+          <template v-if="canRenderGrid && isSingleMode">
+            <LPolygon
+              v-for="cell in renderedSingleHighlights"
+              :key="`single-${cell.cellId}`"
+              :lat-lngs="cell.bounds.map(p => [p.lat, p.lng])"
+              :color="getCellStyle(cell).strokeColor"
+              :weight="getCellStyle(cell).strokeWeight"
+              :opacity="getCellStyle(cell).strokeOpacity"
+              :fill-color="getCellStyle(cell).fillColor"
+              :fill-opacity="getCellStyle(cell).fillOpacity"
+            >
+              <LPopup>
+                <div class="text-xs text-gray-600 flex items-center gap-1">
+                  <span>{{ getDecorInfo(Array.from(cell.decorTypes)[0])?.icon }}</span>
+                  <span>{{ getDecorInfo(Array.from(cell.decorTypes)[0])?.name }}</span>
+                </div>
+              </LPopup>
+            </LPolygon>
+          </template>
+
+          
+          <!-- S2 Cell 內容徽章（高縮放顯示，避免太密） -->
+          <template v-if="canRenderGrid && !isPinMode && mapZoom >= 16">
+            <template v-for="cell in badgeCells" :key="`badge-${cell.cellId}`">
+              <!-- 只顯示有裝飾品或 POI 的格子 -->
+              <LMarker
+                v-if="cell.decorTypes.size > 0 || cell.poiCount > 0"
+                :lat-lng="[cell.center.lat, cell.center.lng]"
+              >
+                <LIcon
+                  :icon-size="[0, 0]"
+                  class-name="cell-badge-container"
+                >
+                  <!-- 自定義 HTML 內容 - 確保點擊事件能穿透到下層 LMarker/LPopup -->
+                  <div 
+                    class="absolute -translate-x-1/2 -translate-y-1/2 flex flex-col items-center pointer-events-none"
+                    style="width: 80px;"
+                  >
+                    <!-- 飾品圖示群組 -->
+                    <div class="flex items-center justify-center gap-1 mb-0.5 bg-white/90 rounded-full px-1.5 py-1 shadow-sm border border-emerald-100 backdrop-blur-sm">
+                      <div 
+                        v-for="decorId in Array.from(cell.decorTypes).slice(0, 3)" 
+                        :key="decorId"
+                        class="w-5 h-5 md:w-6 md:h-6 flex items-center justify-center"
+                      >
+                        <img 
+                          v-if="getDecorInfo(decorId)?.iconUrl" 
+                          :src="getDecorInfo(decorId)?.iconUrl" 
+                          class="w-full h-full object-contain"
+                        />
+                        <span v-else class="text-sm md:text-base leading-none">
+                          {{ getDecorInfo(decorId)?.icon }}
+                        </span>
+                      </div>
+                    </div>
+                    
+                    <!-- POI 計數徽章 -->
+                    <div v-if="cell.poiCount > 0" class="bg-emerald-600 text-white text-[10px] md:text-xs font-bold px-1.5 py-0.5 rounded-full shadow-sm border border-white">
+                      ×{{ cell.poiCount }}
+                    </div>
+                  </div>
+                </LIcon>
+              </LMarker>
+            </template>
           </template>
           
-          <!-- POI 標記點（Grid Mode 下 < 16 顯示，Pin Mode 下總是顯示）-->
+          <!-- POI 標記點（Pin Mode 下顯示）-->
           <LMarker
-            v-if="!s2GridEnabled || mapZoom < 16"
+            v-if="isPinMode"
             v-for="poi in fetchedPoints"
             :key="poi.id"
             :lat-lng="[poi.lat, poi.lon]"
@@ -202,10 +241,9 @@
             <div class="flex items-center justify-between text-xs md:text-sm mb-2">
               <div>
                 <span class="text-gray-600">已選擇</span>
-                <span :class="['font-bold ml-1', selectedFilters.length >= 20 ? 'text-red-500' : 'text-emerald-600']">
+                <span class="font-bold ml-1 text-emerald-600">
                   {{ selectedFilters.length }}
                 </span>
-                <span class="text-gray-400">/ 20</span>
               </div>
               <div>
                 <span class="text-gray-600">找到</span>
@@ -219,7 +257,7 @@
               <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
                 <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
               </svg>
-              {{ selectedFilters.length >= 20 ? '已達上限 (最多20種)' : '超過 10 種查詢會比較慢喔' }}
+              超過 10 種查詢會比較慢喔
             </div>
 
             <div class="flex gap-2">
@@ -227,7 +265,7 @@
                 @click="selectAll"
                 class="flex-1 px-3 py-2 bg-emerald-100 hover:bg-emerald-200 active:bg-emerald-300 text-emerald-700 rounded-lg text-xs font-medium transition-colors"
               >
-                選前20個
+                全選
               </button>
               <button
                 @click="clearAll"
@@ -256,14 +294,13 @@
                 selectedFilters.includes(rule.id) 
                   ? 'bg-emerald-50 border border-emerald-200' 
                   : isMobile ? 'bg-gray-50' : '',
-                !selectedFilters.includes(rule.id) && selectedFilters.length >= 20 ? 'opacity-50 cursor-not-allowed grayscale' : ''
+                ''
               ]"
             >
               <input
                 type="checkbox"
                 :value="rule.id"
                 v-model="selectedFilters"
-                :disabled="!selectedFilters.includes(rule.id) && selectedFilters.length >= 20"
                 :class="[
                   'rounded border-gray-300 text-emerald-500 focus:ring-emerald-500 focus:ring-offset-0',
                   isMobile ? 'w-3 h-3 absolute opacity-0' : 'w-4 h-4'
@@ -324,10 +361,10 @@
           <!-- 網格模式按鈕 -->
           <div class="relative group h-full">
             <button
-              @click="s2GridEnabled = true"
+              @click="viewMode = 'grid'"
               :class="[
                 'flex items-center gap-1.5 px-3 h-full rounded-lg text-sm font-medium transition-all',
-                s2GridEnabled ? 'bg-emerald-500 text-white shadow-sm' : 'text-gray-500 hover:bg-gray-50'
+                isGridMode ? 'bg-emerald-500 text-white shadow-sm' : 'text-gray-500 hover:bg-gray-50'
               ]"
             >
               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -347,8 +384,8 @@
                   <div class="bg-emerald-500/20 flex items-center justify-center text-[10px]">🍔</div>
                 </div>
                 <div class="flex-1 space-y-1">
-                  <p>• Zoom ≥ 16 : 顯示網格與內容</p>
-                  <p>• Zoom < 16 : 顯示大頭針</p>
+                  <p>• 任何縮放：顯示網格</p>
+                  <p>• 切換標記模式：顯示大頭針</p>
                 </div>
               </div>
               <div class="text-gray-400 text-[10px]">適合：查看飾品分佈與覆蓋率</div>
@@ -358,10 +395,10 @@
           <!-- 標記模式按鈕 -->
           <div class="relative group h-full">
             <button
-              @click="s2GridEnabled = false"
+              @click="viewMode = 'pin'"
               :class="[
                 'flex items-center gap-1.5 px-3 h-full rounded-lg text-sm font-medium transition-all',
-                !s2GridEnabled ? 'bg-blue-500 text-white shadow-sm' : 'text-gray-500 hover:bg-gray-50'
+                isPinMode ? 'bg-blue-500 text-white shadow-sm' : 'text-gray-500 hover:bg-gray-50'
               ]"
             >
               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -388,11 +425,56 @@
               <div class="text-gray-400 text-[10px]">適合：單純尋找地點，畫面清爽</div>
             </div>
           </div>
+
+          <!-- 單一飾品格子提示按鈕（避免干擾，僅在網格模式下顯示） -->
+          <div class="relative group h-full">
+            <button
+              @click="toggleSingleTypeCells"
+              class="flex items-center gap-1.5 px-3 h-full rounded-lg text-sm font-medium transition-all"
+              :class="isSingleMode ? 'bg-emerald-600 text-white shadow-sm' : 'text-gray-500 hover:bg-gray-50'"
+            >
+              <span class="md:hidden font-bold text-xs">純種</span>
+              <span class="hidden md:inline">純種區</span>
+            </button>
+            
+            <!-- Desktop Tooltip (Hover) -->
+            <div class="hidden md:block absolute right-0 top-full mt-2 w-56 bg-gray-900 text-white text-xs rounded-xl p-3 shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-[2000] pointer-events-none translate-y-2 group-hover:translate-y-0">
+              <div class="font-bold mb-2 text-emerald-300">純種區</div>
+              <p>顯示 L17 中只有一種飾品的格子</p>
+              <p class="text-gray-400 text-[10px] mt-1">任何縮放均可顯示</p>
+            </div>
+
+            <!-- Mobile Ephemeral Tooltip (Auto-hide) -->
+            <Transition
+              enter-active-class="transition duration-200 ease-out"
+              enter-from-class="opacity-0 translate-y-2"
+              enter-to-class="opacity-100 translate-y-0"
+              leave-active-class="transition duration-200 ease-in"
+              leave-from-class="opacity-100 translate-y-0"
+              leave-to-class="opacity-0 translate-y-2"
+            >
+              <div 
+                v-if="showPureModeHint" 
+                class="md:hidden absolute right-0 top-full mt-2 w-48 bg-gray-900/95 text-white text-xs rounded-xl p-3 shadow-xl z-[2000] backdrop-blur-sm border border-emerald-500/30"
+              >
+                <div class="flex items-start gap-2">
+                  <span class="text-lg">🦄</span>
+                  <div>
+                    <div class="font-bold text-emerald-300 mb-1">純種區模式</div>
+                    <p class="leading-relaxed">只顯示單一飾品種類的地點</p>
+                  </div>
+                </div>
+              </div>
+            </Transition>
+          </div>
         </div>
       </div>
 
       <!-- 地點搜尋欄 -->
-      <div class="absolute top-3 md:top-4 left-16 right-36 md:right-auto md:w-80 md:left-1/2 md:-translate-x-1/2 z-[1001]">
+      <div 
+        class="absolute top-3 md:top-4 left-16 right-36 md:right-auto md:w-80 transition-all duration-300 z-[1001] w-[190px]"
+        :class="showPanel ? 'md:left-[22rem]' : 'md:left-16'"
+      >
         <div class="relative">
           <!-- 搜尋輸入框 -->
           <div class="bg-white rounded-xl shadow-lg border border-gray-200 flex items-center overflow-hidden h-10">
@@ -470,7 +552,10 @@
       </div>
 
       <!-- 第二行控制列：定位、縮放等級、搜尋按鈕 -->
-      <div class="absolute top-16 md:top-[60px] left-16 md:left-1/2 md:-translate-x-1/2 flex items-center gap-2 z-[1000]">
+      <div 
+        class="absolute top-16 md:top-[60px] left-16 flex items-center gap-2 z-[1000] transition-all duration-300"
+        :class="showPanel ? 'md:left-[22rem]' : 'md:left-16'"
+      >
         <!-- 定位按鈕 -->
         <button
           @click="goToMyLocation"
@@ -499,13 +584,13 @@
             <span class="text-[10px] md:text-xs text-gray-500">Lv.</span>
             <span 
               class="font-bold text-sm md:text-base"
-              :class="canSearch ? 'text-emerald-600' : 'text-orange-500'"
+              :class="canSearch ? 'text-emerald-600' : 'text-red-600'"
             >
               {{ mapZoom }}
             </span>
             <span 
               class="text-[10px] md:text-xs px-1.5 py-0.5 rounded-full hidden md:inline"
-              :class="canSearch ? 'bg-emerald-100 text-emerald-600' : 'bg-orange-100 text-orange-500'"
+              :class="canSearch ? 'bg-emerald-100 text-emerald-600' : 'bg-red-100 text-red-600 font-bold'"
             >
               {{ canSearch ? '可搜尋' : `需≥${MIN_ZOOM_FOR_QUERY}` }}
             </span>
@@ -526,7 +611,7 @@
             <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
           </svg>
           <span class="font-medium hidden md:inline">
-            {{ !canSearch ? '放大地圖' : selectedFilters.length === 0 ? '選擇類型' : '搜尋此區域' }}
+            {{ !canSearch ? '請放大才能搜尋' : selectedFilters.length === 0 ? '選擇類型' : '搜尋此區域' }}
           </span>
           <span class="font-medium md:hidden">
             搜尋
@@ -556,7 +641,7 @@
         leave-to-class="opacity-0 translate-y-2"
       >
         <div
-          v-if="s2GridEnabled && showGridLegend"
+          v-if="isGridMode && showGridLegend"
           :class="[
             'absolute bg-white rounded-xl shadow-lg z-[999] border border-gray-200',
             'bottom-3 md:bottom-4 left-3 md:left-4',
@@ -615,7 +700,7 @@
         leave-to-class="opacity-0 scale-90"
       >
         <button
-          v-if="s2GridEnabled && !showGridLegend"
+          v-if="isGridMode && !showGridLegend"
           @click="showGridLegend = true"
           class="absolute bottom-3 md:bottom-4 right-3 md:right-4 bg-white rounded-xl p-2.5 md:p-3 shadow-lg hover:shadow-xl active:scale-95 transition-all z-[999] border border-gray-200"
           title="顯示網格顏色說明"
@@ -646,6 +731,46 @@
           </span>
         </div>
       </Transition>
+
+      <!-- 單一格載入提示 -->
+      <Transition
+        enter-active-class="transition duration-200 ease-out"
+        enter-from-class="opacity-0 -translate-y-2"
+        enter-to-class="opacity-100 translate-y-0"
+        leave-active-class="transition duration-200 ease-in"
+        leave-from-class="opacity-100 translate-y-0"
+        leave-to-class="opacity-0 -translate-y-2"
+      >
+        <div
+          v-if="isSingleMode && (isSingleTypeCellsLoading || isSingleTypeCellsRendering)"
+          class="absolute top-16 left-1/2 -translate-x-1/2 bg-white rounded-full px-3 py-1 shadow-md z-[1000] border border-emerald-200 text-xs text-emerald-700 flex items-center gap-2"
+        >
+          <span class="animate-spin">⏳</span>
+          <span>純種區載入中…</span>
+        </div>
+
+      </Transition>
+      
+      <!-- 網格模式縮放過小提示 (Zoom Warning Toast) -->
+      <Transition
+        enter-active-class="transition duration-300 ease-out"
+        enter-from-class="opacity-0 translate-y-2"
+        enter-to-class="opacity-100 translate-y-0"
+        leave-active-class="transition duration-200 ease-in"
+        leave-from-class="opacity-100 translate-y-0"
+        leave-to-class="opacity-0 translate-y-2"
+      >
+        <div
+          v-if="showGridZoomWarning && isGridMode"
+          class="absolute bottom-20 left-1/2 -translate-x-1/2 bg-gray-900/90 text-white rounded-full px-4 py-2 shadow-xl z-[1000] backdrop-blur-sm border border-gray-700 flex items-center gap-2"
+        >
+          <span class="text-xl">🔍</span>
+          <div class="flex flex-col">
+            <span class="font-bold text-sm">請放大地圖以顯示網格</span>
+            <span class="text-[10px] text-gray-400">目前縮放等級: {{ mapZoom }} (需 ≥ {{ GRID_MIN_ZOOM }})</span>
+          </div>
+        </div>
+      </Transition>
     </div>
   </ClientOnly>
 </template>
@@ -654,6 +779,7 @@
 import { LMap, LTileLayer, LMarker, LPopup, LIcon, LPolygon } from '@vue-leaflet/vue-leaflet';
 import 'leaflet/dist/leaflet.css';
 import type { MapBounds, POIPoint, GeocodingResult } from '~/types/map';
+import type { S2CellData } from '~/types/s2';
 import { useDecorRules } from '~/composables/useDecorRules';
 import { useLocalFirstPOI } from '~/composables/useLocalFirstPOI';
 import { useS2Grid } from '~/composables/useS2Grid';
@@ -673,6 +799,8 @@ const {
   findCellForPoint,
   getCellIdFromLatLng,
   getCellStyle,
+  getCellCenter,
+  getCellVertices,
 } = useS2Grid();
 
 // 響應式視窗寬度
@@ -692,7 +820,7 @@ onMounted(() => {
 const mapCenter = ref<[number, number]>([25.0478, 121.5170]); // 台北車站
 const mapZoom = ref(16);
 const mapRef = ref();
-const MIN_ZOOM_FOR_QUERY = 15; // 最小查詢縮放層級
+const MIN_ZOOM_FOR_QUERY = 16; // 最小查詢縮放層級
 
 // ⚠️ 重要：使用 shallowRef 避免 Vue 對 Leaflet 物件進行深層響應式監聯
 // 這是 Vue + Leaflet 效能優化的關鍵！
@@ -709,18 +837,63 @@ const showSearchResults = ref(false);
 const selectedResultIndex = ref(-1);
 let searchDebounceTimer: ReturnType<typeof setTimeout> | null = null;
 
-// S2 網格狀態（預設啟用）
-const s2GridEnabled = ref(true);
+// 顯示模式（網格 / 標記 / 單一格）
+type MapViewMode = 'grid' | 'pin' | 'single';
+const viewMode = ref<MapViewMode>('grid');
+const isGridMode = computed(() => viewMode.value === 'grid');
+const isPinMode = computed(() => viewMode.value === 'pin');
+const isSingleMode = computed(() => viewMode.value === 'single');
+// S2 Grid L17 visibility: matches user request "zoom > 15" -> zoom >= 16
+// S2 Grid L17 visibility: matches user request "zoom > 15" -> zoom >= 16
+const canRenderGrid = computed(() => mapZoom.value >= 16);
+const badgeCells = computed(() => (isSingleMode.value ? singleTypeCellsInView.value : s2Cells.value));
+// Computed property for grid cells to ensure they only render in Grid Mode (not Single Mode residue)
+// Computed property for grid cells to ensure they render in both Grid and Single Mode (but not mixed inappropriately)
+const displayedGridCells = computed(() => {
+  if (isGridMode.value) return s2Cells.value;
+  if (isSingleMode.value) return singleTypeCellsInView.value;
+  return [];
+});
+const isModeTransitioning = ref(false);
 
-// 監聽網格開關，同步更新配置並處理顯示
-watch(s2GridEnabled, (enabled) => {
-  updateS2Config({ enabled });
-  if (!enabled) {
+// Pure Mode Hint State
+const showPureModeHint = ref(false);
+let pureModeHintTimer: ReturnType<typeof setTimeout> | null = null;
+
+
+// Zoom Warning State
+const showGridZoomWarning = ref(false);
+let gridZoomWarningTimer: ReturnType<typeof setTimeout> | null = null;
+const GRID_MIN_ZOOM = 16;
+
+watch(viewMode, (mode) => {
+  handleViewModeChange(mode);
+});
+
+const handleViewModeChange = async (mode: MapViewMode) => {
+  isModeTransitioning.value = true;
+  await nextTick();
+  
+  const gridEnabled = mode !== 'pin';
+  updateS2Config({ enabled: gridEnabled });
+  
+  if (!gridEnabled) {
     clearS2Grid();
   } else if (currentBounds) {
     calculateS2Grid(currentBounds, mapZoom.value);
   }
-});
+
+  isSingleTypeCellsRendering.value = false;
+  if (mode === 'single') {
+    updateSingleTypeCellsInView();
+  } else {
+    singleTypeCellsInView.value = [];
+  }
+  
+  isModeTransitioning.value = false;
+};
+
+// Removed watch(canRenderGrid) as it used deleted scheduleGridRender
 
 // POI 標記顯示狀態（預設顯示）
 const poisVisible = ref(true);
@@ -732,6 +905,28 @@ const userLocation = ref<[number, number] | null>(null);
 
 // 網格圖例顯示狀態
 const showGridLegend = ref(true);
+
+// 單一飾品格（L17）顯示
+interface SingleTypeCell {
+  cellId: string;
+  decorType: string;
+  center?: { lat: number; lng: number }; // Added for optimization
+}
+
+interface SingleTypeCellView extends SingleTypeCell {
+  bounds: { lat: number; lng: number }[];
+  center: { lat: number; lng: number };
+}
+
+const singleTypeCells = shallowRef<SingleTypeCell[]>([]);
+const singleTypeCellsInView = shallowRef<SingleTypeCellView[]>([]);
+const isSingleTypeCellsLoading = ref(false);
+const isSingleTypeCellsRendering = ref(false);
+const SINGLE_TYPE_CELL_LIMIT = 800;
+const hasSearched = ref(false);
+
+// Batch rendering variables removed for performance
+// Using smart diffing in useS2Grid instead for crash prevention without visual lag
 
 // ⚠️ 使用 shallowRef 來儲存 POI 點位，避免 Vue 對每個點位物件進行深層監聽
 const fetchedPoints = shallowRef<POIPoint[]>([]);
@@ -757,6 +952,17 @@ const getCountForRule = (ruleId: string) => {
   return fetchedPoints.value.filter(p => p.decorType === ruleId).length;
 };
 
+const clearRenderTimer = (timer: ReturnType<typeof setTimeout> | null) => {
+  if (timer) clearTimeout(timer);
+};
+
+const resetLayers = () => {
+  // renderedGridCells and others removed
+  renderedPoints.value = [];
+};
+
+// Helper functions removed (cloneCellsForRender, scheduleGridRender, renderInBatches)
+
 // 地圖準備完成
 const onMapReady = (map: any) => {
   // 不使用 ref 儲存 Leaflet 地圖實例！
@@ -765,12 +971,17 @@ const onMapReady = (map: any) => {
   updateMapBounds();
   
   // 初始化 S2 配置（確保狀態同步）
-  updateS2Config({ enabled: s2GridEnabled.value });
+  updateS2Config({ enabled: !isPinMode.value });
   
   // 如果 S2 網格啟用，初始化網格
-  if (s2GridEnabled.value && currentBounds) {
+  if (!isPinMode.value && currentBounds) {
     calculateS2Grid(currentBounds, mapZoom.value);
   }
+
+  if (isSingleMode.value && !isModeTransitioning.value && hasSearched.value) {
+    updateSingleTypeCellsInView();
+  }
+  // ScheduleGridRender removed
 };
 
 // 組件掛載時執行（修復直接進入頁面時地圖不顯示的問題）
@@ -790,17 +1001,24 @@ onMounted(() => {
 });
 
 
+// 地圖互動開始 - 清空網格以避免 DOM 同步錯誤
+// Reverted: User found this caused stuttering. Now relying on Smart Diff in useS2Grid.ts to prevent crashes.
+
 // 地圖移動結束 - 只更新邊界，不自動查詢
 const onMapMoveEnd = () => {
   updateMapBounds();
   
   // 如果 S2 網格啟用，重新計算網格
-  if (s2GridEnabled.value && currentBounds) {
+  if (!isPinMode.value && currentBounds) {
     calculateS2Grid(currentBounds, mapZoom.value);
     // 如果有 POI 數據，重新關聯
     if (fetchedPoints.value.length > 0) {
       associatePOIsToCells();
     }
+  }
+
+  if (isSingleMode.value && !isModeTransitioning.value) {
+    updateSingleTypeCellsInView();
   }
 };
 
@@ -809,7 +1027,19 @@ const updateMapBounds = () => {
   if (!leafletMap) return;
   
   // 同步縮放層級
-  mapZoom.value = leafletMap.getZoom();
+  const newZoom = leafletMap.getZoom();
+  mapZoom.value = newZoom;
+  
+  // Check for grid visibility warning
+  if (isGridMode.value && newZoom < GRID_MIN_ZOOM) {
+    showGridZoomWarning.value = true;
+    if (gridZoomWarningTimer) clearTimeout(gridZoomWarningTimer);
+    gridZoomWarningTimer = setTimeout(() => {
+      showGridZoomWarning.value = false;
+    }, 4000);
+  } else {
+    showGridZoomWarning.value = false;
+  }
   
   const bounds = leafletMap.getBounds();
   // 使用普通物件，不需要響應式
@@ -819,7 +1049,111 @@ const updateMapBounds = () => {
     east: bounds.getEast(),
     west: bounds.getWest(),
   };
+  
+  // Directly update S2 grid if needed
+  if (!isPinMode.value) {
+    // Grid update is handled by reactivity of s2Cells in calculateS2Grid
+  }
 };
+
+const shouldShowSingleTypeCells = computed(() => {
+  return isSingleMode.value;
+});
+
+const loadSingleTypeCells = async () => {
+  if (singleTypeCells.value.length > 0 || isSingleTypeCellsLoading.value) return;
+
+  isSingleTypeCellsLoading.value = true;
+  try {
+    const response = await fetch('/data/regions/taiwan_main_island/s2_l17_single.json');
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+    const data = await response.json();
+
+    // Optimize: Pre-calculate center coordinates to avoid repetitive S2 calculations during filtering
+    singleTypeCells.value = (data.cells || []).map((cell: any) => ({
+      ...cell,
+      center: getCellCenter(cell.cellId)
+    }));
+  } catch (err) {
+    console.warn('[Map] 無法載入單一飾品格資料', err);
+  } finally {
+    isSingleTypeCellsLoading.value = false;
+  }
+};
+
+const isCellIntersectingBounds = (cellId: string, bounds: MapBounds): boolean => {
+  const vertices = getCellVertices(cellId);
+  let minLat = 90, maxLat = -90, minLng = 180, maxLng = -180;
+  vertices.forEach(p => {
+    minLat = Math.min(minLat, p.lat);
+    maxLat = Math.max(maxLat, p.lat);
+    minLng = Math.min(minLng, p.lng);
+    maxLng = Math.max(maxLng, p.lng);
+  });
+  return !(minLat > bounds.north || maxLat < bounds.south || minLng > bounds.east || maxLng < bounds.west);
+};
+
+// Fast check using pre-calculated center
+const isCellCenterInBounds = (center: { lat: number, lng: number }, bounds: MapBounds): boolean => {
+    // Add a small buffer (approx 100m) to catch cells partially in view
+    // 0.001 degrees is roughly 111m
+    const buffer = 0.001; 
+    return center.lat <= bounds.north + buffer &&
+           center.lat >= bounds.south - buffer &&
+           center.lng <= bounds.east + buffer &&
+           center.lng >= bounds.west - buffer;
+};
+
+const updateSingleTypeCellsInView = () => {
+  if (!shouldShowSingleTypeCells.value || !currentBounds || singleTypeCells.value.length === 0) {
+    singleTypeCellsInView.value = [];
+    return;
+  }
+
+  const filtered = singleTypeCells.value
+    .filter(cell => cell.center ? isCellCenterInBounds(cell.center, currentBounds!) : isCellIntersectingBounds(cell.cellId, currentBounds!))
+    .slice(0, SINGLE_TYPE_CELL_LIMIT)
+    .map(cell => ({
+      ...cell,
+      bounds: getCellVertices(cell.cellId),
+      center: getCellCenter(cell.cellId),
+      decorTypes: new Set([cell.decorType]), // Add decorTypes Set for getCellStyle compatibility
+      poiCount: 1, 
+      priority: 'high'
+    })) as S2CellData[]; // Cast to S2CellData to satisfy type requirements
+
+  singleTypeCellsInView.value = filtered;
+  singleTypeCellsInView.value = filtered;
+  
+  // renderInBatches logic removed - using direct assignment to singleTypeCellsInView
+};
+
+const toggleSingleTypeCells = async () => {
+  viewMode.value = isSingleMode.value ? 'grid' : 'single';
+  if (viewMode.value === 'single') {
+    // Show ephemeral hint on mobile
+    if (isMobile.value) {
+      showPureModeHint.value = true;
+      if (pureModeHintTimer) clearTimeout(pureModeHintTimer);
+      pureModeHintTimer = setTimeout(() => {
+        showPureModeHint.value = false;
+      }, 3000);
+    }
+    await loadSingleTypeCells();
+  } else {
+    showPureModeHint.value = false;
+  }
+  updateSingleTypeCellsInView();
+};
+
+// Replaced by direct usage of s2Cells in template
+// watch(s2Cells... removed
+
+// Replaced by direct usage of fetchedPoints in template
+// watch(fetchedPoints... removed
+
 
 // 是否可以搜尋
 const canSearch = computed(() => mapZoom.value >= MIN_ZOOM_FOR_QUERY);
@@ -861,6 +1195,7 @@ const handleSearch = async () => {
   }
   abortController = new AbortController();
   currentAttempt.value = 0;
+  hasSearched.value = true;
 
   console.log('[Map] Searching POIs...', { bounds: currentBounds, filters: selectedFilters.value.length });
   
@@ -870,10 +1205,7 @@ const handleSearch = async () => {
     const points = await fetchPOIs(
       currentBounds, 
       selectedRules, 
-      abortController.signal,
-      (attempt) => {
-        currentAttempt.value = attempt;
-      }
+      abortController.signal
     );
     
     console.log('[Map] Received', points.length, 'points');
@@ -881,8 +1213,8 @@ const handleSearch = async () => {
     // 使用 shallowRef，直接賦值整個陣列來觸發更新
     fetchedPoints.value = Object.freeze(points) as POIPoint[];
     
-    // 如果 S2 網格啟用，關聯 POI 到 Cell
-    if (s2GridEnabled.value) {
+    // 如果非標記模式，關聯 POI 到 Cell
+    if (!isPinMode.value) {
       associatePOIsToCells();
     }
     
@@ -901,12 +1233,15 @@ const handleSearch = async () => {
   } finally {
     abortController = null;
     currentAttempt.value = 0;
+    if (isSingleMode.value) {
+      scheduleSingleTypeCellsUpdate();
+    }
   }
 };
 
-// 全選 (限制 20 個)
+// 全選
 const selectAll = () => {
-  selectedFilters.value = decorRules.slice(0, 20).map(r => r.id);
+  selectedFilters.value = decorRules.map(r => r.id);
 };
 
 // 清除全部
@@ -914,32 +1249,14 @@ const clearAll = () => {
   selectedFilters.value = [];
 };
 
-// S2 網格功能
-const toggleS2Grid = () => {
-  s2GridEnabled.value = !s2GridEnabled.value;
-  updateS2Config({ enabled: s2GridEnabled.value });
-  
-  if (s2GridEnabled.value && currentBounds) {
-    // 啟用時計算網格
-    calculateS2Grid(currentBounds, mapZoom.value);
-    // 如果有 POI 數據，關聯到 Cell
-    if (fetchedPoints.value.length > 0) {
-      associatePOIsToCells();
-    }
-  } else {
-    // 關閉時清除網格
-    clearS2Grid();
-  }
-};
-
 // 將 POI 與 S2 Cell 關聯
 const associatePOIsToCells = () => {
   if (!s2Cells.value || s2Cells.value.length === 0) {
-    console.log('[S2Grid] No cells to associate');
+    // console.log('[S2Grid] No cells to associate');
     return;
   }
   
-  console.log(`[S2Grid] Associating ${fetchedPoints.value.length} POIs to ${s2Cells.value.length} cells`);
+  // console.log(`[S2Grid] Associating ${fetchedPoints.value.length} POIs to ${s2Cells.value.length} cells`);
   
   // 重置所有 Cell 的數據
   s2Cells.value.forEach(cell => {
@@ -949,11 +1266,12 @@ const associatePOIsToCells = () => {
   });
   
   let matchCount = 0;
-  let notFoundCount = 0;
   
   // 對每個 POI，找到其所屬的 Cell
+  const cellMap = new Map(s2Cells.value.map(cell => [cell.cellId, cell]));
   fetchedPoints.value.forEach((poi, index) => {
-    const cell = findCellForPoint(poi.lat, poi.lon);
+    const cellId = getCellIdFromLatLng(poi.lat, poi.lon);
+    const cell = cellMap.get(cellId);
     
     if (cell) {
       // 將飾品類型添加到 Cell
@@ -969,24 +1287,10 @@ const associatePOIsToCells = () => {
       } else {
         cell.priority = 'low';
       }
-      
-      if (index < 5) {
-        console.log(`[S2Grid] POI #${index}: "${poi.name}" (${poi.lat.toFixed(5)}, ${poi.lon.toFixed(5)}) -> Cell ${cell.cellId}`);
-      }
-    } else {
-      notFoundCount++;
-      if (notFoundCount <= 3) {
-        console.log(`[S2Grid] POI "${poi.name}" (${poi.lat.toFixed(5)}, ${poi.lon.toFixed(5)}) not found in any cell`);
-      }
     }
   });
   
-  const cellsWithPOIs = s2Cells.value.filter(c => c.poiCount > 0);
-  console.log(`[S2Grid] Associated ${matchCount} POIs, ${notFoundCount} not found. Cells with POIs: ${cellsWithPOIs.length}/${s2Cells.value.length}`);
-  
-  // 強制觸發 Vue 響應式更新
-  const updatedCells = [...s2Cells.value];
-  s2Cells.value = updatedCells;
+  // No need to schedule render, s2Cells is reactive
 };
 
 // 計算網格中央飾品圖示的位置
