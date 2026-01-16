@@ -201,7 +201,7 @@
               @click="goToCategory(cat.id)"
               class="flex items-center gap-4 p-3 rounded-xl bg-emerald-50/50 hover:bg-emerald-50 cursor-pointer transition-colors"
             >
-              <span class="text-2xl">{{ cat.icon }}</span>
+              <Icon :name="cat.icon" class="text-2xl" />
               <div class="flex-1">
                 <p class="font-semibold text-gray-800">{{ cat.name }}</p>
                 <div class="flex items-center gap-2 mt-1">
