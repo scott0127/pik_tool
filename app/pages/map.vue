@@ -215,7 +215,7 @@
           <!-- 標題列 -->
           <div class="p-3 md:p-4 border-b border-gray-200 flex items-center justify-between bg-gradient-to-r from-emerald-50 to-teal-50">
             <!-- 手機拖動指示條 -->
-            <div v-if="isMobile" class="absolute top-2 left-1/2 -translate-x-1/2 w-10 h-1 bg-gray-300 rounded-full"></div>
+            
             
             <div class="flex items-center gap-2 md:gap-3">
               <span class="text-xl md:text-2xl">🗺️</span>
@@ -472,7 +472,7 @@
 
       <!-- 地點搜尋欄 -->
       <div 
-        class="absolute top-3 md:top-4 left-16 right-36 md:right-auto md:w-80 transition-all duration-300 z-[1001] w-[190px]"
+        class="absolute top-3 md:top-4 left-16 right-48 md:right-auto md:w-80 transition-all duration-300 z-[1001]"
         :class="showPanel ? 'md:left-[22rem]' : 'md:left-16'"
       >
         <div class="relative">
@@ -551,83 +551,60 @@
         </div>
       </div>
 
-      <!-- 第二行控制列：定位、縮放等級、搜尋按鈕 -->
-      <div 
-        class="absolute top-16 md:top-[60px] left-16 flex items-center gap-2 z-[1000] transition-all duration-300"
-        :class="showPanel ? 'md:left-[22rem]' : 'md:left-16'"
-      >
-        <!-- 定位按鈕 -->
+      <!-- Top-Center: "Search This Area" Floating Pill -->
+      <div class="absolute top-20 left-1/2 -translate-x-1/2 z-[1000]">
         <button
-          @click="goToMyLocation"
-          :disabled="isLocating"
-          class="flex items-center justify-center w-10 h-10 bg-white rounded-xl shadow-lg border transition-all hover:shadow-xl active:scale-95"
-          :class="[
-            isLocating ? 'cursor-wait' : 'cursor-pointer',
-            locationError ? 'border-red-300' : 'border-gray-200'
-          ]"
-          :title="locationError || '移動到我的位置'"
-        >
-          <!-- 載入中動畫 -->
-          <svg v-if="isLocating" class="animate-spin h-5 w-5 text-emerald-500" viewBox="0 0 24 24">
-            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none" />
-            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-          </svg>
-          <!-- 定位圖示 (Google Maps 風格) -->
-          <svg v-else xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" :class="locationError ? 'text-red-500' : 'text-emerald-600'" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm8.94 3A8.994 8.994 0 0013 3.06V1h-2v2.06A8.994 8.994 0 003.06 11H1v2h2.06A8.994 8.994 0 0011 20.94V23h2v-2.06A8.994 8.994 0 0020.94 13H23v-2h-2.06zM12 19c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z"/>
-          </svg>
-        </button>
-
-        <!-- 縮放等級指示器 -->
-        <div class="bg-white rounded-xl px-3 shadow-lg border border-gray-200 h-10 flex items-center">
-          <div class="flex items-center gap-1.5 md:gap-2">
-            <span class="text-[10px] md:text-xs text-gray-500">Lv.</span>
-            <span 
-              class="font-bold text-sm md:text-base"
-              :class="canSearch ? 'text-emerald-600' : 'text-red-600'"
-            >
-              {{ mapZoom }}
-            </span>
-            <span 
-              class="text-[10px] md:text-xs px-1.5 py-0.5 rounded-full hidden md:inline"
-              :class="canSearch ? 'bg-emerald-100 text-emerald-600' : 'bg-red-100 text-red-600 font-bold'"
-            >
-              {{ canSearch ? '可搜尋' : `需≥${MIN_ZOOM_FOR_QUERY}` }}
-            </span>
-          </div>
-        </div>
-
-        <!-- 搜尋按鈕 -->
-        <button
-          v-if="!isLoading"
+          v-if="!isLoading && canSearch && selectedFilters.length > 0"
           @click="handleSearch"
-          :disabled="!canSearch || selectedFilters.length === 0"
-          class="flex items-center h-10 gap-1.5 md:gap-2 px-3 md:px-4 rounded-xl shadow-lg transition-all duration-200 text-sm"
-          :class="canSearch && selectedFilters.length > 0
-            ? 'bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 active:scale-95 text-white cursor-pointer'
-            : 'bg-gray-100 text-gray-400 cursor-not-allowed border border-gray-200'"
+          class="flex items-center h-10 gap-2 px-4 rounded-full shadow-xl bg-white text-emerald-600 font-bold border border-emerald-100 hover:scale-105 active:scale-95 transition-all"
         >
           <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
             <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
           </svg>
-          <span class="font-medium hidden md:inline">
-            {{ !canSearch ? '請放大才能搜尋' : selectedFilters.length === 0 ? '選擇類型' : '搜尋此區域' }}
-          </span>
-          <span class="font-medium md:hidden">
-            搜尋
-          </span>
+          <span>搜尋此區域</span>
         </button>
 
-        <!-- 載入中狀態 -->
+        <!-- Loading State Pill -->
         <div
-          v-else
-          class="flex items-center h-10 gap-1.5 md:gap-2 px-3 md:px-4 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-xl shadow-lg text-white text-sm"
+          v-else-if="isLoading"
+          class="flex items-center h-10 gap-2 px-4 rounded-full shadow-xl bg-white text-emerald-600 font-bold border border-emerald-100"
         >
-          <svg class="animate-spin h-4 w-4" viewBox="0 0 24 24">
+           <svg class="animate-spin h-4 w-4" viewBox="0 0 24 24">
             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none" />
             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
           </svg>
-          <span class="font-medium">{{ loadingMessage }}</span>
+          <span>讀取中...</span>
+        </div>
+      </div>
+
+      <!-- Bottom-Right: Navigation Controls (Zoom & Location) -->
+      <div class="absolute bottom-24 md:bottom-8 right-4 flex flex-col gap-3 z-[999] items-end pb-[env(safe-area-inset-bottom)]">
+        <!-- Location Button -->
+        <button
+          @click="goToMyLocation"
+          :disabled="isLocating"
+          class="w-12 h-12 bg-white rounded-full shadow-xl flex items-center justify-center border border-gray-100 text-gray-700 hover:bg-gray-50 active:bg-gray-100 transition-all"
+          :title="locationError || '移動到我的位置'"
+        >
+          <svg v-if="isLocating" class="animate-spin h-6 w-6 text-emerald-500" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none" />
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+          </svg>
+          <svg v-else xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" :class="locationError ? 'text-red-500' : 'text-gray-700'" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm8.94 3A8.994 8.994 0 0013 3.06V1h-2v2.06A8.994 8.994 0 003.06 11H1v2h2.06A8.994 8.994 0 0011 20.94V23h2v-2.06A8.994 8.994 0 0020.94 13H23v-2h-2.06zM12 19c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z"/>
+          </svg>
+        </button>
+
+        <!-- Zoom Indicator / Controls -->
+        <div class="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden flex flex-col">
+           <!-- Zoom Indicator -->
+           <div class="px-2 py-1.5 text-[10px] text-center font-bold text-gray-500 border-b border-gray-100 bg-gray-50">
+             Lv.{{ mapZoom }}
+           </div>
+           <!-- (Optional) Add + / - buttons here in future if map object exposed -->
+           <div v-if="!canSearch" class="px-2 py-1 bg-red-50 text-red-600 text-[10px] font-bold text-center">
+             放大
+           </div>
         </div>
       </div>
 
