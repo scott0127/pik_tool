@@ -1,252 +1,141 @@
 <template>
-  <div class="space-y-8 pb-8">
-    <!-- Hero Section -->
-    <section class="relative text-center py-10 overflow-hidden">
-      <!-- Background decorations -->
-      <div class="absolute inset-0 pointer-events-none overflow-hidden">
-        <span class="leaf-decoration top-4 left-[10%] sway text-5xl">🌿</span>
-        <span class="leaf-decoration top-8 right-[15%] sway text-4xl" style="animation-delay: 0.5s">🍃</span>
-        <span class="leaf-decoration bottom-4 left-[20%] sway text-3xl" style="animation-delay: 1s">🌱</span>
-        <span class="leaf-decoration bottom-8 right-[10%] float text-4xl">🌸</span>
-      </div>
+  <div class="min-h-screen relative pb-20">
 
-      <!-- Main content -->
-      <div class="relative z-10">
-        <div class="inline-block mb-4">
-          <div class="relative">
-            <div class="w-20 h-20 bg-gradient-to-br from-emerald-400 via-teal-400 to-emerald-500 rounded-[1.5rem] shadow-2xl flex items-center justify-center float glow-emerald">
-              <span class="text-4xl">🌱</span>
-            </div>
-            <span class="absolute -top-1 -right-1 text-xl sparkle">✨</span>
-          </div>
-        </div>
-        
-        <h1 class="text-3xl md:text-4xl font-extrabold mb-3">
-          <span class="text-gradient">Pikmin Bloom</span>
-          <span class="text-gray-700"> 飾品圖鑑</span>
-        </h1>
-        
-        <p class="text-gray-500 text-base max-w-md mx-auto">
-          追蹤你的皮克敏飾品蒐集進度，成為圖鑑大師！
-        </p>
-      </div>
-    </section>
+    <div class="relative z-10 pt-4 md:pt-8">
+      <HomeBentoGrid>
+          <!-- 1. Hero -->
+          <template #hero>
+              <HomeHeroSection />
+          </template>
 
-    <!-- ⭐ 四大功能按鈕區 -->
-    <section class="max-w-4xl mx-auto">
-      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <!-- 1. 我還缺什麼 -->
-        <button 
-          @click="showMissingItems"
-          class="glass rounded-2xl p-5 text-left transition-all duration-300 hover:shadow-xl hover:scale-[1.02] group"
-        >
-          <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-orange-400 to-red-500 flex items-center justify-center mb-3 shadow-lg group-hover:scale-110 transition-transform">
-            <Icon name="line-md:question-circle" class="text-3xl text-white" />
-          </div>
-          <h3 class="font-bold text-gray-800 mb-1">我還缺什麼？</h3>
-          <p class="text-sm text-gray-500 mb-2">快速找到未蒐集飾品</p>
-          <div class="flex items-center gap-2">
-            <span class="text-2xl font-extrabold text-orange-500">{{ uncollectedCount }}</span>
-            <span class="text-xs text-gray-400">件未蒐集</span>
-          </div>
-        </button>
+          <!-- 2. Near Complete -->
+          <template #near-complete>
+             <HomeNearCompleteScroll 
+                :categories="nearCompleteCategories" 
+                @select-category="goToCategory"
+            />
+          </template>
 
-        <!-- 2. 無法取得的飾品 -->
-        <button 
-          @click="showUnobtainable"
-          class="glass rounded-2xl p-5 text-left transition-all duration-300 hover:shadow-xl hover:scale-[1.02] group"
-        >
-          <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-purple-400 to-indigo-500 flex items-center justify-center mb-3 shadow-lg group-hover:scale-110 transition-transform">
-            <Icon name="line-md:alert-circle" class="text-3xl text-white" />
-          </div>
-          <h3 class="font-bold text-gray-800 mb-1">無法取得？</h3>
-          <p class="text-sm text-gray-500 mb-2">地區/活動限定飾品</p>
-          <div class="flex items-center gap-2">
-            <span class="text-2xl font-extrabold text-purple-500">{{ limitedCount }}</span>
-            <span class="text-xs text-gray-400">件限定飾品</span>
-          </div>
-        </button>
+          <!-- 3. Missing Action -->
+            <template #action-missing>
+              <div @click="showMissingItems" class="group h-full w-full min-h-[220px] p-6 flex flex-col items-start justify-between relative overflow-hidden bg-white/60 backdrop-blur-md rounded-[2.5rem] shadow-xl hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 cursor-pointer border-2 border-white/60 hover:border-orange-200">
+                   <!-- Soft Aurora Background -->
+                   <div class="absolute top-[-20%] right-[-20%] w-64 h-64 bg-orange-200/40 rounded-full blur-[80px] pointer-events-none group-hover:bg-orange-300/50 transition-colors duration-700"></div>
+                   <div class="absolute bottom-[-20%] left-[-20%] w-64 h-64 bg-red-100/40 rounded-full blur-[80px] pointer-events-none group-hover:bg-red-200/50 transition-colors duration-700"></div>
 
-        <!-- 3. 即將完成 -->
-        <button 
-          @click="showNearComplete"
-          class="glass rounded-2xl p-5 text-left transition-all duration-300 hover:shadow-xl hover:scale-[1.02] group"
-        >
-          <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center mb-3 shadow-lg group-hover:scale-110 transition-transform">
-            <Icon name="line-md:my-location-loop" class="text-3xl text-white" />
-          </div>
-          <h3 class="font-bold text-gray-800 mb-1">即將完成！</h3>
-          <p class="text-sm text-gray-500 mb-2">差一點就完成的類別</p>
-          <div class="flex items-center gap-2">
-            <span class="text-2xl font-extrabold text-emerald-500">{{ nearCompleteCategories.length }}</span>
-            <span class="text-xs text-gray-400">個類別快完成</span>
-          </div>
-        </button>
+                   <!-- Icon -->
+                   <div class="w-14 h-14 rounded-2xl bg-orange-500 flex items-center justify-center text-3xl shadow-lg shadow-orange-200 group-hover:scale-110 transition-transform duration-300 relative z-10 mb-4">
+                       <Icon name="lucide:help-circle" class="text-white" />
+                   </div>
 
-        <!-- 4. 按皮克敏查看 -->
-        <button 
-          @click="showPikminModal = true"
-          class="glass rounded-2xl p-5 text-left transition-all duration-300 hover:shadow-xl hover:scale-[1.02] group"
-        >
-          <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-pink-400 to-rose-500 flex items-center justify-center mb-3 shadow-lg group-hover:scale-110 transition-transform">
-            <Icon name="line-md:star-pulsating-loop" class="text-3xl text-white" />
-          </div>
-          <h3 class="font-bold text-gray-800 mb-1">按類型查看</h3>
-          <p class="text-sm text-gray-500 mb-2">選擇皮克敏類型篩選</p>
-          <div class="flex items-center gap-1">
-            <div 
-              v-for="type in PIKMIN_TYPES.slice(0, 5)" 
-              :key="type"
-              class="w-5 h-5 rounded-full shadow-sm"
-              :class="PIKMIN_TYPE_COLORS[type]"
-            ></div>
-            <span class="text-xs text-gray-400 ml-1">+{{ PIKMIN_TYPES.length - 5 }}</span>
-          </div>
-        </button>
-      </div>
-    </section>
-
-    <!-- Overall Progress Card -->
-    <section class="max-w-2xl mx-auto">
-      <div class="card relative overflow-hidden">
-        <div class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-emerald-100 to-transparent rounded-bl-full opacity-50"></div>
-        
-        <div class="relative z-10">
-          <div class="flex items-center gap-3 mb-6">
-            <span class="text-2xl">🏆</span>
-            <h2 class="text-xl font-bold text-gray-800">總體蒐集進度</h2>
-          </div>
-
-          <div class="flex items-center justify-center gap-8 mb-6">
-            <!-- Progress Circle -->
-            <div class="relative w-28 h-28">
-              <svg class="w-28 h-28 progress-ring" viewBox="0 0 36 36">
-                <circle class="text-gray-200" stroke="currentColor" stroke-width="2.5" fill="transparent" r="16" cx="18" cy="18"/>
-                <circle class="text-emerald-500 progress-ring-circle" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" fill="transparent" r="16" cx="18" cy="18"
-                  :stroke-dasharray="100.53"
-                  :stroke-dashoffset="100.53 - (stats.percentage / 100) * 100.53"
-                />
-              </svg>
-              <div class="absolute inset-0 flex flex-col items-center justify-center">
-                <span class="text-2xl font-extrabold text-gradient">{{ stats.percentage }}%</span>
+                   <!-- Text Content -->
+                   <div class="relative z-10 space-y-1 mb-auto">
+                       <h3 class="text-2xl font-black text-gray-800 tracking-tight group-hover:text-orange-600 transition-colors">我還缺什麼？</h3>
+                       <p class="text-sm text-gray-500 font-medium">快速找到未蒐集飾品</p>
+                   </div>
+                   
+                   <!-- Count -->
+                   <div class="relative z-10 mt-4 flex items-baseline gap-1.5">
+                       <span class="text-4xl font-black text-orange-500 leading-none">{{ uncollectedCount }}</span>
+                       <span class="text-sm font-bold text-gray-400">件未蒐集</span>
+                   </div>
               </div>
-            </div>
+          </template>
 
-            <!-- Stats -->
-            <div class="text-left">
-              <div class="mb-3">
-                <p class="text-sm text-gray-500 mb-1">已蒐集</p>
-                <p class="text-3xl font-extrabold text-emerald-600">{{ stats.collected }}</p>
+          <!-- 4. Limited Action -->
+            <template #action-limited>
+              <div @click="showUnobtainable" class="group h-full w-full min-h-[220px] p-6 flex flex-col items-start justify-between relative overflow-hidden bg-white/60 backdrop-blur-md rounded-[2.5rem] shadow-xl hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 cursor-pointer border-2 border-white/60 hover:border-purple-200">
+                  <!-- Soft Aurora Background -->
+                  <div class="absolute top-[-20%] right-[-20%] w-64 h-64 bg-purple-200/40 rounded-full blur-[80px] pointer-events-none group-hover:bg-purple-300/50 transition-colors duration-700"></div>
+                  <div class="absolute bottom-[-20%] left-[-20%] w-64 h-64 bg-pink-100/40 rounded-full blur-[80px] pointer-events-none group-hover:bg-pink-200/50 transition-colors duration-700"></div>
+                  
+                  <!-- Icon -->
+                   <div class="w-14 h-14 rounded-2xl bg-purple-500 flex items-center justify-center text-3xl shadow-lg shadow-purple-200 group-hover:scale-110 transition-transform duration-300 relative z-10 mb-4">
+                       <Icon name="lucide:alert-circle" class="text-white" />
+                   </div>
+
+                   <!-- Text Content -->
+                   <div class="relative z-10 space-y-1 mb-auto">
+                       <h3 class="text-2xl font-black text-gray-800 tracking-tight group-hover:text-purple-600 transition-colors">無法取得？</h3>
+                       <p class="text-sm text-gray-500 font-medium">地區/活動限定飾品</p>
+                   </div>
+
+                   <!-- Count -->
+                   <div class="relative z-10 mt-4 flex items-baseline gap-1.5">
+                       <span class="text-4xl font-black text-purple-500 leading-none">{{ limitedCount }}</span>
+                       <span class="text-sm font-bold text-gray-400">件限定飾品</span>
+                   </div>
               </div>
-              <div>
-                <p class="text-sm text-gray-500 mb-1">總數量</p>
-                <p class="text-xl font-bold text-gray-400">{{ stats.total }}</p>
-              </div>
-            </div>
-          </div>
+          </template>
 
-          <!-- Progress bar -->
-          <div class="h-2.5 bg-gray-200 rounded-full overflow-hidden">
-            <div 
-              class="h-full bg-gradient-to-r from-emerald-400 via-teal-400 to-emerald-500 transition-all duration-1000 ease-out rounded-full"
-              :style="{ width: `${stats.percentage}%` }"
-            ></div>
-          </div>
-          <p class="text-center text-sm text-gray-500 mt-2">
-            還差 <span class="font-bold text-emerald-600">{{ stats.total - stats.collected }}</span> 件即可完成圖鑑！
-          </p>
-        </div>
-      </div>
-    </section>
-
-    <!-- Quick Actions -->
-    <section class="flex flex-col sm:flex-row gap-4 justify-center">
-      <NuxtLink to="/collection" class="btn-primary text-base">
-        <span class="mr-2">📖</span> 瀏覽完整圖鑑
-      </NuxtLink>
-      <NuxtLink to="/map" class="btn-primary text-base">
-        <span class="mr-2">🗺️</span> 飾品地點地圖
-      </NuxtLink>
-    </section>
-
-    <!-- Near Complete Categories (Expandable) -->
-    <Transition
-      enter-active-class="transition duration-300 ease-out"
-      enter-from-class="opacity-0 -translate-y-4"
-      enter-to-class="opacity-100 translate-y-0"
-      leave-active-class="transition duration-200 ease-in"
-      leave-from-class="opacity-100 translate-y-0"
-      leave-to-class="opacity-0 -translate-y-4"
-    >
-      <section v-if="showNearCompleteSection" ref="nearCompleteRef" class="max-w-4xl mx-auto">
-        <div class="card">
-          <div class="flex items-center justify-between mb-4">
-            <div class="flex items-center gap-3">
-              <span class="text-2xl">🎯</span>
-              <h2 class="text-xl font-bold text-gray-800">即將完成的類別</h2>
-            </div>
-            <button @click="showNearCompleteSection = false" class="text-gray-400 hover:text-gray-600 text-xl">✕</button>
-          </div>
-          
-          <div v-if="nearCompleteCategories.length === 0" class="text-center py-8 text-gray-500">
-            <span class="text-4xl mb-2 block">🎉</span>
-            <p>太棒了！你沒有接近完成的類別</p>
-            <p class="text-sm">繼續努力蒐集更多飾品吧！</p>
-          </div>
-          
-          <div v-else class="space-y-3">
-            <div 
-              v-for="cat in nearCompleteCategories" 
-              :key="cat.id"
-              @click="goToCategory(cat.id)"
-              class="flex items-center gap-4 p-3 rounded-xl bg-emerald-50/50 hover:bg-emerald-50 cursor-pointer transition-colors"
-            >
-              <Icon :name="cat.icon" class="text-2xl" />
-              <div class="flex-1">
-                <p class="font-semibold text-gray-800">{{ cat.name }}</p>
-                <div class="flex items-center gap-2 mt-1">
-                  <div class="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
-                    <div 
-                      class="h-full bg-gradient-to-r from-emerald-400 to-teal-400 rounded-full"
-                      :style="{ width: `${cat.percentage}%` }"
-                    ></div>
+           <!-- 5. Map Action -->
+            <template #action-map>
+              <div @click="router.push('/map')" class="group h-full w-full min-h-[220px] p-6 flex flex-col justify-between relative overflow-hidden bg-white/60 backdrop-blur-md rounded-[2.5rem] shadow-xl hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 cursor-pointer border-2 border-white/60 hover:border-emerald-200">
+                   <!-- Soft Aurora Background -->
+                   <div class="absolute top-[-20%] right-[-20%] w-64 h-64 bg-emerald-200/40 rounded-full blur-[80px] pointer-events-none group-hover:bg-emerald-300/50 transition-colors duration-700"></div>
+                   <div class="absolute bottom-[-20%] left-[-20%] w-64 h-64 bg-teal-100/40 rounded-full blur-[80px] pointer-events-none group-hover:bg-teal-200/50 transition-colors duration-700"></div>
+                   
+                  <div class="flex items-start justify-between relative z-10">
+                       <div class="w-14 h-14 rounded-2xl bg-white/80 backdrop-blur-sm flex items-center justify-center text-3xl shadow-sm border border-white/50 group-hover:scale-110 transition-transform duration-300">
+                           <Icon name="lucide:map-pin" class="text-emerald-500 drop-shadow-sm" />
+                       </div>
                   </div>
-                  <span class="text-sm font-medium text-emerald-600">{{ cat.percentage }}%</span>
-                </div>
+
+                  <div class="mt-4 relative z-10 group-hover:translate-x-1 transition-transform duration-300">
+                       <h3 class="text-2xl font-black text-gray-800 tracking-tight">飾品地圖</h3>
+                       <p class="text-sm text-gray-500 font-medium opacity-90 group-hover:text-emerald-600 transition-colors">幫你精準使用掃描器</p>
+                  </div>
               </div>
-              <div class="text-right">
-                <p class="text-sm font-bold text-orange-500">差 {{ cat.remaining }} 件</p>
-                <p class="text-xs text-gray-400">{{ cat.collected }}/{{ cat.total }}</p>
-              </div>
+          </template>
+      </HomeBentoGrid>
+
+      <div class="mt-6 md:mt-10 grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+        <div class="space-y-3">
+          <button
+            @click="router.push('/collection')"
+            class="w-full flex items-center justify-center gap-3 px-6 py-4 rounded-2xl bg-gradient-to-r from-emerald-500 to-green-600 text-white font-bold shadow-lg hover:shadow-xl transition-all hover:-translate-y-0.5"
+          >
+            <span class="text-xl">📖</span>
+            <span>瀏覽完整圖鑑</span>
+          </button>
+          <button
+            @click="router.push('/map')"
+            class="w-full flex items-center justify-center gap-3 px-6 py-4 rounded-2xl bg-gradient-to-r from-emerald-500 to-green-600 text-white font-bold shadow-lg hover:shadow-xl transition-all hover:-translate-y-0.5"
+          >
+            <span class="text-xl">🗺️</span>
+            <span>飾品地點地圖</span>
+          </button>
+        </div>
+
+        <div class="bg-white/60 backdrop-blur-md rounded-3xl p-6 shadow-xl border-2 border-white/60">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center text-2xl">💡</div>
+            <div>
+              <h3 class="text-lg font-extrabold text-gray-800">使用小提示</h3>
+              <p class="text-xs text-gray-500">讓你更快完成收藏</p>
             </div>
           </div>
+          <ul class="space-y-2 text-sm text-gray-600">
+            <li class="flex items-start gap-2">
+              <span class="text-emerald-500 mt-0.5">✓</span>
+              <span>點擊飾品卡片即可標記「已蒐集」，再次點擊可取消。</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-emerald-500 mt-0.5">✓</span>
+              <span>支援中文搜尋與顏色關鍵字（紅／黃／藍），也可搭配篩選更精準。</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-emerald-500 mt-0.5">✓</span>
+              <span>登入即可雲端同步收藏，換裝置也不會遺失進度。</span>
+            </li>
+          </ul>
         </div>
-      </section>
-    </Transition>
-
-    <!-- Tips Card -->
-    <section class="max-w-2xl mx-auto">
-      <div class="card">
-        <div class="flex items-center gap-3 mb-4">
-          <span class="text-2xl">💡</span>
-          <h3 class="text-lg font-bold text-gray-800">使用小提示</h3>
-        </div>
-        <ul class="space-y-2 text-gray-600 text-sm">
-          <li class="flex items-start gap-2">
-            <span class="text-emerald-500 mt-0.5">✓</span>
-            <span>點擊飾品卡片即可標記為「已蒐集」</span>
-          </li>
-          <li class="flex items-start gap-2">
-            <span class="text-emerald-500 mt-0.5">✓</span>
-            <span>支援中文搜尋，輸入「紅」找紅色皮克敏</span>
-          </li>
-          <li class="flex items-start gap-2">
-            <span class="text-emerald-500 mt-0.5">✓</span>
-            <span>登入帳號可以雲端同步蒐集進度</span>
-          </li>
-        </ul>
       </div>
-    </section>
+      
+      <!-- Footer Buttons (Pikmin Type, etc) - keeping them simple below for now or integrating better later -->
+    </div>
+
+    <!-- Modals (Pikmin Type, etc) -->
 
     <!-- Pikmin Type Selection Modal -->
     <Teleport to="body">
@@ -260,7 +149,7 @@
       >
         <div 
           v-if="showPikminModal"
-          class="modal-overlay"
+          class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm"
           @click.self="showPikminModal = false"
         >
           <Transition
@@ -271,12 +160,20 @@
             leave-from-class="opacity-100 scale-100 translate-y-0"
             leave-to-class="opacity-0 scale-95 translate-y-4"
           >
-            <div v-if="showPikminModal" class="modal-content max-w-md">
+            <div v-if="showPikminModal" class="bg-white rounded-3xl p-6 shadow-2xl max-w-md w-full relative overflow-hidden">
+                <!-- Decorative background -->
+                <div class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-emerald-100 to-transparent rounded-bl-full opacity-50 -z-10"></div>
+
               <div class="flex items-center justify-between mb-6">
                 <h3 class="text-xl font-bold text-gray-800 flex items-center gap-2">
-                  <span>🌈</span> 選擇皮克敏類型
+                  <span class="text-2xl">🌈</span> 選擇皮克敏類型
                 </h3>
-                <button @click="showPikminModal = false" class="text-gray-400 hover:text-gray-600 text-xl">✕</button>
+                <button 
+                    @click="showPikminModal = false" 
+                    class="w-10 h-10 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors"
+                >
+                    <Icon name="ion:close" class="text-xl text-gray-500" />
+                </button>
               </div>
               
               <div class="grid grid-cols-4 gap-3">
@@ -284,14 +181,14 @@
                   v-for="type in PIKMIN_TYPES" 
                   :key="type"
                   @click="goToPikminType(type)"
-                  class="flex flex-col items-center gap-2 p-4 rounded-2xl bg-white/80 hover:bg-white border-2 border-transparent hover:border-emerald-300 transition-all hover:shadow-lg"
+                  class="flex flex-col items-center gap-2 p-3 rounded-2xl bg-slate-50 hover:bg-emerald-50 border-2 border-transparent hover:border-emerald-200 transition-all hover:shadow-md group"
                 >
                   <div 
-                    class="w-12 h-12 rounded-full shadow-lg"
+                    class="w-10 h-10 rounded-full shadow-sm group-hover:scale-110 transition-transform"
                     :class="PIKMIN_TYPE_COLORS[type]"
                   ></div>
-                  <span class="text-xs font-semibold text-gray-700">{{ PIKMIN_TYPE_NAMES[type] }}</span>
-                  <span class="text-sm font-bold text-emerald-600">{{ getPikminTypePercentage(type) }}%</span>
+                  <span class="text-[10px] font-bold text-gray-600 group-hover:text-emerald-700">{{ PIKMIN_TYPE_NAMES[type] }}</span>
+                  <span class="text-[10px] font-medium text-gray-400 group-hover:text-emerald-500">{{ getPikminTypePercentage(type) }}%</span>
                 </button>
               </div>
             </div>
@@ -303,34 +200,31 @@
 </template>
 
 <script setup lang="ts">
-import { DECOR_CATEGORY_TYPES, PIKMIN_TYPES, PIKMIN_TYPE_NAMES, PIKMIN_TYPE_COLORS, type PikminType, type DecorCategoryType } from '~/types/decor';
+import { PIKMIN_TYPES, PIKMIN_TYPE_NAMES, PIKMIN_TYPE_COLORS, type PikminType } from '~/types/decor';
 
 const router = useRouter();
-const { getStats, isCollected } = useCollection();
-const { getDecorDefinitions, getAllDecorItems, getItemsByCategoryType } = useDecorData();
+const { getStats } = useCollection();
+const { getDecorDefinitions } = useDecorData();
 
-// Auth is now handled by AuthStore in app.vue
-
+// Stats
 const stats = computed(() => getStats());
 
 // Modal states
 const showPikminModal = ref(false);
-const showNearCompleteSection = ref(false);
-const nearCompleteRef = ref<HTMLElement | null>(null);
 
-// 1. 未蒐集數量
+// 1. Uncollected Count
 const uncollectedCount = computed(() => {
   return stats.value.total - stats.value.collected;
 });
 
-// 2. 限定飾品數量 (regional + special)
+// 2. Limited Items Count (regional + special)
 const limitedCount = computed(() => {
   const regional = stats.value.byCategoryType['regional']?.total || 0;
   const special = stats.value.byCategoryType['special']?.total || 0;
   return regional + special;
 });
 
-// 3. 即將完成的類別 (80-99% 完成度)
+// 3. Near Complete Categories (70-99% complete)
 const nearCompleteCategories = computed(() => {
   const definitions = getDecorDefinitions();
   const results: Array<{
@@ -347,15 +241,29 @@ const nearCompleteCategories = computed(() => {
     const catStats = stats.value.byCategory[def.category.id];
     if (!catStats || catStats.total === 0) return;
     
+    // Calculate percentage
     const percentage = Math.round((catStats.collected / catStats.total) * 100);
     const remaining = catStats.total - catStats.collected;
     
-    // 80-99% 完成，且至少差 1 件
+    // Find a representative icon (Red Pikmin of the first variant)
+    let iconUrl = '';
+    if (def.variants.length > 0) {
+        const firstVar = def.variants[0];
+        // Try Red first, then fallback to any available
+        if ((firstVar as any).imageUrls?.['red']) {
+            iconUrl = (firstVar as any).imageUrls['red'];
+        } else if ((firstVar as any).imageUrl) {
+            iconUrl = (firstVar as any).imageUrl;
+        }
+    }
+
+    // Condition: 70% to 99% collected, and at least 1 remaining
     if (percentage >= 70 && percentage < 100 && remaining > 0) {
       results.push({
         id: def.category.id,
         name: def.category.name,
-        icon: def.category.icon || '📦',
+        // If we found an image URL, use it. Otherwise fallback to Notomoji without 'lucide:' prefix
+        icon: iconUrl || (def.category.icon || 'fluent-emoji:package'), 
         collected: catStats.collected,
         total: catStats.total,
         remaining,
@@ -364,8 +272,8 @@ const nearCompleteCategories = computed(() => {
     }
   });
 
-  // 按完成度排序（高到低）
-  return results.sort((a, b) => b.percentage - a.percentage).slice(0, 5);
+  // Sort by percentage (highest first) and take top 6
+  return results.sort((a, b) => b.percentage - a.percentage).slice(0, 6);
 });
 
 const getPikminTypePercentage = (type: PikminType): number => {
@@ -374,31 +282,13 @@ const getPikminTypePercentage = (type: PikminType): number => {
   return Math.round((data.collected / data.total) * 100);
 };
 
-// 功能按鈕動作
+// Navigation Actions
 const showMissingItems = () => {
-  // 導航到圖鑑頁面，篩選未蒐集
   router.push({ path: '/collection', query: { status: 'uncollected' } });
 };
 
 const showUnobtainable = () => {
-  // 導航到圖鑑頁面，篩選限定飾品
   router.push({ path: '/collection', query: { limited: 'true' } });
-};
-
-const showNearComplete = () => {
-  showNearCompleteSection.value = !showNearCompleteSection.value;
-  
-  // 如果顯示區塊，自動滾動到該區塊（置中顯示）
-  if (showNearCompleteSection.value) {
-    nextTick(() => {
-      if (nearCompleteRef.value) {
-        nearCompleteRef.value.scrollIntoView({ 
-          behavior: 'smooth', 
-          block: 'center' // 改成置中，避免滑過頭
-        });
-      }
-    });
-  }
 };
 
 const goToPikminType = (type: PikminType) => {
