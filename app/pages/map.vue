@@ -213,11 +213,20 @@
           ]"
         >
           <!-- 標題列 -->
-          <div class="p-3 md:p-4 border-b border-gray-200 flex items-center justify-between bg-gradient-to-r from-emerald-50 to-teal-50">
+          <div 
+            class="relative p-3 md:p-4 border-b border-gray-200 flex items-center justify-between bg-gradient-to-r from-emerald-50 to-teal-50 touch-none"
+            @touchstart="handleTouchStart"
+            @touchmove="handleTouchMove"
+            @touchend="handleTouchEnd"
+          >
             <!-- 手機拖動指示條 -->
+            <div 
+              v-if="isMobile"
+              class="absolute top-1.5 left-1/2 -translate-x-1/2 w-12 h-1 bg-gray-300/50 rounded-full"
+            ></div>
             
             
-            <div class="flex items-center gap-2 md:gap-3">
+            <div class="flex items-center gap-2 md:gap-3 mt-1 md:mt-0">
               <span class="text-xl md:text-2xl">🗺️</span>
               <div>
                 <h2 class="font-bold text-gray-800 text-sm md:text-base">飾品地點篩選</h2>
@@ -438,10 +447,10 @@
             </button>
             
             <!-- Desktop Tooltip (Hover) -->
-            <div class="hidden md:block absolute right-0 top-full mt-2 w-56 bg-gray-900 text-white text-xs rounded-xl p-3 shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-[2000] pointer-events-none translate-y-2 group-hover:translate-y-0">
-              <div class="font-bold mb-2 text-emerald-300">純種區</div>
-              <p>顯示 L17 中只有一種飾品的格子</p>
-              <p class="text-gray-400 text-[10px] mt-1">任何縮放均可顯示</p>
+            <div class="hidden md:block absolute right-0 top-full mt-2 w-64 bg-gray-900 text-white text-xs rounded-xl p-3 shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-[2000] pointer-events-none translate-y-2 group-hover:translate-y-0">
+              <div class="font-bold mb-2 text-emerald-300">純種區模式</div>
+              <p class="leading-relaxed mb-1">該區域僅包含「單一種」飾品（或路邊），不會混雜其他類型。</p>
+              <p class="text-gray-400">適合：精準鎖定特定飾品，排除干擾。</p>
             </div>
 
             <!-- Mobile Ephemeral Tooltip (Auto-hide) -->
@@ -455,13 +464,13 @@
             >
               <div 
                 v-if="showPureModeHint" 
-                class="md:hidden absolute right-0 top-full mt-2 w-48 bg-gray-900/95 text-white text-xs rounded-xl p-3 shadow-xl z-[2000] backdrop-blur-sm border border-emerald-500/30"
+                class="md:hidden absolute right-0 top-full mt-2 w-56 bg-gray-900/95 text-white text-xs rounded-xl p-3 shadow-xl z-[2000] backdrop-blur-sm border border-emerald-500/30"
               >
                 <div class="flex items-start gap-2">
                   <span class="text-lg">🦄</span>
                   <div>
                     <div class="font-bold text-emerald-300 mb-1">純種區模式</div>
-                    <p class="leading-relaxed">只顯示單一飾品種類的地點</p>
+                    <p class="leading-relaxed">此區域僅判定為一種飾品（或路邊），不混雜其他類型，專為精準鎖定設計。</p>
                   </div>
                 </div>
               </div>
@@ -469,6 +478,42 @@
           </div>
         </div>
       </div>
+      
+      <!-- 純種模式常駐說明 (當純種模式開啟時顯示) -->
+      <Transition
+        enter-active-class="transition duration-300 ease-out"
+        enter-from-class="opacity-0 -translate-y-2"
+        enter-to-class="opacity-100 translate-y-0"
+        leave-active-class="transition duration-200 ease-in"
+        leave-from-class="opacity-100 translate-y-0"
+        leave-to-class="opacity-0 -translate-y-2"
+      >
+        <div 
+          v-if="isSingleMode && !showPureModeHint && showPureModeExplanation"
+          class="absolute top-20 md:top-24 left-1/2 -translate-x-1/2 z-[990] max-w-[90vw] md:max-w-md w-full"
+        >
+          <div class="bg-white/90 backdrop-blur-sm rounded-xl p-3 shadow-lg border border-emerald-200 flex items-start gap-3">
+            <div class="bg-emerald-100 p-1.5 rounded-full shrink-0">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <div class="text-xs text-gray-700 leading-relaxed">
+              <span class="font-bold text-emerald-700 block mb-0.5">純種模式已開啟</span>
+              地圖上顯示的每一個格子，都保證<span class="font-bold text-gray-900">只有一種飾品類型</span>（或是路邊貼紙）。
+              <br>這代表該區域是 42 種飾品中，剛好只有其中一種的重生點，沒有其他干擾。
+            </div>
+            <button 
+              @click="showPureModeExplanation = false"
+              class="text-gray-400 hover:text-gray-600 p-1"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </Transition>
 
       <!-- 地點搜尋欄 -->
       <div 
@@ -554,7 +599,7 @@
       <!-- Top-Center: "Search This Area" Floating Pill -->
       <div class="absolute top-20 left-1/2 -translate-x-1/2 z-[1000]">
         <button
-          v-if="!isLoading && canSearch && selectedFilters.length > 0"
+          v-if="!isLoading && canSearch && selectedFilters.length > 0 && !isSingleMode"
           @click="handleSearch"
           class="flex items-center h-10 gap-2 px-4 rounded-full shadow-xl bg-white text-emerald-600 font-bold border border-emerald-100 hover:scale-105 active:scale-95 transition-all"
         >
@@ -577,8 +622,8 @@
         </div>
       </div>
 
-      <!-- Bottom-Right: Navigation Controls (Zoom & Location) -->
-      <div class="absolute bottom-24 md:bottom-8 right-4 flex flex-col gap-3 z-[999] items-end pb-[env(safe-area-inset-bottom)]">
+      <!-- Top-Right: Navigation Controls (Zoom & Location) -->
+      <div class="absolute top-16 md:top-20 right-3 md:right-4 flex flex-col gap-3 z-[999] items-end">
         <!-- Location Button -->
         <button
           @click="goToMyLocation"
@@ -645,7 +690,7 @@
             <!-- 說明項目 -->
             <div class="flex items-center gap-2 text-xs">
               <div class="w-4 h-4 rounded-sm flex-shrink-0" style="background-color: #10B981; opacity: 0.5;"></div>
-              <span class="text-gray-700"><span class="font-semibold">綠色</span>：單一飾品類型（精準！）</span>
+              <span class="text-gray-700"><span class="font-semibold">綠色</span>：單一飾品類型</span>
             </div>
             <div class="flex items-center gap-2 text-xs">
               <div class="w-4 h-4 rounded-sm flex-shrink-0" style="background-color: #F59E0B; opacity: 0.5;"></div>
@@ -835,6 +880,7 @@ const isModeTransitioning = ref(false);
 
 // Pure Mode Hint State
 const showPureModeHint = ref(false);
+const showPureModeExplanation = ref(true); // Default enabled, user can close it
 let pureModeHintTimer: ReturnType<typeof setTimeout> | null = null;
 
 
@@ -882,6 +928,36 @@ const userLocation = ref<[number, number] | null>(null);
 
 // 網格圖例顯示狀態
 const showGridLegend = ref(true);
+
+// 拖動關閉面板邏輯 (Mobile)
+const touchStartY = ref(0);
+const touchCurrentY = ref(0);
+const isPanelDragging = ref(false);
+
+const handleTouchStart = (e: TouchEvent) => {
+  if (!isMobile.value) return;
+  touchStartY.value = e.touches[0].clientY;
+  isPanelDragging.value = true;
+};
+
+const handleTouchMove = (e: TouchEvent) => {
+  if (!isPanelDragging.value) return;
+  touchCurrentY.value = e.touches[0].clientY;
+};
+
+const handleTouchEnd = () => {
+  if (!isPanelDragging.value) return;
+  const distance = touchCurrentY.value - touchStartY.value;
+  // 如果向下滑動超過 50px 且有移動，則關閉面板
+  if (distance > 50 && touchCurrentY.value !== 0) {
+    showPanel.value = false;
+  }
+  
+  // 重置狀態
+  isPanelDragging.value = false;
+  touchStartY.value = 0;
+  touchCurrentY.value = 0;
+};
 
 // 單一飾品格（L17）顯示
 interface SingleTypeCell {
@@ -1118,6 +1194,10 @@ const toggleSingleTypeCells = async () => {
         showPureModeHint.value = false;
       }, 3000);
     }
+    // Always show persistent banner when entering mode (unless user closed it previously in this session? 
+    // Let's reset it to true for better discovery every time they enter mode)
+    showPureModeExplanation.value = true;
+    
     await loadSingleTypeCells();
   } else {
     showPureModeHint.value = false;
