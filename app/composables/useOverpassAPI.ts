@@ -83,8 +83,19 @@ out center;
 
       // 判斷這個點屬於哪個飾品類型
       let matchedRule: DecorRule | null = null;
+      
+      // [NEW] Rough bounding box for Taiwan Main Island + Islands to exclude JP-only content
+      // Taiwan is roughly Lat 21-26, Lon 119-122
+      // Japan is roughly Lat 24-46, Lon 122-154 (Okinawa starts around 122.5E)
+      // We assume if we are scanning Taiwan, we exclude JP-only rules.
+      const isTaiwan = (lat >= 21 && lat <= 26.5 && lon >= 118 && lon <= 122.5);
 
       for (const [ruleId, rule] of decorRulesMap) {
+        // [NEW] Region Check
+        if (rule.region === 'JP' && isTaiwan) {
+             continue; // Skip JP-only rules if in Taiwan
+        }
+
         for (const tag of rule.tags) {
           const [key, value] = tag.split('=');
           if (key && value && element.tags[key] === value) {

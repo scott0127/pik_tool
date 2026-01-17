@@ -230,6 +230,15 @@ function filterLocalPOIs(
       // 檢查是否在範圍內
       if (poi.lat < bounds.south || poi.lat > bounds.north) return false;
       if (poi.lon < bounds.west || poi.lon > bounds.east) return false;
+
+      // [NEW] Region Check
+      const rule = ruleMap.get(poi.decorType);
+      if (rule?.region === 'JP') {
+          // Check if point is in Taiwan (Approximate Bounds)
+          const isTaiwan = (poi.lat >= 21 && poi.lat <= 26.5 && poi.lon >= 118 && poi.lon <= 122.5);
+          if (isTaiwan) return false;
+      }
+
       // 檢查是否在選擇的類型內
       return ruleIds.has(poi.decorType);
     })

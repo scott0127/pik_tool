@@ -50,7 +50,7 @@ export const decorRules: DecorRule[] = [
   { id: 'art_gallery', name: '美術館', icon: '🎨', tags: ['tourism=museum', 'tourism=gallery', 'shop=art', 'amenity=arts_centre'] },
   { id: 'stadium', name: '體育館', icon: '🏟️', tags: ['leisure=stadium', 'leisure=sports_centre', 'building=stadium'] },
   { id: 'movie_theater', name: '電影院', icon: '🎬', tags: ['amenity=cinema'] },
-  { id: 'shrine', name: '神社', icon: '⛩️', tags: ['amenity=place_of_worship'] },
+  { id: 'shrine', name: '神社', icon: '⛩️', tags: ['amenity=place_of_worship'], region: 'JP' },
   
   // 特殊分類 (Special)
   { id: 'roadside', name: '路邊', icon: '🏷️', tags: [] }, // Roadside 無特定 OSM 標籤
