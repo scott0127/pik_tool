@@ -37,11 +37,11 @@
               v-for="cell in displayedGridCells"
               :key="cell.cellId"
               :lat-lngs="cell.bounds.map(p => [p.lat, p.lng])"
-              :color="getCellStyle(cell).strokeColor"
-              :weight="getCellStyle(cell).strokeWeight"
-              :opacity="getCellStyle(cell).strokeOpacity"
-              :fill-color="getCellStyle(cell).fillColor"
-              :fill-opacity="getCellStyle(cell).fillOpacity"
+              :color="getCellStyleWithReports(cell).strokeColor"
+              :weight="getCellStyleWithReports(cell).strokeWeight"
+              :opacity="getCellStyleWithReports(cell).strokeOpacity"
+              :fill-color="getCellStyleWithReports(cell).fillColor"
+              :fill-opacity="getCellStyleWithReports(cell).fillOpacity"
             >
               <LPopup v-if="isGridMode">
                 <div class="min-w-[200px] p-2">
@@ -52,9 +52,11 @@
                   <div class="text-xs text-gray-500 mb-3 font-mono break-all">
                     {{ cell.cellId }}
                   </div>
-                  <div v-if="cell.decorTypes.size > 0" class="space-y-2">
-                    <div class="text-xs font-semibold text-gray-700 mb-1">預測飾品類型：</div>
+                  
+                  <div class="space-y-2">
+                    <div class="text-xs font-semibold text-gray-700 mb-1">飾品類型 ({{ getEffectiveDecors(cell).size }}種)：</div>
                     <div class="flex flex-wrap gap-1">
+                      <!-- Existing Decors -->
                       <span
                         v-for="decorId in Array.from(cell.decorTypes)"
                         :key="decorId"
@@ -63,18 +65,59 @@
                         <span>{{ getDecorInfo(decorId)?.icon }}</span>
                         <span>{{ getDecorInfo(decorId)?.name }}</span>
                       </span>
+                      
+                      <!-- Added Decors -->
+                      <span
+                        v-for="decorId in Array.from(getAddedDecors(cell.cellId))"
+                        :key="`added-${decorId}`"
+                        class="inline-flex items-center gap-1 px-2 py-1 bg-blue-50 text-blue-700 rounded text-xs border border-blue-200"
+                        title="使用者回報新增"
+                      >
+                        <span>{{ getDecorInfo(decorId)?.icon }}</span>
+                        <span>{{ getDecorInfo(decorId)?.name }}</span>
+                        <span class="text-[10px]">👤</span>
+                      </span>
                     </div>
+
                     <div class="mt-2 pt-2 border-t border-gray-200">
-                      <div class="text-xs text-gray-600">
-                        <span class="font-medium">{{ cell.decorTypes.size }}</span> 種飾品混合
-                        <span v-if="cell.decorTypes.size === 1" class="text-emerald-600">（精準！）</span>
-                        <span v-else-if="cell.decorTypes.size <= 3" class="text-yellow-600">（中等）</span>
+                      <!-- Purity Status -->
+                      <div class="text-xs text-gray-600 mb-2">
+                        <span class="font-medium">{{ getEffectiveDecors(cell).size }}</span> 種飾品混合
+                        <span v-if="getEffectiveDecors(cell).size === 1" class="text-emerald-600">（精準！）</span>
+                        <span v-else-if="getEffectiveDecors(cell).size <= 3" class="text-yellow-600">（中等）</span>
                         <span v-else class="text-red-600">（混雜）</span>
                       </div>
+                      
+                      <!-- Report Actions -->
+                      <div class="space-y-1">
+                          <!-- Not Pure Warning -->
+                          <div v-if="isReported(cell.cellId)" class="w-full bg-purple-50 text-purple-700 font-bold px-2 py-1.5 rounded flex items-center gap-1.5 border border-purple-200 text-xs text-left">
+                              <span>⚠️</span>
+                              <span>有人回報這格不純！</span>
+                          </div>
+                           
+                           <!-- Report Functions (Only if logged in) -->
+                           <div v-if="user" class="grid grid-cols-2 gap-1 pt-1">
+                                <!-- Report Pure Error -->
+                               <button 
+                                  v-if="!isReported(cell.cellId) && cell.decorTypes.size === 1 && getAddedDecors(cell.cellId).size === 0"
+                                  @click="confirmReport(cell.cellId)"
+                                  class="col-span-2 bg-gray-50 hover:bg-red-50 text-gray-500 hover:text-red-600 px-2 py-1.5 rounded border border-gray-200 hover:border-red-200 text-xs transition-colors"
+                              >
+                                  回報錯誤 (非純種)
+                              </button>
+                              
+                              <!-- Report Missing Decor -->
+                              <button 
+                                  @click="openDecorSelector(cell.cellId)"
+                                  class="col-span-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-600 hover:text-emerald-700 px-2 py-1.5 rounded border border-emerald-200 hover:border-emerald-300 text-xs font-medium transition-colors flex items-center justify-center gap-1"
+                              >
+                                  <span>➕</span>
+                                  <span>回報缺漏飾品</span>
+                              </button>
+                           </div>
+                      </div>
                     </div>
-                  </div>
-                  <div v-else class="text-xs text-gray-500">
-                    🏷️ 路邊區域（無特定飾品標籤）
                   </div>
                 </div>
               </LPopup>
@@ -84,19 +127,38 @@
           <!-- 單一格高亮層（只在單一格模式顯示） -->
           <template v-if="canRenderGrid && isSingleMode">
             <LPolygon
-              v-for="cell in renderedSingleHighlights"
+              v-for="cell in singleTypeCellsInView"
               :key="`single-${cell.cellId}`"
               :lat-lngs="cell.bounds.map(p => [p.lat, p.lng])"
-              :color="getCellStyle(cell).strokeColor"
-              :weight="getCellStyle(cell).strokeWeight"
-              :opacity="getCellStyle(cell).strokeOpacity"
-              :fill-color="getCellStyle(cell).fillColor"
-              :fill-opacity="getCellStyle(cell).fillOpacity"
+              :color="getCellStyleWithReports(cell).strokeColor"
+              :weight="getCellStyleWithReports(cell).strokeWeight"
+              :opacity="getCellStyleWithReports(cell).strokeOpacity"
+              :fill-color="getCellStyleWithReports(cell).fillColor"
+              :fill-opacity="getCellStyleWithReports(cell).fillOpacity"
+              @click="handlePolygonClick(cell)"
             >
               <LPopup>
-                <div class="text-xs text-gray-600 flex items-center gap-1">
-                  <span>{{ getDecorInfo(Array.from(cell.decorTypes)[0])?.icon }}</span>
-                  <span>{{ getDecorInfo(Array.from(cell.decorTypes)[0])?.name }}</span>
+                <div class="min-w-[160px] p-1">
+                  <div class="text-xs text-gray-600 flex items-center gap-2 mb-2">
+                    <span class="text-lg">{{ getDecorInfo(Array.from(cell.decorTypes)[0])?.icon }}</span>
+                    <span class="font-bold">{{ getDecorInfo(Array.from(cell.decorTypes)[0])?.name }}</span>
+                    <span class="text-emerald-600 text-[10px] border border-emerald-200 px-1 rounded bg-emerald-50">純種</span>
+                  </div>
+                  
+                  <!-- Report Status / Action -->
+                  <div class="text-xs border-t border-gray-100 pt-2 mt-1">
+                      <div v-if="isReported(cell.cellId)" class="bg-purple-50 text-purple-700 font-bold px-2 py-1.5 rounded flex items-center gap-1.5 border border-purple-200 mb-1">
+                          <span>⚠️</span>
+                          <span>有人回報這格不純！</span>
+                      </div>
+                       <button 
+                          v-else-if="user"
+                          @click="confirmReport(cell.cellId)"
+                          class="w-full bg-gray-50 hover:bg-red-50 text-gray-500 hover:text-red-600 font-medium px-2 py-1.5 rounded transition-colors text-center border border-gray-200 hover:border-red-200"
+                      >
+                          回報錯誤 (非純種)
+                      </button>
+                  </div>
                 </div>
               </LPopup>
             </LPolygon>
@@ -106,9 +168,9 @@
           <!-- S2 Cell 內容徽章（高縮放顯示，避免太密） -->
           <template v-if="canRenderGrid && !isPinMode && mapZoom >= 16">
             <template v-for="cell in badgeCells" :key="`badge-${cell.cellId}`">
-              <!-- 只顯示有裝飾品或 POI 的格子 -->
+              <!-- 只顯示有裝飾品或 POI 的格子 (或有回報的) -->
               <LMarker
-                v-if="cell.decorTypes.size > 0 || cell.poiCount > 0"
+                v-if="getEffectiveDecors(cell).size > 0 || cell.poiCount > 0"
                 :lat-lng="[cell.center.lat, cell.center.lng]"
               >
                 <LIcon
@@ -120,27 +182,27 @@
                     class="absolute -translate-x-1/2 -translate-y-1/2 flex flex-col items-center pointer-events-none"
                     style="width: 80px;"
                   >
-                    <!-- 飾品圖示群組 -->
-                    <div class="flex items-center justify-center gap-1 mb-0.5 bg-white/90 rounded-full px-1.5 py-1 shadow-sm border border-emerald-100 backdrop-blur-sm">
-                      <div 
-                        v-for="decorId in Array.from(cell.decorTypes).slice(0, 3)" 
-                        :key="decorId"
-                        class="w-5 h-5 md:w-6 md:h-6 flex items-center justify-center"
-                      >
-                        <img 
-                          v-if="getDecorInfo(decorId)?.iconUrl" 
-                          :src="getDecorInfo(decorId)?.iconUrl" 
-                          class="w-full h-full object-contain"
-                        />
-                        <span v-else class="text-sm md:text-base leading-none">
-                          {{ getDecorInfo(decorId)?.icon }}
-                        </span>
-                      </div>
+                    <!-- 飾品圖示群組 (Top) -->
+                    <div class="flex items-center justify-center gap-0.5 mb-0.5 bg-white/95 rounded-full px-1.5 py-1 shadow-sm border border-emerald-100 backdrop-blur-sm">
+                        <!-- 顯示前 3 個圖示 (No text here) -->
+                        <div 
+                            v-for="decorId in Array.from(getEffectiveDecors(cell)).slice(0, 3)" 
+                            :key="decorId"
+                            class="w-4 h-4 flex items-center justify-center"
+                        >
+                            <span class="text-sm leading-none">
+                            {{ getDecorInfo(decorId)?.icon }}
+                            </span>
+                        </div>
+                        <span v-if="getEffectiveDecors(cell).size > 3" class="text-[10px] text-gray-400 leading-none">...</span>
                     </div>
                     
-                    <!-- POI 計數徽章 -->
-                    <div v-if="cell.poiCount > 0" class="bg-emerald-600 text-white text-[10px] md:text-xs font-bold px-1.5 py-0.5 rounded-full shadow-sm border border-white">
-                      ×{{ cell.poiCount }}
+                    <!-- 底部徽章群組 -->
+                    <div class="flex items-center gap-1 mt-0.5">
+                        <!-- 飾品總數徽章 (Moved Here) -->
+                        <div class="bg-gray-800 text-white text-[10px] md:text-xs font-bold px-1.5 py-0.5 rounded-full shadow-sm border border-white">
+                            {{ getEffectiveDecors(cell).size }}種飾品
+                        </div>
                     </div>
                   </div>
                 </LIcon>
@@ -262,11 +324,11 @@
             </div>
             
             <!-- 警告訊息 -->
-            <div v-if="selectedFilters.length > 30" class="mb-2 px-2 py-1 rounded bg-orange-50 text-orange-600 text-xs flex items-center gap-1">
+            <div v-if="selectedFilters.length > 10" class="mb-2 px-2 py-1 rounded bg-orange-50 text-orange-600 text-xs flex items-center gap-1">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
                 <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
               </svg>
-              超過30種查詢會比較慢喔
+              在非台灣的地方查詢超過10種會卡死喔!
             </div>
 
             <div class="flex gap-2">
@@ -352,9 +414,72 @@
         </div>
       </Transition>
 
-      <!-- 展開按鈕（當面板隱藏時顯示） -->
+      <!-- [NEW] Decor Selector Modal -->
+      <Transition
+        enter-active-class="transition duration-300 ease-out"
+        enter-from-class="opacity-0 scale-95"
+        enter-to-class="opacity-100 scale-100"
+        leave-active-class="transition duration-200 ease-in"
+        leave-from-class="opacity-100 scale-100"
+        leave-to-class="opacity-0 scale-95"
+      >
+        <div 
+          v-if="showDecorSelector"
+          class="absolute inset-0 z-[2000] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"
+          @click.self="showDecorSelector = false"
+        >
+          <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[80vh] flex flex-col overflow-hidden">
+            <!-- Header -->
+            <div class="p-4 border-b border-gray-100 flex items-center justify-between bg-emerald-50">
+              <div class="flex items-center gap-2">
+                <span class="text-2xl">➕</span>
+                <div>
+                  <h3 class="font-bold text-gray-800">回報缺漏飾品</h3>
+                  <p class="text-xs text-gray-500">請選擇此地點實際存在的飾品類型</p>
+                </div>
+              </div>
+              <button @click="showDecorSelector = false" class="text-gray-400 hover:text-gray-600 p-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            <!-- List -->
+            <div class="overflow-y-auto p-4 grid grid-cols-4 gap-2">
+              <button
+                v-for="decor in allDecors"
+                :key="decor.id"
+                @click="toggleDecorReport(decor.id)"
+                :disabled="decorLoading"
+                :class="[
+                  'flex flex-col items-center justify-center p-2 rounded-xl border transition-all text-center h-24',
+                  hasAddedDecor(selectedCellForDecorReport!, decor.id)
+                    ? 'bg-emerald-100 border-emerald-500 ring-2 ring-emerald-200 cursor-default opacity-50'
+                    : 'bg-gray-50 border-gray-100 hover:bg-emerald-50 hover:border-emerald-200 hover:shadow-md'
+                ]"
+              >
+                <div class="text-3xl mb-1">{{ decor.icon }}</div>
+                <div class="text-xs text-gray-700 font-medium leading-tight line-clamp-2">
+                    {{ decor.name.split('/')[0] }}
+                </div>
+                <div v-if="hasAddedDecor(selectedCellForDecorReport!, decor.id)" class="text-[10px] text-emerald-700 font-bold mt-1">
+                    已回報
+                </div>
+              </button>
+            </div>
+
+            <!-- Footer -->
+            <div class="p-4 border-t border-gray-100 bg-gray-50 text-xs text-gray-500 text-center">
+                點擊圖示即可送出回報。您的貢獻能讓地圖更準確！
+            </div>
+          </div>
+        </div>
+      </Transition>
+
+      <!-- Panel Toggle Button (for side panel) -->
       <button
-        v-if="!showPanel"
+        v-if="!showPanel && !showDecorSelector"
         @click="showPanel = true"
         class="absolute top-3 md:top-4 left-3 md:left-4 bg-white rounded-xl p-2.5 md:p-3 shadow-lg hover:shadow-xl active:scale-95 transition-all z-[1000] border border-gray-200"
         title="顯示篩選面板"
@@ -663,7 +788,7 @@
         leave-to-class="opacity-0 translate-y-2"
       >
         <div
-          v-if="isGridMode && showGridLegend"
+          v-if="(isGridMode || isSingleMode) && showGridLegend"
           :class="[
             'absolute bg-white rounded-xl shadow-lg z-[999] border border-gray-200',
             'bottom-3 md:bottom-4 left-3 md:left-4',
@@ -676,7 +801,7 @@
             @click="showGridLegend = false"
           >
             <div class="flex items-center gap-2">
-              <span class="text-sm font-bold text-gray-800">🔲 網格顏色說明</span>
+              <span class="text-sm font-bold text-gray-800">{{ isSingleMode ? '🦄 純種模式說明' : '🔲 網格顏色說明' }}</span>
             </div>
             <button class="text-gray-400 hover:text-gray-600 transition-colors">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -687,27 +812,44 @@
           
           <!-- 內容區 -->
           <div class="px-3 pb-3 space-y-2">
-            <!-- 說明項目 -->
-            <div class="flex items-center gap-2 text-xs">
-              <div class="w-4 h-4 rounded-sm flex-shrink-0" style="background-color: #10B981; opacity: 0.5;"></div>
-              <span class="text-gray-700"><span class="font-semibold">綠色</span>：單一飾品類型</span>
-            </div>
-            <div class="flex items-center gap-2 text-xs">
-              <div class="w-4 h-4 rounded-sm flex-shrink-0" style="background-color: #F59E0B; opacity: 0.5;"></div>
-              <span class="text-gray-700"><span class="font-semibold">黃色</span>：2-3 種飾品混合</span>
-            </div>
-            <div class="flex items-center gap-2 text-xs">
-              <div class="w-4 h-4 rounded-sm flex-shrink-0" style="background-color: #EF4444; opacity: 0.5;"></div>
-              <span class="text-gray-700"><span class="font-semibold">紅色</span>：4+ 種飾品混雜</span>
-            </div>
-            <div class="flex items-center gap-2 text-xs">
-              <div class="w-4 h-4 rounded-sm flex-shrink-0" style="background-color: #9CA3AF; opacity: 0.5;"></div>
-              <span class="text-gray-700"><span class="font-semibold">灰色</span>：路邊區域（無標籤）</span>
-            </div>
-            
-            <div class="pt-2 mt-2 border-t border-gray-200 text-xs text-gray-500">
-              點擊網格可查看詳細資訊
-            </div>
+            <!-- Grid Mode Legend -->
+            <template v-if="isGridMode">
+                <div class="flex items-center gap-2 text-xs">
+                <div class="w-4 h-4 rounded-sm flex-shrink-0" style="background-color: #10B981; opacity: 0.5;"></div>
+                <span class="text-gray-700"><span class="font-semibold">綠色</span>：單一飾品類型</span>
+                </div>
+                <div class="flex items-center gap-2 text-xs">
+                <div class="w-4 h-4 rounded-sm flex-shrink-0" style="background-color: #F59E0B; opacity: 0.5;"></div>
+                <span class="text-gray-700"><span class="font-semibold">黃色</span>：2-3 種飾品混合</span>
+                </div>
+                <div class="flex items-center gap-2 text-xs">
+                <div class="w-4 h-4 rounded-sm flex-shrink-0" style="background-color: #EF4444; opacity: 0.5;"></div>
+                <span class="text-gray-700"><span class="font-semibold">紅色</span>：4+ 種飾品混雜</span>
+                </div>
+                <div class="flex items-center gap-2 text-xs">
+                <div class="w-4 h-4 rounded-sm flex-shrink-0" style="background-color: #9CA3AF; opacity: 0.5;"></div>
+                <span class="text-gray-700"><span class="font-semibold">灰色</span>：路邊區域（無標籤）</span>
+                </div>
+                <div class="pt-2 mt-2 border-t border-gray-200 text-xs text-gray-500">
+                點擊網格可查看詳細資訊
+                </div>
+            </template>
+
+            <!-- Single Mode Legend -->
+            <template v-if="isSingleMode">
+                <div class="flex items-center gap-2 text-xs">
+                <div class="w-4 h-4 rounded-sm flex-shrink-0" style="background-color: #10B981; opacity: 0.5;"></div>
+                <span class="text-gray-700"><span class="font-semibold">綠色</span>：單一飾品類型 (純種)</span>
+                </div>
+                <div class="flex items-center gap-2 text-xs">
+                <div class="w-4 h-4 rounded-sm flex-shrink-0 border border-purple-300" style="background-color: #9333ea; opacity: 0.5;"></div>
+                <span class="text-gray-700"><span class="font-semibold text-purple-700">紫色</span>：已被回報 (非純種)</span>
+                </div>
+                
+                <div class="pt-2 mt-2 border-t border-gray-200 text-xs text-gray-500 leading-relaxed">
+                  若發現綠色格子非純種，<br>請點擊格子回報 ⚠️
+                </div>
+            </template>
           </div>
         </div>
       </Transition>
@@ -722,10 +864,10 @@
         leave-to-class="opacity-0 scale-90"
       >
         <button
-          v-if="isGridMode && !showGridLegend"
+          v-if="(isGridMode || isSingleMode) && !showGridLegend"
           @click="showGridLegend = true"
           class="absolute bottom-3 md:bottom-4 right-3 md:right-4 bg-white rounded-xl p-2.5 md:p-3 shadow-lg hover:shadow-xl active:scale-95 transition-all z-[999] border border-gray-200"
-          title="顯示網格顏色說明"
+          title="顯示說明"
         >
           <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 md:h-6 md:w-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -806,11 +948,15 @@ import { useDecorRules } from '~/composables/useDecorRules';
 import { useLocalFirstPOI } from '~/composables/useLocalFirstPOI';
 import { useS2Grid } from '~/composables/useS2Grid';
 import { useGeocoding } from '~/composables/useGeocoding';
+import { useCellReports } from '~/composables/useCellReports'; // [NEW]
 
 // Composables
 const { decorRules, getDecorRule } = useDecorRules();
 const { fetchPOIs, isLoading, error, dataSource, preloadAllRegions } = useLocalFirstPOI();
 const { searchLocation, isSearching, searchError } = useGeocoding();
+// [NEW] Cell Reports Logic
+const { reportedCellIds, fetchReportsForCells, submitReport, isReported, isReportedNotPure, getAddedDecors, hasAddedDecor } = useCellReports();
+const user = useSupabaseUser(); // Get user state for UI checks
 const { 
   config: s2Config,
   cells: s2Cells,
@@ -819,19 +965,125 @@ const {
   calculateGrid: calculateS2Grid,
   clearGrid: clearS2Grid,
   findCellForPoint,
-  getCellIdFromLatLng,
+  getCellIdFromLatLng, // [RESTORED]
   getCellStyle,
   getCellCenter,
   getCellVertices,
 } = useS2Grid();
+
+// [NEW] Helper to get effective decor types (Local + Reported)
+const getEffectiveDecors = (cell: any) => {
+    const localDecors = new Set(cell.decorTypes);
+    const addedDecors = getAddedDecors(cell.cellId);
+    addedDecors.forEach(d => localDecors.add(d));
+    return localDecors;
+};
+
+// [NEW] Wrapper for getCellStyle to inject custom styles
+const getCellStyleWithReports = (cell: any) => { // Use 'any' or correct type
+    // 1. Purple Grid (Not Pure) - Only valid in Pure Mode (Single Mode)
+    if (isSingleMode.value && (isReportedNotPure(cell.cellId) || (isReported(cell.cellId) && isReported(cell.cellId) !== true))) { 
+         // Note: isReported checks 'not_pure' in old logic, but let's strictly use isReportedNotPure from new composable
+         // Actually, isReportedNotPure is what we want.
+         return {
+            strokeColor: '#9333ea', // Purple-600
+            strokeWeight: 2,
+            strokeOpacity: 0.8,
+            fillColor: '#9333ea',
+            fillOpacity: 0.2
+        };
+    }
+    
+    // 2. Grid Mode - Recalculate color based on effective decors (including reported ones)
+    // Even in Single Mode, if we have added decors (making it not pure), we might want to handle it?
+    // But user said: "Green is Pure, Purple is Reported Not Pure".
+    // So in Single Mode, keep Purple logic.
+    
+    // In Grid Mode, we update colors based on count.
+    const effectiveDecors = getEffectiveDecors(cell);
+    if (effectiveDecors.size > cell.decorTypes.size) {
+        // We have added decors! Recalculate color based on effective size
+        const size = effectiveDecors.size;
+        
+        // Logic copied/adapted from getCellStyle in useS2Grid (simplified)
+        // 1 = Green, 2-3 = Yellow, 4+ = Red
+        let color = '#9CA3AF'; // Default Gray
+        if (size === 1) color = '#10B981'; // Green
+        else if (size <= 3) color = '#F59E0B'; // Yellow
+        else color = '#EF4444'; // Red
+        
+        return {
+            strokeColor: color,
+            strokeWeight: 1,
+            strokeOpacity: 0.5,
+            fillColor: color,
+            fillOpacity: 0.35
+        };
+    }
+
+    return getCellStyle(cell);
+};
+
+const handlePolygonClick = (cell: any) => {
+  console.log('[Map] Polygon clicked:', cell.cellId, cell);
+};
+
+// [NEW] Decor Selector Logic
+const showDecorSelector = ref(false);
+const selectedCellForDecorReport = ref<string | null>(null);
+const decorLoading = ref(false);
+const allDecors = decorRules;
+
+const openDecorSelector = (cellId: string) => {
+    selectedCellForDecorReport.value = cellId;
+    showDecorSelector.value = true;
+};
+
+const toggleDecorReport = async (decorId: string) => {
+    if (!selectedCellForDecorReport.value) return;
+    
+    const cellId = selectedCellForDecorReport.value;
+    
+    // Check if already added (optimistic check)
+    if (hasAddedDecor(cellId, decorId)) {
+        alert('您已經回報過這個飾品了！'); 
+        return; 
+    }
+
+    try {
+        decorLoading.value = true;
+        await submitReport(cellId, 'missing_decor', decorId);
+        // Don't close immediately, allow multiple selections? Or close for feedback?
+        // Let's keep it open for multi-select feel, but maybe show a toast.
+    } catch (e: any) {
+        alert('回報失敗：' + (e.message || '未知錯誤'));
+    } finally {
+        decorLoading.value = false;
+    }
+};
 
 // 響應式視窗寬度
 const windowWidth = ref(typeof window !== 'undefined' ? window.innerWidth : 1024);
 const isMobile = computed(() => windowWidth.value < 768);
 
 // 監聯視窗大小變化
+// 監聯視窗大小變化
 const updateWindowWidth = () => {
   windowWidth.value = window.innerWidth;
+};
+
+// [NEW] Confirm Report Logic
+const confirmReport = async (cellId: string) => {
+    if (!confirm('⚠️ 警告：您確定要回報這個格子並非「純種」嗎？\n\n回報後，所有玩家在地圖上都會看到這個標記。\n請僅在您實際確認過該地點會出現其他飾品時才回報。')) {
+        return;
+    }
+    
+    try {
+        await submitReport(cellId);
+        alert('感謝您的回報！地圖已更新。');
+    } catch (e: any) {
+        alert('回報失敗：' + (e.message || '未知錯誤'));
+    }
 };
 
 onMounted(() => {
@@ -850,7 +1102,7 @@ let leafletMap: any = null; // 不使用 ref，直接用普通變數
 
 // 狀態管理
 const showPanel = ref(true);
-const selectedFilters = ref<string[]>(decorRules.slice(0, 3).map(r => r.id)); // 預設只選前三個，避免查詢過重
+const selectedFilters = ref<string[]>(decorRules.slice(0, 42).map(r => r.id)); // 預設只選前三個，避免查詢過重
 
 // 搜尋功能狀態
 const searchQuery = ref('');
@@ -1067,6 +1319,12 @@ const onMapMoveEnd = () => {
     // 如果有 POI 數據，重新關聯
     if (fetchedPoints.value.length > 0) {
       associatePOIsToCells();
+    }
+    
+    // [NEW] Fetch reports for visible cells
+    const cellIds = s2Cells.value.map(c => c.cellId);
+    if (cellIds.length > 0) {
+        fetchReportsForCells(cellIds);
     }
   }
 

@@ -68,6 +68,40 @@ export interface Database {
           }
         ]
       }
+      cell_reports: {
+        Row: {
+          id: string
+          s2_cell_id: string
+          user_id: string | null
+          report_type: string | null
+          decor_id: string | null
+          created_at: string | null
+        }
+        Insert: {
+          id?: string
+          s2_cell_id: string
+          user_id?: string | null
+          report_type?: string | null
+          decor_id?: string | null
+          created_at?: string | null
+        }
+        Update: {
+          id?: string
+          s2_cell_id?: string
+          user_id?: string | null
+          report_type?: string | null
+          decor_id?: string | null
+          created_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cell_reports_user_id_fkey"
+            columns: ["user_id"]
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
     }
     Views: {
       [_ in never]: never
