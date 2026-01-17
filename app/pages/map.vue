@@ -490,7 +490,7 @@
       >
         <div 
           v-if="isSingleMode && !showPureModeHint && showPureModeExplanation"
-          class="absolute top-20 md:top-24 left-1/2 -translate-x-1/2 z-[990] max-w-[90vw] md:max-w-md w-full"
+          class="absolute top-20 md:top-24 left-1/2 -translate-x-1/2 z-[990] max-w-[65vw] md:max-w-md w-full"
         >
           <div class="bg-white/90 backdrop-blur-sm rounded-xl p-3 shadow-lg border border-emerald-200 flex items-start gap-3">
             <div class="bg-emerald-100 p-1.5 rounded-full shrink-0">
