@@ -320,7 +320,7 @@
   >
     <div 
       v-if="showCoffeeModal" 
-      class="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"
+      class="fixed inset-0 z-[3000] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"
       @click.self="showCoffeeModal = false"
     >
       <Transition
@@ -411,7 +411,7 @@
   >
     <div 
       v-if="showFeedbackModal" 
-      class="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"
+      class="fixed inset-0 z-[3000] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"
       @click.self="showFeedbackModal = false"
     >
       <Transition
@@ -528,7 +528,7 @@
   >
     <div 
       v-if="showFeedbackSuccess" 
-      class="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"
+      class="fixed inset-0 z-[3000] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"
       @click.self="showFeedbackSuccess = false"
     >
       <div class="bg-white rounded-3xl shadow-2xl max-w-sm w-full overflow-hidden text-center p-8">

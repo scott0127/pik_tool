@@ -3776,15 +3776,15 @@
     {
       "category": {
         "id": "osechi",
-        "name": "御節料理店",
-        "nameEn": "Osechi Shop",
+        "name": "日式年菜",
+        "nameEn": "Osechi",
         "type": "special",
         "icon": "noto:bento-box"
       },
       "variants": [
         {
           "id": "osechi",
-          "name": "御節料理",
+          "name": "日式年菜",
           "nameEn": "Osechi",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/5/53/Decor_Red_Osechi.png/100px-Decor_Red_Osechi.png",
           "imageUrls": {
