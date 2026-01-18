@@ -137,6 +137,57 @@
         </NuxtLink>
       </div>
 
+      <!-- Recommended Friends Section -->
+      <section v-if="recommendedPosts.length > 0" class="mb-10 animate-slide-up" style="animation-delay: 0.15s;">
+        <h2 class="text-xl font-bold text-gray-800 flex items-center gap-2 mb-4">
+          <span class="text-2xl">✨</span>
+          推薦好友
+          <span class="text-xs font-normal text-gray-500 bg-gray-100 px-2 py-1 rounded-full border border-gray-200">
+            每 10 秒更新
+          </span>
+        </h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3">
+          <div
+            v-for="post in recommendedPosts"
+            :key="`rec-${post.id}`"
+            class="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-xl p-3 border border-indigo-100 hover:shadow-md transition-all duration-300 group"
+          >
+            <div class="flex items-center gap-2 mb-2">
+              <div class="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-400 to-purple-500 flex items-center justify-center text-white text-xs font-bold shadow-sm">
+                {{ post.username.charAt(0).toUpperCase() }}
+              </div>
+              <div class="overflow-hidden">
+                <h3 class="font-bold text-gray-800 text-sm truncate">{{ post.username }}</h3>
+              </div>
+            </div>
+            
+            <div 
+              class="bg-white rounded-lg px-2 py-1.5 mb-2 border border-indigo-100 cursor-pointer hover:bg-indigo-50 transition-colors"
+              @click="copyCode(post.friend_code)"
+              title="點擊複製"
+            >
+              <p class="font-mono text-xs font-bold text-indigo-600 tracking-wider text-center">
+                {{ formatDisplayCode(post.friend_code) }}
+              </p>
+            </div>
+
+            <div class="flex justify-end">
+               <button
+                @click="copyCode(post.friend_code)"
+                class="text-[10px] text-indigo-400 hover:text-indigo-600 flex items-center gap-1 opacity-60 group-hover:opacity-100 transition-opacity"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
+                  <path d="M8 2a1 1 0 000 2h2a1 1 0 100-2H8z" />
+                  <path d="M3 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v6h-4.586l1.293-1.293a1 1 0 00-1.414-1.414l-3 3a1 1 0 000 1.414l3 3a1 1 0 001.414-1.414L10.414 13H15v3a2 2 0 01-2 2H5a2 2 0 01-2-2V5zM15 11h2a1 1 0 110 2h-2v-2z" />
+                </svg>
+                複製
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <!-- Posts Section -->
       <section class="animate-slide-up" style="animation-delay: 0.2s;">
         <div class="flex items-center justify-between mb-6">
@@ -482,4 +533,78 @@ const formatDate = (dateStr: string) => {
   
   return date.toLocaleDateString('zh-TW');
 };
+
+// --- Recommendation Logic ---
+const recommendedPosts = ref<FriendPost[]>([]);
+const recommendationQueue = ref<FriendPost[]>([]);
+let recommendTimer: any = null;
+
+// Fisher-Yates Shuffle
+const shuffleArray = <T>(array: T[]): T[] => {
+  const newArr = [...array];
+  for (let i = newArr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [newArr[i], newArr[j]] = [newArr[j], newArr[i]];
+  }
+  return newArr;
+};
+
+const refreshRecommendations = () => {
+  // 如果總人數過少，直接顯示全部，不需輪播邏輯
+  if (posts.value.length <= 10) {
+    recommendedPosts.value = [...posts.value];
+    return;
+  }
+
+  const needed = 10;
+  const nextBatch: FriendPost[] = [];
+
+  // 如果 Queue 不夠，進行補充邏輯
+  if (recommendationQueue.value.length < needed) {
+    // 1. 先把 Queue 剩下的都拿出來
+    nextBatch.push(...recommendationQueue.value);
+    
+    // 2. 產生新的一輪洗牌名單
+    const newShuffled = shuffleArray(posts.value);
+    
+    // 3. 計算還缺多少
+    const remainingNeeded = needed - nextBatch.length;
+    
+    // 從新名單取剩下的數量
+    const fill = newShuffled.slice(0, remainingNeeded);
+    nextBatch.push(...fill);
+    
+    // 剩下的放回 Queue
+    recommendationQueue.value = newShuffled.slice(remainingNeeded);
+  } else {
+    // Queue 足夠，直接切 10 個
+    const batch = recommendationQueue.value.slice(0, needed);
+    nextBatch.push(...batch);
+    // 更新 Queue (移除已取出的)
+    recommendationQueue.value = recommendationQueue.value.slice(needed);
+  }
+
+  recommendedPosts.value = nextBatch;
+};
+
+const startRecommendationTimer = () => {
+  if (recommendTimer) clearInterval(recommendTimer);
+  // 首次執行
+  refreshRecommendations();
+  // 每 30 秒刷新
+  recommendTimer = setInterval(refreshRecommendations, 10000);
+};
+
+// 監聽 posts 變更，當載入完成時啟動推薦
+watch(posts, (newPosts) => {
+  if (newPosts.length > 0) {
+    // 初始化 Queue: 第一次直接洗牌
+    recommendationQueue.value = shuffleArray(newPosts);
+    startRecommendationTimer();
+  }
+});
+
+onUnmounted(() => {
+  if (recommendTimer) clearInterval(recommendTimer);
+});
 </script>
