@@ -257,225 +257,24 @@
       </div>
 
       <!-- 側邊/底部控制面板 (響應式) -->
-      <Transition
-        enter-active-class="transition duration-300 ease-out"
-        :enter-from-class="isMobile ? 'opacity-0 translate-y-full' : 'opacity-0 -translate-x-full'"
-        :enter-to-class="isMobile ? 'opacity-100 translate-y-0' : 'opacity-100 translate-x-0'"
-        leave-active-class="transition duration-200 ease-in"
-        :leave-from-class="isMobile ? 'opacity-100 translate-y-0' : 'opacity-100 translate-x-0'"
-        :leave-to-class="isMobile ? 'opacity-0 translate-y-full' : 'opacity-0 -translate-x-full'"
-      >
-        <div
-          v-if="showPanel"
-          :class="[
-            'absolute bg-white shadow-2xl overflow-hidden flex flex-col z-[1000] border border-gray-200',
-            isMobile 
-              ? 'left-0 right-0 bottom-0 max-h-[60vh] rounded-t-3xl' 
-              : 'top-4 left-4 bottom-4 w-80 rounded-2xl'
-          ]"
-        >
-          <!-- 標題列 -->
-          <div 
-            class="relative p-3 md:p-4 border-b border-gray-200 flex items-center justify-between bg-gradient-to-r from-emerald-50 to-teal-50 touch-none"
-            @touchstart="handleTouchStart"
-            @touchmove="handleTouchMove"
-            @touchend="handleTouchEnd"
-          >
-            <!-- 手機拖動指示條 -->
-            <div 
-              v-if="isMobile"
-              class="absolute top-1.5 left-1/2 -translate-x-1/2 w-12 h-1 bg-gray-300/50 rounded-full"
-            ></div>
-            
-            
-            <div class="flex items-center gap-2 md:gap-3 mt-1 md:mt-0">
-              <span class="text-xl md:text-2xl">🗺️</span>
-              <div>
-                <h2 class="font-bold text-gray-800 text-sm md:text-base">{{ $t('map.panel.title') }}</h2>
-                <p class="text-xs text-gray-500 hidden md:block">{{ $t('map.panel.subtitle') }}</p>
-              </div>
-            </div>
-            <button
-              @click="showPanel = false"
-              class="p-2 hover:bg-white/50 rounded-lg transition-colors"
-              :title="isMobile ? $t('map.panel.close') : $t('map.panel.hide')"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                <path v-if="isMobile" fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
-                <path v-else fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
-              </svg>
-            </button>
-          </div>
-
-          <!-- 統計資訊 -->
-          <div class="p-3 md:p-4 bg-gray-50 border-b border-gray-200">
-            <div class="flex items-center justify-between text-xs md:text-sm mb-2">
-              <div>
-                <span class="text-gray-600">{{ $t('map.stats.selected') }}</span>
-                <span class="font-bold ml-1 text-emerald-600">
-                  {{ selectedFilters.length }}
-                </span>
-              </div>
-              <div>
-                <span class="text-gray-600">{{ $t('map.stats.found') }}</span>
-                <span class="font-bold text-teal-600 ml-1">{{ fetchedPoints.length }}</span>
-                <span class="text-gray-400">{{ $t('map.stats.places') }}</span>
-              </div>
-            </div>
-            
-            <!-- 警告訊息 -->
-            <div v-if="selectedFilters.length > 10" class="mb-2 px-2 py-1 rounded bg-orange-50 text-orange-600 text-xs flex items-center gap-1">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
-              </svg>
-              {{ $t('map.stats.warning') }}
-            </div>
-
-            <div class="flex gap-2">
-              <button
-                @click="selectAll"
-                class="flex-1 px-3 py-2 bg-emerald-100 hover:bg-emerald-200 active:bg-emerald-300 text-emerald-700 rounded-lg text-xs font-medium transition-colors"
-              >
-                {{ $t('map.stats.select_all') }}
-              </button>
-              <button
-                @click="clearAll"
-                class="flex-1 px-3 py-2 bg-gray-100 hover:bg-gray-200 active:bg-gray-300 text-gray-700 rounded-lg text-xs font-medium transition-colors"
-              >
-                {{ $t('map.stats.clear') }}
-              </button>
-            </div>
-          </div>
-
-          <!-- 篩選列表 - 手機使用網格佈局 -->
-          <div 
-            :class="[
-              'flex-1 overflow-y-auto p-2 md:p-4 bg-white',
-              isMobile ? 'grid grid-cols-3 gap-1 content-start' : 'space-y-1'
-            ]"
-          >
-            <label
-              v-for="rule in decorRules"
-              :key="rule.id"
-              :class="[
-                'flex items-center cursor-pointer transition-all relative',
-                isMobile 
-                  ? 'flex-col gap-1 p-2 rounded-xl text-center'
-                  : 'gap-3 p-3 rounded-xl hover:bg-gray-100 group',
-                selectedFilters.includes(rule.id) 
-                  ? 'bg-emerald-50 border border-emerald-200' 
-                  : isMobile ? 'bg-gray-50' : '',
-                ''
-              ]"
-            >
-              <input
-                type="checkbox"
-                :value="rule.id"
-                v-model="selectedFilters"
-                :class="[
-                  'rounded border-gray-300 text-emerald-500 focus:ring-emerald-500 focus:ring-offset-0',
-                  isMobile ? 'w-3 h-3 absolute opacity-0' : 'w-4 h-4'
-                ]"
-              />
-              <span :class="isMobile ? 'text-2xl' : 'text-2xl group-hover:scale-110 transition-transform'">{{ rule.icon }}</span>
-              <span :class="isMobile ? 'text-[10px] leading-tight text-gray-600 line-clamp-2' : 'text-sm font-medium text-gray-700 flex-1'">
-                {{ $t('decor_types.' + rule.id) }}
-              </span>
-              <span v-if="!isMobile" class="text-xs text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity">
-                {{ getCountForRule(rule.id) }}
-              </span>
-            </label>
-          </div>
-
-          <!-- 載入狀態指示器 -->
-          <div
-            v-if="isLoading"
-            class="p-3 bg-gradient-to-r from-emerald-500 to-teal-500 text-white text-center"
-          >
-            <div class="flex items-center justify-center gap-2">
-              <svg class="animate-spin h-4 w-4" viewBox="0 0 24 24">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none" />
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-              </svg>
-              <span class="text-sm font-medium">{{ $t('map.loading') }}</span>
-            </div>
-          </div>
-
-          <!-- 錯誤訊息 -->
-          <div
-            v-if="error"
-            class="p-3 bg-red-50 border-t border-red-200 text-red-600 text-sm"
-          >
-            <div class="flex items-start gap-2">
-              <span>⚠️</span>
-              <span>{{ error }}</span>
-            </div>
-          </div>
-        </div>
-      </Transition>
+      <MapControlPanel
+        v-model:showPanel="showPanel"
+        v-model:selectedFilters="selectedFilters"
+        :is-loading="isLoading"
+        :error="error"
+        :decor-rules="decorRules"
+        :fetched-points="fetchedPoints"
+        :is-mobile="isMobile"
+        @select-all="selectAll"
+        @clear-all="clearAll"
+      />
 
       <!-- [NEW] Decor Selector Modal -->
-      <Transition
-        enter-active-class="transition duration-300 ease-out"
-        enter-from-class="opacity-0 scale-95"
-        enter-to-class="opacity-100 scale-100"
-        leave-active-class="transition duration-200 ease-in"
-        leave-from-class="opacity-100 scale-100"
-        leave-to-class="opacity-0 scale-95"
-      >
-        <div 
-          v-if="showDecorSelector"
-          class="absolute inset-0 z-[2000] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"
-          @click.self="showDecorSelector = false"
-        >
-          <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[80vh] flex flex-col overflow-hidden">
-            <!-- Header -->
-            <div class="p-4 border-b border-gray-100 flex items-center justify-between bg-emerald-50">
-                <div class="flex items-center gap-2">
-                <span class="text-2xl">➕</span>
-                <div>
-                  <h3 class="font-bold text-gray-800">{{ $t('map.report.title') }}</h3>
-                  <p class="text-xs text-gray-500">{{ $t('map.report.subtitle') }}</p>
-                </div>
-              </div>
-              <button @click="showDecorSelector = false" class="text-gray-400 hover:text-gray-600 p-2">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
-
-            <!-- List -->
-            <div class="overflow-y-auto p-4 grid grid-cols-4 gap-2">
-              <button
-                v-for="decor in allDecors"
-                :key="decor.id"
-                @click="toggleDecorReport(decor.id)"
-                :disabled="decorLoading"
-                :class="[
-                  'flex flex-col items-center justify-center p-2 rounded-xl border transition-all text-center h-24',
-                  hasAddedDecor(selectedCellForDecorReport!, decor.id)
-                    ? 'bg-emerald-100 border-emerald-500 ring-2 ring-emerald-200 cursor-default opacity-50'
-                    : 'bg-gray-50 border-gray-100 hover:bg-emerald-50 hover:border-emerald-200 hover:shadow-md'
-                ]"
-              >
-                <div class="text-3xl mb-1">{{ decor.icon }}</div>
-                <div class="text-xs text-gray-700 font-medium leading-tight line-clamp-2">
-                    {{ $t('decor_types.' + decor.id) }}
-                </div>
-                <div v-if="hasAddedDecor(selectedCellForDecorReport!, decor.id)" class="text-[10px] text-emerald-700 font-bold mt-1">
-                    {{ $t('map.report.reported') }}
-                </div>
-              </button>
-            </div>
-
-            <!-- Footer -->
-            <div class="p-4 border-t border-gray-100 bg-gray-50 text-xs text-gray-500 text-center">
-                {{ $t('map.report.footer') }}
-            </div>
-          </div>
-        </div>
-      </Transition>
+      <MapDecorSelector
+        v-model="showDecorSelector"
+        :cell-id="selectedCellForDecorReport"
+        :all-decors="allDecors"
+      />
 
       <!-- Panel Toggle Button (for side panel) -->
       <button
@@ -640,240 +439,31 @@
         </div>
       </Transition>
 
-      <!-- 地點搜尋欄 -->
-      <div 
-        class="absolute top-3 md:top-4 left-16 right-48 md:right-auto md:w-80 transition-all duration-300 z-[1001]"
-        :class="showPanel ? 'md:left-[22rem]' : 'md:left-16'"
-      >
-        <div class="relative">
-          <!-- 搜尋輸入框 -->
-          <div class="bg-white rounded-xl shadow-lg border border-gray-200 flex items-center overflow-hidden h-10">
-            <div class="pl-3 md:pl-4 text-gray-400">
-              <svg v-if="!isSearching" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 md:h-5 md:w-5" viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
-              </svg>
-              <svg v-else class="animate-spin h-4 w-4 md:h-5 md:w-5" viewBox="0 0 24 24">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none" />
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-              </svg>
-            </div>
-            <input
-              v-model="searchQuery"
-              @input="handleSearchInput"
-              @focus="handleSearchFocus"
-              @keydown="handleSearchKeydown"
-              type="text"
-              :placeholder="$t('map.search.placeholder')"
-              class="flex-1 px-3 h-full text-sm md:text-base outline-none"
-            />
-            <button
-              v-if="searchQuery"
-              @click="clearSearch"
-              class="pr-3 md:pr-4 text-gray-400 hover:text-gray-600 transition-colors"
-              :title="$t('map.search.clear')"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 md:h-5 md:w-5" viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
-              </svg>
-            </button>
-          </div>
-
-          <!-- 搜尋結果下拉選單 -->
-          <Transition
-            enter-active-class="transition duration-200 ease-out"
-            enter-from-class="opacity-0 -translate-y-2"
-            enter-to-class="opacity-100 translate-y-0"
-            leave-active-class="transition duration-150 ease-in"
-            leave-from-class="opacity-100 translate-y-0"
-            leave-to-class="opacity-0 -translate-y-2"
-          >
-            <div
-              v-if="showSearchResults && (searchResults.length > 0 || searchError)"
-              class="absolute top-full mt-2 w-full bg-white rounded-xl shadow-2xl border border-gray-200 overflow-hidden max-h-80 overflow-y-auto"
-            >
-              <!-- 錯誤訊息 -->
-              <div v-if="searchError" class="p-3 text-sm text-red-600 flex items-center gap-2">
-                <span>⚠️</span>
-                <span>{{ searchError }}</span>
-              </div>
-
-              <!-- 搜尋結果列表 -->
-              <div v-else>
-                <button
-                  v-for="(result, index) in searchResults"
-                  :key="result.place_id"
-                  @click="selectSearchResult(result)"
-                  :class="[
-                    'w-full text-left px-3 md:px-4 py-2 md:py-3 hover:bg-emerald-50 transition-colors border-b border-gray-100 last:border-b-0',
-                    selectedResultIndex === index ? 'bg-emerald-50' : ''
-                  ]"
-                >
-                  <div class="font-medium text-gray-800 text-sm md:text-base mb-1 line-clamp-1">
-                    {{ getLocationName(result.display_name) }}
-                  </div>
-                  <div class="text-xs md:text-sm text-gray-500 line-clamp-1">
-                    {{ result.display_name }}
-                  </div>
-                </button>
-              </div>
-            </div>
-          </Transition>
-        </div>
-      </div>
-
-      <!-- Top-Center: "Search This Area" Floating Pill -->
-      <div class="absolute top-20 left-1/2 -translate-x-1/2 z-[1000]">
-        <button
-          v-if="!isLoading && canSearch && selectedFilters.length > 0 && !isSingleMode"
-          @click="handleSearch"
-          class="flex items-center h-10 gap-2 px-4 rounded-full shadow-xl bg-white text-emerald-600 font-bold border border-emerald-100 hover:scale-105 active:scale-95 transition-all"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-            <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
-          </svg>
-          <span>{{ $t('map.search.search_area') }}</span>
-        </button>
-
-        <!-- Loading State Pill -->
-        <div
-          v-else-if="isLoading"
-          class="flex items-center h-10 gap-2 px-4 rounded-full shadow-xl bg-white text-emerald-600 font-bold border border-emerald-100"
-        >
-           <svg class="animate-spin h-4 w-4" viewBox="0 0 24 24">
-            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none" />
-            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-          </svg>
-          <span>{{ $t('map.search.loading') }}</span>
-        </div>
-      </div>
+      <!-- 地點搜尋欄 & 搜尋區域按鈕 -->
+      <MapSearch
+        :panel-visible="showPanel"
+        :is-loading="isLoading"
+        :can-search-area="canSearch"
+        :has-selected-filters="selectedFilters.length > 0"
+        :is-single-mode="isSingleMode"
+        @search-area="handleSearch"
+        @fly-to="(lat, lon) => mapRef?.leafletObject?.flyTo([lat, lon], 18)"
+      />
 
       <!-- Top-Right: Navigation Controls (Zoom & Location) -->
-      <div class="absolute top-16 md:top-20 right-3 md:right-4 flex flex-col gap-3 z-[999] items-end">
-        <!-- Location Button -->
-        <button
-          @click="goToMyLocation"
-          :disabled="isLocating"
-          class="w-12 h-12 bg-white rounded-full shadow-xl flex items-center justify-center border border-gray-100 text-gray-700 hover:bg-gray-50 active:bg-gray-100 transition-all"
-          :title="locationError || $t('map.user_location')"
-        >
-          <svg v-if="isLocating" class="animate-spin h-6 w-6 text-emerald-500" viewBox="0 0 24 24">
-            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none" />
-            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-          </svg>
-          <svg v-else xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" :class="locationError ? 'text-red-500' : 'text-gray-700'" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm8.94 3A8.994 8.994 0 0013 3.06V1h-2v2.06A8.994 8.994 0 003.06 11H1v2h2.06A8.994 8.994 0 0011 20.94V23h2v-2.06A8.994 8.994 0 0020.94 13H23v-2h-2.06zM12 19c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z"/>
-          </svg>
-        </button>
-
-        <!-- Zoom Indicator / Controls -->
-        <div class="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden flex flex-col">
-           <!-- Zoom Indicator -->
-           <div class="px-2 py-1.5 text-[10px] text-center font-bold text-gray-500 border-b border-gray-100 bg-gray-50">
-             Lv.{{ mapZoom }}
-           </div>
-           <!-- (Optional) Add + / - buttons here in future if map object exposed -->
-           <div v-if="!canSearch" class="px-2 py-1 bg-red-50 text-red-600 text-[10px] font-bold text-center">
-             {{ $t('map.zoom_in') }}
-           </div>
-        </div>
-      </div>
+      <MapZoomControls
+        :map-zoom="mapZoom"
+        :is-locating="isLocating"
+        :location-error="locationError"
+        :can-search="canSearch"
+        @locate="goToMyLocation"
+      />
 
       <!-- S2 網格圖例面板（可摺疊）-->
-      <Transition
-        enter-active-class="transition duration-300 ease-out"
-        enter-from-class="opacity-0 translate-y-2"
-        enter-to-class="opacity-100 translate-y-0"
-        leave-active-class="transition duration-200 ease-in"
-        leave-from-class="opacity-100 translate-y-0"
-        leave-to-class="opacity-0 translate-y-2"
-      >
-        <div
-          v-if="(isGridMode || isSingleMode) && showGridLegend"
-          :class="[
-            'absolute bg-white rounded-xl shadow-lg z-[999] border border-gray-200',
-            'bottom-3 md:bottom-4 left-3 md:left-4',
-            'max-w-[calc(100vw-1.5rem)] md:max-w-xs'
-          ]"
-        >
-          <!-- 標題列（可點擊摺疊）-->
-          <div 
-            class="flex items-center justify-between p-3 cursor-pointer select-none"
-            @click="showGridLegend = false"
-          >
-            <div class="flex items-center gap-2">
-              <span class="text-sm font-bold text-gray-800">{{ isSingleMode ? '🦄 純種模式說明' : '🔲 網格顏色說明' }}</span>
-            </div>
-            <button class="text-gray-400 hover:text-gray-600 transition-colors">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
-              </svg>
-            </button>
-          </div>
-          
-          <!-- 內容區 -->
-          <div class="px-3 pb-3 space-y-2">
-            <!-- Grid Mode Legend -->
-            <template v-if="isGridMode">
-                <div class="flex items-center gap-2 text-xs">
-                <div class="w-4 h-4 rounded-sm flex-shrink-0" style="background-color: #10B981; opacity: 0.5;"></div>
-                <span class="text-gray-700"><span class="font-semibold">綠色</span>：單一飾品類型</span>
-                </div>
-                <div class="flex items-center gap-2 text-xs">
-                <div class="w-4 h-4 rounded-sm flex-shrink-0" style="background-color: #F59E0B; opacity: 0.5;"></div>
-                <span class="text-gray-700"><span class="font-semibold">黃色</span>：2-3 種飾品混合</span>
-                </div>
-                <div class="flex items-center gap-2 text-xs">
-                <div class="w-4 h-4 rounded-sm flex-shrink-0" style="background-color: #EF4444; opacity: 0.5;"></div>
-                <span class="text-gray-700"><span class="font-semibold">紅色</span>：4+ 種飾品混雜</span>
-                </div>
-                <div class="flex items-center gap-2 text-xs">
-                <div class="w-4 h-4 rounded-sm flex-shrink-0" style="background-color: #9CA3AF; opacity: 0.5;"></div>
-                <span class="text-gray-700"><span class="font-semibold">灰色</span>：路邊區域（無標籤）</span>
-                </div>
-                <div class="pt-2 mt-2 border-t border-gray-200 text-xs text-gray-500">
-                點擊網格可查看詳細資訊
-                </div>
-            </template>
-
-            <!-- Single Mode Legend -->
-            <template v-if="isSingleMode">
-                <div class="flex items-center gap-2 text-xs">
-                <div class="w-4 h-4 rounded-sm flex-shrink-0" style="background-color: #10B981; opacity: 0.5;"></div>
-                <span class="text-gray-700"><span class="font-semibold">綠色</span>：單一飾品類型 (純種)</span>
-                </div>
-                <div class="flex items-center gap-2 text-xs">
-                <div class="w-4 h-4 rounded-sm flex-shrink-0 border border-purple-300" style="background-color: #9333ea; opacity: 0.5;"></div>
-                <span class="text-gray-700"><span class="font-semibold text-purple-700">紫色</span>：已被回報 (非純種)</span>
-                </div>
-                
-                <div class="pt-2 mt-2 border-t border-gray-200 text-xs text-gray-500 leading-relaxed">
-                  若發現綠色格子非純種，<br>請點擊格子回報 ⚠️
-                </div>
-            </template>
-          </div>
-        </div>
-      </Transition>
-      
-      <!-- 圖例開啟按鈕（當圖例關閉時顯示）-->
-      <Transition
-        enter-active-class="transition duration-300 ease-out"
-        enter-from-class="opacity-0 scale-90"
-        enter-to-class="opacity-100 scale-100"
-        leave-active-class="transition duration-200 ease-in"
-        leave-from-class="opacity-100 scale-100"
-        leave-to-class="opacity-0 scale-90"
-      >
-        <button
-          v-if="(isGridMode || isSingleMode) && !showGridLegend"
-          @click="showGridLegend = true"
-          class="absolute bottom-3 md:bottom-4 right-3 md:right-4 bg-white rounded-xl p-2.5 md:p-3 shadow-lg hover:shadow-xl active:scale-95 transition-all z-[999] border border-gray-200"
-          title="顯示說明"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 md:h-6 md:w-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-        </button>
-      </Transition>
+      <MapGridLegend
+        :is-grid-mode="isGridMode"
+        :is-single-mode="isSingleMode"
+      />
 
       <!-- 搜尋結果提示 -->
       <Transition
@@ -949,6 +539,11 @@ import { useLocalFirstPOI } from '~/composables/useLocalFirstPOI';
 import { useS2Grid } from '~/composables/useS2Grid';
 import { useGeocoding } from '~/composables/useGeocoding';
 import { useCellReports } from '~/composables/useCellReports'; // [NEW]
+import MapControlPanel from '~/components/map/MapControlPanel.vue';
+import MapSearch from '~/components/map/MapSearch.vue';
+import MapDecorSelector from '~/components/map/MapDecorSelector.vue';
+import MapGridLegend from '~/components/map/MapGridLegend.vue';
+import MapZoomControls from '~/components/map/MapZoomControls.vue';
 
 // Composables
 const { decorRules, getDecorRule } = useDecorRules();
