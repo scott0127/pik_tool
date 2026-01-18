@@ -238,6 +238,15 @@
             "pin": "Pin",
             "pure": "Pure Zone"
         },
+        "cell_info": {
+            "decor_types": "Decor Types",
+            "types_unit": " types",
+            "mixed_types": " types found",
+            "pure": "Pure",
+            "medium": "Mixed",
+            "mixed": "Heavily Mixed",
+            "user_reported": "User Reported"
+        },
         "search": {
             "placeholder": "Search location",
             "clear": "Clear",

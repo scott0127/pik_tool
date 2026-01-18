@@ -179,6 +179,15 @@
             "pin": "標記",
             "pure": "純種區"
         },
+        "cell_info": {
+            "decor_types": "飾品類型",
+            "types_unit": "種",
+            "mixed_types": "種飾品",
+            "pure": "純種",
+            "medium": "混合",
+            "mixed": "雜亂",
+            "user_reported": "玩家回報"
+        },
         "search": {
             "placeholder": "搜尋地點",
             "clear": "清除",
