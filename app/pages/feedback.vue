@@ -12,8 +12,8 @@
         <div class="inline-flex items-center justify-center w-20 h-20 rounded-3xl bg-gradient-to-br from-violet-400 to-purple-500 shadow-xl shadow-violet-200 mb-4">
           <span class="text-4xl">💬</span>
         </div>
-        <h1 class="text-3xl font-extrabold gradient-text mb-2">意見回饋</h1>
-        <p class="text-gray-500">您的意見對我們非常重要！</p>
+        <h1 class="text-3xl font-extrabold gradient-text mb-2">{{ $t('feedback.page_title') }}</h1>
+        <p class="text-gray-500">{{ $t('feedback.page_subtitle') }}</p>
       </header>
 
       <!-- Feedback Form -->
@@ -21,7 +21,7 @@
         <form @submit.prevent="submitFeedback" class="space-y-6">
           <!-- Feedback Type -->
           <div>
-            <label class="block text-sm font-semibold text-gray-700 mb-3">回饋類型</label>
+            <label class="block text-sm font-semibold text-gray-700 mb-3">{{ $t('feedback.form.label_type') }}</label>
             <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
               <button
                 v-for="type in feedbackTypes"
@@ -46,14 +46,14 @@
             <label class="block text-sm font-semibold text-gray-700 mb-2">
               <span class="flex items-center gap-2">
                 <span>📧</span>
-                Email（選填）
+                <span>{{ $t('feedback.form.email_label') }}</span>
               </span>
             </label>
             <input
               v-model="form.email"
               type="email"
               class="input-field"
-              placeholder="如需回覆請留下您的 Email"
+              :placeholder="$t('feedback.form.email_placeholder')"
             >
           </div>
 
@@ -62,7 +62,7 @@
             <label class="block text-sm font-semibold text-gray-700 mb-2">
               <span class="flex items-center gap-2">
                 <span>📝</span>
-                詳細內容
+                {{ $t('feedback.form.message_label') }}
                 <span class="text-red-500">*</span>
               </span>
             </label>
@@ -71,14 +71,14 @@
               required
               rows="5"
               class="input-field resize-none"
-              placeholder="請詳細描述您的建議、問題或發現的錯誤..."
+              :placeholder="$t('feedback.form.message_placeholder')"
             ></textarea>
             <p class="text-xs text-gray-400 mt-1">{{ form.message.length }} / 1000 字</p>
           </div>
 
           <!-- Device Info (Auto-filled) -->
           <div class="bg-gray-50/80 rounded-xl p-4">
-            <p class="text-xs text-gray-500 mb-2">📱 裝置資訊（自動收集，用於問題診斷）</p>
+            <p class="text-xs text-gray-500 mb-2">{{ $t('feedback.form.device_info') }}</p>
             <p class="text-xs text-gray-400 font-mono">{{ deviceInfo }}</p>
           </div>
 
@@ -92,7 +92,7 @@
               <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none" />
               <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
             </svg>
-            <span>{{ submitting ? '提交中...' : '送出回饋' }}</span>
+            <span>{{ submitting ? $t('feedback.form.submitting') : $t('feedback.form.submit') }}</span>
           </button>
         </form>
       </div>
@@ -101,7 +101,7 @@
       <div class="glass rounded-3xl p-6 mt-6 animate-slide-up" style="animation-delay: 0.2s;">
         <h3 class="font-bold text-gray-800 mb-4 flex items-center gap-2">
           <span>🔗</span>
-          其他聯繫方式
+          {{ $t('feedback.other_contact') }}
         </h3>
         <div class="space-y-3">
           <a 
@@ -117,7 +117,7 @@
             </div>
             <div>
               <p class="font-medium text-gray-800">GitHub Issues</p>
-              <p class="text-xs text-gray-500">回報 Bug 或提出功能建議</p>
+              <p class="text-xs text-gray-500">{{ $t('feedback.github_desc') }}</p>
             </div>
           </a>
         </div>
@@ -142,13 +142,13 @@
               <div class="w-20 h-20 mx-auto bg-gradient-to-br from-emerald-400 to-teal-500 rounded-full flex items-center justify-center mb-4 shadow-xl">
                 <span class="text-4xl">✅</span>
               </div>
-              <h3 class="text-xl font-bold text-gray-800 mb-2">感謝您的回饋！</h3>
-              <p class="text-gray-500 mb-6">我們已收到您的意見，將會認真參考。</p>
+              <h3 class="text-xl font-bold text-gray-800 mb-2">{{ $t('feedback.success.title') }}</h3>
+              <p class="text-gray-500 mb-6">{{ $t('feedback.success.desc') }}</p>
               <button
                 @click="showSuccess = false"
                 class="btn-primary"
               >
-                好的
+                {{ $t('feedback.success.ok') }}
               </button>
             </div>
           </div>
@@ -159,12 +159,14 @@
 </template>
 
 <script setup lang="ts">
-const feedbackTypes = [
-  { id: 'suggestion', icon: '💡', label: '功能建議' },
-  { id: 'bug', icon: '🐛', label: '回報錯誤' },
-  { id: 'data', icon: '📊', label: '資料問題' },
-  { id: 'other', icon: '💭', label: '其他' },
-];
+const { t } = useI18n();
+
+const feedbackTypes = computed(() => [
+  { id: 'suggestion', icon: '💡', label: t('feedback.types.suggestion') },
+  { id: 'bug', icon: '🐛', label: t('feedback.types.bug') },
+  { id: 'data', icon: '📊', label: t('feedback.types.data') },
+  { id: 'other', icon: '💭', label: t('feedback.types.other') },
+]);
 
 const form = ref({
   type: 'suggestion',
@@ -217,7 +219,7 @@ const submitFeedback = async () => {
     };
   } catch (error) {
     console.error('Failed to submit feedback:', error);
-    alert('提交失敗，請稍後再試');
+    alert(t('feedback.alerts.submit_failed', '提交失敗，請稍後再試'));
   } finally {
     submitting.value = false;
   }

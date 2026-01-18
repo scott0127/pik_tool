@@ -7,7 +7,7 @@
       :class="[selected === null ? 'ring-2 ring-emerald-400 ring-offset-2' : '']"
     >
       <div class="w-8 h-8 rounded-full bg-gradient-to-br from-red-400 via-blue-400 to-purple-400 shadow-md"></div>
-      <span class="text-xs font-semibold">全部</span>
+      <span class="text-xs font-semibold">{{ $t('components.pikmin_filter.all') }}</span>
     </button>
 
     <!-- Individual Pikmin Types -->
@@ -22,7 +22,7 @@
         class="w-8 h-8 rounded-full shadow-md transition-transform group-hover:scale-110"
         :class="PIKMIN_TYPE_COLORS[type]"
       ></div>
-      <span class="text-xs font-semibold">{{ PIKMIN_TYPE_NAMES[type] }}</span>
+      <span class="text-xs font-semibold">{{ $t(`pikmin_types.${type}`) }}</span>
     </button>
   </div>
 </template>

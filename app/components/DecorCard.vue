@@ -43,7 +43,7 @@
         <img 
           v-if="imageUrl && !hasError"
           :src="imageUrl"
-          :alt="`${variant?.nameEn} ${pikminType} Pikmin`"
+          :alt="`${locale === 'en' ? variant?.nameEn : variant?.name} ${t('pikmin_types.' + pikminType)}`"
           class="relative w-full h-full object-contain transform group-hover:scale-110 transition-transform duration-300"
           loading="lazy"
           referrerpolicy="no-referrer"
@@ -97,11 +97,11 @@
 
       <!-- Info Section -->
       <div class="p-3 text-center border-t border-gray-100">
-        <p class="text-sm font-bold text-gray-700 truncate" :title="variant?.name">
-          {{ variant?.name || 'Unknown' }}
+        <p class="text-sm font-bold text-gray-700 truncate" :title="locale === 'en' ? variant?.nameEn : variant?.name">
+          {{ (locale === 'en' ? variant?.nameEn : variant?.name) || 'Unknown' }}
         </p>
-        <p class="text-xs text-gray-400 truncate mt-0.5" :title="variant?.nameEn">
-          {{ variant?.nameEn || '' }}
+        <p class="text-xs text-gray-400 truncate mt-0.5" :title="locale === 'en' ? variant?.name : variant?.nameEn">
+          {{ (locale === 'en' ? variant?.name : variant?.nameEn) || '' }}
         </p>
       </div>
     </div>
@@ -142,6 +142,7 @@ const emit = defineEmits<{
 const { isCollected: checkCollected, toggleCollected } = useCollection();
 const { getVariant, getCategory, getImageUrl } = useDecorData();
 const toast = useToast();
+const { t, locale } = useI18n();
 
 const variant = computed(() => getVariant(props.categoryId, props.variantId));
 const category = computed(() => getCategory(props.categoryId));
@@ -152,17 +153,7 @@ const hasError = ref(false);
 const showRipple = ref(false);
 
 const pikminTypeShort = computed(() => {
-  const shorts: Record<PikminType, string> = {
-    red: 'R',
-    yellow: 'Y',
-    blue: 'B',
-    purple: 'P',
-    white: 'W',
-    rock: '岩',
-    winged: '翼',
-    ice: '冰',
-  };
-  return shorts[props.pikminType];
+  return t(`pikmin_types_short.${props.pikminType}`);
 });
 
 const pikminBadgeClass = computed(() => {
@@ -183,9 +174,9 @@ const handleClick = () => {
   
   // Show toast notification
   if (isNowCollected) {
-    toast.success('已儲存 ✓', 1200);
+    toast.success(t('components.toast.saved'), 1200);
   } else {
-    toast.info('已移除', 1200);
+    toast.info(t('components.toast.removed'), 1200);
   }
   
   emit('toggle', props.itemId);

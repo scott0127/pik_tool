@@ -27,7 +27,7 @@
               <div class="w-5 h-5 rounded-full bg-blue-500 ring-4 ring-blue-200 border-2 border-white shadow-md"></div>
             </LIcon>
             <LPopup>
-              <div class="text-xs text-gray-600">📍 你的位置</div>
+              <div class="text-xs text-gray-600">{{ $t('map.user_location') }}</div>
             </LPopup>
           </LMarker>
           
@@ -54,7 +54,7 @@
                   </div>
                   
                   <div class="space-y-2">
-                    <div class="text-xs font-semibold text-gray-700 mb-1">飾品類型 ({{ getEffectiveDecors(cell).size }}種)：</div>
+                    <div class="text-xs font-semibold text-gray-700 mb-1">{{$t('map.cell_info.decor_types')}} ({{ getEffectiveDecors(cell).size }}{{$t('map.cell_info.types_unit')}})：</div>
                     <div class="flex flex-wrap gap-1">
                       <!-- Existing Decors -->
                       <span
@@ -71,7 +71,7 @@
                         v-for="decorId in Array.from(getAddedDecors(cell.cellId))"
                         :key="`added-${decorId}`"
                         class="inline-flex items-center gap-1 px-2 py-1 bg-blue-50 text-blue-700 rounded text-xs border border-blue-200"
-                        title="使用者回報新增"
+                        :title="$t('map.cell_info.user_reported')"
                       >
                         <span>{{ getDecorInfo(decorId)?.icon }}</span>
                         <span>{{ getDecorInfo(decorId)?.name }}</span>
@@ -82,10 +82,10 @@
                     <div class="mt-2 pt-2 border-t border-gray-200">
                       <!-- Purity Status -->
                       <div class="text-xs text-gray-600 mb-2">
-                        <span class="font-medium">{{ getEffectiveDecors(cell).size }}</span> 種飾品混合
-                        <span v-if="getEffectiveDecors(cell).size === 1" class="text-emerald-600">（精準！）</span>
-                        <span v-else-if="getEffectiveDecors(cell).size <= 3" class="text-yellow-600">（中等）</span>
-                        <span v-else class="text-red-600">（混雜）</span>
+                        <span class="font-medium">{{ getEffectiveDecors(cell).size }}</span> {{ $t('map.cell_info.mixed_types') }}
+                        <span v-if="getEffectiveDecors(cell).size === 1" class="text-emerald-600">（{{ $t('map.cell_info.pure') }}）</span>
+                        <span v-else-if="getEffectiveDecors(cell).size <= 3" class="text-yellow-600">（{{ $t('map.cell_info.medium') }}）</span>
+                        <span v-else class="text-red-600">（{{ $t('map.cell_info.mixed') }}）</span>
                       </div>
                       
                       <!-- Report Actions -->
@@ -93,7 +93,7 @@
                           <!-- Not Pure Warning -->
                           <div v-if="isReported(cell.cellId)" class="w-full bg-purple-50 text-purple-700 font-bold px-2 py-1.5 rounded flex items-center gap-1.5 border border-purple-200 text-xs text-left">
                               <span>⚠️</span>
-                              <span>有人回報這格不純！</span>
+                              <span>{{ $t('map.report.impure_warning') }}</span>
                           </div>
                            
                            <!-- Report Functions (Only if logged in) -->
@@ -104,7 +104,7 @@
                                   @click="confirmReport(cell.cellId)"
                                   class="col-span-2 bg-gray-50 hover:bg-red-50 text-gray-500 hover:text-red-600 px-2 py-1.5 rounded border border-gray-200 hover:border-red-200 text-xs transition-colors"
                               >
-                                  回報錯誤 (非純種)
+                                  {{ $t('map.report.error_pure') }}
                               </button>
                               
                               <!-- Report Missing Decor -->
@@ -113,7 +113,7 @@
                                   class="col-span-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-600 hover:text-emerald-700 px-2 py-1.5 rounded border border-emerald-200 hover:border-emerald-300 text-xs font-medium transition-colors flex items-center justify-center gap-1"
                               >
                                   <span>➕</span>
-                                  <span>回報缺漏飾品</span>
+                                  <span>{{ $t('map.report.missing') }}</span>
                               </button>
                            </div>
                       </div>
@@ -142,21 +142,21 @@
                   <div class="text-xs text-gray-600 flex items-center gap-2 mb-2">
                     <span class="text-lg">{{ getDecorInfo(Array.from(cell.decorTypes)[0])?.icon }}</span>
                     <span class="font-bold">{{ getDecorInfo(Array.from(cell.decorTypes)[0])?.name }}</span>
-                    <span class="text-emerald-600 text-[10px] border border-emerald-200 px-1 rounded bg-emerald-50">純種</span>
+                    <span class="text-emerald-600 text-[10px] border border-emerald-200 px-1 rounded bg-emerald-50">{{ $t('map.modes.pure') }}</span>
                   </div>
                   
                   <!-- Report Status / Action -->
                   <div class="text-xs border-t border-gray-100 pt-2 mt-1">
                       <div v-if="isReported(cell.cellId)" class="bg-purple-50 text-purple-700 font-bold px-2 py-1.5 rounded flex items-center gap-1.5 border border-purple-200 mb-1">
                           <span>⚠️</span>
-                          <span>有人回報這格不純！</span>
+                          <span>{{ $t('map.report.impure_warning') }}</span>
                       </div>
                        <button 
                           v-else-if="user"
                           @click="confirmReport(cell.cellId)"
                           class="w-full bg-gray-50 hover:bg-red-50 text-gray-500 hover:text-red-600 font-medium px-2 py-1.5 rounded transition-colors text-center border border-gray-200 hover:border-red-200"
                       >
-                          回報錯誤 (非純種)
+                          {{ $t('map.report.error_pure') }}
                       </button>
                   </div>
                 </div>
@@ -201,7 +201,7 @@
                     <div class="flex items-center gap-1 mt-0.5">
                         <!-- 飾品總數徽章 (Moved Here) -->
                         <div class="bg-gray-800 text-white text-[10px] md:text-xs font-bold px-1.5 py-0.5 rounded-full shadow-sm border border-white">
-                            {{ getEffectiveDecors(cell).size }}種飾品
+                            {{ getEffectiveDecors(cell).size }}{{$t('map.cell_info.types_unit')}}
                         </div>
                     </div>
                   </div>
@@ -291,14 +291,14 @@
             <div class="flex items-center gap-2 md:gap-3 mt-1 md:mt-0">
               <span class="text-xl md:text-2xl">🗺️</span>
               <div>
-                <h2 class="font-bold text-gray-800 text-sm md:text-base">飾品地點篩選</h2>
-                <p class="text-xs text-gray-500 hidden md:block">選擇要顯示的飾品類型</p>
+                <h2 class="font-bold text-gray-800 text-sm md:text-base">{{ $t('map.panel.title') }}</h2>
+                <p class="text-xs text-gray-500 hidden md:block">{{ $t('map.panel.subtitle') }}</p>
               </div>
             </div>
             <button
               @click="showPanel = false"
               class="p-2 hover:bg-white/50 rounded-lg transition-colors"
-              :title="isMobile ? '關閉' : '隱藏面板'"
+              :title="isMobile ? $t('map.panel.close') : $t('map.panel.hide')"
             >
               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                 <path v-if="isMobile" fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
@@ -311,15 +311,15 @@
           <div class="p-3 md:p-4 bg-gray-50 border-b border-gray-200">
             <div class="flex items-center justify-between text-xs md:text-sm mb-2">
               <div>
-                <span class="text-gray-600">已選擇</span>
+                <span class="text-gray-600">{{ $t('map.stats.selected') }}</span>
                 <span class="font-bold ml-1 text-emerald-600">
                   {{ selectedFilters.length }}
                 </span>
               </div>
               <div>
-                <span class="text-gray-600">找到</span>
+                <span class="text-gray-600">{{ $t('map.stats.found') }}</span>
                 <span class="font-bold text-teal-600 ml-1">{{ fetchedPoints.length }}</span>
-                <span class="text-gray-400">個地點</span>
+                <span class="text-gray-400">{{ $t('map.stats.places') }}</span>
               </div>
             </div>
             
@@ -328,7 +328,7 @@
               <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
                 <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
               </svg>
-              在非台灣的地方查詢超過10種會卡死喔!
+              {{ $t('map.stats.warning') }}
             </div>
 
             <div class="flex gap-2">
@@ -336,13 +336,13 @@
                 @click="selectAll"
                 class="flex-1 px-3 py-2 bg-emerald-100 hover:bg-emerald-200 active:bg-emerald-300 text-emerald-700 rounded-lg text-xs font-medium transition-colors"
               >
-                全選
+                {{ $t('map.stats.select_all') }}
               </button>
               <button
                 @click="clearAll"
                 class="flex-1 px-3 py-2 bg-gray-100 hover:bg-gray-200 active:bg-gray-300 text-gray-700 rounded-lg text-xs font-medium transition-colors"
               >
-                清除
+                {{ $t('map.stats.clear') }}
               </button>
             </div>
           </div>
@@ -379,7 +379,7 @@
               />
               <span :class="isMobile ? 'text-2xl' : 'text-2xl group-hover:scale-110 transition-transform'">{{ rule.icon }}</span>
               <span :class="isMobile ? 'text-[10px] leading-tight text-gray-600 line-clamp-2' : 'text-sm font-medium text-gray-700 flex-1'">
-                {{ isMobile ? rule.name.split('/')[0].replace(/\(.*\)/, '').trim() : rule.name }}
+                {{ $t('decor_types.' + rule.id) }}
               </span>
               <span v-if="!isMobile" class="text-xs text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity">
                 {{ getCountForRule(rule.id) }}
@@ -397,7 +397,7 @@
                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none" />
                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
               </svg>
-              <span class="text-sm font-medium">查詢中...</span>
+              <span class="text-sm font-medium">{{ $t('map.loading') }}</span>
             </div>
           </div>
 
@@ -431,11 +431,11 @@
           <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[80vh] flex flex-col overflow-hidden">
             <!-- Header -->
             <div class="p-4 border-b border-gray-100 flex items-center justify-between bg-emerald-50">
-              <div class="flex items-center gap-2">
+                <div class="flex items-center gap-2">
                 <span class="text-2xl">➕</span>
                 <div>
-                  <h3 class="font-bold text-gray-800">回報缺漏飾品</h3>
-                  <p class="text-xs text-gray-500">請選擇此地點實際存在的飾品類型</p>
+                  <h3 class="font-bold text-gray-800">{{ $t('map.report.title') }}</h3>
+                  <p class="text-xs text-gray-500">{{ $t('map.report.subtitle') }}</p>
                 </div>
               </div>
               <button @click="showDecorSelector = false" class="text-gray-400 hover:text-gray-600 p-2">
@@ -461,17 +461,17 @@
               >
                 <div class="text-3xl mb-1">{{ decor.icon }}</div>
                 <div class="text-xs text-gray-700 font-medium leading-tight line-clamp-2">
-                    {{ decor.name.split('/')[0] }}
+                    {{ $t('decor_types.' + decor.id) }}
                 </div>
                 <div v-if="hasAddedDecor(selectedCellForDecorReport!, decor.id)" class="text-[10px] text-emerald-700 font-bold mt-1">
-                    已回報
+                    {{ $t('map.report.reported') }}
                 </div>
               </button>
             </div>
 
             <!-- Footer -->
             <div class="p-4 border-t border-gray-100 bg-gray-50 text-xs text-gray-500 text-center">
-                點擊圖示即可送出回報。您的貢獻能讓地圖更準確！
+                {{ $t('map.report.footer') }}
             </div>
           </div>
         </div>
@@ -482,7 +482,7 @@
         v-if="!showPanel && !showDecorSelector"
         @click="showPanel = true"
         class="absolute top-3 md:top-4 left-3 md:left-4 bg-white rounded-xl p-2.5 md:p-3 shadow-lg hover:shadow-xl active:scale-95 transition-all z-[1000] border border-gray-200"
-        title="顯示篩選面板"
+        :title="$t('map.panel.show')"
       >
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 md:h-6 md:w-6 text-emerald-600" viewBox="0 0 20 20" fill="currentColor">
           <path d="M3 3a1 1 0 000 2h11a1 1 0 100-2H3zM3 7a1 1 0 000 2h5a1 1 0 000-2H3zM3 11a1 1 0 100 2h4a1 1 0 100-2H3zM13 16a1 1 0 102 0v-5.586l1.293 1.293a1 1 0 001.414-1.414l-3-3a1 1 0 00-1.414 0l-3 3a1 1 0 101.414 1.414L13 10.414V16z" />
@@ -504,7 +504,7 @@
               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM14 5a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM4 15a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1v-4zM14 15a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z" />
               </svg>
-              <span class="hidden md:inline">網格</span>
+              <span class="hidden md:inline">{{ $t('map.modes.grid') }}</span>
             </button>
             
             <!-- 網格模式 Tooltip -->
@@ -539,7 +539,7 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
               </svg>
-              <span class="hidden md:inline">標記</span>
+              <span class="hidden md:inline">{{ $t('map.modes.pin') }}</span>
             </button>
              <!-- 標記模式 Tooltip -->
             <div class="absolute right-0 top-full mt-2 w-64 bg-gray-900 text-white text-xs rounded-xl p-3 shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-[2000] pointer-events-none translate-y-2 group-hover:translate-y-0">
@@ -567,8 +567,8 @@
               class="flex items-center gap-1.5 px-3 h-full rounded-lg text-sm font-medium transition-all"
               :class="isSingleMode ? 'bg-emerald-600 text-white shadow-sm' : 'text-gray-500 hover:bg-gray-50'"
             >
-              <span class="md:hidden font-bold text-xs">純種</span>
-              <span class="hidden md:inline">純種區</span>
+              <span class="md:hidden font-bold text-xs">{{ $t('map.modes.pure') }}</span>
+              <span class="hidden md:inline">{{ $t('map.modes.pure') }}</span>
             </button>
             
             <!-- Desktop Tooltip (Hover) -->
@@ -663,14 +663,14 @@
               @focus="handleSearchFocus"
               @keydown="handleSearchKeydown"
               type="text"
-              placeholder="搜尋地點"
+              :placeholder="$t('map.search.placeholder')"
               class="flex-1 px-3 h-full text-sm md:text-base outline-none"
             />
             <button
               v-if="searchQuery"
               @click="clearSearch"
               class="pr-3 md:pr-4 text-gray-400 hover:text-gray-600 transition-colors"
-              title="清除"
+              :title="$t('map.search.clear')"
             >
               <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 md:h-5 md:w-5" viewBox="0 0 20 20" fill="currentColor">
                 <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
@@ -731,7 +731,7 @@
           <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
             <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
           </svg>
-          <span>搜尋此區域</span>
+          <span>{{ $t('map.search.search_area') }}</span>
         </button>
 
         <!-- Loading State Pill -->
@@ -743,7 +743,7 @@
             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none" />
             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
           </svg>
-          <span>讀取中...</span>
+          <span>{{ $t('map.search.loading') }}</span>
         </div>
       </div>
 
@@ -754,7 +754,7 @@
           @click="goToMyLocation"
           :disabled="isLocating"
           class="w-12 h-12 bg-white rounded-full shadow-xl flex items-center justify-center border border-gray-100 text-gray-700 hover:bg-gray-50 active:bg-gray-100 transition-all"
-          :title="locationError || '移動到我的位置'"
+          :title="locationError || $t('map.user_location')"
         >
           <svg v-if="isLocating" class="animate-spin h-6 w-6 text-emerald-500" viewBox="0 0 24 24">
             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none" />
@@ -773,7 +773,7 @@
            </div>
            <!-- (Optional) Add + / - buttons here in future if map object exposed -->
            <div v-if="!canSearch" class="px-2 py-1 bg-red-50 text-red-600 text-[10px] font-bold text-center">
-             放大
+             {{ $t('map.zoom_in') }}
            </div>
         </div>
       </div>
@@ -1028,6 +1028,8 @@ const handlePolygonClick = (cell: any) => {
   console.log('[Map] Polygon clicked:', cell.cellId, cell);
 };
 
+const { t } = useI18n();
+
 // [NEW] Decor Selector Logic
 const showDecorSelector = ref(false);
 const selectedCellForDecorReport = ref<string | null>(null);
@@ -1045,8 +1047,9 @@ const toggleDecorReport = async (decorId: string) => {
     const cellId = selectedCellForDecorReport.value;
     
     // Check if already added (optimistic check)
+    // Check if already added (optimistic check)
     if (hasAddedDecor(cellId, decorId)) {
-        alert('您已經回報過這個飾品了！'); 
+        alert(t('map.report.already_reported', '您已經回報過這個飾品了！')); 
         return; 
     }
 
@@ -1056,7 +1059,7 @@ const toggleDecorReport = async (decorId: string) => {
         // Don't close immediately, allow multiple selections? Or close for feedback?
         // Let's keep it open for multi-select feel, but maybe show a toast.
     } catch (e: any) {
-        alert('回報失敗：' + (e.message || '未知錯誤'));
+        alert(t('map.report.report_failed', '回報失敗：') + (e.message || t('map.error_unknown', '未知錯誤')));
     } finally {
         decorLoading.value = false;
     }
@@ -1074,15 +1077,15 @@ const updateWindowWidth = () => {
 
 // [NEW] Confirm Report Logic
 const confirmReport = async (cellId: string) => {
-    if (!confirm('⚠️ 警告：您確定要回報這個格子並非「純種」嗎？\n\n回報後，所有玩家在地圖上都會看到這個標記。\n請僅在您實際確認過該地點會出現其他飾品時才回報。')) {
+    if (!confirm(t('map.report.confirm_impure', '⚠️ 警告：您確定要回報這個格子並非「純種」嗎？\n\n回報後，所有玩家在地圖上都會看到這個標記。\n請僅在您實際確認過該地點會出現其他飾品時才回報。'))) {
         return;
     }
     
     try {
         await submitReport(cellId);
-        alert('感謝您的回報！地圖已更新。');
+        alert(t('map.report.thank_you', '感謝您的回報！地圖已更新。'));
     } catch (e: any) {
-        alert('回報失敗：' + (e.message || '未知錯誤'));
+        alert(t('map.report.report_failed', '回報失敗：') + (e.message || t('map.error_unknown', '未知錯誤')));
     }
 };
 
@@ -1482,10 +1485,10 @@ let abortController: AbortController | null = null;
 // 載入訊息
 const loadingMessage = computed(() => {
   const attempt = currentAttempt.value;
-  if (attempt <= 2) return '皮克敏正在努力挖掘...';
-  if (attempt <= 4) return '皮克敏覺得小累...';
-  if (attempt === 5) return '皮克敏快找到了...';
-  return '皮克敏真的快找到了...';
+  if (attempt <= 2) return t('map.loading_messages.msg1', '皮克敏正在努力挖掘...');
+  if (attempt <= 4) return t('map.loading_messages.msg2', '皮克敏覺得小累...');
+  if (attempt === 5) return t('map.loading_messages.msg3', '皮克敏快找到了...');
+  return t('map.loading_messages.msg4', '皮克敏真的快找到了...');
 });
 
 // 手動搜尋
@@ -1665,7 +1668,7 @@ const getDecorInfo = (decorId: string) => {
 const goToMyLocation = () => {
   // 檢查瀏覽器是否支援 Geolocation API
   if (!navigator.geolocation) {
-    locationError.value = '您的瀏覽器不支援定位功能';
+    locationError.value = t('map.location.not_supported', '您的瀏覽器不支援定位功能');
     console.error('[Map] Geolocation is not supported by this browser');
     return;
   }
@@ -1697,16 +1700,16 @@ const goToMyLocation = () => {
       
       switch (error.code) {
         case error.PERMISSION_DENIED:
-          locationError.value = '定位權限被拒絕，請在瀏覽器設定中允許定位';
+          locationError.value = t('map.location.permission_denied', '定位權限被拒絕，請在瀏覽器設定中允許定位');
           break;
         case error.POSITION_UNAVAILABLE:
-          locationError.value = '無法取得位置資訊';
+          locationError.value = t('map.location.unavailable', '無法取得位置資訊');
           break;
         case error.TIMEOUT:
-          locationError.value = '定位請求超時，請重試';
+          locationError.value = t('map.location.timeout', '定位請求超時，請重試');
           break;
         default:
-          locationError.value = '發生未知錯誤';
+          locationError.value = t('map.location.unknown_error', '發生未知錯誤');
           break;
       }
       

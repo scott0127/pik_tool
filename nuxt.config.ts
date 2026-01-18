@@ -3,7 +3,7 @@ export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
   
-  modules: ['@nuxtjs/tailwindcss', '@nuxtjs/supabase', '@nuxt/icon'],
+  modules: ['@nuxtjs/tailwindcss', '@nuxtjs/supabase', '@nuxt/icon', '@nuxtjs/i18n'],
   
   // Icon 配置：全部使用 Iconify API（避免掃描本地套件）
   icon: {
@@ -30,6 +30,17 @@ export default defineNuxtConfig({
         persistSession: true,
       },
     },
+  },
+
+  i18n: {
+    locales: [
+      { code: 'zh', language: 'zh-TW', file: 'zh.json', name: '繁體中文' },
+      { code: 'en', language: 'en-US', file: 'en.json', name: 'English' }
+    ],
+    defaultLocale: 'zh',
+    strategy: 'no_prefix', // 不改變 URL 結構
+    langDir: 'locales',
+    detectBrowserLanguage: false
   },
   
   app: {

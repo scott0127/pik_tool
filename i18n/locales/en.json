@@ -1,0 +1,397 @@
+{
+    "app": {
+        "title": "Pikmin Bloom Decor Tracker",
+        "subtitle": "Decor Collector",
+        "description": "Pikmin Bloom Decor Tracker - Track your Pikmin decor collection progress (Non-profit · CC BY-SA 4.0)"
+    },
+    "nav": {
+        "home": "Home",
+        "collection": "Collection",
+        "map": "Map",
+        "friends": "Friends"
+    },
+    "header": {
+        "coffee": "Support",
+        "coffee_mobile": "Buy Me a Coffee",
+        "star": "Star",
+        "star_mobile": "Star on GitHub",
+        "feedback": "Report Bug / Suggestion",
+        "search": "Search decors, categories...",
+        "mobile_progress": "Progress",
+        "mobile_progress_count": "{collected} / {total} Items"
+    },
+    "auth": {
+        "login": "Login",
+        "logout": "Logout"
+    },
+    "home": {
+        "missing": {
+            "title": "What's Missing?",
+            "desc": "Find uncollected items",
+            "count_suffix": " missing"
+        },
+        "limited": {
+            "title": "Unobtainable?",
+            "desc": "Regional / Event Limited",
+            "count_suffix": " limited"
+        },
+        "map": {
+            "title": "Decor Map",
+            "desc": "Use radar efficiently"
+        },
+        "actions": {
+            "browse_collection": "Browse Collection",
+            "open_map": "Open Decor Map"
+        },
+        "near_complete": {
+            "title": "Near Complete",
+            "view_all": "View All",
+            "empty": "All collected!",
+            "remaining": "{n} remaining"
+        },
+        "tips": {
+            "title": "Tips & Tricks",
+            "subtitle": "Complete your collection faster",
+            "tip1": "Click on a decor card to mark it as 'Collected'. Click again to unmark.",
+            "tip2": "Supports search by keywords and colors (Red/Yellow/Blue). Use filters for precision.",
+            "tip3": "Login to sync your collection to the cloud and never lose progress."
+        }
+    },
+    "coffee": {
+        "title": "Thanks for your support!",
+        "redirect": "Redirecting to Buy Me a Coffee page",
+        "notice": {
+            "title": "Important Notice",
+            "point1": "Your support is for the 'Developer', not purchasing game content.",
+            "point2": "This is an unofficial fan project, free to use.",
+            "point3": "All game assets belong to Nintendo.",
+            "point4": "Sponsorship supports development work, not trading game items."
+        },
+        "footer": "Every coffee motivates me to improve this tool! 💪",
+        "cancel": "Cancel",
+        "confirm": "Go to Support ☕"
+    },
+    "hero": {
+        "badge": "Garden Tracker",
+        "title": {
+            "prefix": "Collect Your",
+            "suffix": "Pikmin Decor"
+        },
+        "subtitle": {
+            "line1": "Let every step bloom flowers.",
+            "line2": "Create your unique decor garden."
+        },
+        "tooltip": "Catch them all!",
+        "collected": "Collected"
+    },
+    "collection": {
+        "title": "Decor Collection",
+        "subtitle": "Click items to mark as collected",
+        "stats": {
+            "showing": "Showing",
+            "items": "items",
+            "collected": "Collected"
+        },
+        "filters": {
+            "search_label": "🔍 Search",
+            "search_placeholder": "Search decor name...",
+            "category_type": "🎯 Obtain Method",
+            "pikmin_type": "🌈 Pikmin Type",
+            "status": "✅ Status",
+            "status_all": "All",
+            "status_collected": "Collected",
+            "status_uncollected": "Missing",
+            "active_label": "Active Filters:",
+            "limited": "Limited Only",
+            "clear": "Clear All"
+        },
+        "sections": {
+            "regular": {
+                "title": "Regular Categories",
+                "desc": "Obtained from specific locations (Restaurants, Parks, Stations, etc.)"
+            },
+            "special": {
+                "title": "Special Categories",
+                "desc": "Limited time events, holidays, special missions"
+            },
+            "count_suffix": " categories"
+        },
+        "info": {
+            "regular": {
+                "title": "How to get Regular Décor",
+                "desc": "Visit specific location types, pick up seedlings, and raise Pikmin to 4 hearts."
+            },
+            "special": {
+                "title": "How to get Special Décor",
+                "desc": "Participate in limited-time events, anniversaries, or special missions. These are often time-limited."
+            }
+        },
+        "actions": {
+            "collect_all": "Collect All",
+            "collect_all_tooltip": "Mark all Pikmin in this category as collected"
+        },
+        "scroll": {
+            "special": "Jump to Special",
+            "top": "Back to Top"
+        },
+        "types": {
+            "uncollected_regular": "Missing (Regular)",
+            "anniversary": "Anniversary"
+        },
+        "alerts": {
+            "collected_all": "\"{category}\" is already fully collected!",
+            "confirm_collect_all": "Confirm collecting all {count} Pikmin in \"{category}\"?\n({uncollected} uncollected items)"
+        }
+    },
+    "time": {
+        "just_now": "Just now",
+        "min_ago": "{n}m ago",
+        "hour_ago": "{n}h ago",
+        "day_ago": "{n}d ago"
+    },
+    "friends": {
+        "title": "Friend Exchange",
+        "subtitle": "Share your Pikmin Bloom friend code and make new friends!",
+        "tips": {
+            "title": "Tips",
+            "row1": "Find your friend code in the Pikmin Bloom app profile.",
+            "row2": "Do not post inappropriate content; violators will be blocked.",
+            "row3": "Max 3 posts per person per day."
+        },
+        "form": {
+            "title": "Post Your Friend Code",
+            "label_name": "Display Name",
+            "placeholder_name": "Your Nickname",
+            "label_code": "Friend Code",
+            "label_message": "Message (Optional)",
+            "placeholder_message": "e.g. I play everyday, let's walk together!",
+            "submit": "Post",
+            "submitting": "Posting..."
+        },
+        "login_prompt": "Login to post your friend code",
+        "rec_title": "Recommended Friends",
+        "rec_update": "Updates every 10s",
+        "copy_tooltip": "Click to copy",
+        "copy_btn": "Copy",
+        "all_players": "All Players",
+        "refresh": "Refresh",
+        "error": "Load Failed",
+        "retry": "Retry",
+        "loading": "Loading...",
+        "empty_title": "No friend codes yet",
+        "empty_desc": "Be the first one!",
+        "copy_code": "Copy Code",
+        "delete": "Delete My Post",
+        "toast_copied": "Friend code copied!",
+        "alerts": {
+            "login_first": "Please login first",
+            "invalid_code": "Friend code must be 12 digits",
+            "enter_name": "Please enter display name",
+            "post_failed": "Post failed: {msg}",
+            "confirm_delete": "Are you sure you want to delete this post?"
+        },
+        "modal": {
+            "select_type": "Select Pikmin Type"
+        }
+    },
+    "footer": {
+        "total_views": "Total Page Views",
+        "source": "Source: Pikipedia",
+        "disclaimer": "Disclaimer",
+        "feedback": "Feedback",
+        "contact_me": "Contact for any issues:",
+        "takedown_help": "Assistance with takedown requests available",
+        "copyright": "© 2026 Pikmin Bloom Decor Collector",
+        "unofficial": "Unofficial Fan Tool • Pikmin Bloom Copyright Nintendo",
+        "made_by": "Made with 💚 by LKB"
+    },
+    "map": {
+        "user_location": "📍 Your Location",
+        "panel": {
+            "title": "Decor Filter",
+            "subtitle": "Select decor types to display",
+            "close": "Close",
+            "hide": "Hide Panel",
+            "show": "Show Filter Panel"
+        },
+        "stats": {
+            "selected": "Selected",
+            "found": "Found",
+            "places": "places",
+            "warning": "Searching more than 10 types outside Taiwan might freeze the map!",
+            "select_all": "Select All",
+            "clear": "Clear"
+        },
+        "loading": "Searching...",
+        "report": {
+            "title": "Report Missing Decor",
+            "subtitle": "Select decor types actually present here",
+            "reported": "Reported",
+            "footer": "Click icon to submit. Your contribution makes the map more accurate!",
+            "error_pure": "Report Error (Not Pure)",
+            "missing": "Report Missing",
+            "pure_zone": "Pure Zone",
+            "impure_warning": "Reported as not pure!"
+        },
+        "modes": {
+            "grid": "Grid",
+            "pin": "Pin",
+            "pure": "Pure Zone"
+        },
+        "search": {
+            "placeholder": "Search location",
+            "clear": "Clear",
+            "search_area": "Search this area",
+            "loading": "Loading...",
+            "zoom_for_search": "Zoom in to search",
+            "retry": "Retry"
+        },
+        "zoom_in": "Zoom In"
+    },
+    "feedback": {
+        "page_title": "Feedback",
+        "page_subtitle": "Your feedback is very important to us!",
+        "title": "Bug Report / Suggestion",
+        "subtitle": "Your feedback is very important to us!",
+        "types": {
+            "suggestion": "Suggestion",
+            "bug": "Bug Report",
+            "dev": "Collaboration",
+            "data": "Data Issue",
+            "other": "Other"
+        },
+        "form": {
+            "email_label": "Email (Optional)",
+            "message_label": "Details",
+            "email_placeholder": "Leave email if you need a reply",
+            "message_placeholder": "Please describe your suggestion, issue, or error found...",
+            "device_info": "📱 Device Info (Auto-collected for diagnosis)",
+            "submit": "Submit Feedback",
+            "submitting": "Submitting..."
+        },
+        "email_label": "Email (Optional)",
+        "message_label": "Details",
+        "placeholders": {
+            "email": "Leave your email if you want a reply",
+            "suggestion": "Describe the feature you want or suggestion...",
+            "bug": "Describe the issue, including steps to reproduce...",
+            "dev": "[Important]\nThis inquiry is unrelated to Pikmin game or Nintendo.\n\nThis is a non-profit fan project. Not affiliated with, sponsored, or endorsed by Nintendo. All game assets copyright Nintendo. (CC BY-SA 4.0)\n\n---\nIf you have web/app development needs, feel free to leave your contact info!",
+            "default": "Enter your feedback..."
+        },
+        "buttons": {
+            "suggestion": "Submit Suggestion 💡",
+            "bug": "Submit Report 🐛",
+            "dev": "Submit Inquiry 💼",
+            "default": "Submit",
+            "cancel": "Cancel",
+            "submitting": "Submitting..."
+        },
+        "success": {
+            "title": "Thank you for your feedback!",
+            "desc": "We have received your message and will review it carefully.",
+            "ok": "OK"
+        },
+        "other_contact": "Other Contacts",
+        "github_desc": "Report Bug or Suggest Feature",
+        "alerts": {
+            "submit_failed": "Submission failed, please try again later"
+        }
+    },
+    "components": {
+        "category_nav": {
+            "all": "All",
+            "regular": "Regular Decor",
+            "special": "Special Decor",
+            "uncollected_regular": "Missing (Regular)",
+            "uncollected_desc": "Uncollected regular decor to help verify your collection",
+            "anniversary": "Anniversary",
+            "anniversary_desc": "Pikmin Bloom anniversary event limited decor",
+            "event_ended": "(Event may have ended)"
+        },
+        "pikmin_filter": {
+            "all": "All"
+        },
+        "toast": {
+            "saved": "Saved ✓",
+            "removed": "Removed"
+        },
+        "decor_grid": {
+            "empty_title": "No items found",
+            "empty_desc": "Try adjusting filters or search keywords",
+            "clear_filters": "Clear All Filters"
+        }
+    },
+    "pikmin_types": {
+        "red": "Red Pikmin",
+        "yellow": "Yellow Pikmin",
+        "blue": "Blue Pikmin",
+        "purple": "Purple Pikmin",
+        "white": "White Pikmin",
+        "rock": "Rock Pikmin",
+        "winged": "Winged Pikmin",
+        "ice": "Ice Pikmin"
+    },
+    "pikmin_types_short": {
+        "red": "R",
+        "yellow": "Y",
+        "blue": "B",
+        "purple": "P",
+        "white": "W",
+        "rock": "Rk",
+        "winged": "Wi",
+        "ice": "Ic"
+    },
+    "decor_types": {
+        "restaurant": "Restaurant",
+        "cafe": "Cafe",
+        "sweetshop": "Sweetshop",
+        "bakery": "Bakery",
+        "burger": "Burger Shop",
+        "italian": "Italian Restaurant",
+        "ramen": "Ramen Shop",
+        "sushi": "Sushi Restaurant",
+        "curry": "Curry Restaurant",
+        "korean": "Korean Restaurant",
+        "taco": "Mexican Restaurant",
+        "convenience": "Convenience Store",
+        "supermarket": "Supermarket",
+        "cosmetics": "Cosmetics Shop",
+        "clothing": "Clothing Store",
+        "electronics": "Electronics Store",
+        "hardware": "Hardware Store",
+        "library": "Library / Bookstore",
+        "pharmacy": "Pharmacy",
+        "hair_salon": "Hair Salon",
+        "laundry": "Laundromat",
+        "post_office": "Post Office",
+        "hotel": "Hotel",
+        "university": "University / College",
+        "station": "Station",
+        "bus_stop": "Bus Stop",
+        "airport": "Airport",
+        "bridge": "Bridge",
+        "park": "Park",
+        "forest": "Forest",
+        "waterside": "Waterside",
+        "beach": "Beach",
+        "mountain": "Mountain",
+        "zoo": "Zoo",
+        "theme_park": "Theme Park",
+        "art_gallery": "Art Gallery",
+        "stadium": "Stadium",
+        "movie_theater": "Movie Theater",
+        "shrine": "Shrine",
+        "regular": "Location Decor",
+        "regular_desc": "Obtained from seedlings found at specific locations",
+        "special": "Event Limited",
+        "special_desc": "Obtainable only during limited-time events",
+        "roadside": "Roadside",
+        "roadside_desc": "Obtained from roadside seedlings",
+        "weather": "Weather",
+        "weather_desc": "Obtained under specific weather conditions",
+        "regional": "Regional",
+        "regional_desc": "Exclusive to specific countries/regions",
+        "rare": "Rare Variant",
+        "rare_desc": "Rare variants of regular decor"
+    }
+}

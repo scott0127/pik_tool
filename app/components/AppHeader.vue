@@ -4,7 +4,7 @@
     <div class="h-1 bg-gradient-to-r from-emerald-400 via-teal-400 to-emerald-400"></div>
     
     <div class="glass border-t-0 border-x-0">
-      <div class="max-w-7xl mx-auto px-4 py-3">
+      <div class="max-w-8xl mx-auto px-4 py-3">
         <div class="flex items-center justify-between">
           <!-- Logo and Title -->
           <NuxtLink to="/" class="flex items-center gap-3 group">
@@ -17,9 +17,9 @@
             </div>
             <div>
               <h1 class="text-xl font-extrabold text-gradient group-hover:opacity-80 transition-opacity">
-                Pikmin Bloom
+                {{ $t('app.title') }}
               </h1>
-              <p class="text-xs text-gray-500 font-medium">飾品圖鑑收藏家</p>
+              <p class="text-xs text-gray-500 font-medium">{{ $t('app.subtitle') }}</p>
             </div>
           </NuxtLink>
 
@@ -81,10 +81,10 @@
             <button 
               @click="handleCoffeeClick"
               class="hidden md:flex items-center gap-2 px-4 h-10 rounded-xl bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 text-white transition-all hover:shadow-lg group"
-              title="請我喝杯咖啡"
+              :title="$t('header.coffee_mobile')"
             >
               <span class="text-lg group-hover:scale-110 transition-transform">☕</span>
-              <span class="text-sm font-semibold hidden lg:inline">支持</span>
+              <span class="text-sm font-semibold hidden lg:inline">{{ $t('header.coffee') }}</span>
             </button>
 
             <!-- GitHub Star Button (Desktop) -->
@@ -93,21 +93,21 @@
               target="_blank"
               rel="noopener noreferrer"
               class="hidden md:flex items-center gap-2 px-4 h-10 rounded-xl bg-gradient-to-r from-gray-800 to-gray-900 hover:from-gray-700 hover:to-gray-800 text-white transition-all hover:shadow-lg group"
-              title="github幫我按星星"
+              :title="$t('header.star_mobile')"
             >
               <span class="text-lg group-hover:scale-110 transition-transform">⭐</span>
-              <span class="text-sm font-semibold hidden lg:inline">Star</span>
+              <span class="text-sm font-semibold hidden lg:inline">{{ $t('header.star') }}</span>
             </a>
 
             <!-- Feedback Button (Desktop) -->
             <button 
               @click="showFeedbackModal = true"
               class="hidden md:flex items-center gap-2 px-4 h-10 rounded-xl bg-gradient-to-r from-violet-500 to-purple-600 hover:from-violet-600 hover:to-purple-700 text-white transition-all hover:shadow-lg group overflow-hidden"
-              title="BUG、建議回報/合作諮詢"
+              :title="$t('header.feedback')"
             >
               <div class="hidden lg:block w-24 overflow-hidden">
                 <span class="inline-block whitespace-nowrap animate-marquee text-sm font-semibold">
-                  BUG、建議回報/合作諮詢&nbsp;&nbsp;&nbsp;&nbsp;BUG、建議回報/合作諮詢&nbsp;&nbsp;&nbsp;&nbsp;
+                  {{ $t('header.feedback') }}&nbsp;&nbsp;&nbsp;&nbsp;{{ $t('header.feedback') }}&nbsp;&nbsp;&nbsp;&nbsp;
                 </span>
               </div>
             </button>
@@ -119,6 +119,9 @@
             >
               🔍
             </button>
+            
+            <!-- Language Switcher (Desktop) -->
+            <LanguageSwitcher class="hidden md:flex" />
 
             <!-- User Menu -->
             <div class="hidden sm:block">
@@ -134,7 +137,7 @@
                     @click="handleLogout"
                     class="text-sm text-gray-500 hover:text-red-500 transition-colors"
                   >
-                    登出
+                    {{ $t('auth.logout') }}
                   </button>
                 </div>
               </template>
@@ -143,7 +146,7 @@
                 to="/auth"
                 class="btn-primary text-sm !py-2 !px-4"
               >
-                登入
+                {{ $t('auth.login') }}
               </NuxtLink>
             </div>
 
@@ -182,7 +185,7 @@
               v-model="searchQuery"
               @keyup.enter="handleSearch"
               type="text"
-              placeholder="搜尋飾品名稱、分類..."
+              :placeholder="$t('header.search')"
               class="input-field pl-12 pr-12"
               autofocus
             />
@@ -223,16 +226,18 @@
                   </span>
                 </div>
                 <div>
-                  <p class="font-bold text-gray-700">蒐集進度</p>
-                  <p class="text-sm text-gray-500">{{ stats.collected }} / {{ stats.total }} 件</p>
+                </div>
+                <div>
+                  <p class="font-bold text-gray-700">{{ $t('header.mobile_progress') }}</p>
+                  <p class="text-sm text-gray-500">{{ $t('header.mobile_progress_count', { collected: stats.collected, total: stats.total }) }}</p>
                   <p v-if="user" class="text-xs text-gray-400 truncate max-w-[150px]" :title="user.email">{{ user.email }}</p>
                 </div>
               </div>
               <template v-if="user">
-                <button @click="handleLogout" class="text-sm text-red-500">登出</button>
+                <button @click="handleLogout" class="text-sm text-red-500">{{ $t('auth.logout') }}</button>
               </template>
               <NuxtLink v-else to="/auth" @click="showMobileMenu = false" class="btn-primary text-sm !py-2">
-                登入
+                {{ $t('auth.login') }}
               </NuxtLink>
             </div>
 
@@ -242,7 +247,7 @@
               class="flex items-center justify-center gap-2 bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 text-white rounded-2xl p-4 transition-all w-full max-w-[200px]"
             >
               <span class="text-2xl flex-shrink-0">☕</span>
-              <span class="font-semibold">請我喝杯咖啡</span>
+              <span class="font-semibold">{{ $t('header.coffee_mobile') }}</span>
             </button>
 
             <!-- GitHub Star Button (Mobile) -->
@@ -255,7 +260,7 @@
               <span class="text-2xl flex-shrink-0">⭐</span>
               <div class="overflow-hidden">
                 <span class="inline-block whitespace-nowrap animate-marquee font-semibold">
-                  github幫我按星星&nbsp;&nbsp;&nbsp;&nbsp;github幫我按星星&nbsp;&nbsp;&nbsp;&nbsp;
+                  {{ $t('header.star_mobile') }}&nbsp;&nbsp;&nbsp;&nbsp;{{ $t('header.star_mobile') }}&nbsp;&nbsp;&nbsp;&nbsp;
                 </span>
               </div>
             </a>
@@ -268,21 +273,26 @@
               <span class="text-2xl flex-shrink-0">💬</span>
               <div class="overflow-hidden">
                 <span class="inline-block whitespace-nowrap animate-marquee font-semibold">
-                  BUG、建議回報/合作諮詢&nbsp;&nbsp;&nbsp;&nbsp;BUG、建議回報/合作諮詢&nbsp;&nbsp;&nbsp;&nbsp;
+                  {{ $t('header.feedback') }}&nbsp;&nbsp;&nbsp;&nbsp;{{ $t('header.feedback') }}&nbsp;&nbsp;&nbsp;&nbsp;
                 </span>
               </div>
             </button>
 
-            <!-- Mobile Search -->
-            <div class="relative">
-              <input 
-                v-model="searchQuery"
-                @keyup.enter="handleSearch"
-                type="text"
-                placeholder="搜尋飾品..."
-                class="input-field pl-12"
-              />
-              <span class="absolute left-4 top-1/2 -translate-y-1/2 text-xl">🔍</span>
+            <!-- Mobile Search & Language -->
+            <div class="flex gap-2 items-center">
+              <div class="relative flex-1">
+                <input 
+                  v-model="searchQuery"
+                  @keyup.enter="handleSearch"
+                  type="text"
+                  :placeholder="$t('header.search')"
+                  class="input-field pl-12"
+                />
+                <span class="absolute left-4 top-1/2 -translate-y-1/2 text-xl">🔍</span>
+              </div>
+              
+              <!-- Mobile Language Switcher -->
+              <LanguageSwitcher class="!w-[52px] !h-[52px] !rounded-2xl !bg-white/80 border-2 !border-gray-200" />
             </div>
 
             <!-- Mobile Nav -->
@@ -338,13 +348,12 @@
           <!-- Header -->
           <div class="bg-gradient-to-r from-yellow-400 to-orange-500 p-6 text-center">
             <div class="text-5xl mb-3">☕</div>
-            <h3 class="text-2xl font-bold text-white">感謝你的支持！</h3>
+            <h3 class="text-2xl font-bold text-white">{{ $t('coffee.title') }}</h3>
           </div>
 
           <!-- Content -->
           <div class="p-6 space-y-4">
-            <p class="text-gray-700 text-center">
-              即將前往 <strong>Buy Me a Coffee</strong> 贊助頁面
+            <p class="text-gray-700 text-center" v-html="$t('coffee.redirect')">
             </p>
 
             <!-- Important Notice -->
@@ -352,23 +361,23 @@
               <div class="flex items-start gap-3">
                 <span class="text-2xl">⚖️</span>
                 <div class="flex-1">
-                  <h4 class="font-bold text-amber-900 mb-2">重要聲明</h4>
+                  <h4 class="font-bold text-amber-900 mb-2">{{ $t('coffee.notice.title') }}</h4>
                   <ul class="space-y-1.5 text-sm text-amber-800">
                     <li class="flex items-start gap-2">
                       <span class="text-green-600 mt-0.5">✓</span>
-                      <span>你的贊助是支持「開發者」而非購買遊戲內容</span>
+                      <span>{{ $t('coffee.notice.point1') }}</span>
                     </li>
                     <li class="flex items-start gap-2">
                       <span class="text-green-600 mt-0.5">✓</span>
-                      <span>本工具是非官方粉絲專案，完全免費使用</span>
+                      <span>{{ $t('coffee.notice.point2') }}</span>
                     </li>
                     <li class="flex items-start gap-2">
                       <span class="text-green-600 mt-0.5">✓</span>
-                      <span>所有遊戲素材版權歸任天堂所有</span>
+                      <span>{{ $t('coffee.notice.point3') }}</span>
                     </li>
                     <li class="flex items-start gap-2">
                       <span class="text-green-600 mt-0.5">✓</span>
-                      <span>贊助是對開發工作的支持，不涉及遊戲內容買賣</span>
+                      <span>{{ $t('coffee.notice.point4') }}</span>
                     </li>
                   </ul>
                 </div>
@@ -376,7 +385,7 @@
             </div>
 
             <p class="text-center text-gray-600 text-sm">
-              你的每一杯咖啡都是我繼續改進這個工具的最大動力！💪
+              {{ $t('coffee.footer') }}
             </p>
           </div>
 
@@ -386,13 +395,13 @@
               @click="showCoffeeModal = false"
               class="flex-1 px-6 py-3 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold transition-all"
             >
-              取消
+              {{ $t('coffee.cancel') }}
             </button>
             <button
               @click="confirmCoffee"
               class="flex-1 px-6 py-3 rounded-xl bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 text-white font-semibold transition-all shadow-lg hover:shadow-xl"
             >
-              前往贊助 ☕
+              {{ $t('coffee.confirm') }}
             </button>
           </div>
         </div>
@@ -429,8 +438,8 @@
           <!-- Header -->
           <div class="bg-gradient-to-r from-violet-500 to-purple-600 p-6 text-center">
             <div class="text-5xl mb-3">💬</div>
-            <h3 class="text-xl font-bold text-white">BUG、建議回報/合作諮詢</h3>
-            <p class="text-violet-100 text-sm mt-1">您的意見對我們非常重要！</p>
+            <h3 class="text-xl font-bold text-white">{{ $t('feedback.title') }}</h3>
+            <p class="text-violet-100 text-sm mt-1">{{ $t('feedback.subtitle') }}</p>
           </div>
 
           <!-- Content -->
@@ -452,7 +461,7 @@
                   ]"
                 >
                   <span class="text-lg">{{ type.icon }}</span>
-                  <span class="font-medium">{{ type.label }}</span>
+                  <span class="font-medium">{{ $t(`feedback.types.${type.id}`) }}</span>
                 </button>
               </div>
             </div>
@@ -462,14 +471,14 @@
               <label class="block text-sm font-semibold text-gray-700 mb-2">
                 <span class="flex items-center gap-2">
                   <span>📧</span>
-                  Email（選填）
+                  {{ $t('feedback.email_label') }}
                 </span>
               </label>
               <input
                 v-model="feedbackForm.email"
                 type="email"
                 class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-violet-400 focus:ring-2 focus:ring-violet-200 outline-none transition-all"
-                placeholder="如需回覆請留下您的 Email"
+                :placeholder="$t('feedback.placeholders.email')"
               >
             </div>
 
@@ -478,7 +487,7 @@
               <label class="block text-sm font-semibold text-gray-700 mb-2">
                 <span class="flex items-center gap-2">
                   <span>📝</span>
-                  詳細內容
+                  {{ $t('feedback.message_label') }}
                   <span class="text-red-500">*</span>
                 </span>
               </label>
@@ -498,7 +507,7 @@
               @click="showFeedbackModal = false"
               class="flex-1 px-6 py-3 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold transition-all"
             >
-              取消
+              {{ $t('feedback.buttons.cancel') }}
             </button>
             <button
               @click="submitFeedback"
@@ -509,7 +518,7 @@
                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none" />
                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
               </svg>
-              <span>{{ feedbackSubmitting ? '提交中...' : feedbackButtonText }}</span>
+              <span>{{ feedbackSubmitting ? $t('feedback.buttons.submitting') : feedbackButtonText }}</span>
             </button>
           </div>
         </div>
@@ -535,13 +544,13 @@
         <div class="w-20 h-20 mx-auto bg-gradient-to-br from-emerald-400 to-teal-500 rounded-full flex items-center justify-center mb-4 shadow-xl">
           <span class="text-4xl">✅</span>
         </div>
-        <h3 class="text-xl font-bold text-gray-800 mb-2">感謝您的回饋！</h3>
-        <p class="text-gray-500 mb-6">我們已收到您的意見，將會認真參考。</p>
+        <h3 class="text-xl font-bold text-gray-800 mb-2">{{ $t('feedback.success.title') }}</h3>
+        <p class="text-gray-500 mb-6">{{ $t('feedback.success.desc') }}</p>
         <button
           @click="showFeedbackSuccess = false"
           class="px-8 py-3 rounded-xl bg-gradient-to-r from-emerald-400 to-teal-500 text-white font-semibold transition-all hover:shadow-lg"
         >
-          好的
+          {{ $t('feedback.success.ok') }}
         </button>
       </div>
     </div>
@@ -573,29 +582,31 @@ const feedbackForm = ref({
   message: '',
 });
 
+const { t } = useI18n();
+
 const feedbackPlaceholder = computed(() => {
   switch (feedbackForm.value.type) {
     case 'suggestion':
-      return '請描述您希望新增的功能或改進建議...';
+      return t('feedback.placeholders.suggestion');
     case 'bug':
-      return '請描述您遇到的問題，包括操作步驟和錯誤訊息...';
+      return t('feedback.placeholders.bug');
     case 'dev':
-      return '【重要聲明】\n此諮詢與 Pikmin 遊戲及任天堂 (Nintendo) 完全無關。\n\n本網頁為非營利粉絲專案，與任天堂 (Nintendo) 無任何關聯、隸屬、贊助或背書關係。網站內出現的所有遊戲截圖、官方美術圖、遊戲角色名稱與商標，其版權均歸 Nintendo 所有。(CC BY-SA 4.0)\n\n---\n此為開發者個人接案服務，如有網頁、APP 或程式開發需求，歡迎留下您的聯絡方式與需求描述！';
+      return t('feedback.placeholders.dev');
     default:
-      return '請輸入您的意見...';
+      return t('feedback.placeholders.default');
   }
 });
 
 const feedbackButtonText = computed(() => {
   switch (feedbackForm.value.type) {
     case 'suggestion':
-      return '送出建議 💡';
+      return t('feedback.buttons.suggestion');
     case 'bug':
-      return '送出回報 🐛';
+      return t('feedback.buttons.bug');
     case 'dev':
-      return '送出諮詢 💼';
+      return t('feedback.buttons.dev');
     default:
-      return '送出';
+      return t('feedback.buttons.default');
   }
 });
 
@@ -640,12 +651,12 @@ const stats = computed(() => getStats());
 const user = computed(() => authStore.user.value);
 const userInitial = computed(() => authStore.userInitial.value);
 
-const navLinks = [
-  { to: '/', name: '首頁', icon: 'line-md:home-md' },
-  { to: '/collection', name: '圖鑑', icon: 'line-md:text-box' },
-  { to: '/map', name: '地圖', icon: 'line-md:map-marker' },
-  { to: '/friends', name: '好友', icon: 'line-md:account' },
-];
+const navLinks = computed(() => [
+  { to: '/', name: t('nav.home'), icon: 'line-md:home-md' },
+  { to: '/collection', name: t('nav.collection'), icon: 'line-md:text-box' },
+  { to: '/map', name: t('nav.map'), icon: 'line-md:map-marker' },
+  { to: '/friends', name: t('nav.friends'), icon: 'line-md:account' },
+]);
 
 const isLoggingOut = ref(false);
 

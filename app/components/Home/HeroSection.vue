@@ -18,19 +18,19 @@
     <div class="relative z-10 flex-1 text-center md:text-left transition-transform duration-200 ease-out" :style="textStyle">
       <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/40 backdrop-blur-md border border-white/50 text-emerald-800 text-xs font-bold uppercase tracking-wider mb-6 shadow-sm hover:scale-105 transition-transform cursor-default">
         <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-        Garden Tracker
+        {{ $t('hero.badge') }}
       </div>
 
       <h1 class="text-5xl md:text-7xl font-black text-gray-800 leading-[0.9] mb-6 tracking-tighter drop-shadow-sm">
-        蒐集你的 <br />
+        {{ $t('hero.title.prefix') }} <br />
         <span class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 via-teal-500 to-lime-500 bg-300% animate-gradient">
-          Pikmin 飾品
+          {{ $t('hero.title.suffix') }}
         </span>
       </h1>
       
       <p class="text-gray-600 text-lg md:text-xl max-w-md mx-auto md:mx-0 leading-relaxed font-medium mb-8">
-        讓每一個步伐都開出花朵。<br />
-        打造屬於你的獨特圖鑑花園。
+        {{ $t('hero.subtitle.line1') }}<br />
+        {{ $t('hero.subtitle.line2') }}
       </p>
 
        <!-- Interactive Pikmin Spirits (8 Colors) -->
@@ -44,7 +44,7 @@
             
             <!-- Tooltip (appears on hover of container) -->
             <div class="absolute -bottom-8 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity text-[10px] font-bold text-emerald-700 bg-white/80 px-2 py-1 rounded-full pointer-events-none whitespace-nowrap">
-                Catch them all!
+                {{ $t('hero.tooltip') }}
             </div>
          </div>
       </div>
@@ -92,7 +92,7 @@
                     <span class="text-3xl font-black text-gray-800 tracking-tighter leading-none">{{ stats.percentage }}%</span>
                 </div>
                 <div class="bg-emerald-100/80 backdrop-blur-md text-emerald-800 text-xs font-bold px-4 py-1.5 rounded-full border border-emerald-200/50 shadow-sm mt-4">
-                    {{ stats.collected }} Collected
+                    {{ stats.collected }} {{ $t('hero.collected') }}
                 </div>
             </div>
 

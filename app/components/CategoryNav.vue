@@ -12,7 +12,7 @@
           <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
             <path d="M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1zM2 11a2 2 0 012-2h12a2 2 0 012 2v4a2 2 0 01-2 2H4a2 2 0 01-2-2v-4z" />
           </svg>
-          <span>全部</span>
+          <span>{{ $t('components.category_nav.all') }}</span>
           <span class="text-xs opacity-70">({{ totalCount }})</span>
         </button>
 
@@ -25,7 +25,7 @@
           <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
             <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" />
           </svg>
-          <span>一般飾品</span>
+          <span>{{ $t('components.category_nav.regular') }}</span>
           <span class="text-xs opacity-70">({{ getCategoryCount('regular') }})</span>
         </button>
 
@@ -38,7 +38,7 @@
           <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
             <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
           </svg>
-          <span>特殊飾品</span>
+          <span>{{ $t('components.category_nav.special') }}</span>
           <span class="text-xs opacity-70">({{ getCategoryCount('special') }})</span>
         </button>
 
@@ -51,7 +51,7 @@
           <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
             <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clip-rule="evenodd" />
           </svg>
-          <span>待收集（一般）</span>
+          <span>{{ $t('components.category_nav.uncollected_regular') }}</span>
           <span class="text-xs opacity-70">({{ getUncollectedRegularCount() }})</span>
         </button>
 
@@ -64,7 +64,7 @@
           <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
             <path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z" />
           </svg>
-          <span>週年紀念</span>
+          <span>{{ $t('components.category_nav.anniversary') }}</span>
           <span class="text-xs opacity-70">({{ getAnniversaryCount() }})</span>
         </button>
 
@@ -90,7 +90,7 @@
         <div>
           <span class="text-gray-600">{{ selectedInfo.description }}</span>
           <span v-if="selected === 'special' || selected === 'anniversary'" class="text-orange-600 font-medium ml-1">
-            （可能已結束活動）
+            {{ $t('components.category_nav.event_ended') }}
           </span>
         </div>
       </div>
@@ -101,6 +101,8 @@
 
 <script setup lang="ts">
 import { DECOR_CATEGORY_TYPES, type DecorCategoryType } from '~/types/decor';
+
+const { t } = useI18n();
 
 const props = defineProps<{
   selected: DecorCategoryType | 'uncollected-regular' | 'anniversary' | null;
@@ -162,35 +164,27 @@ const selectedInfo = computed(() => {
   if (props.selected === 'uncollected-regular') {
     return {
       id: 'uncollected-regular',
-      name: '待收集（一般）',
-      description: '尚未收集的一般飾品，幫助你補齊收藏'
+      name: t('components.category_nav.uncollected_regular'),
+      description: t('components.category_nav.uncollected_desc')
     };
   }
   
   if (props.selected === 'anniversary') {
     return {
       id: 'anniversary',
-      name: '週年紀念',
-      description: 'Pikmin Bloom 週年紀念活動限定飾品'
+      name: t('components.category_nav.anniversary'),
+      description: t('components.category_nav.anniversary_desc')
     };
   }
   
   // 原有的類型說明
   const typeInfo = DECOR_CATEGORY_TYPES.find(t => t.id === props.selected);
   if (typeInfo) {
-    // 更新說明文字
-    if (props.selected === 'regular') {
-      return {
+     return {
         ...typeInfo,
-        description: '從特定地點（如餐廳、公園、車站等）獲得的裝飾'
-      };
-    }
-    if (props.selected === 'special') {
-      return {
-        ...typeInfo,
-        description: '透過活動、節日慶典、特殊任務等限定方式獲得'
-      };
-    }
+        name: t(`decor_types.${typeInfo.id}`), // Although name is not mainly used in template, good to translate
+        description: t(`decor_types.${typeInfo.id}_desc`)
+     };
   }
   
   return typeInfo;

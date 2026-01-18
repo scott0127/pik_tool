@@ -30,14 +30,14 @@
 
                    <!-- Text Content -->
                    <div class="relative z-10 space-y-1 mb-auto">
-                       <h3 class="text-2xl font-black text-gray-800 tracking-tight group-hover:text-orange-600 transition-colors">我還缺什麼？</h3>
-                       <p class="text-sm text-gray-500 font-medium">快速找到未蒐集飾品</p>
+                       <h3 class="text-2xl font-black text-gray-800 tracking-tight group-hover:text-orange-600 transition-colors">{{ $t('home.missing.title') }}</h3>
+                       <p class="text-sm text-gray-500 font-medium">{{ $t('home.missing.desc') }}</p>
                    </div>
                    
                    <!-- Count -->
                    <div class="relative z-10 mt-4 flex items-baseline gap-1.5">
                        <span class="text-4xl font-black text-orange-500 leading-none">{{ uncollectedCount }}</span>
-                       <span class="text-sm font-bold text-gray-400">件未蒐集</span>
+                       <span class="text-sm font-bold text-gray-400">{{ $t('home.missing.count_suffix') }}</span>
                    </div>
               </div>
           </template>
@@ -56,14 +56,14 @@
 
                    <!-- Text Content -->
                    <div class="relative z-10 space-y-1 mb-auto">
-                       <h3 class="text-2xl font-black text-gray-800 tracking-tight group-hover:text-purple-600 transition-colors">無法取得？</h3>
-                       <p class="text-sm text-gray-500 font-medium">地區/活動限定飾品</p>
+                       <h3 class="text-2xl font-black text-gray-800 tracking-tight group-hover:text-purple-600 transition-colors">{{ $t('home.limited.title') }}</h3>
+                       <p class="text-sm text-gray-500 font-medium">{{ $t('home.limited.desc') }}</p>
                    </div>
 
                    <!-- Count -->
                    <div class="relative z-10 mt-4 flex items-baseline gap-1.5">
                        <span class="text-4xl font-black text-purple-500 leading-none">{{ limitedCount }}</span>
-                       <span class="text-sm font-bold text-gray-400">件限定飾品</span>
+                       <span class="text-sm font-bold text-gray-400">{{ $t('home.limited.count_suffix') }}</span>
                    </div>
               </div>
           </template>
@@ -82,8 +82,8 @@
                   </div>
 
                   <div class="mt-4 relative z-10 group-hover:translate-x-1 transition-transform duration-300">
-                       <h3 class="text-2xl font-black text-gray-800 tracking-tight">飾品地圖</h3>
-                       <p class="text-sm text-gray-500 font-medium opacity-90 group-hover:text-emerald-600 transition-colors">幫你精準使用掃描器</p>
+                       <h3 class="text-2xl font-black text-gray-800 tracking-tight">{{ $t('home.map.title') }}</h3>
+                       <p class="text-sm text-gray-500 font-medium opacity-90 group-hover:text-emerald-600 transition-colors">{{ $t('home.map.desc') }}</p>
                   </div>
               </div>
           </template>
@@ -96,14 +96,14 @@
             class="w-full flex items-center justify-center gap-3 px-6 py-4 rounded-2xl bg-gradient-to-r from-emerald-500 to-green-600 text-white font-bold shadow-lg hover:shadow-xl transition-all hover:-translate-y-0.5"
           >
             <span class="text-xl">📖</span>
-            <span>瀏覽完整圖鑑</span>
+            <span>{{ $t('home.actions.browse_collection') }}</span>
           </button>
           <button
             @click="router.push('/map')"
             class="w-full flex items-center justify-center gap-3 px-6 py-4 rounded-2xl bg-gradient-to-r from-emerald-500 to-green-600 text-white font-bold shadow-lg hover:shadow-xl transition-all hover:-translate-y-0.5"
           >
             <span class="text-xl">🗺️</span>
-            <span>飾品地點地圖</span>
+            <span>{{ $t('home.actions.open_map') }}</span>
           </button>
         </div>
 
@@ -111,22 +111,22 @@
           <div class="flex items-center gap-3 mb-4">
             <div class="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center text-2xl">💡</div>
             <div>
-              <h3 class="text-lg font-extrabold text-gray-800">使用小提示</h3>
-              <p class="text-xs text-gray-500">讓你更快完成收藏</p>
+              <h3 class="text-lg font-extrabold text-gray-800">{{ $t('home.tips.title') }}</h3>
+              <p class="text-xs text-gray-500">{{ $t('home.tips.subtitle') }}</p>
             </div>
           </div>
           <ul class="space-y-2 text-sm text-gray-600">
             <li class="flex items-start gap-2">
               <span class="text-emerald-500 mt-0.5">✓</span>
-              <span>點擊飾品卡片即可標記「已蒐集」，再次點擊可取消。</span>
+              <span>{{ $t('home.tips.tip1') }}</span>
             </li>
             <li class="flex items-start gap-2">
               <span class="text-emerald-500 mt-0.5">✓</span>
-              <span>支援中文搜尋與顏色關鍵字（紅／黃／藍），也可搭配篩選更精準。</span>
+              <span>{{ $t('home.tips.tip2') }}</span>
             </li>
             <li class="flex items-start gap-2">
               <span class="text-emerald-500 mt-0.5">✓</span>
-              <span>登入即可雲端同步收藏，換裝置也不會遺失進度。</span>
+              <span>{{ $t('home.tips.tip3') }}</span>
             </li>
           </ul>
         </div>
@@ -166,7 +166,7 @@
 
               <div class="flex items-center justify-between mb-6">
                 <h3 class="text-xl font-bold text-gray-800 flex items-center gap-2">
-                  <span class="text-2xl">🌈</span> 選擇皮克敏類型
+                  <span class="text-2xl">🌈</span> {{ $t('home.modal.select_type') }}
                 </h3>
                 <button 
                     @click="showPikminModal = false" 
@@ -187,7 +187,7 @@
                     class="w-10 h-10 rounded-full shadow-sm group-hover:scale-110 transition-transform"
                     :class="PIKMIN_TYPE_COLORS[type]"
                   ></div>
-                  <span class="text-[10px] font-bold text-gray-600 group-hover:text-emerald-700">{{ PIKMIN_TYPE_NAMES[type] }}</span>
+                  <span class="text-[10px] font-bold text-gray-600 group-hover:text-emerald-700">{{ $t('pikmin_types.' + type ) }}</span>
                   <span class="text-[10px] font-medium text-gray-400 group-hover:text-emerald-500">{{ getPikminTypePercentage(type) }}%</span>
                 </button>
               </div>
@@ -201,6 +201,8 @@
 
 <script setup lang="ts">
 import { PIKMIN_TYPES, PIKMIN_TYPE_NAMES, PIKMIN_TYPE_COLORS, type PikminType } from '~/types/decor';
+
+const { t, locale } = useI18n();
 
 const router = useRouter();
 const { getStats } = useCollection();
@@ -261,7 +263,7 @@ const nearCompleteCategories = computed(() => {
     if (percentage >= 70 && percentage < 100 && remaining > 0) {
       results.push({
         id: def.category.id,
-        name: def.category.name,
+        name: locale.value === 'en' ? def.category.nameEn : def.category.name,
         // If we found an image URL, use it. Otherwise fallback to Notomoji without 'lucide:' prefix
         icon: iconUrl || (def.category.icon || 'fluent-emoji:package'), 
         collected: catStats.collected,

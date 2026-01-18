@@ -37,13 +37,13 @@
             🔍
           </div>
         </div>
-        <p class="text-xl font-bold text-gray-700 mb-2">找不到符合條件的飾品</p>
-        <p class="text-gray-500 mb-6">請嘗試調整篩選條件或搜尋關鍵字</p>
+        <p class="text-xl font-bold text-gray-700 mb-2">{{ $t('components.decor_grid.empty_title') }}</p>
+        <p class="text-gray-500 mb-6">{{ $t('components.decor_grid.empty_desc') }}</p>
         <button 
           @click="$emit('clear-filters')"
           class="btn-secondary"
         >
-          清除所有篩選
+          {{ $t('components.decor_grid.clear_filters') }}
         </button>
       </div>
     </Transition>

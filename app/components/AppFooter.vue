@@ -6,7 +6,7 @@
         <div class="flex items-center justify-center gap-3">
           <span class="text-2xl">👀</span>
           <div>
-            <p class="text-sm text-gray-500">總瀏覽次數</p>
+            <p class="text-sm text-gray-500">{{ $t('footer.total_views') }}</p>
             <p class="text-2xl font-bold text-gradient">
               {{ formattedViews }}
             </p>
@@ -24,7 +24,7 @@
             rel="noopener noreferrer"
             class="text-emerald-600 hover:text-emerald-700 transition-colors font-medium underline underline-offset-2 py-2 sm:py-0"
           >
-            資料來源：Pikipedia
+            {{ $t('footer.source') }}
           </a>
           <span class="hidden sm:inline text-gray-300">•</span>
           <a 
@@ -33,14 +33,14 @@
             rel="noopener noreferrer"
             class="text-gray-700 hover:text-emerald-600 transition-colors font-medium py-2 sm:py-0"
           >
-            版權免責聲明
+            {{ $t('footer.disclaimer') }}
           </a>
           <span class="hidden sm:inline text-gray-300">•</span>
           <a 
             href="https://pik-tool.onrender.com/feedback"
             class="text-gray-700 hover:text-emerald-600 transition-colors font-medium py-2 sm:py-0"
           >
-            問題回饋
+            {{ $t('footer.feedback') }}
           </a>
         </div>
 
@@ -60,7 +60,7 @@
         <!-- Contact Email -->
         <div class="text-sm text-gray-600 max-w-2xl mx-auto px-4">
           <p>
-            如有任何問題請聯絡：
+            {{ $t('footer.contact_me') }}
             <a 
               href="mailto:scott5497ify@gmail.com"
               class="text-emerald-600 hover:text-emerald-700 underline underline-offset-2 font-medium"
@@ -68,7 +68,7 @@
               scott5497ify@gmail.com
             </a>
           </p>
-          <p class="text-xs text-gray-500 mt-1">可協助處理下架要求或其他相關需求</p>
+          <p class="text-xs text-gray-500 mt-1">{{ $t('footer.takedown_help') }}</p>
         </div>
 
         <!-- Detailed Copyright Disclaimer -->
@@ -164,9 +164,9 @@
 
         <!-- Copyright -->
         <div class="text-xs text-gray-400 space-y-1">
-          <p>© 2026 Pikmin Bloom 飾品圖鑑收藏家</p>
-          <p>非官方粉絲工具 • Pikmin Bloom 版權歸任天堂所有</p>
-          <p class="text-gray-400">Made with 💚 by LKB</p>
+          <p>{{ $t('footer.copyright') }}</p>
+          <p>{{ $t('footer.unofficial') }}</p>
+          <p class="text-gray-400">{{ $t('footer.made_by') }}</p>
         </div>
       </div>
     </div>

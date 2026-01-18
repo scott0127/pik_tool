@@ -4,17 +4,17 @@
     <div class="flex items-center justify-between mb-4 px-2">
       <div class="flex items-center gap-2">
          <Icon name="lucide:footprints" class="text-emerald-500 transform -rotate-45" />
-         <h2 class="text-lg font-black text-gray-800 tracking-tight">培育清單</h2>
+         <h2 class="text-lg font-black text-gray-800 tracking-tight">{{ $t('home.near_complete.title') }}</h2>
       </div>
       <button v-if="categories.length > 3" class="text-xs font-bold text-emerald-600 bg-white/40 hover:bg-white/60 px-3 py-1.5 rounded-full backdrop-blur-sm transition-all shadow-sm">
-        全部
+        {{ $t('home.near_complete.view_all') }}
       </button>
     </div>
 
     <!-- Empty State -->
     <div v-if="categories.length === 0" class="flex-1 flex flex-col items-center justify-center text-center opacity-60">
         <Icon name="lucide:flower-2" class="text-4xl text-emerald-300 mb-2 animate-pulse" />
-        <p class="text-sm font-bold text-gray-600">都蒐集完囉！</p>
+        <p class="text-sm font-bold text-gray-600">{{ $t('home.near_complete.empty') }}</p>
     </div>
 
     <!-- List: Expedition Style -->
@@ -36,7 +36,7 @@
             <div class="flex justify-between items-end mb-1">
                 <span class="font-bold text-gray-800 text-sm truncate">{{ cat.name }}</span>
                 <span class="text-[10px] font-black text-emerald-600 bg-emerald-100/50 px-1.5 py-0.5 rounded-md">
-                    差{{ cat.remaining }}個蒐集完成
+                    {{ $t('home.near_complete.remaining', { n: cat.remaining }) }}
                 </span>
             </div>
 
