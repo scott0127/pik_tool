@@ -254,6 +254,61 @@
               </div>
             </LPopup>
           </LMarker>
+
+          <!-- Scanner Pin Overlay -->
+          <template v-if="scannerPinLocation">
+            <LCircle
+              :lat-lng="scannerPinLocation"
+              :radius="120"
+              color="#3b82f6"
+              :weight="1"
+              fill-color="#3b82f6"
+              :fill-opacity="0.1"
+              :dash-array="'5, 5'"
+            />
+            <LMarker
+              :lat-lng="scannerPinLocation"
+              draggable
+              @update:lat-lng="scannerPinLocation = [$event.lat, $event.lng]"
+            >
+              <LIcon :icon-size="[40, 40]" :icon-anchor="[20, 20]" class-name="scanner-icon-container">
+                <div class="relative w-[40px] h-[40px] group cursor-grab active:cursor-grabbing">
+                  <!-- Pulse Effect -->
+                  <div class="absolute inset-0 bg-blue-400 rounded-full opacity-0 animate-ping"></div>
+                  
+                  <!-- Main 3D Body -->
+                  <div class="relative w-full h-full rounded-full bg-gradient-to-br from-blue-400 to-blue-600 border-[3px] border-white shadow-[0_8px_15px_-3px_rgba(0,0,0,0.3)] transform transition-transform duration-300 hover:-translate-y-1">
+                    <!-- Glass/Gloss Reflection -->
+                    <div class="absolute top-0 left-0 w-full h-1/2 bg-gradient-to-b from-white/40 to-transparent rounded-t-full"></div>
+                    
+                    <!-- Center Radar Screen -->
+                    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[24px] h-[24px] bg-blue-900 rounded-full overflow-hidden border border-blue-300/50 flex items-center justify-center">
+                      <!-- Radar Sweep Animation -->
+                      <div class="absolute inset-0 bg-gradient-to-tr from-green-400/0 via-green-400/50 to-green-400/0 animate-spin origin-bottom-left" style="width: 50%; height: 50%; top: 50%; left: 50%;"></div>
+                      <span class="relative z-10 text-[10px]">📡</span>
+                    </div>
+                  </div>
+                  
+                  <!-- Shadow base (for floating effect) -->
+                  <div class="absolute -bottom-2 left-1/2 -translate-x-1/2 w-8 h-1.5 bg-black/20 rounded-[100%] blur-[2px]"></div>
+                </div>
+              </LIcon>
+              <LPopup>
+                <div class="text-center p-1">
+                  <div class="font-bold text-blue-600 mb-0.5">掃描器範圍</div>
+                  <div class="text-[10px] text-gray-500 mb-2 flex flex-col gap-0.5">
+                    <span class="text-blue-500">🔵 範圍：120m</span>
+                  </div>
+                  <button 
+                    @click="scannerPinLocation = null"
+                    class="text-xs bg-red-50 text-red-600 px-2 py-1 rounded border border-red-200 hover:bg-red-100"
+                  >
+                    移除圖釘
+                  </button>
+                </div>
+              </LPopup>
+            </LMarker>
+          </template>
         </LMap>
       </div>
 
@@ -402,6 +457,31 @@
             </Transition>
           </div>
         </div>
+
+        <!-- Spacer -->
+        <div class="w-2"></div>
+
+        <!-- Scanner Toggle Button -->
+        <div class="flex h-10 bg-white rounded-xl shadow-lg border border-gray-200 p-1">
+          <div class="relative group h-full">
+            <button
+              @click="toggleScannerMode"
+              :class="[
+                'flex items-center gap-1.5 px-3 h-full rounded-lg text-sm font-medium transition-all',
+                isScannerMode ? 'bg-blue-600 text-white shadow-sm' : (scannerPinLocation ? 'text-blue-600 bg-blue-50' : 'text-gray-500 hover:bg-gray-50')
+              ]"
+            >
+              <span class="text-lg">📡</span>
+              <span class="hidden md:inline">{{ scannerPinLocation ? '關閉掃描器' : '掃描器' }}</span>
+            </button>
+            <!-- Tooltip -->
+            <div class="absolute right-0 top-full mt-2 w-48 bg-gray-900 text-white text-xs rounded-xl p-3 shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-[2000] pointer-events-none translate-y-2 group-hover:translate-y-0">
+               <div class="font-bold mb-1 text-blue-300">掃描器範圍模擬</div>
+               <p class="mb-0.5">🔵 120m 偵測範圍</p>
+               <p class="text-gray-400 text-[10px]">{{ isScannerMode ? '點擊關閉' : '點擊開啟 (顯示於中心)' }}</p>
+            </div>
+          </div>
+        </div>
       </div>
       
       <!-- 純種模式常駐說明 (當純種模式開啟時顯示) -->
@@ -531,7 +611,7 @@
 </template>
 
 <script setup lang="ts">
-import { LMap, LTileLayer, LMarker, LPopup, LIcon, LPolygon } from '@vue-leaflet/vue-leaflet';
+import { LMap, LTileLayer, LMarker, LPopup, LIcon, LPolygon, LCircle } from '@vue-leaflet/vue-leaflet';
 import 'leaflet/dist/leaflet.css';
 import type { MapBounds, POIPoint, GeocodingResult } from '~/types/map';
 import type { S2CellData } from '~/types/s2';
@@ -765,6 +845,25 @@ const handleViewModeChange = async (mode: MapViewMode) => {
   }
   
   isModeTransitioning.value = false;
+};
+
+// [NEW] Scanner Pin Logic
+const isScannerMode = ref(false); // Deprecated: mainly used for tracking if pin is active
+const scannerPinLocation = ref<[number, number] | null>(null);
+
+const toggleScannerMode = () => {
+  if (scannerPinLocation.value) {
+    // If pin exists, remove it
+    scannerPinLocation.value = null;
+    isScannerMode.value = false;
+  } else {
+    // If no pin, place it at map center
+    const center = mapRef.value?.leafletObject?.getCenter();
+    if (center) {
+      scannerPinLocation.value = [center.lat, center.lng];
+      isScannerMode.value = true;
+    }
+  }
 };
 
 // Removed watch(canRenderGrid) as it used deleted scheduleGridRender
