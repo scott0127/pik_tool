@@ -1016,7 +1016,7 @@ const onMapReady = (map: any) => {
 // 組件掛載時執行（修復直接進入頁面時地圖不顯示的問題）
 onMounted(() => {
   // 預先載入區域資料（Local-First 策略）
-  preloadAllRegions();
+  // preloadAllRegions(); // Disable preloading to save bandwidth (10MB+ taipei.json)
   
   // 等待 DOM 完全載入後強制重新計算地圖尺寸
   nextTick(() => {
