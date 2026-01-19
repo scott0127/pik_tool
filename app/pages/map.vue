@@ -12,6 +12,8 @@
           :zoom-control="false"
           @ready="onMapReady"
           @moveend="onMapMoveEnd"
+          @movestart="isMapMoving = true"
+          @move="onMapMove"
         >
           <LTileLayer
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -276,8 +278,11 @@
                   <!-- Pulse Effect -->
                   <div class="absolute inset-0 bg-blue-400 rounded-full opacity-0 animate-ping"></div>
                   
-                  <!-- Main 3D Body -->
-                  <div class="relative w-full h-full rounded-full bg-gradient-to-br from-blue-400 to-blue-600 border-[3px] border-white shadow-[0_8px_15px_-3px_rgba(0,0,0,0.3)] transform transition-transform duration-300 hover:-translate-y-1">
+                  <!-- Main 3D Body with Jump Animation -->
+                  <div 
+                    class="relative w-full h-full rounded-full bg-gradient-to-br from-blue-400 to-blue-600 border-[3px] border-white shadow-[0_8px_15px_-3px_rgba(0,0,0,0.3)] transform transition-transform duration-200"
+                    :class="{ '-translate-y-3 scale-110': isMapMoving }"
+                  >
                     <!-- Glass/Gloss Reflection -->
                     <div class="absolute top-0 left-0 w-full h-1/2 bg-gradient-to-b from-white/40 to-transparent rounded-t-full"></div>
                     
@@ -289,8 +294,19 @@
                     </div>
                   </div>
                   
-                  <!-- Shadow base (for floating effect) -->
-                  <div class="absolute -bottom-2 left-1/2 -translate-x-1/2 w-8 h-1.5 bg-black/20 rounded-[100%] blur-[2px]"></div>
+                  <!-- Shadow base (shrinks when jumping) -->
+                  <div 
+                    class="absolute -bottom-2 left-1/2 -translate-x-1/2 w-8 h-1.5 bg-black/20 rounded-[100%] blur-[2px] transition-all duration-200"
+                    :class="{ 'opacity-50 scale-75': isMapMoving }"
+                  ></div>
+
+                  <!-- Persistent Hint Label -->
+                  <div class="absolute top-full left-1/2 -translate-x-1/2 mt-2 whitespace-nowrap pointer-events-none z-[1000]">
+                    <div class="bg-gray-900/80 backdrop-blur text-white text-[10px] px-2 py-1 rounded-full shadow-lg border border-white/20 flex items-center gap-1">
+                       <span>✋</span>
+                       <span>可拖曳</span>
+                    </div>
+                  </div>
                 </div>
               </LIcon>
               <LPopup>
@@ -827,22 +843,48 @@ const handleViewModeChange = async (mode: MapViewMode) => {
 };
 
 // [NEW] Scanner Pin Logic
-const isScannerMode = ref(false); // Deprecated: mainly used for tracking if pin is active
+const isScannerMode = ref(true); // Default ON as requested
 const scannerPinLocation = ref<[number, number] | null>(null);
+const isMapMoving = ref(false);
+
+// Initialize scanner position when map is ready or on mount if map available
+const updateScannerToCenter = () => {
+   if (mapRef.value?.leafletObject) {
+     const center = mapRef.value.leafletObject.getCenter();
+     scannerPinLocation.value = [center.lat, center.lng];
+   } else if (mapCenter.value) {
+     scannerPinLocation.value = [...mapCenter.value];
+   }
+};
 
 const toggleScannerMode = () => {
-  if (scannerPinLocation.value) {
-    // If pin exists, remove it
-    scannerPinLocation.value = null;
+  if (isScannerMode.value) {
+    // Turn Off
     isScannerMode.value = false;
+    scannerPinLocation.value = null;
   } else {
-    // If no pin, place it at map center
-    const center = mapRef.value?.leafletObject?.getCenter();
-    if (center) {
-      scannerPinLocation.value = [center.lat, center.lng];
-      isScannerMode.value = true;
-    }
+    // Turn On
+    isScannerMode.value = true;
+    updateScannerToCenter();
   }
+};
+
+const onMapMove = () => {
+    // Only update if scanner is effectively off-screen or too far?
+    // User requested "Keep it within screen"
+    // We check if scannerPinLocation is within current bounds
+    if (isScannerMode.value && scannerPinLocation.value && leafletMap) {
+        const bounds = leafletMap.getBounds();
+        const pinLat = scannerPinLocation.value[0];
+        const pinLng = scannerPinLocation.value[1];
+        
+        // Simple bounding box check
+        // If pin goes outside, pull it back to center (or edge?)
+        // "Just keep it in screen" -> Center is safest UX to find it again.
+        if (!bounds.contains([pinLat, pinLng])) {
+             updateScannerToCenter();
+        }
+    }
 };
 
 // Removed watch(canRenderGrid) as it used deleted scheduleGridRender
@@ -951,6 +993,11 @@ const onMapReady = (map: any) => {
   leafletMap = map;
   // 更新邊界
   updateMapBounds();
+
+  // [NEW] Initialize Scanner Position if enabled
+  if (isScannerMode.value) {
+    updateScannerToCenter();
+  }
   
   // 初始化 S2 配置（確保狀態同步）
   updateS2Config({ enabled: !isPinMode.value });
@@ -988,6 +1035,7 @@ onMounted(() => {
 
 // 地圖移動結束 - 只更新邊界，不自動查詢
 const onMapMoveEnd = () => {
+  isMapMoving.value = false;
   updateMapBounds();
   
   // 如果 S2 網格啟用，重新計算網格
