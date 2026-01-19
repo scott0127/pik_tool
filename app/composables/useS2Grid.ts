@@ -108,7 +108,7 @@ export function useS2Grid() {
     let maxLimit = 3000;
     if (mapZoom >= 18) maxLimit = 1500;      // Zoom 18+: 範圍很小，1500 綽綽有餘
     else if (mapZoom === 17) maxLimit = 3500; // Zoom 17: 一般需要 1000-2000，設 3500 確保大螢幕邊角覆蓋
-    else if (mapZoom === 16) maxLimit = 7000; // Zoom 16: 範圍是 17 的 4 倍，需要約 5000-7000
+    else if (mapZoom === 16) maxLimit = 4000; // Zoom 16: Reduced from 7000 to 4000 for performance
     else if (mapZoom <= 15) maxLimit = 10000; // Zoom 15: 範圍極大，設 10000 作為硬上限
 
     const SAFETY_MAX_CELLS = maxLimit;

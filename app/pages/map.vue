@@ -5,6 +5,7 @@
       <div id="map" class="w-full h-full rounded-3xl overflow-hidden shadow-2xl" style="min-height: 100vh;">
         <LMap
           ref="mapRef"
+          :options="{ preferCanvas: true }"
           :zoom="mapZoom"
           :center="mapCenter"
           :use-global-leaflet="false"
@@ -166,7 +167,7 @@
 
           
           <!-- S2 Cell 內容徽章（高縮放顯示，避免太密） -->
-          <template v-if="canRenderGrid && !isPinMode && mapZoom >= 16">
+          <template v-if="canRenderGrid && !isPinMode && mapZoom >= 17">
             <template v-for="cell in badgeCells" :key="`badge-${cell.cellId}`">
               <!-- 只顯示有裝飾品或 POI 的格子 (或有回報的) -->
               <LMarker
