@@ -457,32 +457,9 @@
             </Transition>
           </div>
         </div>
-
-        <!-- Spacer -->
-        <div class="w-2"></div>
-
-        <!-- Scanner Toggle Button -->
-        <div class="flex h-10 bg-white rounded-xl shadow-lg border border-gray-200 p-1">
-          <div class="relative group h-full">
-            <button
-              @click="toggleScannerMode"
-              :class="[
-                'flex items-center gap-1.5 px-3 h-full rounded-lg text-sm font-medium transition-all',
-                isScannerMode ? 'bg-blue-600 text-white shadow-sm' : (scannerPinLocation ? 'text-blue-600 bg-blue-50' : 'text-gray-500 hover:bg-gray-50')
-              ]"
-            >
-              <span class="text-lg">📡</span>
-              <span class="hidden md:inline">{{ scannerPinLocation ? '關閉掃描器' : '掃描器' }}</span>
-            </button>
-            <!-- Tooltip -->
-            <div class="absolute right-0 top-full mt-2 w-48 bg-gray-900 text-white text-xs rounded-xl p-3 shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-[2000] pointer-events-none translate-y-2 group-hover:translate-y-0">
-               <div class="font-bold mb-1 text-blue-300">掃描器範圍模擬</div>
-               <p class="mb-0.5">🔵 120m 偵測範圍</p>
-               <p class="text-gray-400 text-[10px]">{{ isScannerMode ? '點擊關閉' : '點擊開啟 (顯示於中心)' }}</p>
-            </div>
-          </div>
-        </div>
       </div>
+
+
       
       <!-- 純種模式常駐說明 (當純種模式開啟時顯示) -->
       <Transition
@@ -537,7 +514,9 @@
         :is-locating="isLocating"
         :location-error="locationError"
         :can-search="canSearch"
+        :is-scanner-mode="isScannerMode"
         @locate="goToMyLocation"
+        @toggle-scanner="toggleScannerMode"
       />
 
       <!-- S2 網格圖例面板（可摺疊）-->

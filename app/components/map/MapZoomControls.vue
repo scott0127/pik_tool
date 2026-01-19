@@ -26,6 +26,25 @@
       </svg>
     </button>
 
+    <!-- Scanner Button -->
+    <div class="relative group">
+     <button
+        @click="$emit('toggle-scanner')"
+        class="w-12 h-12 bg-white rounded-full shadow-xl flex items-center justify-center border border-gray-100 transition-all active:scale-95"
+        :class="isScannerMode ? 'bg-blue-600 border-blue-600 text-white' : 'text-gray-600 hover:bg-gray-50 hover:text-blue-600'"
+        :title="isScannerMode ? '關閉掃描器' : '開啟掃描器'"
+      >
+        <span class="text-xl">📡</span>
+      </button>
+      
+      <!-- Scanner Tooltip (Left side) -->
+      <div class="absolute right-full top-1/2 -translate-y-1/2 mr-3 px-3 py-1.5 bg-gray-900 text-white text-xs rounded-xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all whitespace-nowrap z-[2000] pointer-events-none">
+          <div v-if="isScannerMode" class="font-bold text-blue-300">掃描器已開啟</div>
+          <div v-else class="font-bold">開啟掃描器</div>
+          <div class="text-[10px] text-gray-400 mt-0.5">顯示 120m 範圍</div>
+      </div>
+    </div>
+
     <!-- Zoom Indicator / Controls -->
     <div class="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden flex flex-col">
         <!-- Zoom Indicator -->
@@ -45,9 +64,11 @@ defineProps<{
   isLocating: boolean;
   locationError: string | null;
   canSearch: boolean;
+  isScannerMode?: boolean;
 }>();
 
 defineEmits<{
   (e: 'locate'): void;
+  (e: 'toggle-scanner'): void;
 }>();
 </script>
