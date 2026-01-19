@@ -980,8 +980,14 @@ const loadSingleTypeCells = async () => {
     }
     const data = await response.json();
 
+    // [Fix] Filter out JP-only decors (e.g. Shrine) for Taiwan
+    // We strictly filter out any rule with region='JP'.
+    const jpOnlyDecors = new Set(decorRules.filter(r => r.region === 'JP').map(r => r.id));
+
     // Optimize: Pre-calculate center coordinates to avoid repetitive S2 calculations during filtering
-    singleTypeCells.value = (data.cells || []).map((cell: any) => ({
+    singleTypeCells.value = (data.cells || [])
+      .filter((cell: any) => !jpOnlyDecors.has(cell.decorType))
+      .map((cell: any) => ({
       ...cell,
       center: getCellCenter(cell.cellId)
     }));
