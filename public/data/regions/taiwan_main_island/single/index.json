@@ -1,0 +1,183 @@
+{
+  "regionId": "taiwan_main_island",
+  "level": 17,
+  "generatedAt": "2026-01-20T13:55:53.826Z",
+  "totalCellCount": 203506,
+  "types": [
+    {
+      "decorType": "waterside",
+      "cellCount": 90467,
+      "file": "waterside.json"
+    },
+    {
+      "decorType": "bridge",
+      "cellCount": 29374,
+      "file": "bridge.json"
+    },
+    {
+      "decorType": "bus_stop",
+      "cellCount": 24566,
+      "file": "bus_stop.json"
+    },
+    {
+      "decorType": "forest",
+      "cellCount": 9804,
+      "file": "forest.json"
+    },
+    {
+      "decorType": "shrine",
+      "cellCount": 9637,
+      "file": "shrine.json"
+    },
+    {
+      "decorType": "restaurant",
+      "cellCount": 8810,
+      "file": "restaurant.json"
+    },
+    {
+      "decorType": "park",
+      "cellCount": 7497,
+      "file": "park.json"
+    },
+    {
+      "decorType": "mountain",
+      "cellCount": 5991,
+      "file": "mountain.json"
+    },
+    {
+      "decorType": "convenience",
+      "cellCount": 5402,
+      "file": "convenience.json"
+    },
+    {
+      "decorType": "hotel",
+      "cellCount": 1684,
+      "file": "hotel.json"
+    },
+    {
+      "decorType": "cafe",
+      "cellCount": 1441,
+      "file": "cafe.json"
+    },
+    {
+      "decorType": "university",
+      "cellCount": 1303,
+      "file": "university.json"
+    },
+    {
+      "decorType": "post_office",
+      "cellCount": 1182,
+      "file": "post_office.json"
+    },
+    {
+      "decorType": "supermarket",
+      "cellCount": 1144,
+      "file": "supermarket.json"
+    },
+    {
+      "decorType": "burger",
+      "cellCount": 938,
+      "file": "burger.json"
+    },
+    {
+      "decorType": "library",
+      "cellCount": 554,
+      "file": "library.json"
+    },
+    {
+      "decorType": "pharmacy",
+      "cellCount": 525,
+      "file": "pharmacy.json"
+    },
+    {
+      "decorType": "stadium",
+      "cellCount": 487,
+      "file": "stadium.json"
+    },
+    {
+      "decorType": "art_gallery",
+      "cellCount": 474,
+      "file": "art_gallery.json"
+    },
+    {
+      "decorType": "station",
+      "cellCount": 421,
+      "file": "station.json"
+    },
+    {
+      "decorType": "electronics",
+      "cellCount": 247,
+      "file": "electronics.json"
+    },
+    {
+      "decorType": "bakery",
+      "cellCount": 240,
+      "file": "bakery.json"
+    },
+    {
+      "decorType": "clothing",
+      "cellCount": 231,
+      "file": "clothing.json"
+    },
+    {
+      "decorType": "beach",
+      "cellCount": 218,
+      "file": "beach.json"
+    },
+    {
+      "decorType": "hair_salon",
+      "cellCount": 218,
+      "file": "hair_salon.json"
+    },
+    {
+      "decorType": "hardware",
+      "cellCount": 168,
+      "file": "hardware.json"
+    },
+    {
+      "decorType": "laundry",
+      "cellCount": 126,
+      "file": "laundry.json"
+    },
+    {
+      "decorType": "sweetshop",
+      "cellCount": 107,
+      "file": "sweetshop.json"
+    },
+    {
+      "decorType": "cosmetics",
+      "cellCount": 80,
+      "file": "cosmetics.json"
+    },
+    {
+      "decorType": "theme_park",
+      "cellCount": 74,
+      "file": "theme_park.json"
+    },
+    {
+      "decorType": "airport",
+      "cellCount": 42,
+      "file": "airport.json"
+    },
+    {
+      "decorType": "zoo",
+      "cellCount": 26,
+      "file": "zoo.json"
+    },
+    {
+      "decorType": "movie_theater",
+      "cellCount": 18,
+      "file": "movie_theater.json"
+    },
+    {
+      "decorType": "ramen",
+      "cellCount": 6,
+      "file": "ramen.json"
+    },
+    {
+      "decorType": "italian",
+      "cellCount": 4,
+      "file": "italian.json"
+    }
+  ]
+}

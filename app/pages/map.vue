@@ -331,8 +331,9 @@
         </LMap>
       </div>
 
-      <!-- 側邊/底部控制面板 (響應式) -->
+      <!-- 側邊/底部控制面板 (響應式) - 純種模式時隱藏 -->
       <MapControlPanel
+        v-if="!isSingleMode"
         v-model:showPanel="showPanel"
         v-model:selectedFilters="selectedFilters"
         :is-loading="isLoading"
@@ -502,7 +503,7 @@
             <div class="text-xs text-gray-700 leading-relaxed">
               <span class="font-bold text-emerald-700 block mb-0.5">純種模式已開啟</span>
               地圖上顯示的每一個格子，都保證<span class="font-bold text-gray-900">只有一種飾品類型</span>（或是路邊貼紙）。
-              <br>這代表該區域是 42 種飾品中，剛好只有其中一種的重生點，沒有其他干擾。
+              <br>這代表該區域是 42 種飾品中，剛好只有其中一種的重生點，沒有其他干擾，但<span class="font-bold text-red-900">網格不是掃描範圍，請用右側雷達模擬範圍</span>。
             </div>
             <button 
               @click="showPureModeExplanation = false"
@@ -604,6 +605,16 @@
           </div>
         </div>
       </Transition>
+
+      <!-- 純種模式類型選擇器（左側面板）-->
+      <PureModeSelector 
+        v-if="isSingleMode"
+        v-model:selected-types="selectedPureTypes"
+        v-model:show-panel="showPureModePanel"
+        :is-loading="isSingleTypeCellsLoading"
+        :cached-types="cachedPureTypes"
+        @load="loadNewPureTypes"
+      />
     </div>
   </ClientOnly>
 </template>
@@ -623,6 +634,7 @@ import MapSearch from '~/components/map/MapSearch.vue';
 import MapDecorSelector from '~/components/map/MapDecorSelector.vue';
 import MapGridLegend from '~/components/map/MapGridLegend.vue';
 import MapZoomControls from '~/components/map/MapZoomControls.vue';
+import PureModeSelector from '~/components/map/PureModeSelector.vue';
 
 // ⚠️ 維護模式開關 - 當流量到達 90GB 時改為 true
 const MAINTENANCE_MODE = false;
@@ -1102,32 +1114,51 @@ const shouldShowSingleTypeCells = computed(() => {
   return isSingleMode.value;
 });
 
-const loadSingleTypeCells = async () => {
-  if (singleTypeCells.value.length > 0 || isSingleTypeCellsLoading.value) return;
-
+// 載入選定類型的純種格資料
+const loadSingleTypeCells = async (types: string[]) => {
+  if (types.length === 0) return;
+  
   isSingleTypeCellsLoading.value = true;
+  
   try {
-    const response = await fetch('/data/regions/taiwan_main_island/s2_l17_single.json');
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}`);
-    }
-    const data = await response.json();
-
-    // [Fix] Filter out JP-only decors (e.g. Shrine) for Taiwan
-    // We strictly filter out any rule with region='JP'.
+    // 並行載入所有選定類型
+    const responses = await Promise.all(
+      types.map(type => 
+        fetch(`/data/regions/taiwan_main_island/single/${type}.json`)
+          .then(res => res.ok ? res.json() : null)
+          .catch(() => null)
+      )
+    );
+    
+    // 合併所有格子
+    const allCells: any[] = [];
     const jpOnlyDecors = new Set(decorRules.filter(r => r.region === 'JP').map(r => r.id));
-
-    // Optimize: Pre-calculate center coordinates to avoid repetitive S2 calculations during filtering
-    singleTypeCells.value = (data.cells || [])
-      .filter((cell: any) => !jpOnlyDecors.has(cell.decorType))
-      .map((cell: any) => ({
-      ...cell,
-      center: getCellCenter(cell.cellId)
-    }));
+    
+    responses.forEach((data, idx) => {
+      if (!data) return;
+      const decorType = types[idx];
+      
+      // 跳過日本限定飾品
+      if (jpOnlyDecors.has(decorType)) return;
+      
+      (data.cells || []).forEach((cell: any) => {
+        allCells.push({
+          cellId: cell.cellId,
+          decorType: decorType,
+          center: getCellCenter(cell.cellId)
+        });
+      });
+    });
+    
+    singleTypeCells.value = allCells;
+    console.log(`[Map] 載入純種格: ${allCells.length} 格 (${types.length} 種類型)`);
+    
   } catch (err) {
-    console.warn('[Map] 無法載入單一飾品格資料', err);
+    console.warn('[Map] 無法載入純種格資料', err);
   } finally {
     isSingleTypeCellsLoading.value = false;
+    showPureModeSelector.value = false;
+    updateSingleTypeCellsInView();
   }
 };
 
@@ -1179,8 +1210,18 @@ const updateSingleTypeCellsInView = () => {
 };
 
 const toggleSingleTypeCells = async () => {
-  viewMode.value = isSingleMode.value ? 'grid' : 'single';
-  if (viewMode.value === 'single') {
+  if (isSingleMode.value) {
+    // 離開純種模式
+    viewMode.value = 'grid';
+    showPureModeHint.value = false;
+    // 保留快取，只清空當前顯示
+    singleTypeCells.value = [];
+    selectedPureTypes.value = [];
+  } else {
+    // 進入純種模式 - 預設載入餐廳
+    viewMode.value = 'single';
+    showPureModeExplanation.value = true;
+    
     // Show ephemeral hint on mobile
     if (isMobile.value) {
       showPureModeHint.value = true;
@@ -1189,16 +1230,93 @@ const toggleSingleTypeCells = async () => {
         showPureModeHint.value = false;
       }, 3000);
     }
-    // Always show persistent banner when entering mode (unless user closed it previously in this session? 
-    // Let's reset it to true for better discovery every time they enter mode)
-    showPureModeExplanation.value = true;
     
-    await loadSingleTypeCells();
-  } else {
-    showPureModeHint.value = false;
+    // 預設選擇餐廳
+    selectedPureTypes.value = ['restaurant'];
+    showPureModePanel.value = true; // 確保面板顯示
+    await loadNewPureTypes(['restaurant']);
   }
+};
+
+// 純種模式面板顯示狀態
+const showPureModePanel = ref(true);
+
+// 選中的純種類型（複選）
+const selectedPureTypes = ref<string[]>(['restaurant']);
+
+// 純種格資料快取（按類型存儲）
+const pureTypeCellsCache = ref<Map<string, any[]>>(new Map());
+const cachedPureTypes = computed(() => Array.from(pureTypeCellsCache.value.keys()));
+
+// 載入新的純種類型（只載入未快取的）
+const loadNewPureTypes = async (types: string[]) => {
+  // 過濾出需要載入的類型
+  const typesToLoad = types.filter(t => !pureTypeCellsCache.value.has(t));
+  
+  if (typesToLoad.length > 0) {
+    isSingleTypeCellsLoading.value = true;
+    
+    try {
+      const jpOnlyDecors = new Set(decorRules.filter(r => r.region === 'JP').map(r => r.id));
+      
+      // 並行載入所有需要的類型
+      const responses = await Promise.all(
+        typesToLoad.map(type => 
+          fetch(`/data/regions/taiwan_main_island/single/${type}.json`)
+            .then(res => res.ok ? res.json() : null)
+            .catch(() => null)
+        )
+      );
+      
+      // 存入快取
+      responses.forEach((data, idx) => {
+        if (!data) return;
+        const decorType = typesToLoad[idx];
+        
+        // 跳過日本限定飾品
+        if (jpOnlyDecors.has(decorType)) return;
+        
+        const cells = (data.cells || []).map((cell: any) => ({
+          cellId: cell.cellId,
+          decorType: decorType,
+          center: getCellCenter(cell.cellId)
+        }));
+        
+        pureTypeCellsCache.value.set(decorType, cells);
+      });
+      
+      console.log(`[Map] 新載入純種格: ${typesToLoad.length} 種類型，快取總數: ${pureTypeCellsCache.value.size}`);
+      
+    } catch (err) {
+      console.warn('[Map] 無法載入純種格資料', err);
+    } finally {
+      isSingleTypeCellsLoading.value = false;
+    }
+  }
+  
+  // 從快取組合顯示的資料
+  updateDisplayedPureCells();
+};
+
+// 根據選中類型更新顯示的格子
+const updateDisplayedPureCells = () => {
+  const allCells: any[] = [];
+  
+  for (const type of selectedPureTypes.value) {
+    const cached = pureTypeCellsCache.value.get(type);
+    if (cached) {
+      allCells.push(...cached);
+    }
+  }
+  
+  singleTypeCells.value = allCells;
   updateSingleTypeCellsInView();
 };
+
+// Watch 選中類型變化，更新顯示
+watch(selectedPureTypes, () => {
+  updateDisplayedPureCells();
+}, { deep: true });
 
 // Replaced by direct usage of s2Cells in template
 // watch(s2Cells... removed
