@@ -1871,7 +1871,7 @@
       "variants": [
         {
           "id": "lunar_new_year_ornament_1",
-          "name": "農曆新年裝飾A",
+          "name": "農曆新年裝飾-紅色春聯",
           "nameEn": "Lunar New Year Ornament 1",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/b/b7/Decor_Red_Lunar_New_Year_Ornament_1.png/100px-Decor_Red_Lunar_New_Year_Ornament_1.png",
           "imageUrls": {
@@ -1886,7 +1886,7 @@
         },
         {
           "id": "lunar_new_year_ornament_2",
-          "name": "農曆新年裝飾B",
+          "name": "農曆新年裝飾-金色春聯",
           "nameEn": "Lunar New Year Ornament 2",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/9/9d/Decor_Red_Lunar_New_Year_Ornament_2.png/100px-Decor_Red_Lunar_New_Year_Ornament_2.png",
           "imageUrls": {
@@ -1963,7 +1963,7 @@
     {
       "category": {
         "id": "fingerboard",
-        "name": "指板",
+        "name": "手指滑板",
         "nameEn": "Fingerboard",
         "type": "special",
         "icon": "noto:skateboard"
@@ -1971,7 +1971,7 @@
       "variants": [
         {
           "id": "fingerboard",
-          "name": "指板",
+          "name": "手指滑板",
           "nameEn": "Fingerboard",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/d/dc/Decor_Red_Fingerboard.png/100px-Decor_Red_Fingerboard.png",
           "imageUrls": {
@@ -2006,106 +2006,114 @@
       "variants": [
         {
           "id": "flower_card_2",
-          "name": "花札-梅",
+          "name": "花札-第二彈-樣式1",
           "nameEn": "Flower Card 2",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/2/2b/Decor_Red_Flower_Card_2.png/94px-Decor_Red_Flower_Card_2.png",
           "imageUrls": {
-            "red": "https://pikmin.wiki.gallery/images/thumb/2/2b/Decor_Red_Flower_Card_2.png/94px-Decor_Red_Flower_Card_2.png",
-            "yellow": "https://pikmin.wiki.gallery/images/thumb/e/ea/Decor_Yellow_Flower_Card_2.png/100px-Decor_Yellow_Flower_Card_2.png",
-            "blue": "https://pikmin.wiki.gallery/images/thumb/5/58/Decor_Blue_Flower_Card_2.png/100px-Decor_Blue_Flower_Card_2.png",
-            "purple": "https://pikmin.wiki.gallery/images/thumb/d/d7/Decor_Purple_Flower_Card_2.png/100px-Decor_Purple_Flower_Card_2.png",
-            "white": "https://pikmin.wiki.gallery/images/thumb/f/fb/Decor_White_Flower_Card_2.png/100px-Decor_White_Flower_Card_2.png",
-            "rock": "https://pikmin.wiki.gallery/images/thumb/6/61/Decor_Rock_Flower_Card_2.png/100px-Decor_Rock_Flower_Card_2.png",
-            "winged": "https://pikmin.wiki.gallery/images/thumb/b/b5/Decor_Winged_Flower_Card_2.png/100px-Decor_Winged_Flower_Card_2.png"
+            "red": "https://pikmin.wiki.gallery/images/thumb/a/a1/Decor_Red_Flower_Card_8.png/150px-Decor_Red_Flower_Card_8.png",
+            "yellow": "https://pikmin.wiki.gallery/images/thumb/6/62/Decor_Yellow_Flower_Card_7.png/150px-Decor_Yellow_Flower_Card_7.png",
+            "blue": "https://pikmin.wiki.gallery/images/thumb/0/09/Decor_Blue_Flower_Card_8.png/150px-Decor_Blue_Flower_Card_8.png",
+            "purple": "https://pikmin.wiki.gallery/images/thumb/b/bb/Decor_Purple_Flower_Card_8.png/150px-Decor_Purple_Flower_Card_8.png",
+            "white": "https://pikmin.wiki.gallery/images/thumb/f/fb/Decor_White_Flower_Card_2.png/150px-Decor_White_Flower_Card_2.png",
+            "rock": "https://pikmin.wiki.gallery/images/thumb/f/f4/Decor_Rock_Flower_Card_3.png/150px-Decor_Rock_Flower_Card_3.png",
+            "winged": "https://pikmin.wiki.gallery/images/thumb/2/2b/Decor_Winged_Flower_Card_3.png/150px-Decor_Winged_Flower_Card_3.png"
           }
         },
         {
           "id": "flower_card_1",
-          "name": "花札-松",
+          "name": "花札-第二彈-樣式2",
           "nameEn": "Flower Card 1",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/5/5a/Decor_Red_Flower_Card_1.png/94px-Decor_Red_Flower_Card_1.png",
           "imageUrls": {
-            "red": "https://pikmin.wiki.gallery/images/thumb/5/5a/Decor_Red_Flower_Card_1.png/94px-Decor_Red_Flower_Card_1.png",
-            "blue": "https://pikmin.wiki.gallery/images/thumb/d/de/Decor_Blue_Flower_Card_1.png/99px-Decor_Blue_Flower_Card_1.png",
-            "purple": "https://pikmin.wiki.gallery/images/thumb/3/3e/Decor_Purple_Flower_Card_1.png/81px-Decor_Purple_Flower_Card_1.png",
-            "yellow": "https://pikmin.wiki.gallery/images/thumb/e/ee/Decor_Yellow_Flower_Card_1.png/100px-Decor_Yellow_Flower_Card_1.png",
-            "rock": "https://pikmin.wiki.gallery/images/thumb/1/17/Decor_Rock_Flower_Card_1.png/95px-Decor_Rock_Flower_Card_1.png",
-            "white": "https://pikmin.wiki.gallery/images/thumb/d/d2/Decor_White_Flower_Card_1.png/100px-Decor_White_Flower_Card_1.png",
-            "winged": "https://pikmin.wiki.gallery/images/thumb/c/cd/Decor_Winged_Flower_Card_1.png/100px-Decor_Winged_Flower_Card_1.png"
+            "red": "https://pikmin.wiki.gallery/images/thumb/9/9a/Decor_Red_Flower_Card_7.png/150px-Decor_Red_Flower_Card_7.png",
+            "blue": "https://pikmin.wiki.gallery/images/thumb/e/ef/Decor_Blue_Flower_Card_7.png/150px-Decor_Blue_Flower_Card_7.png",
+            "purple": "https://pikmin.wiki.gallery/images/thumb/4/40/Decor_Purple_Flower_Card_7.png/150px-Decor_Purple_Flower_Card_7.png",
+            "yellow": "https://pikmin.wiki.gallery/images/thumb/4/4c/Decor_Yellow_Flower_Card_8.png/150px-Decor_Yellow_Flower_Card_8.png",
+            "rock": "https://pikmin.wiki.gallery/images/thumb/6/61/Decor_Rock_Flower_Card_2.png/150px-Decor_Rock_Flower_Card_2.png",
+            "white": "https://pikmin.wiki.gallery/images/thumb/d/d2/Decor_White_Flower_Card_1.png/150px-Decor_White_Flower_Card_1.png",
+            "winged": "https://pikmin.wiki.gallery/images/thumb/b/b5/Decor_Winged_Flower_Card_2.png/150px-Decor_Winged_Flower_Card_2.png"
+          }
+        },
+        {
+          "id": "flower_card_12",
+          "name": "花札-第二彈-樣式3",
+          "nameEn": "Flower Card 12",
+          "imageUrl": "https://pikmin.wiki.gallery/images/thumb/5/5a/Decor_Red_Flower_Card_1.png/94px-Decor_Red_Flower_Card_1.png",
+          "imageUrls": {
+            "rock": "https://pikmin.wiki.gallery/images/thumb/1/17/Decor_Rock_Flower_Card_1.png/150px-Decor_Rock_Flower_Card_1.png",
+            "winged": "https://pikmin.wiki.gallery/images/thumb/c/cd/Decor_Winged_Flower_Card_1.png/150px-Decor_Winged_Flower_Card_1.png"
           }
         },
         {
           "id": "flower_card_6",
-          "name": "花札-牡丹",
+          "name": "花札-第一彈-牡丹",
           "nameEn": "Flower Card 6",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/0/06/Decor_Yellow_Flower_Card_6.png/94px-Decor_Yellow_Flower_Card_6.png",
           "imageUrls": {
-            "yellow": "https://pikmin.wiki.gallery/images/thumb/0/06/Decor_Yellow_Flower_Card_6.png/94px-Decor_Yellow_Flower_Card_6.png",
-            "purple": "https://pikmin.wiki.gallery/images/thumb/c/c3/Decor_Purple_Flower_Card_6.png/81px-Decor_Purple_Flower_Card_6.png",
+            "yellow": "https://pikmin.wiki.gallery/images/thumb/0/06/Decor_Yellow_Flower_Card_6.png/150px-Decor_Yellow_Flower_Card_6.png",
+            "purple": "https://pikmin.wiki.gallery/images/thumb/c/c3/Decor_Purple_Flower_Card_6.png/150px-Decor_Purple_Flower_Card_6.png",
             "red": "https://pikmin.wiki.gallery/images/thumb/9/9e/Decor_Red_Flower_Card_6.png/100px-Decor_Red_Flower_Card_6.png",
-            "blue": "https://pikmin.wiki.gallery/images/thumb/b/b4/Decor_Blue_Flower_Card_6.png/100px-Decor_Blue_Flower_Card_6.png"
+            "blue": "https://pikmin.wiki.gallery/images/thumb/d/de/Decor_Blue_Flower_Card_1.png/150px-Decor_Blue_Flower_Card_1.png"
           }
         },
         {
           "id": "flower_card_5",
-          "name": "花札-菖蒲",
+          "name": "花札-第一彈-菖蒲",
           "nameEn": "Flower Card 5",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/c/cb/Decor_Red_Flower_Card_5.png/100px-Decor_Red_Flower_Card_5.png",
           "imageUrls": {
-            "red": "https://pikmin.wiki.gallery/images/thumb/c/cb/Decor_Red_Flower_Card_5.png/100px-Decor_Red_Flower_Card_5.png",
-            "yellow": "https://pikmin.wiki.gallery/images/thumb/2/20/Decor_Yellow_Flower_Card_5.png/100px-Decor_Yellow_Flower_Card_5.png",
-            "blue": "https://pikmin.wiki.gallery/images/thumb/4/40/Decor_Blue_Flower_Card_5.png/100px-Decor_Blue_Flower_Card_5.png",
-            "purple": "https://pikmin.wiki.gallery/images/thumb/a/ad/Decor_Purple_Flower_Card_5.png/100px-Decor_Purple_Flower_Card_5.png"
+            "red": "https://pikmin.wiki.gallery/images/thumb/9/9e/Decor_Red_Flower_Card_6.png/150px-Decor_Red_Flower_Card_6.png",
+            "yellow": "https://pikmin.wiki.gallery/images/thumb/2/20/Decor_Yellow_Flower_Card_5.png/150px-Decor_Yellow_Flower_Card_5.png",
+            "blue": "https://pikmin.wiki.gallery/images/thumb/b/b4/Decor_Blue_Flower_Card_6.png/150px-Decor_Blue_Flower_Card_6.png",
+            "purple": "https://pikmin.wiki.gallery/images/thumb/3/3e/Decor_Purple_Flower_Card_1.png/150px-Decor_Purple_Flower_Card_1.png"
           }
         },
         {
           "id": "flower_card_4",
-          "name": "花札-藤",
+          "name": "花札-第一彈-藤",
           "nameEn": "Flower Card 4",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/4/48/Decor_Red_Flower_Card_4.png/100px-Decor_Red_Flower_Card_4.png",
           "imageUrls": {
-            "red": "https://pikmin.wiki.gallery/images/thumb/4/48/Decor_Red_Flower_Card_4.png/100px-Decor_Red_Flower_Card_4.png",
-            "yellow": "https://pikmin.wiki.gallery/images/thumb/5/58/Decor_Yellow_Flower_Card_4.png/100px-Decor_Yellow_Flower_Card_4.png",
-            "blue": "https://pikmin.wiki.gallery/images/thumb/2/22/Decor_Blue_Flower_Card_4.png/100px-Decor_Blue_Flower_Card_4.png",
-            "purple": "https://pikmin.wiki.gallery/images/thumb/0/07/Decor_Purple_Flower_Card_4.png/100px-Decor_Purple_Flower_Card_4.png"
+            "red": "https://pikmin.wiki.gallery/images/thumb/4/48/Decor_Red_Flower_Card_4.png/150px-Decor_Red_Flower_Card_4.png",
+            "yellow": "https://pikmin.wiki.gallery/images/thumb/5/58/Decor_Yellow_Flower_Card_4.png/150px-Decor_Yellow_Flower_Card_4.png",
+            "blue": "https://pikmin.wiki.gallery/images/thumb/4/40/Decor_Blue_Flower_Card_5.png/150px-Decor_Blue_Flower_Card_5.png",
+            "purple": "https://pikmin.wiki.gallery/images/thumb/a/ad/Decor_Purple_Flower_Card_5.png/150px-Decor_Purple_Flower_Card_5.png"
           }
         },
         {
           "id": "flower_card_3",
-          "name": "花札-櫻",
+          "name": "花札-第一彈-櫻",
           "nameEn": "Flower Card 3",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/4/45/Decor_Red_Flower_Card_3.png/100px-Decor_Red_Flower_Card_3.png",
           "imageUrls": {
-            "red": "https://pikmin.wiki.gallery/images/thumb/4/45/Decor_Red_Flower_Card_3.png/100px-Decor_Red_Flower_Card_3.png",
-            "yellow": "https://pikmin.wiki.gallery/images/thumb/b/b4/Decor_Yellow_Flower_Card_3.png/100px-Decor_Yellow_Flower_Card_3.png",
-            "blue": "https://pikmin.wiki.gallery/images/thumb/7/72/Decor_Blue_Flower_Card_3.png/100px-Decor_Blue_Flower_Card_3.png",
-            "purple": "https://pikmin.wiki.gallery/images/thumb/2/2e/Decor_Purple_Flower_Card_3.png/100px-Decor_Purple_Flower_Card_3.png",
-            "rock": "https://pikmin.wiki.gallery/images/thumb/f/f4/Decor_Rock_Flower_Card_3.png/95px-Decor_Rock_Flower_Card_3.png",
-            "winged": "https://pikmin.wiki.gallery/images/thumb/2/2b/Decor_Winged_Flower_Card_3.png/86px-Decor_Winged_Flower_Card_3.png"
+            "red": "https://pikmin.wiki.gallery/images/thumb/4/45/Decor_Red_Flower_Card_3.png/150px-Decor_Red_Flower_Card_3.png",
+            "yellow": "https://pikmin.wiki.gallery/images/thumb/b/b4/Decor_Yellow_Flower_Card_3.png/150px-Decor_Yellow_Flower_Card_3.png",
+            "blue": "https://pikmin.wiki.gallery/images/thumb/7/72/Decor_Blue_Flower_Card_3.png/150px-Decor_Blue_Flower_Card_3.png",
+            "purple": "https://pikmin.wiki.gallery/images/thumb/2/2e/Decor_Purple_Flower_Card_3.png/150px-Decor_Purple_Flower_Card_3.png"
           }
         },
         {
           "id": "flower_card_8",
-          "name": "花札-芒",
+          "name": "花札-第一彈-芒",
           "nameEn": "Flower Card 8",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/a/a1/Decor_Red_Flower_Card_8.png/94px-Decor_Red_Flower_Card_8.png",
           "imageUrls": {
-            "red": "https://pikmin.wiki.gallery/images/thumb/a/a1/Decor_Red_Flower_Card_8.png/94px-Decor_Red_Flower_Card_8.png",
-            "blue": "https://pikmin.wiki.gallery/images/thumb/0/09/Decor_Blue_Flower_Card_8.png/100px-Decor_Blue_Flower_Card_8.png",
-            "purple": "https://pikmin.wiki.gallery/images/thumb/b/bb/Decor_Purple_Flower_Card_8.png/100px-Decor_Purple_Flower_Card_8.png",
-            "yellow": "https://pikmin.wiki.gallery/images/thumb/4/4c/Decor_Yellow_Flower_Card_8.png/100px-Decor_Yellow_Flower_Card_8.png"
+            "red": "https://pikmin.wiki.gallery/images/thumb/5/5a/Decor_Red_Flower_Card_1.png/150px-Decor_Red_Flower_Card_1.png",
+            "blue": "https://pikmin.wiki.gallery/images/thumb/2/22/Decor_Blue_Flower_Card_4.png/150px-Decor_Blue_Flower_Card_4.png",
+            "purple": "https://pikmin.wiki.gallery/images/thumb/0/07/Decor_Purple_Flower_Card_4.png/150px-Decor_Purple_Flower_Card_4.png",
+            "yellow": "https://pikmin.wiki.gallery/images/thumb/e/ee/Decor_Yellow_Flower_Card_1.png/150px-Decor_Yellow_Flower_Card_1.png"
           }
         },
         {
           "id": "flower_card_7",
-          "name": "花札-萩",
+          "name": "花札-第一彈-萩",
           "nameEn": "Flower Card 7",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/6/62/Decor_Yellow_Flower_Card_7.png/94px-Decor_Yellow_Flower_Card_7.png",
           "imageUrls": {
-            "yellow": "https://pikmin.wiki.gallery/images/thumb/6/62/Decor_Yellow_Flower_Card_7.png/94px-Decor_Yellow_Flower_Card_7.png",
-            "blue": "https://pikmin.wiki.gallery/images/thumb/e/ef/Decor_Blue_Flower_Card_7.png/99px-Decor_Blue_Flower_Card_7.png",
-            "red": "https://pikmin.wiki.gallery/images/thumb/9/9a/Decor_Red_Flower_Card_7.png/100px-Decor_Red_Flower_Card_7.png",
-            "purple": "https://pikmin.wiki.gallery/images/thumb/4/40/Decor_Purple_Flower_Card_7.png/100px-Decor_Purple_Flower_Card_7.png"
+            "yellow": "https://pikmin.wiki.gallery/images/thumb/e/ea/Decor_Yellow_Flower_Card_2.png/150px-Decor_Yellow_Flower_Card_2.png",
+            "blue": "https://pikmin.wiki.gallery/images/thumb/5/58/Decor_Blue_Flower_Card_2.png/150px-Decor_Blue_Flower_Card_2.png",
+            "red": "https://pikmin.wiki.gallery/images/thumb/2/2b/Decor_Red_Flower_Card_2.png/150px-Decor_Red_Flower_Card_2.png",
+            "purple": "https://pikmin.wiki.gallery/images/thumb/d/d7/Decor_Purple_Flower_Card_2.png/150px-Decor_Purple_Flower_Card_2.png"
           }
         }
       ],
@@ -2190,7 +2198,7 @@
     {
       "category": {
         "id": "halloween-light",
-        "name": "萬聖節燈光",
+        "name": "萬聖節燈籠",
         "nameEn": "Halloween Light",
         "type": "special",
         "icon": "noto:jack-o-lantern"
@@ -2198,7 +2206,7 @@
       "variants": [
         {
           "id": "halloween_light",
-          "name": "萬聖節燈光",
+          "name": "萬聖節燈籠",
           "nameEn": "Halloween Light",
           "imageUrls": {
             "red": "https://pikmin.wiki.gallery/images/thumb/2/25/Decor_Red_Halloween_Light.png/124px-Decor_Red_Halloween_Light.png",
@@ -2649,8 +2657,8 @@
       "variants": [
         {
           "id": "mahjong_tile_2",
-          "name": "麻將-筒",
-          "nameEn": "Mahjong Tile 2",
+          "name": "麻將-圖集 2",
+          "nameEn": "Mahjong Tile 2 (東、南、西、北、發、中、白板)",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/d/de/Decor_Red_Mahjong_Tile_2.png/79px-Decor_Red_Mahjong_Tile_2.png",
           "imageUrls": {
             "red": "https://pikmin.wiki.gallery/images/thumb/d/de/Decor_Red_Mahjong_Tile_2.png/79px-Decor_Red_Mahjong_Tile_2.png",
@@ -2664,8 +2672,8 @@
         },
         {
           "id": "mahjong_tile_1",
-          "name": "麻將-萬",
-          "nameEn": "Mahjong Tile 1",
+          "name": "麻將-圖集 1",
+          "nameEn": "Mahjong Tile 1 (一萬、小鳥、一筒、五萬、九萬、九條、九筒)",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/b/bd/Decor_White_Mahjong_Tile_1.png/77px-Decor_White_Mahjong_Tile_1.png",
           "imageUrls": {
             "white": "https://pikmin.wiki.gallery/images/thumb/b/bd/Decor_White_Mahjong_Tile_1.png/77px-Decor_White_Mahjong_Tile_1.png",
@@ -2679,7 +2687,7 @@
         },
         {
           "id": "mahjong_tile_3",
-          "name": "麻將-條",
+          "name": "麻將-圖集 3 (二萬、三萬、四萬、六萬、七萬、八萬)",
           "nameEn": "Mahjong Tile 3",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/d/dc/Decor_Yellow_Mahjong_Tile_3.png/86px-Decor_Yellow_Mahjong_Tile_3.png",
           "imageUrls": {
@@ -2693,7 +2701,7 @@
         },
         {
           "id": "mahjong_tile_4",
-          "name": "麻將-風",
+          "name": "麻將-圖集 4(二條、三條、四條、五條、七條、八條)",
           "nameEn": "Mahjong Tile 4",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/7/74/Decor_Yellow_Mahjong_Tile_4.png/100px-Decor_Yellow_Mahjong_Tile_4.png",
           "imageUrls": {
@@ -2707,7 +2715,7 @@
         },
         {
           "id": "mahjong_tile_5",
-          "name": "麻將-發",
+          "name": "麻將-圖集 5 (六條)",
           "nameEn": "Mahjong Tile 5",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/6/60/Decor_White_Mahjong_Tile_5.png/96px-Decor_White_Mahjong_Tile_5.png",
           "imageUrls": {
@@ -3008,7 +3016,7 @@
       "variants": [
         {
           "id": "playing_card_3",
-          "name": "撲克牌-方塊",
+          "name": "撲克牌-梅花1",
           "nameEn": "Playing Card 3",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/c/cf/Decor_Red_Playing_Card_3.png/100px-Decor_Red_Playing_Card_3.png",
           "imageUrls": {
@@ -3023,7 +3031,7 @@
         },
         {
           "id": "playing_card_4",
-          "name": "撲克牌-梅花",
+          "name": "撲克牌-梅花2",
           "nameEn": "Playing Card 4",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/5/5c/Decor_Red_Playing_Card_4.png/100px-Decor_Red_Playing_Card_4.png",
           "imageUrls": {
@@ -3037,7 +3045,7 @@
         },
         {
           "id": "playing_card_1",
-          "name": "撲克牌-黑桃",
+          "name": "撲克牌-菱形1",
           "nameEn": "Playing Card 1",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/4/45/Decor_Red_Playing_Card_1.png/100px-Decor_Red_Playing_Card_1.png",
           "imageUrls": {
@@ -3052,7 +3060,7 @@
         },
         {
           "id": "playing_card_2",
-          "name": "撲克牌-紅心",
+          "name": "撲克牌-菱形2",
           "nameEn": "Playing Card 2",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/e/e3/Decor_Red_Playing_Card_2.png/100px-Decor_Red_Playing_Card_2.png",
           "imageUrls": {
@@ -3061,7 +3069,15 @@
             "blue": "https://pikmin.wiki.gallery/images/thumb/5/53/Decor_Blue_Playing_Card_2.png/100px-Decor_Blue_Playing_Card_2.png",
             "white": "https://pikmin.wiki.gallery/images/thumb/f/f9/Decor_White_Playing_Card_2.png/100px-Decor_White_Playing_Card_2.png",
             "rock": "https://pikmin.wiki.gallery/images/thumb/6/6d/Decor_Rock_Playing_Card_2.png/100px-Decor_Rock_Playing_Card_2.png",
-            "winged": "https://pikmin.wiki.gallery/images/thumb/b/bf/Decor_Winged_Playing_Card_2.png/100px-Decor_Winged_Playing_Card_2.png",
+            "winged": "https://pikmin.wiki.gallery/images/thumb/b/bf/Decor_Winged_Playing_Card_2.png/100px-Decor_Winged_Playing_Card_2.png"
+          }
+        },
+        {
+          "id": "playing_card_5",
+          "name": "撲克牌-JOKER",
+          "nameEn": "Playing Card 5",
+          "imageUrl": "https://pikmin.wiki.gallery/images/thumb/e/e3/Decor_Red_Playing_Card_2.png/100px-Decor_Red_Playing_Card_2.png",
+          "imageUrls": {
             "purple": "https://pikmin.wiki.gallery/images/thumb/b/bc/Decor_Purple_Playing_Card_2.png/100px-Decor_Purple_Playing_Card_2.png"
           }
         }
