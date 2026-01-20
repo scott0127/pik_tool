@@ -20,6 +20,7 @@
         <div class="flex-1">
           <h3 class="font-bold text-gray-900 text-sm mb-1">📢 最新更新</h3>
           <ul class="text-sm text-gray-600 leading-relaxed mb-2 list-disc list-inside space-y-1">
+            <li><span class="text-red-600 font-medium">地圖服務會在流量額度達95%時暫時關閉</span>，其他功能運作正常，<span class="text-green-600 font-medium">如暫停將於 2/1 重新開放。</span></li>
             <li>掃描雷達範圍更接近遊戲內的掃描器範圍</li>
             <li>特殊種類校正：<span class="text-emerald-600 font-medium">麻將、撲克牌、花札(花卡片)</span> 精確更正了!</li>
           </ul>

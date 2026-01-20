@@ -1,5 +1,8 @@
 <template>
-  <ClientOnly>
+  <!-- 維護模式開關：設為 true 時顯示維護頁面 -->
+  <MapMaintenance v-if="MAINTENANCE_MODE" />
+  
+  <ClientOnly v-else>
     <div class="relative h-screen w-full overflow-hidden">
       <!-- 地圖容器 -->
       <div id="map" class="w-full h-full rounded-3xl overflow-hidden shadow-2xl" style="min-height: 100vh;">
@@ -620,6 +623,9 @@ import MapSearch from '~/components/map/MapSearch.vue';
 import MapDecorSelector from '~/components/map/MapDecorSelector.vue';
 import MapGridLegend from '~/components/map/MapGridLegend.vue';
 import MapZoomControls from '~/components/map/MapZoomControls.vue';
+
+// ⚠️ 維護模式開關 - 當流量到達 90GB 時改為 true
+const MAINTENANCE_MODE = false;
 
 // Composables
 const { decorRules, getDecorRule } = useDecorRules();
