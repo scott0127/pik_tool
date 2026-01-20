@@ -20,7 +20,7 @@
         <div class="flex-1">
           <h3 class="font-bold text-gray-900 text-sm mb-1">【網站營運公告】</h3>
           <p class="text-sm text-gray-600 leading-relaxed mb-2">
-            目前我在Rneder的伺服器流量已使用 80%，月底可能面臨<span class="text-red-600 font-bold">網路流量額度達到上限而導致網頁服務中斷</span>。
+            目前我在Rneder的伺服器流量已使用 80% 雖然每個月會重置流量，但本月底可能面臨<span class="text-red-600 font-bold">網路流量額度達到上限而導致網頁服務中斷</span>。
             為求網站永續經營，<br><span class="text-green-600 font-bold">誠徵伺服器資源GCP(Google Cloud Platform)/Render/小額贊助</span>，這部分的款項僅用於維持網站運作。
             如有意願協助，請與我聯繫，謝謝大家！
           </p>

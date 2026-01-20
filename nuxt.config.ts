@@ -82,5 +82,14 @@ export default defineNuxtConfig({
       ],
     },
   },
+
+  // Nitro 配置：啟用靜態資源壓縮 (Gzip + Brotli)
+  // Build 時會自動產生 .gz 和 .br 壓縮版本，節省 60-80% 帶寬
+  nitro: {
+    compressPublicAssets: {
+      gzip: true,
+      brotli: true,
+    },
+  },
 })
 
