@@ -1,7 +1,7 @@
 // Pikmin types available in Pikmin Bloom
 export type PikminType = 'red' | 'yellow' | 'blue' | 'purple' | 'white' | 'rock' | 'winged' | 'ice';
 
-export const PIKMIN_TYPES: PikminType[] = ['red', 'yellow', 'blue', 'purple', 'white', 'rock', 'winged', 'ice'];
+export const PIKMIN_TYPES: PikminType[] = ['red', 'yellow', 'blue', 'white', 'purple', 'rock', 'winged', 'ice'];
 
 export const PIKMIN_TYPE_NAMES: Record<PikminType, string> = {
   red: '紅皮克敏',
