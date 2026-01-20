@@ -1,2 +1,32 @@
+# Robots.txt - 優化帶寬使用
+# 限制爬蟲對大型數據文件的訪問
+
 User-Agent: *
-Disallow:
+Allow: /
+Disallow: /data/regions/*/tiles/
+Crawl-delay: 10
+
+# 允許搜索引擎索引主要頁面
+User-Agent: Googlebot
+Allow: /
+Disallow: /data/
+
+User-Agent: Bingbot
+Allow: /
+Disallow: /data/
+
+# 完全阻止已知的高頻爬蟲
+User-Agent: AhrefsBot
+Disallow: /
+
+User-Agent: SemrushBot
+Disallow: /
+
+User-Agent: MJ12bot
+Disallow: /
+
+User-Agent: DotBot
+Disallow: /
+
+# Sitemap
+Sitemap: https://pik-tool.onrender.com/sitemap.xml
