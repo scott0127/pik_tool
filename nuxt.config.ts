@@ -42,6 +42,15 @@ export default defineNuxtConfig({
     langDir: 'locales',
     detectBrowserLanguage: false
   },
+
+  routeRules: {
+    // Cache static data for 1 year (immutable)
+    '/data/**': { headers: { 'cache-control': 'public, max-age=31536000, immutable' } },
+    // Cache images for 1 day
+    '/og-image.png': { headers: { 'cache-control': 'public, max-age=86400' } },
+    // Cache other static assets
+    '/_nuxt/**': { headers: { 'cache-control': 'public, max-age=31536000, immutable' } },
+  },
   
   app: {
     head: {

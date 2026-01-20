@@ -52,6 +52,7 @@
     </div>
 
     <!-- Global Toast Notifications -->
+    <GlobalAnnouncement />
     <Toast 
       v-if="currentToast && isShowingToast"
       :message="currentToast.message"
