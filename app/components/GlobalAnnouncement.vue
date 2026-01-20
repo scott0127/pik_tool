@@ -39,7 +39,7 @@
 </template>
 
 <script setup lang="ts">
-const isVisible = ref(true);
+const isVisible = ref(false); // 暫時關閉公告
 const startProgress = ref(false);
 
 onMounted(() => {
