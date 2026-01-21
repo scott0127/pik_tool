@@ -1114,6 +1114,33 @@ const shouldShowSingleTypeCells = computed(() => {
   return isSingleMode.value;
 });
 
+/**
+ * 解碼 S2 Cell IDs - 支援差量編碼和舊格式
+ * @param data - JSON 資料，可能是 { encoding: 'delta', base, deltas } 或 { cells: [{cellId}] }
+ * @returns string[] - Cell IDs 陣列
+ */
+const decodeCellIds = (data: any): string[] => {
+  // 新格式：差量編碼
+  if (data.encoding === 'delta' && data.base && Array.isArray(data.deltas)) {
+    const decoded: string[] = [];
+    let current = BigInt(data.base);
+    
+    for (const delta of data.deltas) {
+      current += BigInt(delta);
+      decoded.push(current.toString());
+    }
+    
+    return decoded;
+  }
+  
+  // 舊格式：cells 陣列
+  if (Array.isArray(data.cells)) {
+    return data.cells.map((c: any) => c.cellId);
+  }
+  
+  return [];
+};
+
 // 載入選定類型的純種格資料
 const loadSingleTypeCells = async (types: string[]) => {
   if (types.length === 0) return;
@@ -1141,11 +1168,14 @@ const loadSingleTypeCells = async (types: string[]) => {
       // 跳過日本限定飾品
       if (jpOnlyDecors.has(decorType)) return;
       
-      (data.cells || []).forEach((cell: any) => {
+      // 解碼 cell IDs（支援差量編碼和舊格式）
+      const cellIds = decodeCellIds(data);
+      
+      cellIds.forEach((cellId: string) => {
         allCells.push({
-          cellId: cell.cellId,
+          cellId: cellId,
           decorType: decorType,
-          center: getCellCenter(cell.cellId)
+          center: getCellCenter(cellId)
         });
       });
     });
@@ -1276,10 +1306,12 @@ const loadNewPureTypes = async (types: string[]) => {
         // 跳過日本限定飾品
         if (jpOnlyDecors.has(decorType)) return;
         
-        const cells = (data.cells || []).map((cell: any) => ({
-          cellId: cell.cellId,
+        // 解碼 cell IDs（支援差量編碼和舊格式）
+        const cellIds = decodeCellIds(data);
+        const cells = cellIds.map((cellId: string) => ({
+          cellId: cellId,
           decorType: decorType,
-          center: getCellCenter(cell.cellId)
+          center: getCellCenter(cellId)
         }));
         
         pureTypeCellsCache.value.set(decorType, cells);
