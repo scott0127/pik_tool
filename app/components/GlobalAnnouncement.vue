@@ -23,6 +23,7 @@
             <li><span class="text-red-600 font-medium">地圖服務會在流量額度達95%時暫時關閉</span>，其他功能運作正常，<span class="text-green-600 font-medium">如暫停將於 2/1 重新開放。</span></li>
             <li>掃描雷達範圍更接近遊戲內的掃描器範圍</li>
             <li>特殊種類校正：<span class="text-emerald-600 font-medium">麻將、撲克牌、花札(花卡片)</span> 精確更正了!</li>
+            <li><span class="text-indigo-600 font-medium">如果想鼓勵我的開發，可以點擊咖啡按鈕可以小額贊助(此贊助無對價關係且網頁所有功能皆免費)</span></li>
           </ul>
           <div class="w-full bg-gray-100 rounded-full h-1 mt-1 overflow-hidden">
              <div class="bg-emerald-500 h-full transition-all duration-[3000ms] ease-linear w-full" :class="{ '!w-0': startProgress }"></div>
