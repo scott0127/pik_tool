@@ -34,8 +34,8 @@ interface RegionData {
     lon: number;
     name: string;
     decorType: string;
-    decorName: string;
-    decorIcon: string;
+    decorName?: string;  // Optional - can be derived from decorType via decorRules
+    decorIcon?: string;  // Optional - can be derived from decorType via decorRules
     iconUrl?: string;
   }>;
 }
@@ -250,8 +250,9 @@ function filterLocalPOIs(
         lon: poi.lon,
         name: poi.name,
         decorType: poi.decorType,
-        decorName: poi.decorName,
-        decorIcon: poi.decorIcon,
+        // 優先從 decorRules 取得，fallback 到 POI 資料（向下相容）
+        decorName: rule?.name || poi.decorName || poi.decorType,
+        decorIcon: rule?.icon || poi.decorIcon || '📍',
         iconUrl: rule?.iconUrl || poi.iconUrl,
         tags: {},
       };
