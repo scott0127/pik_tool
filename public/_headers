@@ -8,9 +8,8 @@
 /og-image.png
   Cache-Control: public, max-age=604800
 
-# Cache data files (check if they change often - assuming they are relatively static)
 /data/*
-  Cache-Control: public, max-age=86400, stale-while-revalidate=86400, must-revalidate
+  Cache-Control: public, max-age=0, must-revalidate
 
 # Nuxt build assets (hashed)
 /_nuxt/*
