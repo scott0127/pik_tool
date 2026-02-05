@@ -23,6 +23,7 @@
             <li><span class="text-red-600 font-medium">提醒大家!農曆新年裝飾品盆栽打彩色蘑菇有機會掉落</span></li>
             <li>2/5號更新如下</li>
             <li>新增2026巧克力特殊類別</li>
+            <li>新增稀有廚師冰皮、鍬形蟲冰皮、橡栗冰皮</li>
             <li><span class="text-indigo-600 font-medium">如果想鼓勵我的開發，可以點擊咖啡按鈕可以小額贊助(此贊助無對價關係且網頁所有功能皆免費)</span></li>
           </ul>
           <div class="w-full bg-gray-100 rounded-full h-1 mt-1 overflow-hidden">

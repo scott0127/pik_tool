@@ -24,7 +24,8 @@
             "white": "https://pikmin.wiki.gallery/images/thumb/c/cf/Decor_White_Chef_Hat_%28Rare%29.png/67px-Decor_White_Chef_Hat_%28Rare%29.png",
             "purple": "https://pikmin.wiki.gallery/images/thumb/0/0c/Decor_Purple_Chef_Hat_%28Rare%29.png/51px-Decor_Purple_Chef_Hat_%28Rare%29.png",
             "rock": "https://pikmin.wiki.gallery/images/thumb/b/bc/Decor_Rock_Chef_Hat_%28Rare%29.png/78px-Decor_Rock_Chef_Hat_%28Rare%29.png",
-            "winged": "https://pikmin.wiki.gallery/images/thumb/5/59/Decor_Winged_Chef_Hat_%28Rare%29.png/62px-Decor_Winged_Chef_Hat_%28Rare%29.png"
+            "winged": "https://pikmin.wiki.gallery/images/thumb/5/59/Decor_Winged_Chef_Hat_%28Rare%29.png/62px-Decor_Winged_Chef_Hat_%28Rare%29.png",
+            "ice": "https://pikmin.wiki.gallery/images/thumb/b/b5/Decor_Ice_Chef_Hat_%28Rare%29.png/82px-Decor_Ice_Chef_Hat_%28Rare%29.png"
           }
         },
         {
@@ -281,7 +282,8 @@
             "white": "https://pikmin.wiki.gallery/images/thumb/b/bc/Decor_White_Stag_Beetle.png/100px-Decor_White_Stag_Beetle.png",
             "purple": "https://pikmin.wiki.gallery/images/thumb/0/0e/Decor_Purple_Stag_Beetle.png/96px-Decor_Purple_Stag_Beetle.png",
             "rock": "https://pikmin.wiki.gallery/images/thumb/c/c6/Decor_Rock_Stag_Beetle.png/85px-Decor_Rock_Stag_Beetle.png",
-            "winged": "https://pikmin.wiki.gallery/images/thumb/4/4c/Decor_Winged_Stag_Beetle.png/100px-Decor_Winged_Stag_Beetle.png"
+            "winged": "https://pikmin.wiki.gallery/images/thumb/4/4c/Decor_Winged_Stag_Beetle.png/100px-Decor_Winged_Stag_Beetle.png",
+            "ice": "https://pikmin.wiki.gallery/images/thumb/4/4c/Decor_Ice_Stag_Beetle.png/119px-Decor_Ice_Stag_Beetle.png"
           }
         },
         {
@@ -296,7 +298,8 @@
             "white": "https://pikmin.wiki.gallery/images/thumb/e/e8/Decor_White_Acorn.png/80px-Decor_White_Acorn.png",
             "purple": "https://pikmin.wiki.gallery/images/thumb/4/4d/Decor_Purple_Acorn.png/96px-Decor_Purple_Acorn.png",
             "rock": "https://pikmin.wiki.gallery/images/thumb/f/f5/Decor_Rock_Acorn.png/100px-Decor_Rock_Acorn.png",
-            "winged": "https://pikmin.wiki.gallery/images/thumb/9/94/Decor_Winged_Acorn.png/76px-Decor_Winged_Acorn.png"
+            "winged": "https://pikmin.wiki.gallery/images/thumb/9/94/Decor_Winged_Acorn.png/76px-Decor_Winged_Acorn.png",
+            "ice": "https://pikmin.wiki.gallery/images/thumb/b/b9/Decor_Ice_Acorn.png/122px-Decor_Ice_Acorn.png"
           }
         }
       ],
@@ -307,7 +310,8 @@
         "white",
         "purple",
         "rock",
-        "winged"
+        "winged",
+        "ice"
       ]
     },
     {
