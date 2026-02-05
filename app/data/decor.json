@@ -3828,6 +3828,43 @@
     },
     {
       "category": {
+        "id": "2026 Chocolate",
+        "name": "2026巧克力",
+        "nameEn": "2026 Chocolate",
+        "type": "special",
+        "icon": "noto:bento-box"
+      },
+      "variants": [
+        {
+          "id": "2026_chocolate",
+          "name": "2026巧克力",
+          "nameEn": "2026 Chocolate",
+          "imageUrl": "https://pikmin.wiki.gallery/images/thumb/c/ca/Decor_Red_2026_Chocolate.png/124px-Decor_Red_2026_Chocolate.png",
+          "imageUrls": {
+            "red": "https://pikmin.wiki.gallery/images/thumb/c/ca/Decor_Red_2026_Chocolate.png/124px-Decor_Red_2026_Chocolate.png",
+            "yellow": "https://pikmin.wiki.gallery/images/thumb/d/db/Decor_Yellow_2026_Chocolate.png/132px-Decor_Yellow_2026_Chocolate.png",
+            "blue": "https://pikmin.wiki.gallery/images/thumb/6/64/Decor_Blue_2026_Chocolate.png/122px-Decor_Blue_2026_Chocolate.png",
+            "white": "https://pikmin.wiki.gallery/images/thumb/4/44/Decor_White_2026_Chocolate.png/86px-Decor_White_2026_Chocolate.png",
+            "purple": "https://pikmin.wiki.gallery/images/thumb/4/4d/Decor_Purple_2026_Chocolate.png/78px-Decor_Purple_2026_Chocolate.png",
+            "rock": "https://pikmin.wiki.gallery/images/thumb/7/71/Decor_Rock_2026_Chocolate.png/111px-Decor_Rock_2026_Chocolate.png",
+            "winged": "https://pikmin.wiki.gallery/images/6/6c/Decor_Winged_2026_Chocolate.png",
+            "ice": "https://pikmin.wiki.gallery/images/thumb/3/34/Decor_Ice_2026_Chocolate.png/101px-Decor_Ice_2026_Chocolate.png"
+          }
+        }
+      ],
+      "availablePikminTypes": [
+        "red",
+        "yellow",
+        "blue",
+        "white",
+        "purple",
+        "rock",
+        "winged",
+        "ice"
+      ]
+    },
+    {
+      "category": {
         "id": "golden-airplane",
         "name": "金色飛機玩具",
         "nameEn": "Golden Toy Airplane",

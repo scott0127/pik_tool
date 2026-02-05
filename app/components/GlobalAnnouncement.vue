@@ -20,9 +20,9 @@
         <div class="flex-1">
           <h3 class="font-bold text-gray-900 text-sm mb-1">📢 最新更新</h3>
           <ul class="text-sm text-gray-600 leading-relaxed mb-2 list-disc list-inside space-y-1">
-            <li><span class="text-red-600 font-medium">地圖服務會在流量額度達95%時暫時關閉</span>，其他功能運作正常，<span class="text-green-600 font-medium">如暫停將於 2/1 重新開放。</span></li>
-            <li>掃描雷達範圍更接近遊戲內的掃描器範圍</li>
-            <li>特殊種類校正：<span class="text-emerald-600 font-medium">麻將、撲克牌、花札(花卡片)</span> 精確更正了!</li>
+            <li><span class="text-red-600 font-medium">提醒大家!農曆新年裝飾品盆栽打彩色蘑菇有機會掉落</span></li>
+            <li>2/5號更新如下</li>
+            <li>新增2026巧克力特殊類別</li>
             <li><span class="text-indigo-600 font-medium">如果想鼓勵我的開發，可以點擊咖啡按鈕可以小額贊助(此贊助無對價關係且網頁所有功能皆免費)</span></li>
           </ul>
           <div class="w-full bg-gray-100 rounded-full h-1 mt-1 overflow-hidden">
