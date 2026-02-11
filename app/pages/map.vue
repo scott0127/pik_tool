@@ -1036,15 +1036,24 @@ onMounted(() => {
   // 預先載入區域資料（Local-First 策略）
   // preloadAllRegions(); // Disable preloading to save bandwidth (10MB+ taipei.json)
   
-  // 等待 DOM 完全載入後強制重新計算地圖尺寸
-  nextTick(() => {
-    setTimeout(() => {
-      if (leafletMap) {
-        leafletMap.invalidateSize();
-        console.log('[Map] Forced map resize on mount');
-      }
-    }, 300);
-  });
+  // 等待容器真正可見後再 invalidateSize（修復 app.vue v-show 競爭條件）
+  // app.vue 的 isInitializing 會讓容器 display:none，Leaflet 在 0×0 下計算磚座標會全部錯位
+  const waitForVisible = () => {
+    const mapEl = document.getElementById('map');
+    if (mapEl && mapEl.offsetHeight > 0) {
+      // 容器已可見，等一個 rAF 確保 layout 完成
+      requestAnimationFrame(() => {
+        if (leafletMap) {
+          leafletMap.invalidateSize();
+          console.log('[Map] Forced map resize after visible');
+        }
+      });
+    } else {
+      // 容器尚未可見，繼續等待
+      requestAnimationFrame(waitForVisible);
+    }
+  };
+  nextTick(waitForVisible);
 });
 
 
