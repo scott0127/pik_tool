@@ -23,6 +23,8 @@
   "devDependencies": {
     "@nuxt/icon": "^2.2.0",
     "@nuxtjs/tailwindcss": "^6.14.0",
+    "@supabase/supabase-js": "^2.98.0",
+    "dotenv": "^17.3.1",
     "happy-dom": "^20.1.0",
     "tsx": "^4.21.0",
     "vitest": "^4.0.17"

@@ -224,8 +224,8 @@
             class="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-xl p-3 border border-indigo-100 hover:shadow-md transition-all duration-300 group"
           >
             <div class="flex items-center gap-2 mb-2">
-              <div class="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-400 to-purple-500 flex items-center justify-center text-white text-sm font-bold shadow-sm shrink-0">
-                {{ post.username.charAt(0).toUpperCase() }}
+              <div class="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-100 to-purple-100 flex items-center justify-center shadow-sm shrink-0 overflow-hidden p-0.5">
+                <img :src="getPikminAvatar(post.username)" :alt="post.username" class="w-full h-full object-contain" loading="lazy" />
               </div>
               <div class="overflow-hidden flex-1">
                 <h3 class="font-bold text-gray-800 text-sm truncate">{{ post.username }}</h3>
@@ -430,8 +430,8 @@
           >
             <div class="flex items-start justify-between mb-3">
               <div class="flex items-center gap-3">
-                <div class="w-11 h-11 rounded-full bg-gradient-to-br from-pink-400 to-rose-500 flex items-center justify-center text-white font-bold shadow-lg text-lg">
-                  {{ post.username.charAt(0).toUpperCase() }}
+                <div class="w-11 h-11 rounded-full bg-gradient-to-br from-pink-100 to-rose-100 flex items-center justify-center shadow-lg overflow-hidden p-0.5">
+                  <img :src="getPikminAvatar(post.username)" :alt="post.username" class="w-full h-full object-contain" loading="lazy" />
                 </div>
                 <div>
                   <h3 class="font-bold text-gray-800">{{ post.username }}</h3>
@@ -554,6 +554,20 @@ const showCopyToast = ref(false);
 // 導入地區常數
 import { FRIEND_REGIONS, ALL_REGION_OPTIONS } from '~/constants/regions';
 import { FRIEND_INTENTS, ALL_INTENT_OPTIONS } from '~/constants/intents';
+import scrapedImages from '../../scraped_images.json';
+
+// 皮克敏頭像：從 scraped_images.json 取得所有圖片 URL
+const PIKMIN_AVATAR_URLS = Object.values(scrapedImages) as string[];
+
+// 根據 username 產生一個穩定的 hash 對應到固定的皮克敏圖片
+function getPikminAvatar(username: string): string {
+  let hash = 0;
+  for (let i = 0; i < username.length; i++) {
+    hash = ((hash << 5) - hash + username.charCodeAt(i)) | 0;
+  }
+  const index = Math.abs(hash) % PIKMIN_AVATAR_URLS.length;
+  return PIKMIN_AVATAR_URLS[index];
+}
 
 const newPost = ref({
   username: '',

@@ -1,9 +1,9 @@
 // Service Worker for Pikmin Bloom Decor Tracker
 // 離線快取大型靜態資源，減少重複下載
 
-const CACHE_NAME = 'pikmin-decor-v4';
-const STATIC_CACHE_NAME = 'pikmin-static-v4';
-const DATA_CACHE_NAME = 'pikmin-data-v4';
+const CACHE_NAME = 'pikmin-decor-v5';
+const STATIC_CACHE_NAME = 'pikmin-static-v5';
+const DATA_CACHE_NAME = 'pikmin-data-v5';
 
 // 立即快取的核心資源
 const PRECACHE_URLS = [
@@ -59,7 +59,7 @@ self.addEventListener('fetch', (event) => {
 
     // 開發者模式與 Vite HMR 繞過：絕對不要快取 Vite 的 websocket 和任何帶有 HMR 標記 (t= / v= / vite) 的模組
     if (
-        url.pathname.includes('/@vite/') || 
+        url.pathname.includes('/@vite/') ||
         url.pathname.includes('/@fs/') ||
         url.search.includes('?v=') ||
         url.search.includes('?t=') ||
