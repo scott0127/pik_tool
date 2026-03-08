@@ -1,8 +1,11 @@
 {
     "app": {
-        "title": "Pikmin Bloom Decor Tracker",
+        "title": "Pikmin Bloom Decor Tracker & Map",
         "subtitle": "Decor Collector",
-        "description": "Pikmin Bloom Decor Tracker - Track your Pikmin decor collection progress (Non-profit · CC BY-SA 4.0)"
+        "description": "Pikmin Bloom Decor Tracker, Interactive Map, and Global Friend Exchange. Track your Pikmin decor collection progress, find missing decor locations, and exchange postcards with friends globally.",
+        "keywords": "Pikmin Bloom, Pikmin Tracker, Decor Pikmin, Pikmin Map, Friend Code, Postcards, Pikmin Bloom Friends, Niantic, Nintendo",
+        "og_title": "Pikmin Bloom Tracker & Map | Find Friends Globally",
+        "og_desc": "The ultimate tool for Pikmin Bloom players. Track decor collections, explore the interactive map, and exchange friend codes globally."
     },
     "nav": {
         "home": "Home",

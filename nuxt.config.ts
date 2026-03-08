@@ -59,25 +59,15 @@ export default defineNuxtConfig({
   
   app: {
     head: {
-      title: 'Pikmin Bloom 飾品圖鑑',
       meta: [
         { charset: 'utf-8' },
         { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-        { name: 'description', content: 'Pikmin Bloom 飾品蒐集追蹤器 - 追蹤你的皮克敏飾品收藏進度 (非營利・CC BY-SA 4.0)' },
         { name: 'theme-color', content: '#059669' },
         
-        // Open Graph / Facebook
-        { property: 'og:type', content: 'website' },
-        { property: 'og:site_name', content: 'Pikmin Bloom 飾品蒐集追蹤器 - 追蹤你的皮克敏飾品收藏進度 (非營利・CC BY-SA 4.0)' },
-        { property: 'og:title', content: 'Pikmin Bloom 飾品蒐集追蹤器 - 追蹤你的皮克敏飾品收藏進度 (非營利・CC BY-SA 4.0)' },
-        { property: 'og:description', content: 'Pikmin Bloom 飾品蒐集追蹤器 - 追蹤你的皮克敏飾品收藏進度 (非營利・CC BY-SA 4.0)' },
+        // Open Graph Image is static so keeping it here as fallback, though dynamic also handles it
         { property: 'og:image', content: '/og-image.png' },
-
-        // Twitter
-        { name: 'twitter:card', content: 'summary_large_image' },
-        { name: 'twitter:title', content: 'Pikmin Bloom 飾品蒐集追蹤器 - 追蹤你的皮克敏飾品收藏進度 (非營利・CC BY-SA 4.0)' },
-        { name: 'twitter:description', content: 'Pikmin Bloom 飾品蒐集追蹤器 - 追蹤你的皮克敏飾品收藏進度 (非營利・CC BY-SA 4.0)' },
         { name: 'twitter:image', content: '/og-image.png' },
+        { name: 'twitter:card', content: 'summary_large_image' },
 
         // PWA iOS Support
         { name: 'apple-mobile-web-app-capable', content: 'yes' },
@@ -91,6 +81,12 @@ export default defineNuxtConfig({
         { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
         { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' },
         { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600;700&display=swap' },
+      ],
+      script: [
+        {
+          type: 'application/ld+json',
+          innerHTML: `{"@context":"https://schema.org","@type":"WebSite","name":"Pikmin Bloom 飾品圖鑑","alternateName":"Pikmin圖鑑","url":"https://pik-tool.onrender.com/"}`
+        }
       ],
     },
   },

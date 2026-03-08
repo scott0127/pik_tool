@@ -1,8 +1,11 @@
 {
     "app": {
-        "title": "Pikmin Bloom 飾品圖鑑",
-        "subtitle": "飾品圖鑑收藏家",
-        "description": "Pikmin Bloom 飾品蒐集追蹤器 - 追蹤你的皮克敏飾品收藏進度 (非營利・CC BY-SA 4.0)"
+        "title": "Pikmin Bloom 飾品圖鑑與地圖",
+        "subtitle": "尋找你的每一隻皮克敏",
+        "description": "最完整的 Pikmin Bloom 飾品圖鑑、雷達地圖與國際好友交換平台。輕鬆追蹤飾品進度、搜尋探測器地圖區域，並與全球玩家交換明信片。",
+        "keywords": "皮克敏, Pikmin Bloom, 飾品圖鑑, 皮克敏地圖, 探測器, 皮克敏好友, 交換明信片, Nintendo, Niantic",
+        "og_title": "Pikmin Bloom 飾品圖鑑、尋寶地圖與好友交換所",
+        "og_desc": "皮克敏玩家必備工具：一鍵追蹤飾品圖鑑進度、精準預測探測器地點，並與全球玩家交換好友碼與明信片。"
     },
     "nav": {
         "home": "首頁",

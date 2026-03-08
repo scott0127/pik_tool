@@ -72,8 +72,33 @@ const authStore = useAuthStore();
 const { loadCollection, loadFromCloud } = useCollection();
 const isInitializing = ref(true);
 
+const { t, locale } = useI18n();
+
 // Toast system
 const { currentToast, isShowing: isShowingToast } = useToast();
+
+// 動態 SEO 設定 (支援多語系)
+useHead(() => ({
+  titleTemplate: (titleChunk) => {
+    return titleChunk ? `${titleChunk} - ${t('app.title')}` : t('app.title');
+  },
+  htmlAttrs: {
+    lang: locale.value === 'en' ? 'en' : 'zh-TW',
+  },
+  meta: [
+    { name: 'keywords', content: t('app.keywords') }
+  ]
+}));
+
+useSeoMeta({
+  title: () => t('app.title'),
+  ogTitle: () => t('app.og_title'),
+  description: () => t('app.description'),
+  ogDescription: () => t('app.og_desc'),
+  twitterTitle: () => t('app.og_title'),
+  twitterDescription: () => t('app.og_desc'),
+  ogSiteName: () => t('app.title'),
+});
 
 onMounted(async () => {
   console.log('[App] Starting initialization...');
