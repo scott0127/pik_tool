@@ -51,8 +51,9 @@
       <AppFooter />
     </div>
 
-    <!-- Global Toast Notifications -->
+    <!-- Global Components -->
     <GlobalAnnouncement />
+    <PwaInstallPrompt />
     <Toast 
       v-if="currentToast && isShowingToast"
       :message="currentToast.message"

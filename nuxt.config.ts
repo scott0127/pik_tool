@@ -73,9 +73,16 @@ export default defineNuxtConfig({
         { name: 'twitter:title', content: 'Pikmin Bloom 飾品蒐集追蹤器 - 追蹤你的皮克敏飾品收藏進度 (非營利・CC BY-SA 4.0)' },
         { name: 'twitter:description', content: 'Pikmin Bloom 飾品蒐集追蹤器 - 追蹤你的皮克敏飾品收藏進度 (非營利・CC BY-SA 4.0)' },
         { name: 'twitter:image', content: '/og-image.png' },
+
+        // PWA iOS Support
+        { name: 'apple-mobile-web-app-capable', content: 'yes' },
+        { name: 'apple-mobile-web-app-status-bar-style', content: 'black-translucent' },
+        { name: 'apple-mobile-web-app-title', content: 'Pikmin圖鑑' },
       ],
       link: [
         { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
+        { rel: 'manifest', href: '/manifest.webmanifest' },
+        { rel: 'apple-touch-icon', href: '/icon.png' },
         { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
         { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' },
         { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600;700&display=swap' },
