@@ -79,14 +79,47 @@
             </div>
           </div>
           
-          <!-- Region Selector (NEW) -->
+          <!-- Intent Selector (NEW) -->
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-2">
+              <span class="flex items-center gap-1.5">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-emerald-500" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm-1.5-3.879l-3-3a1 1 0 011.414-1.414L9 11.586l4.293-4.293a1 1 0 011.414 1.414l-5 5a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                </svg>
+                交友目的 (自由選填，最多 2 個)
+              </span>
+            </label>
+            <div class="flex flex-wrap gap-2">
+              <button
+                v-for="intent in FRIEND_INTENTS"
+                :key="intent.id"
+                type="button"
+                @click="toggleIntent(intent.id)"
+                :disabled="!newPost.intents.includes(intent.id) && newPost.intents.length >= 2"
+                class="px-3 py-1.5 rounded-xl border text-sm font-medium transition-all duration-200 flex items-center gap-1.5 shadow-sm"
+                :class="[
+                  newPost.intents.includes(intent.id) 
+                    ? intent.colorClass
+                    : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50 hover:border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed'
+                ]"
+              >
+                <span>{{ intent.icon }}</span>
+                <span>{{ intent.label }}</span>
+              </button>
+            </div>
+            <p v-if="newPost.intents.length === 2" class="text-xs text-amber-500 mt-2 font-medium flex items-center gap-1">
+               已達到目的上限 (2 個)
+            </p>
+          </div>
+          
+          <!-- Region Selector -->
           <div>
             <label class="block text-sm font-semibold text-gray-700 mb-2">
               <span class="flex items-center gap-1.5">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
                   <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" />
                 </svg>
-                常駐地區 (自由選填，最多 3 個)
+                常駐地區 (自由選填，最多 2 個)
               </span>
             </label>
             <div class="flex flex-wrap gap-2">
@@ -98,7 +131,7 @@
                     :key="region"
                     type="button"
                     @click="toggleRegion(region)"
-                    :disabled="!newPost.regions.includes(region) && newPost.regions.length >= 3"
+                    :disabled="!newPost.regions.includes(region) && newPost.regions.length >= 2"
                     class="px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200 border"
                     :class="[
                       newPost.regions.includes(region) 
@@ -111,11 +144,8 @@
                 </div>
               </div>
             </div>
-            <p v-if="newPost.regions.length === 3" class="text-xs text-amber-500 mt-2 font-medium flex items-center gap-1">
-               <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
-                 <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
-               </svg>
-               已達到選擇上限 (3 個)
+            <p v-if="newPost.regions.length === 2" class="text-xs text-amber-500 mt-2 font-medium flex items-center gap-1">
+               已達到地區上限 (2 個)
             </p>
           </div>
 
@@ -194,16 +224,22 @@
             class="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-xl p-3 border border-indigo-100 hover:shadow-md transition-all duration-300 group"
           >
             <div class="flex items-center gap-2 mb-2">
-              <div class="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-400 to-purple-500 flex items-center justify-center text-white text-xs font-bold shadow-sm">
+              <div class="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-400 to-purple-500 flex items-center justify-center text-white text-sm font-bold shadow-sm shrink-0">
                 {{ post.username.charAt(0).toUpperCase() }}
               </div>
-              <div class="overflow-hidden">
+              <div class="overflow-hidden flex-1">
                 <h3 class="font-bold text-gray-800 text-sm truncate">{{ post.username }}</h3>
+                <p class="text-[10px] text-gray-400 flex items-center gap-0.5">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-2.5 w-2.5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd" />
+                  </svg>
+                  {{ formatDate(post.created_at) }}
+                </p>
               </div>
             </div>
             
             <div 
-              class="bg-white rounded-lg px-2 py-1.5 mb-2 border border-indigo-100 cursor-pointer hover:bg-indigo-50 transition-colors"
+              class="bg-white rounded-lg px-2 py-2 mb-2 border border-indigo-100 cursor-pointer hover:bg-indigo-50 transition-colors shadow-[inset_0_2px_4px_rgba(0,0,0,0.02)]"
               @click="copyCode(post.friend_code)"
               :title="$t('friends.copy_tooltip')"
             >
@@ -212,16 +248,46 @@
               </p>
             </div>
 
-            <div class="flex justify-end">
+            <div class="flex-1 flex flex-col justify-between">
+              <!-- Intent Tags (Small) -->
+              <div v-if="getPostIntents(post.regions).length > 0" class="flex flex-wrap gap-1 mb-2">
+                <span 
+                  v-for="intentId in getPostIntents(post.regions)" 
+                  :key="`rec-${post.id}-intent-${intentId}`" 
+                  class="px-1.5 py-[2px] rounded text-[10px] font-semibold border flex items-center gap-1 shadow-sm"
+                  :class="getIntentColor(intentId)"
+                  :title="getIntentLabel(intentId)"
+                >
+                  <span class="text-[12px] leading-none">{{ getIntentIcon(intentId) }}</span>
+                  <span class="leading-none">{{ getIntentLabel(intentId) }}</span>
+                </span>
+              </div>
+
+              <!-- Region Tags (Small) -->
+              <div v-if="getPostRegions(post.regions).length > 0" class="flex flex-wrap gap-1 mb-2">
+                <span v-for="region in getPostRegions(post.regions)" :key="`rec-${post.id}-region-${region}`" class="px-1.5 py-[2px] bg-white text-gray-500 border border-gray-200 rounded text-[10px] font-bold shadow-[0_1px_2px_rgba(0,0,0,0.02)]">
+                  {{ region.split(' ')[0] }}
+                </span>
+              </div>
+            </div>
+
+            <!-- User Message (Small and truncated) -->
+            <div v-if="post.message" class="mb-2">
+              <p class="text-xs text-gray-600 bg-white/70 rounded p-1.5 border border-indigo-50/50 line-clamp-2 leading-relaxed" :title="post.message">
+                {{ post.message }}
+              </p>
+            </div>
+
+            <div class="flex flex-wrap justify-between items-end mt-auto gap-2">
                <button
                 @click="copyCode(post.friend_code)"
-                class="text-[10px] text-indigo-400 hover:text-indigo-600 flex items-center gap-1 opacity-60 group-hover:opacity-100 transition-opacity"
+                class="text-[11px] font-medium text-white bg-indigo-500 hover:bg-indigo-600 px-2.5 py-1 rounded-md flex items-center gap-1 shadow-sm transition-colors w-full justify-center"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
                   <path d="M8 2a1 1 0 000 2h2a1 1 0 100-2H8z" />
                   <path d="M3 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v6h-4.586l1.293-1.293a1 1 0 00-1.414-1.414l-3 3a1 1 0 000 1.414l3 3a1 1 0 001.414-1.414L10.414 13H15v3a2 2 0 01-2 2H5a2 2 0 01-2-2V5zM15 11h2a1 1 0 110 2h-2v-2z" />
                 </svg>
-                {{ $t('friends.copy_btn') }}
+                複製代碼
               </button>
             </div>
           </div>
@@ -255,47 +321,74 @@
         </div>
 
         <!-- Filter Bar -->
-        <div class="mb-6 bg-white/50 backdrop-blur-md rounded-2xl p-4 border border-gray-100 shadow-sm flex flex-col gap-3">
-          <div class="flex items-center gap-2 text-sm font-semibold text-gray-600">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-              <path fill-rule="evenodd" d="M3 3a1 1 0 011-1h12a1 1 0 011 1v3a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 018 17v-5.586L3.293 6.707A1 1 0 013 6V3z" clip-rule="evenodd" />
-            </svg>
-            地區篩選：
-          </div>
-          
-          <!-- 第一層：大分區 -->
-          <div class="flex flex-wrap gap-2">
-            <button
-              @click="clearAllFilters"
-              class="px-4 py-1.5 rounded-full text-sm font-medium transition-colors border"
-              :class="selectedCategories.length === 0 && selectedRegionFilters.length === 0 ? 'bg-emerald-500 text-white border-emerald-600 shadow-sm' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'"
-            >
-              全部
-            </button>
-            <button
-              v-for="group in FRIEND_REGIONS"
-              :key="`cat-${group.label}`"
-              @click="toggleCategoryFilter(group.label)"
-              class="px-4 py-1.5 rounded-full text-sm font-medium transition-colors border"
-              :class="selectedCategories.includes(group.label) ? 'bg-indigo-500 text-white border-indigo-600 shadow-sm' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'"
-            >
-              {{ group.label }}
-            </button>
+        <div class="mb-6 bg-white/50 backdrop-blur-md rounded-2xl p-4 border border-gray-100 shadow-sm flex flex-col gap-4">
+          <!-- Intents Filter -->
+          <div>
+            <div class="flex items-center gap-2 text-sm font-semibold text-gray-600 mb-2">
+              <span class="text-xl">🎯</span> 目的篩選：
+            </div>
+            <div class="flex flex-wrap gap-2">
+              <button
+                @click="clearIntentFilters"
+                class="px-4 py-1.5 rounded-full text-sm font-medium transition-colors border shadow-sm"
+                :class="selectedIntentFilters.length === 0 ? 'bg-indigo-500 text-white border-indigo-600' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'"
+              >
+                所有目的
+              </button>
+              <button
+                v-for="intent in FRIEND_INTENTS"
+                :key="`filter-intent-${intent.id}`"
+                @click="toggleIntentFilter(intent.id)"
+                class="px-3 py-1.5 rounded-full text-sm font-medium transition-colors border flex items-center gap-1"
+                :class="selectedIntentFilters.includes(intent.id) ? 'bg-indigo-50 border-indigo-300 text-indigo-700 shadow-sm' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'"
+              >
+                <span>{{ intent.icon }}</span>
+                <span>{{ intent.label }}</span>
+              </button>
+            </div>
           </div>
 
-          <!-- 第二層：具體地區 (顯示所有被選中大分區的細項) -->
-          <div v-if="selectedCategories.length > 0" class="flex flex-col gap-2 mt-1 pt-3 border-t border-gray-100 animate-slide-up">
-            <div v-for="cat in selectedCategories" :key="`subcat-${cat}`" class="flex flex-wrap gap-2 items-center">
-              <span class="text-xs font-bold text-gray-400 mr-1">{{ cat }}:</span>
+          <div class="w-full h-px bg-gray-200"></div>
+
+          <!-- Regions Filter -->
+          <div>
+            <div class="flex items-center gap-2 text-sm font-semibold text-gray-600 mb-2">
+              <span class="text-xl">🌍</span> 地區篩選：
+            </div>
+            <!-- 第一層：大分區 -->
+            <div class="flex flex-wrap gap-2">
               <button
-                v-for="region in getOptionsForCategory(cat)"
-                :key="`filter-${region}`"
-                @click="toggleRegionFilter(region)"
-                class="px-3 py-1.5 rounded-full text-sm font-medium transition-colors border"
-                :class="selectedRegionFilters.includes(region) ? 'bg-emerald-500 text-white border-emerald-600 shadow-sm' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'"
+                @click="clearRegionFilters"
+                class="px-4 py-1.5 rounded-full text-sm font-medium transition-colors border shadow-sm"
+                :class="selectedCategories.length === 0 && selectedRegionFilters.length === 0 ? 'bg-emerald-500 text-white border-emerald-600' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'"
               >
-                {{ region }}
+                全球
               </button>
+              <button
+                v-for="group in FRIEND_REGIONS"
+                :key="`cat-${group.label}`"
+                @click="toggleCategoryFilter(group.label)"
+                class="px-4 py-1.5 rounded-full text-sm font-medium transition-colors border"
+                :class="selectedCategories.includes(group.label) ? 'bg-emerald-50 text-emerald-700 border-emerald-300 shadow-sm' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'"
+              >
+                {{ group.label.split(' ')[0] }}
+              </button>
+            </div>
+
+            <!-- 第二層：具體地區 -->
+            <div v-if="selectedCategories.length > 0" class="flex flex-col gap-2 mt-2 pt-2 border-t border-gray-100 animate-slide-up">
+              <div v-for="cat in selectedCategories" :key="`subcat-${cat}`" class="flex flex-wrap gap-2 items-center">
+                <span class="text-xs font-bold text-gray-400 mr-1">{{ cat.split(' ')[0] }}:</span>
+                <button
+                  v-for="region in getOptionsForCategory(cat)"
+                  :key="`filter-${region}`"
+                  @click="toggleRegionFilter(region)"
+                  class="px-3 py-1.5 rounded-full text-sm font-medium transition-colors border"
+                  :class="selectedRegionFilters.includes(region) ? 'bg-emerald-500 text-white border-emerald-600 shadow-sm' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'"
+                >
+                  {{ region.split(' ')[0] }}
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -369,10 +462,23 @@
               </p>
             </div>
             
+            <!-- Intent Tags -->
+            <div v-if="getPostIntents(post.regions).length > 0" class="flex flex-wrap gap-1.5 mb-2">
+              <span 
+                v-for="intentId in getPostIntents(post.regions)" 
+                :key="`${post.id}-intent-${intentId}`" 
+                class="px-2 py-0.5 rounded text-xs font-semibold flex items-center gap-1 border"
+                :class="getIntentColor(intentId)"
+              >
+                <span>{{ getIntentIcon(intentId) }}</span>
+                <span>{{ getIntentLabel(intentId) }}</span>
+              </span>
+            </div>
+
             <!-- Region Tags -->
-            <div v-if="post.regions && post.regions.length > 0" class="flex flex-wrap gap-1.5 mb-3">
-              <span v-for="region in post.regions" :key="`${post.id}-${region}`" class="px-2 py-0.5 bg-indigo-50 text-indigo-600 border border-indigo-100 rounded text-xs font-semibold">
-                📍 {{ region }}
+            <div v-if="getPostRegions(post.regions).length > 0" class="flex flex-wrap gap-1.5 mb-3">
+              <span v-for="region in getPostRegions(post.regions)" :key="`${post.id}-region-${region}`" class="px-2 py-0.5 bg-gray-50 text-gray-600 border border-gray-200 rounded text-xs font-bold">
+                📍 {{ region.split(' ')[0] }}
               </span>
             </div>
             
@@ -447,13 +553,25 @@ const showCopyToast = ref(false);
 
 // 導入地區常數
 import { FRIEND_REGIONS, ALL_REGION_OPTIONS } from '~/constants/regions';
+import { FRIEND_INTENTS, ALL_INTENT_OPTIONS } from '~/constants/intents';
 
 const newPost = ref({
   username: '',
   friendCode: '',
   message: '',
   regions: [] as string[],
+  intents: [] as string[],
 });
+
+// 切換選擇目的
+const toggleIntent = (intentId: string) => {
+  const idx = newPost.value.intents.indexOf(intentId);
+  if (idx > -1) {
+    newPost.value.intents.splice(idx, 1);
+  } else if (newPost.value.intents.length < 2) {
+    newPost.value.intents.push(intentId);
+  }
+};
 
 // 切換選擇地區
 const toggleRegion = (region: string) => {
@@ -535,11 +653,10 @@ const fetchPosts = async () => {
       .select('*')
       .order('created_at', { ascending: false });
       
-    // 複合篩選邏輯：
-    // 如果使用者沒有選任何細項 (selectedRegionFilters)，但有選大類別 (selectedCategories)
-    // 就等於搜尋該大類別下的所有地區。
-    // 如果有選細項，就搜尋所選的細項目。
-    let targetRegions: string[] = [...selectedRegionFilters.value];
+    // 合併篩選邏輯：地區 + 目的
+    // 因為在資料庫中我們把 regions 和 intents 都存在同一個叫做 `regions` 的字串陣列欄位裡，
+    // 所以查尋條件都可以合併在一起做 overlaps。
+    let targetTags: string[] = [...selectedRegionFilters.value, ...selectedIntentFilters.value];
     
     // 把只有選大類、沒選細項的大類地區全部加入
     selectedCategories.value.forEach(cat => {
@@ -547,15 +664,16 @@ const fetchPosts = async () => {
       // 如果這個大類的細項都沒有被選，代表使用者想要整個大類
       const hasSpecificSelection = optionsForCat.some(opt => selectedRegionFilters.value.includes(opt));
       if (!hasSpecificSelection) {
-        targetRegions.push(...optionsForCat);
+        targetTags.push(...optionsForCat);
       }
     });
 
     // 去重複
-    targetRegions = [...new Set(targetRegions)];
+    targetTags = [...new Set(targetTags)];
 
-    if (targetRegions.length > 0) {
-      query = query.overlaps('regions', targetRegions);
+    if (targetTags.length > 0) {
+      // 在 Supabase 中尋找 regions 陣列中包含 targetTags 任何一個的 post
+      query = query.overlaps('regions', targetTags);
     }
 
     const { data, error: err } = await query;
@@ -600,12 +718,15 @@ const submitPost = async () => {
       throw new Error('No authenticated session found');
     }
     
+    // 為了不更動後端資料庫架構，我們將 intents 和 regions 結合存在 `regions` 欄位中
+    const combinedTags = [...newPost.value.regions, ...newPost.value.intents];
+    
     const { data, error } = await supabase.from('friend_posts').insert({
       user_id: actualUserId,
       username: newPost.value.username.trim(),
       friend_code: cleanCode,
       message: newPost.value.message.trim() || null,
-      regions: newPost.value.regions.length > 0 ? newPost.value.regions : null,
+      regions: combinedTags.length > 0 ? combinedTags : null,
     }).select();
     
     if (error) {
@@ -615,6 +736,7 @@ const submitPost = async () => {
     // Reset form and refresh
     newPost.value.message = '';
     newPost.value.regions = [];
+    newPost.value.intents = [];
     await fetchPosts();
   } catch (e: any) {
     console.error('Failed to submit post:', e);
@@ -686,9 +808,9 @@ const shuffleArray = <T>(array: T[]): T[] => {
 };
 
 const refreshRecommendations = () => {
-  // 如果總人數過少，直接顯示全部，不需輪播邏輯
+  // 不論有沒有篩選，少於或等於10個直接全秀(打亂排列)，不輪播
   if (posts.value.length <= 10) {
-    recommendedPosts.value = [...posts.value];
+    recommendedPosts.value = shuffleArray(posts.value);
     return;
   }
 
@@ -700,7 +822,7 @@ const refreshRecommendations = () => {
     // 1. 先把 Queue 剩下的都拿出來
     nextBatch.push(...recommendationQueue.value);
     
-    // 2. 產生新的一輪洗牌名單
+    // 2. 產生新的一輪洗牌名單 (基於過濾後的清單)
     const newShuffled = shuffleArray(posts.value);
     
     // 3. 計算還缺多少
@@ -727,11 +849,11 @@ const startRecommendationTimer = () => {
   if (recommendTimer) clearInterval(recommendTimer);
   // 首次執行
   refreshRecommendations();
-  // 每 30 秒刷新
+  // 每 10 秒刷新
   recommendTimer = setInterval(refreshRecommendations, 10000);
 };
 
-// 監聽 posts 變更，當載入完成時啟動推薦
+// 監聽 posts 變更，重新建立 Queue
 watch(posts, (newPosts) => {
   if (newPosts.length > 0) {
     // 推薦系統應該基於全部使用者，所以如果目前沒有篩選條件，就更新推薦
@@ -744,6 +866,23 @@ watch(posts, (newPosts) => {
 
 const selectedCategories = ref<string[]>([]);
 const selectedRegionFilters = ref<string[]>([]);
+const selectedIntentFilters = ref<string[]>([]);
+
+// Helper Functions for separating regions and intents on display
+const getPostRegions = (tags: string[] | null) => {
+  if (!tags) return [];
+  return tags.filter(tag => ALL_REGION_OPTIONS.includes(tag));
+};
+
+const getPostIntents = (tags: string[] | null) => {
+  if (!tags) return [];
+  return tags.filter(tag => ALL_INTENT_OPTIONS.includes(tag));
+};
+
+const getIntentObj = (id: string) => FRIEND_INTENTS.find(i => i.id === id);
+const getIntentIcon = (id: string) => getIntentObj(id)?.icon || '';
+const getIntentLabel = (id: string) => getIntentObj(id)?.label || id;
+const getIntentColor = (id: string) => getIntentObj(id)?.colorClass || 'bg-gray-100 text-gray-800 border-gray-200';
 
 const getOptionsForCategory = (label: string) => {
   return FRIEND_REGIONS.find(g => g.label === label)?.options || [];
@@ -770,13 +909,31 @@ const toggleRegionFilter = (region: string) => {
   }
 };
 
-const clearAllFilters = () => {
+const toggleIntentFilter = (intentId: string) => {
+  const idx = selectedIntentFilters.value.indexOf(intentId);
+  if (idx > -1) {
+    selectedIntentFilters.value.splice(idx, 1);
+  } else {
+    selectedIntentFilters.value.push(intentId);
+  }
+};
+
+const clearRegionFilters = () => {
   selectedCategories.value = [];
   selectedRegionFilters.value = [];
 };
 
+const clearIntentFilters = () => {
+  selectedIntentFilters.value = [];
+};
+
+const clearAllFilters = () => {
+  clearRegionFilters();
+  clearIntentFilters();
+};
+
 // 當選擇的地區或分區改變時，重新 fetch
-watch([selectedRegionFilters, selectedCategories], () => {
+watch([selectedRegionFilters, selectedCategories, selectedIntentFilters], () => {
   fetchPosts();
 }, { deep: true });
 

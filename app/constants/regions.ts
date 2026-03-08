@@ -7,24 +7,24 @@ export interface RegionGroup {
 
 export const FRIEND_REGIONS: RegionGroup[] = [
   {
-    label: '北部地區',
-    options: ['基隆市', '台北市', '新北市', '桃園市', '新竹縣', '新竹市', '宜蘭縣'],
+    label: '台灣 (Taiwan)',
+    options: ['基隆/雙北', '桃竹苗', '中彰投', '雲嘉南', '高屏', '宜花東', '離島'],
   },
   {
-    label: '中部地區',
-    options: ['苗栗縣', '台中市', '彰化縣', '南投縣', '雲林縣'],
+    label: '亞洲 (Asia)',
+    options: ['日本 (Japan)', '韓國 (South Korea)', '港澳 (HK/Macao)', '東南亞 (SEA)', '中國 (China)', '其他亞洲 (Other Asia)'],
   },
   {
-    label: '南部地區',
-    options: ['嘉義縣', '嘉義市', '台南市', '高雄市', '屏東縣'],
+    label: '美洲 (Americas)',
+    options: ['美國 (USA)', '加拿大 (Canada)', '中南美洲 (Latin America)'],
   },
   {
-    label: '東部及離島',
-    options: ['花蓮縣', '台東縣', '澎湖縣', '金門縣', '連江縣'],
+    label: '歐洲 (Europe)',
+    options: ['英國 (UK)', '西歐 (Western Europe)', '北歐 (Northern Europe)', '南歐 (Southern Europe)', '東歐 (Eastern Europe)'],
   },
   {
-    label: '海外地區',
-    options: ['日本', '韓國', '香港/澳門', '東南亞', '北美', '歐洲', '其他海外'],
+    label: '大洋洲 & 其他',
+    options: ['澳洲 (Australia)', '紐西蘭 (New Zealand)', '非洲 (Africa)', '中東 (Middle East)', '其他 (Others)'],
   }
 ];
 

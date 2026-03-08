@@ -40,7 +40,12 @@ export default defineNuxtConfig({
     defaultLocale: 'zh',
     strategy: 'no_prefix', // 不改變 URL 結構
     langDir: 'locales',
-    detectBrowserLanguage: false
+    detectBrowserLanguage: {
+      useCookie: true,
+      cookieKey: 'i18n_redirected',
+      redirectOn: 'root', // 只有在路由根部才重定向 (因 no_prefix 主要是依賴 cookie)
+      fallbackLocale: 'en'
+    }
   },
 
   routeRules: {
