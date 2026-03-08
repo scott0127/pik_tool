@@ -51,17 +51,16 @@
 
        <!-- Missing Tracker Badge -->
        <div class="mt-8 flex justify-center md:justify-start w-full">
-         <button @click="showMissingModal = true" class="group relative inline-flex items-center justify-center gap-2.5 px-6 py-3 text-sm font-medium text-emerald-800 bg-emerald-50/80 backdrop-blur-sm rounded-2xl md:rounded-full hover:bg-emerald-100/80 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 overflow-hidden shadow-sm border border-emerald-200 hover:shadow hover:-translate-y-0.5 transition-all w-full md:w-auto text-left md:text-center">
+         <button @click="showMissingModal = true" class="group relative inline-flex flex-wrap items-center justify-center gap-3 px-6 py-3.5 text-sm md:text-[15px] font-medium text-emerald-800 bg-[#e7f9ec] backdrop-blur-sm shadow-[0_4px_15px_-4px_rgba(52,211,153,0.3)] rounded-full hover:bg-[#d5f5de] focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 overflow-hidden border border-emerald-100/60 hover:-translate-y-0.5 transition-all max-w-[95vw] md:max-w-none">
             
-            <div class="flex items-center justify-center text-emerald-500 shrink-0">
-                <Icon name="lucide:search" class="w-4 h-4" />
-            </div>
+            <Icon name="lucide:search" class="text-xl text-emerald-600 shrink-0" />
 
-            <span v-if="missingSpirits.length > 0" class="flex-1 leading-relaxed tracking-wide">
-              你還差 <span class="text-emerald-600 font-extrabold text-base mx-0.5">{{ missingSpirits.length }}</span> 種顏色就蒐集完了！<span class="text-emerald-600/70 border-b border-emerald-400 hover:text-emerald-600 hover:border-emerald-600 pb-0.5 ml-1 whitespace-nowrap inline-block transition-colors">點擊看差誰</span>
-            </span>
-            <span v-else class="flex-1 tracking-wide">
-              🎉 太神啦！這個月的皮克敏已經全部收集完畢！
+            <div v-if="missingSpirits.length > 0" class="flex items-center flex-wrap justify-center gap-x-2 gap-y-1">
+              <span class="text-gray-700 whitespace-nowrap">你還差 <span class="text-emerald-700 font-extrabold text-lg mx-0.5">{{ missingSpirits.length }}</span> 種顏色就蒐集完了！</span>
+              <span class="text-emerald-600/90 border-b border-emerald-400 group-hover:text-emerald-700 group-hover:border-emerald-600 transition-colors whitespace-nowrap text-[13px] md:text-sm font-semibold pb-0.5">點擊看差誰</span>
+            </div>
+            <span v-else class="text-gray-700 tracking-wide font-normal">
+              🎉 太神啦！收集完畢！
             </span>
          </button>
        </div>

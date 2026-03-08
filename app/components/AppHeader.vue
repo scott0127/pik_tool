@@ -41,15 +41,26 @@
 
           <!-- Right Section -->
           <div class="flex items-center gap-3">
-            <!-- PWA Install Button -->
+            <!-- PWA Install Button (iOS) -->
             <button 
-              v-if="canInstall"
-              @click="triggerPrompt"
+              v-if="canInstallIos"
+              @click="triggerIosPrompt"
               class="flex items-center gap-1.5 px-3 sm:px-4 h-10 rounded-2xl bg-gradient-to-r from-teal-500 to-emerald-500 text-white shadow-md shadow-emerald-500/20 hover:shadow-lg hover:-translate-y-0.5 transition-all group"
-              title="安裝 App 到主畫面"
+              title="安裝 App 到主畫面 (iOS)"
             >
               <Icon name="lucide:apple" class="text-lg group-hover:scale-110 transition-transform" />
               <span class="text-sm font-bold hidden sm:inline">iOS 捷徑</span>
+            </button>
+
+            <!-- PWA Install Button (Android/Desktop) -->
+            <button 
+              v-if="canInstallAndroid"
+              @click="triggerAndroidPrompt"
+              class="flex items-center gap-1.5 px-3 sm:px-4 h-10 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-md shadow-emerald-500/20 hover:shadow-lg hover:-translate-y-0.5 transition-all group"
+              title="安裝 App 到主畫面 (Android/PC)"
+            >
+              <Icon name="lucide:download" class="text-lg group-hover:scale-110 transition-transform" />
+              <span class="text-sm font-bold hidden sm:inline">下載 App</span>
             </button>
 
             <!-- Progress Ring (Desktop) -->
@@ -572,7 +583,7 @@
 const authStore = useAuthStore();
 const router = useRouter();
 const { getStats } = useCollection();
-const { canInstall, triggerPrompt } = usePwaInstall();
+const { canInstallIos, canInstallAndroid, triggerIosPrompt, triggerAndroidPrompt } = usePwaInstall();
 
 const showMobileMenu = ref(false);
 const showSearch = ref(false);
