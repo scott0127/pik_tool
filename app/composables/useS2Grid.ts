@@ -30,6 +30,44 @@ export function useS2Grid() {
   }
 
   /**
+   * 計算兩個經緯度之間的距離（公尺），使用 Haversine 公式
+   */
+  function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
+    const R = 6371e3; // 地球半徑（公尺）
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+              Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+              Math.sin(dLon/2) * Math.sin(dLon/2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    return R * c;
+  }
+
+  /**
+   * 根據掃描器位置和半徑，找出範圍內的網格並預測飾品
+   * @param scannerLat 掃描器緯度
+   * @param scannerLng 掃描器經度
+   * @param radius 半徑（公尺），預設 100m (與遊戲相同)
+   */
+  function calculateRadarPrediction(scannerLat: number, scannerLng: number, radius: number = 100): Set<string> {
+    const detectedDecors = new Set<string>();
+    
+    // 遍歷當前顯示的所有網格
+    cells.value.forEach(cell => {
+      // Pikmin Bloom 的判定是基於網格的中心點是否在範圍內
+      const distance = calculateDistance(scannerLat, scannerLng, cell.center.lat, cell.center.lng);
+      
+      if (distance <= radius) {
+        // 網格中心點在雷達範圍內，加入該網格包含的所有飾品類型
+        cell.decorTypes.forEach(decor => detectedDecors.add(decor));
+      }
+    });
+
+    return detectedDecors;
+  }
+
+
+  /**
    * 根據 S2 Cell ID 獲取 4 個頂點座標
    * S2 Cell 在地圖上是不規則四邊形
    */
@@ -287,5 +325,7 @@ export function useS2Grid() {
     getCellCenter,
     getCellColor,
     getCellStyle,
+    calculateDistance,
+    calculateRadarPrediction,
   };
 }

@@ -48,10 +48,9 @@
         <!-- 更新內容 -->
         <div v-show="currentTab === 'update'" class="flex-1">
           <ul class="text-sm text-gray-600 leading-relaxed list-disc list-inside space-y-1">
-            <li><span class="text-red-600 font-medium">3/7優化純種地圖精確度，機場、河流、公園區域判斷變得更準確了!</span></li>
+            <li><span class="text-green-600 font-medium">3/7優化純種地圖精確度，機場、河流、公園區域判斷變得更準確了!</span></li>
             <li>2/5 新增 2026 巧克力特殊類別</li>
             <li>新增稀有廚師冰皮、鍬形蟲冰皮、橡栗冰皮</li>
-            <li><span class="text-indigo-600 font-medium">點擊咖啡按鈕可小額贊助鼓勵開發 ☕</span></li>
           </ul>
         </div>
 

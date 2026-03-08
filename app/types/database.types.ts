@@ -41,6 +41,7 @@ export interface Database {
           username: string
           friend_code: string
           message: string | null
+          regions: string[] | null
           created_at: string
         }
         Insert: {
@@ -49,6 +50,7 @@ export interface Database {
           username: string
           friend_code: string
           message?: string | null
+          regions?: string[] | null
           created_at?: string
         }
         Update: {
@@ -57,6 +59,7 @@ export interface Database {
           username?: string
           friend_code?: string
           message?: string | null
+          regions?: string[] | null
           created_at?: string
         }
         Relationships: [

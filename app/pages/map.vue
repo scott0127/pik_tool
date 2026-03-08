@@ -264,7 +264,7 @@
           <template v-if="scannerPinLocation">
             <LCircle
               :lat-lng="scannerPinLocation"
-              :radius="120"
+              :radius="100"
               color="#3b82f6"
               :weight="1"
               fill-color="#3b82f6"
@@ -343,6 +343,15 @@
         :is-mobile="isMobile"
         @select-all="selectAll"
         @clear-all="clearAll"
+      />
+
+      <!-- [NEW] Scanner Prediction Panel -->
+      <ScannerPanel 
+        v-if="isScannerMode && scannerPinLocation"
+        :show="isScannerMode && scannerPinLocation !== null"
+        :predicted-decors="scannerPredictedRules"
+        :is-calculating="isScannerCalculating"
+        @close="toggleScannerMode"
       />
 
       <!-- [NEW] Decor Selector Modal -->
@@ -635,6 +644,7 @@ import MapDecorSelector from '~/components/map/MapDecorSelector.vue';
 import MapGridLegend from '~/components/map/MapGridLegend.vue';
 import MapZoomControls from '~/components/map/MapZoomControls.vue';
 import PureModeSelector from '~/components/map/PureModeSelector.vue';
+import ScannerPanel from '~/components/map/ScannerPanel.vue';
 
 // ⚠️ 維護模式開關 - 當流量到達 90GB 時改為 true
 const MAINTENANCE_MODE = false;
@@ -658,6 +668,7 @@ const {
   getCellStyle,
   getCellCenter,
   getCellVertices,
+  calculateRadarPrediction,
 } = useS2Grid();
 
 // [NEW] Helper to get effective decor types (Local + Reported)
@@ -865,6 +876,29 @@ const isScannerMode = ref(true); // Default ON as requested
 const scannerPinLocation = ref<[number, number] | null>(null);
 const isMapMoving = ref(false);
 
+const scannerPredictedDecors = ref<Set<string>>(new Set());
+const scannerPredictedRules = computed(() => {
+    return Array.from(scannerPredictedDecors.value)
+        .map(id => getDecorInfo(id))
+        .filter(rule => rule !== undefined) as any[];
+});
+const isScannerCalculating = ref(false);
+
+// ⚠️ 使用 shallowRef 來儲存 POI 點位，避免 Vue 對每個點位物件進行深層監聽
+const fetchedPoints = shallowRef<POIPoint[]>([]);
+
+let scannerDebounceTimer: ReturnType<typeof setTimeout> | null = null;
+watch([scannerPinLocation, fetchedPoints], ([newLoc]) => {
+    if (newLoc && isScannerMode.value) {
+        if (scannerDebounceTimer) clearTimeout(scannerDebounceTimer);
+        isScannerCalculating.value = true;
+        scannerDebounceTimer = setTimeout(() => {
+            scannerPredictedDecors.value = calculateRadarPrediction(newLoc[0], newLoc[1], 100);
+            isScannerCalculating.value = false;
+        }, 300); // 300ms debounce
+    }
+}, { immediate: true });
+
 // Initialize scanner position when map is ready or on mount if map available
 const updateScannerToCenter = () => {
    if (mapRef.value?.leafletObject) {
@@ -970,8 +1004,6 @@ const hasSearched = ref(false);
 // Batch rendering variables removed for performance
 // Using smart diffing in useS2Grid instead for crash prevention without visual lag
 
-// ⚠️ 使用 shallowRef 來儲存 POI 點位，避免 Vue 對每個點位物件進行深層監聽
-const fetchedPoints = shallowRef<POIPoint[]>([]);
 
 // 使用普通物件儲存邊界，不需要響應式
 let currentBounds: MapBounds | null = null;
