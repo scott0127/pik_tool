@@ -255,28 +255,44 @@
         </div>
 
         <!-- Filter Bar -->
-        <div class="mb-6 bg-white/50 backdrop-blur-md rounded-2xl p-4 border border-gray-100 shadow-sm flex flex-col sm:flex-row gap-3 items-start sm:items-center">
-          <div class="flex items-center gap-2 text-sm font-semibold text-gray-600 whitespace-nowrap">
+        <div class="mb-6 bg-white/50 backdrop-blur-md rounded-2xl p-4 border border-gray-100 shadow-sm flex flex-col gap-3">
+          <div class="flex items-center gap-2 text-sm font-semibold text-gray-600">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
               <path fill-rule="evenodd" d="M3 3a1 1 0 011-1h12a1 1 0 011 1v3a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 018 17v-5.586L3.293 6.707A1 1 0 013 6V3z" clip-rule="evenodd" />
             </svg>
             地區篩選：
           </div>
-          <div class="flex-1 overflow-x-auto pb-1 -mb-1 hide-scrollbar">
-            <div class="flex gap-2">
+          
+          <!-- 第一層：大分區 -->
+          <div class="flex flex-wrap gap-2">
+            <button
+              @click="clearAllFilters"
+              class="px-4 py-1.5 rounded-full text-sm font-medium transition-colors border"
+              :class="selectedCategories.length === 0 && selectedRegionFilters.length === 0 ? 'bg-emerald-500 text-white border-emerald-600 shadow-sm' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'"
+            >
+              全部
+            </button>
+            <button
+              v-for="group in FRIEND_REGIONS"
+              :key="`cat-${group.label}`"
+              @click="toggleCategoryFilter(group.label)"
+              class="px-4 py-1.5 rounded-full text-sm font-medium transition-colors border"
+              :class="selectedCategories.includes(group.label) ? 'bg-indigo-500 text-white border-indigo-600 shadow-sm' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'"
+            >
+              {{ group.label }}
+            </button>
+          </div>
+
+          <!-- 第二層：具體地區 (顯示所有被選中大分區的細項) -->
+          <div v-if="selectedCategories.length > 0" class="flex flex-col gap-2 mt-1 pt-3 border-t border-gray-100 animate-slide-up">
+            <div v-for="cat in selectedCategories" :key="`subcat-${cat}`" class="flex flex-wrap gap-2 items-center">
+              <span class="text-xs font-bold text-gray-400 mr-1">{{ cat }}:</span>
               <button
-                @click="selectedRegionFilter = null"
-                class="px-4 py-1.5 rounded-full text-sm font-medium transition-colors whitespace-nowrap border"
-                :class="selectedRegionFilter === null ? 'bg-emerald-500 text-white border-emerald-600 shadow-sm' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'"
-              >
-                全部地區
-              </button>
-              <button
-                v-for="region in ALL_REGION_OPTIONS"
+                v-for="region in getOptionsForCategory(cat)"
                 :key="`filter-${region}`"
-                @click="selectedRegionFilter = selectedRegionFilter === region ? null : region"
-                class="px-4 py-1.5 rounded-full text-sm font-medium transition-colors whitespace-nowrap border"
-                :class="selectedRegionFilter === region ? 'bg-emerald-500 text-white border-emerald-600 shadow-sm' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'"
+                @click="toggleRegionFilter(region)"
+                class="px-3 py-1.5 rounded-full text-sm font-medium transition-colors border"
+                :class="selectedRegionFilters.includes(region) ? 'bg-emerald-500 text-white border-emerald-600 shadow-sm' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'"
               >
                 {{ region }}
               </button>
@@ -519,8 +535,27 @@ const fetchPosts = async () => {
       .select('*')
       .order('created_at', { ascending: false });
       
-    if (selectedRegionFilter.value) {
-      query = query.contains('regions', [selectedRegionFilter.value]);
+    // 複合篩選邏輯：
+    // 如果使用者沒有選任何細項 (selectedRegionFilters)，但有選大類別 (selectedCategories)
+    // 就等於搜尋該大類別下的所有地區。
+    // 如果有選細項，就搜尋所選的細項目。
+    let targetRegions: string[] = [...selectedRegionFilters.value];
+    
+    // 把只有選大類、沒選細項的大類地區全部加入
+    selectedCategories.value.forEach(cat => {
+      const optionsForCat = getOptionsForCategory(cat);
+      // 如果這個大類的細項都沒有被選，代表使用者想要整個大類
+      const hasSpecificSelection = optionsForCat.some(opt => selectedRegionFilters.value.includes(opt));
+      if (!hasSpecificSelection) {
+        targetRegions.push(...optionsForCat);
+      }
+    });
+
+    // 去重複
+    targetRegions = [...new Set(targetRegions)];
+
+    if (targetRegions.length > 0) {
+      query = query.overlaps('regions', targetRegions);
     }
 
     const { data, error: err } = await query;
@@ -700,19 +735,50 @@ const startRecommendationTimer = () => {
 watch(posts, (newPosts) => {
   if (newPosts.length > 0) {
     // 推薦系統應該基於全部使用者，所以如果目前沒有篩選條件，就更新推薦
-    if (!selectedRegionFilter.value) {
+    if (selectedCategories.value.length === 0 && selectedRegionFilters.value.length === 0) {
       recommendationQueue.value = shuffleArray(newPosts);
       startRecommendationTimer();
     }
   }
 });
 
-const selectedRegionFilter = ref<string | null>(null);
+const selectedCategories = ref<string[]>([]);
+const selectedRegionFilters = ref<string[]>([]);
 
-// 當選擇的地區改變時，重新 fetch
-watch(selectedRegionFilter, () => {
+const getOptionsForCategory = (label: string) => {
+  return FRIEND_REGIONS.find(g => g.label === label)?.options || [];
+};
+
+const toggleCategoryFilter = (cat: string) => {
+  const idx = selectedCategories.value.indexOf(cat);
+  if (idx > -1) {
+    selectedCategories.value.splice(idx, 1);
+    // 移除該分類下已選的細項
+    const options = getOptionsForCategory(cat);
+    selectedRegionFilters.value = selectedRegionFilters.value.filter(r => !options.includes(r));
+  } else {
+    selectedCategories.value.push(cat);
+  }
+};
+
+const toggleRegionFilter = (region: string) => {
+  const idx = selectedRegionFilters.value.indexOf(region);
+  if (idx > -1) {
+    selectedRegionFilters.value.splice(idx, 1);
+  } else {
+    selectedRegionFilters.value.push(region);
+  }
+};
+
+const clearAllFilters = () => {
+  selectedCategories.value = [];
+  selectedRegionFilters.value = [];
+};
+
+// 當選擇的地區或分區改變時，重新 fetch
+watch([selectedRegionFilters, selectedCategories], () => {
   fetchPosts();
-});
+}, { deep: true });
 
 onUnmounted(() => {
   if (recommendTimer) clearInterval(recommendTimer);
