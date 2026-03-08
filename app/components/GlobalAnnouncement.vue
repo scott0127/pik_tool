@@ -48,8 +48,10 @@
         <!-- 更新內容 -->
         <div v-show="currentTab === 'update'" class="flex-1">
           <ul class="text-sm text-gray-600 leading-relaxed list-disc list-inside space-y-1">
-            <li><span class="text-green-600 font-medium">3/7優化純種地圖精確度，機場、河流、公園區域判斷變得更準確了!</span></li>
-            <li>2/5 新增 2026 巧克力特殊類別</li>
+            <li>3/9 主頁現在會顯示<span class="text-green-600 font-medium">當月復刻的裝飾品</span>皮克敏了!</li>
+            <li class="flex items-center flex-wrap">新增 <span class="inline-flex items-center text-blue-600 font-semibold tracking-wide mx-1" style="font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif;"><Icon name="lucide:apple" class="w-3.5 h-3.5 mr-0.5 mb-[1px]"/>iOS</span> 專屬「加到主畫面」捷徑按鈕</li>
+            <li>好友功能可以為自己設定出沒區域了!，想拿外國/漂亮明信片嗎! 快去設定你的區域吧</li>
+            <li>3/7優化純種地圖精確度，機場、河流、公園區域判斷變得更準確了!</li>
             <li>新增稀有廚師冰皮、鍬形蟲冰皮、橡栗冰皮</li>
           </ul>
         </div>
@@ -90,7 +92,7 @@
 
         <!-- 進度條 -->
         <div class="w-full bg-gray-100 rounded-full h-1 overflow-hidden">
-          <div class="bg-emerald-500 h-full transition-all duration-[8000ms] ease-linear w-full" :class="{ '!w-0': startProgress }"></div>
+          <div class="bg-emerald-500 h-full transition-all duration-[10000ms] ease-linear w-full" :class="{ '!w-0': startProgress }"></div>
         </div>
       </div>
     </div>
@@ -100,7 +102,7 @@
 <script setup lang="ts">
 const isVisible = ref(true);
 const startProgress = ref(false);
-const currentTab = ref<'update' | 'event'>('event'); // 預設顯示活動頁
+const currentTab = ref<'update' | 'event'>('update'); // 預設先顯示更新
 const copied = ref(false);
 
 const INVITE_CODE = 'G79K77XF';
@@ -133,9 +135,16 @@ onMounted(() => {
     startProgress.value = true;
   }, 100);
 
-  // Auto hide after 8 seconds (給用戶更多時間看活動)
+  // 3秒後自動切換到活動分頁
+  setTimeout(() => {
+    if (currentTab.value === 'update') {
+      currentTab.value = 'event';
+    }
+  }, 3000);
+
+  // 10秒後自動隱藏
   setTimeout(() => {
     isVisible.value = false;
-  }, 28100);
+  }, 10000);
 });
 </script>

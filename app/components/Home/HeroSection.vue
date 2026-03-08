@@ -28,7 +28,7 @@
         </span>
       </h1>
       
-      <p class="text-gray-600 text-lg md:text-xl max-w-md mx-auto md:mx-0 leading-relaxed font-medium mb-8">
+      <p class="text-gray-600 text-lg md:text-xl max-w-md mx-auto md:mx-0 leading-relaxed font-medium mb-12">
         {{ $t('hero.subtitle.line1') }}<br />
         {{ $t('hero.subtitle.line2') }}
       </p>
@@ -43,7 +43,7 @@
              </div>
             
             <!-- Tooltip (appears on hover of container) -->
-            <div class="absolute -bottom-8 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity text-[10px] font-bold text-emerald-700 bg-white/80 px-2 py-1 rounded-full pointer-events-none whitespace-nowrap">
+            <div class="absolute bottom-full mb-3 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-all duration-300 text-[11px] font-bold text-emerald-700 bg-white/95 shadow-md border border-emerald-100/50 px-3.5 py-1.5 rounded-full pointer-events-none whitespace-nowrap z-30 transform group-hover:-translate-y-1">
                 {{ $t('hero.tooltip') }}
             </div>
          </div>
@@ -51,16 +51,17 @@
 
        <!-- Missing Tracker Badge -->
        <div class="mt-8 flex justify-center md:justify-start w-full">
-         <button @click="showMissingModal = true" class="group relative inline-flex items-center justify-center gap-2 px-5 py-3 md:px-6 md:py-2.5 text-xs md:text-sm font-semibold text-white transition-all bg-emerald-600 rounded-2xl md:rounded-full hover:bg-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 overflow-hidden shadow-md hover:shadow-lg w-full md:w-auto text-left md:text-center">
-            <div class="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]"></div>
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 shrink-0" viewBox="0 0 20 20" fill="currentColor">
-              <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
-            </svg>
-            <span v-if="missingSpirits.length > 0" class="flex-1 leading-snug">
-              你還差 <span class="text-yellow-300 font-bold text-base px-0.5">{{ missingSpirits.length }}</span> 種顏色的皮皮就蒐集完了！<span class="underline decoration-emerald-400 underline-offset-2 ml-1 whitespace-nowrap inline-block">點擊看差誰</span>
+         <button @click="showMissingModal = true" class="group relative inline-flex items-center justify-center gap-2.5 px-6 py-3 text-sm font-medium text-emerald-800 bg-emerald-50/80 backdrop-blur-sm rounded-2xl md:rounded-full hover:bg-emerald-100/80 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 overflow-hidden shadow-sm border border-emerald-200 hover:shadow hover:-translate-y-0.5 transition-all w-full md:w-auto text-left md:text-center">
+            
+            <div class="flex items-center justify-center text-emerald-500 shrink-0">
+                <Icon name="lucide:search" class="w-4 h-4" />
+            </div>
+
+            <span v-if="missingSpirits.length > 0" class="flex-1 leading-relaxed tracking-wide">
+              你還差 <span class="text-emerald-600 font-extrabold text-base mx-0.5">{{ missingSpirits.length }}</span> 種顏色就蒐集完了！<span class="text-emerald-600/70 border-b border-emerald-400 hover:text-emerald-600 hover:border-emerald-600 pb-0.5 ml-1 whitespace-nowrap inline-block transition-colors">點擊看差誰</span>
             </span>
-            <span v-else class="flex-1">
-              🎉 太神啦！這個月的皮皮已經全部收集完畢！
+            <span v-else class="flex-1 tracking-wide">
+              🎉 太神啦！這個月的皮克敏已經全部收集完畢！
             </span>
          </button>
        </div>

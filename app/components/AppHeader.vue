@@ -41,6 +41,17 @@
 
           <!-- Right Section -->
           <div class="flex items-center gap-3">
+            <!-- PWA Install Button -->
+            <button 
+              v-if="canInstall"
+              @click="triggerPrompt"
+              class="flex items-center gap-1.5 px-3 sm:px-4 h-10 rounded-2xl bg-gradient-to-r from-teal-500 to-emerald-500 text-white shadow-md shadow-emerald-500/20 hover:shadow-lg hover:-translate-y-0.5 transition-all group"
+              title="安裝 App 到主畫面"
+            >
+              <Icon name="lucide:apple" class="text-lg group-hover:scale-110 transition-transform" />
+              <span class="text-sm font-bold hidden sm:inline">iOS 捷徑</span>
+            </button>
+
             <!-- Progress Ring (Desktop) -->
             <div class="hidden sm:flex items-center gap-3 bg-white/50 rounded-2xl px-4 py-2">
               <div class="relative w-10 h-10">
@@ -561,6 +572,7 @@
 const authStore = useAuthStore();
 const router = useRouter();
 const { getStats } = useCollection();
+const { canInstall, triggerPrompt } = usePwaInstall();
 
 const showMobileMenu = ref(false);
 const showSearch = ref(false);

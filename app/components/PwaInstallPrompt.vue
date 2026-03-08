@@ -22,7 +22,7 @@
         
         <!-- Content -->
         <div class="flex-1">
-          <h3 class="font-bold text-gray-800 text-lg leading-tight mb-1">將圖鑑加到主畫面</h3>
+          <h3 class="font-bold text-gray-800 text-lg leading-tight mb-1">建立桌面捷徑</h3>
           <p class="text-sm text-gray-600 leading-snug mb-3">
             隨時隨地開啟，享受全螢幕、更快速的無縫體驗！
           </p>
@@ -36,17 +36,10 @@
               稍後再說
             </button>
             <button 
-              v-if="!isIos"
-              @click="installPwa"
-              class="px-5 py-2 rounded-xl bg-emerald-500 text-white shadow-md shadow-emerald-500/20 hover:bg-emerald-600 transition-colors flex-1 text-center"
-            >
-              立刻安裝
-            </button>
-            <button 
-              v-else
               @click="showIosInstructions = true"
-              class="px-5 py-2 rounded-xl bg-blue-500 text-white shadow-md shadow-blue-500/20 hover:bg-blue-600 transition-colors flex-1 text-center"
+              class="px-5 py-2 rounded-xl bg-blue-500 text-white shadow-md shadow-blue-500/20 hover:bg-blue-600 transition-colors flex-1 text-center flex items-center justify-center gap-1.5"
             >
+              <Icon name="lucide:apple" class="w-4 h-4" />
               如何安裝？
             </button>
           </div>
@@ -93,6 +86,6 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
-const { showPrompt, isIos, installPwa, dismissPrompt } = usePwaInstall();
+const { showPrompt, dismissPrompt } = usePwaInstall();
 const showIosInstructions = ref(false);
 </script>
