@@ -1,9 +1,9 @@
 // Service Worker for Pikmin Bloom Decor Tracker
 // 離線快取大型靜態資源，減少重複下載
 
-const CACHE_NAME = 'pikmin-decor-v1';
-const STATIC_CACHE_NAME = 'pikmin-static-v1';
-const DATA_CACHE_NAME = 'pikmin-data-v2';
+const CACHE_NAME = 'pikmin-decor-v2';
+const STATIC_CACHE_NAME = 'pikmin-static-v2';
+const DATA_CACHE_NAME = 'pikmin-data-v3';
 
 // 立即快取的核心資源
 const PRECACHE_URLS = [
@@ -97,12 +97,26 @@ self.addEventListener('fetch', (event) => {
                 });
             })
         );
-    } else {
-        // 其他請求: Network First, fallback to cache
+    } else if (event.request.mode === 'navigate') {
+        // HTML 導航請求: 必須 Network First，確保抓到最新的 index.html 和新的 js 檔名
         event.respondWith(
             fetch(event.request)
                 .then((response) => {
-                    // 成功獲取，更新快取
+                    if (response.ok) {
+                        const responseClone = response.clone();
+                        caches.open(DATA_CACHE_NAME).then((cache) => {
+                            cache.put(event.request, responseClone);
+                        });
+                    }
+                    return response;
+                })
+                .catch(() => caches.match(event.request))
+        );
+    } else {
+        // 其他請求 (圖片、字體等): Network First, fallback to cache
+        event.respondWith(
+            fetch(event.request)
+                .then((response) => {
                     if (response.ok) {
                         const responseClone = response.clone();
                         caches.open(STATIC_CACHE_NAME).then((cache) => {
@@ -111,10 +125,7 @@ self.addEventListener('fetch', (event) => {
                     }
                     return response;
                 })
-                .catch(() => {
-                    // 網路失敗，嘗試從快取獲取
-                    return caches.match(event.request);
-                })
+                .catch(() => caches.match(event.request))
         );
     }
 });
@@ -126,5 +137,8 @@ self.addEventListener('message', (event) => {
         caches.keys().then((names) => {
             names.forEach((name) => caches.delete(name));
         });
+    } else if (event.data === 'SKIP_WAITING') {
+        console.log('[SW] Skipping waiting...');
+        self.skipWaiting();
     }
 });

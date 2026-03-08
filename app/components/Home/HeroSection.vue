@@ -47,7 +47,23 @@
                 {{ $t('hero.tooltip') }}
             </div>
          </div>
-      </div>
+       </div>
+
+       <!-- Missing Tracker Badge -->
+       <div class="mt-8 flex justify-center md:justify-start w-full">
+         <button @click="showMissingModal = true" class="group relative inline-flex items-center justify-center gap-2 px-5 py-3 md:px-6 md:py-2.5 text-xs md:text-sm font-semibold text-white transition-all bg-emerald-600 rounded-2xl md:rounded-full hover:bg-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 overflow-hidden shadow-md hover:shadow-lg w-full md:w-auto text-left md:text-center">
+            <div class="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]"></div>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 shrink-0" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+            </svg>
+            <span v-if="missingSpirits.length > 0" class="flex-1 leading-snug">
+              你還差 <span class="text-yellow-300 font-bold text-base px-0.5">{{ missingSpirits.length }}</span> 種顏色的皮皮就蒐集完了！<span class="underline decoration-emerald-400 underline-offset-2 ml-1 whitespace-nowrap inline-block">點擊看差誰</span>
+            </span>
+            <span v-else class="flex-1">
+              🎉 太神啦！這個月的皮皮已經全部收集完畢！
+            </span>
+         </button>
+       </div>
     </div>
 
     <!-- Right Content: Floating 3D Stats Core -->
@@ -103,12 +119,63 @@
         </div>
     </div>
   </div>
+
+  <!-- Missing Pikmin Modal -->
+  <div v-if="showMissingModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-sm animate-fade-in" @click.self="showMissingModal = false">
+    <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden animate-pop-in">
+      <div class="p-6 border-b border-gray-100 flex justify-between items-center bg-gradient-to-r from-emerald-50 to-teal-50">
+        <h3 class="text-xl font-bold text-emerald-800 flex items-center gap-2">
+          <Icon name="lucide:search" class="text-emerald-500" />
+          還缺少的反向情人節貼紙
+        </h3>
+        <button @click="showMissingModal = false" class="text-gray-400 hover:text-gray-600 transition-colors bg-white rounded-full p-1 shadow-sm border border-gray-100">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+      
+      <div class="p-6">
+        <p class="text-gray-600 text-sm mb-4 font-medium text-center bg-yellow-50 text-yellow-800 py-2 rounded-lg border border-yellow-200">
+          這是您目前還沒有收集到的顏色喔！快出門尋找它們吧！
+        </p>
+        
+        <div v-if="missingSpirits.length > 0" class="grid grid-cols-3 gap-4">
+          <div v-for="spirit in missingSpirits" :key="spirit.type" class="flex flex-col items-center p-3 rounded-2xl bg-gray-50 border border-gray-100 hover:bg-emerald-50 hover:border-emerald-200 transition-colors group">
+             <div class="w-16 h-16 flex items-center justify-center p-2 mb-2 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3 drop-shadow-md">
+                <img :src="spirit.image" :alt="spirit.type" class="w-full h-full object-contain filter grayscale group-hover:grayscale-0 opacity-70 group-hover:opacity-100 transition-all duration-300" />
+             </div>
+             <span class="text-xs font-bold text-gray-500 group-hover:text-emerald-700 capitalize">
+               {{ spirit.name }}
+             </span>
+          </div>
+        </div>
+        
+        <div v-else class="text-center py-8">
+          <div class="text-5xl mb-4">🏆</div>
+          <p class="text-emerald-600 font-bold text-lg">恭喜您！</p>
+          <p class="text-gray-500 text-sm mt-1">您已經集齊了所有反向情人節貼紙！</p>
+        </div>
+      </div>
+      
+      <div class="p-4 bg-gray-50 border-t border-gray-100 flex justify-end gap-3">
+         <button @click="showMissingModal = false" class="px-6 py-2 bg-white border border-gray-200 text-gray-700 rounded-xl font-medium hover:bg-gray-100 transition-colors shadow-sm">
+           關閉
+         </button>
+         <button @click="navigateTo('/collection?category=reverse-valentine-sticker')" class="px-6 py-2 bg-emerald-600 text-white rounded-xl font-medium hover:bg-emerald-500 transition-colors shadow-sm flex items-center gap-2">
+           去圖鑑打勾
+           <Icon name="lucide:arrow-right" class="w-4 h-4" />
+         </button>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted } from 'vue';
+import { ref, computed } from 'vue';
 
-const { getStats } = useCollection();
+const { getStats, isCollected } = useCollection();
+const showMissingModal = ref(false);
 const stats = computed(() => getStats());
 
 // Tilt Logic
@@ -117,15 +184,19 @@ const tiltX = ref(0);
 const tiltY = ref(0);
 
 const pikminSpirits = [
-    { type: 'red', image: 'https://pikmin.wiki.gallery/images/thumb/a/a7/Decor_Red_Chef_Hat.png/63px-Decor_Red_Chef_Hat.png' },
-    { type: 'yellow', image: 'https://pikmin.wiki.gallery/images/thumb/3/33/Decor_Yellow_Chef_Hat.png/51px-Decor_Yellow_Chef_Hat.png' },
-    { type: 'blue', image: 'https://pikmin.wiki.gallery/images/thumb/e/ef/Decor_Blue_Chef_Hat.png/61px-Decor_Blue_Chef_Hat.png' },
-    { type: 'purple', image: 'https://pikmin.wiki.gallery/images/thumb/6/66/Decor_Purple_Chef_Hat.png/51px-Decor_Purple_Chef_Hat.png' },
-    { type: 'white', image: 'https://pikmin.wiki.gallery/images/thumb/9/93/Decor_White_Chef_Hat.png/67px-Decor_White_Chef_Hat.png' },
-    { type: 'rock', image: 'https://pikmin.wiki.gallery/images/thumb/7/79/Decor_Rock_Chef_Hat.png/78px-Decor_Rock_Chef_Hat.png' },
-    { type: 'winged', image: 'https://pikmin.wiki.gallery/images/thumb/7/74/Decor_Winged_Chef_Hat.png/63px-Decor_Winged_Chef_Hat.png' },
-    { type: 'ice', image: 'https://pikmin.wiki.gallery/images/thumb/5/58/Decor_Ice_Chef_Hat.png/55px-Decor_Ice_Chef_Hat.png' }
+    { type: 'red', name: '紅色', image: 'https://pikmin.wiki.gallery/images/a/a8/Decor_Red_Reverse_Valentine%27s_Day_Sticker.png', id: 'reverse-valentine-sticker_reverse_valentine_sticker_red' },
+    { type: 'yellow', name: '黃色', image: 'https://pikmin.wiki.gallery/images/0/0b/Decor_Yellow_Reverse_Valentine%27s_Day_Sticker.png', id: 'reverse-valentine-sticker_reverse_valentine_sticker_yellow' },
+    { type: 'blue', name: '藍色', image: 'https://pikmin.wiki.gallery/images/3/38/Decor_Blue_Reverse_Valentine%27s_Day_Sticker.png', id: 'reverse-valentine-sticker_reverse_valentine_sticker_blue' },
+    { type: 'purple', name: '紫色', image: 'https://pikmin.wiki.gallery/images/2/24/Decor_Purple_Reverse_Valentine%27s_Day_Sticker.png', id: 'reverse-valentine-sticker_reverse_valentine_sticker_purple' },
+    { type: 'white', name: '白色', image: 'https://pikmin.wiki.gallery/images/9/9e/Decor_White_Reverse_Valentine%27s_Day_Sticker.png', id: 'reverse-valentine-sticker_reverse_valentine_sticker_white' },
+    { type: 'rock', name: '岩石', image: 'https://pikmin.wiki.gallery/images/b/b8/Decor_Rock_Reverse_Valentine%27s_Day_Sticker.png', id: 'reverse-valentine-sticker_reverse_valentine_sticker_rock' },
+    { type: 'winged', name: '羽翅', image: 'https://pikmin.wiki.gallery/images/4/4a/Decor_Winged_Reverse_Valentine%27s_Day_Sticker.png', id: 'reverse-valentine-sticker_reverse_valentine_sticker_winged' }
 ];
+
+const missingSpirits = computed(() => {
+    // 使用真實資料庫 ID 確認是否收集
+    return pikminSpirits.filter(spirit => !isCollected(spirit.id));
+});
 
 const handleMouseMove = (e: MouseEvent) => {
     if (!heroContainer.value) return;
@@ -180,6 +251,12 @@ const textStyle = computed(() => ({
 }
 .animate-bounce-gentle {
     animation: float 2s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
 }
 </style>
 
