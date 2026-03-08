@@ -26,6 +26,19 @@ export const REGIONS: Record<string, Region> = {
     gridSize: 4, // 4×4 = 16 區塊
   },
 
+  test_park: {
+    id: 'test_park',
+    name: '228和平公園',
+    nameEn: '228 Peace Park',
+    bbox: {
+      north: 25.0430,
+      south: 25.0380,
+      east: 121.5180,
+      west: 121.5130,
+    },
+    gridSize: 1, // 單一區塊
+  },
+
   taiwan_main_island: {
     id: 'taiwan_main_island',
     name: '台灣本島',

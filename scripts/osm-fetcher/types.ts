@@ -58,6 +58,7 @@ export interface OverpassElement {
   lat?: number;
   lon?: number;
   center?: { lat: number; lon: number };
+  geometry?: { lat: number; lon: number }[];
   tags?: Record<string, string>;
 }
 
