@@ -1,36 +1,23 @@
 // Service Worker for Pikmin Bloom Decor Tracker
 // 離線快取大型靜態資源，減少重複下載
+// ⚠️ 不預快取 HTML 導航路由，避免部署後舊 HTML 引用不存在的 chunk 檔
 
-const CACHE_NAME = 'pikmin-decor-v5';
-const STATIC_CACHE_NAME = 'pikmin-static-v5';
-const DATA_CACHE_NAME = 'pikmin-data-v5';
-
-// 立即快取的核心資源
-const PRECACHE_URLS = [
-    '/',
-    '/collection',
-    '/map',
-];
+const CACHE_NAME = 'pikmin-decor-v6';
+const STATIC_CACHE_NAME = 'pikmin-static-v6';
+const DATA_CACHE_NAME = 'pikmin-data-v6';
 
 // 需要快取的數據 URL 模式
 const DATA_URL_PATTERNS = [
     /\/data\/regions\/.*\.json$/,
 ];
 
-// 安裝事件 - 預快取核心資源
+// 安裝事件 - 立即接管（不再預快取 HTML）
 self.addEventListener('install', (event) => {
     console.log('[SW] Installing service worker...');
-    event.waitUntil(
-        caches.open(STATIC_CACHE_NAME)
-            .then((cache) => {
-                console.log('[SW] Pre-caching core resources');
-                return cache.addAll(PRECACHE_URLS);
-            })
-            .then(() => self.skipWaiting())
-    );
+    self.skipWaiting();
 });
 
-// 啟用事件 - 清理舊快取
+// 啟用事件 - 清理舊快取 & 通知所有客戶端
 self.addEventListener('activate', (event) => {
     console.log('[SW] Activating service worker...');
     event.waitUntil(
@@ -43,7 +30,16 @@ self.addEventListener('activate', (event) => {
                         return caches.delete(name);
                     })
             );
-        }).then(() => self.clients.claim())
+        })
+        .then(() => self.clients.claim())
+        .then(() => {
+            // 通知所有開啟中的頁面：新版本已啟用
+            self.clients.matchAll({ type: 'window' }).then((clients) => {
+                clients.forEach((client) => {
+                    client.postMessage({ type: 'SW_UPDATED' });
+                });
+            });
+        })
     );
 });
 
