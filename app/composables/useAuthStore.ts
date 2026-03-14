@@ -12,6 +12,7 @@ const user = ref<any>(null);
 const session = ref<any>(null);
 const isLoading = ref(false);
 const isInitialized = ref(false);
+const isAdmin = ref(false);
 
 // 防止重复初始化
 let initPromise: Promise<void> | null = null;
@@ -44,12 +45,28 @@ export const useAuthStore = () => {
         
         console.log('[AuthStore] Initial session:', !!currentSession);
 
+        if (user.value) {
+          // @ts-ignore: admins table not yet in Database types
+          const { data } = await supabase.from('admins').select('user_id').eq('user_id', user.value.id).maybeSingle();
+          isAdmin.value = !!data;
+        } else {
+          isAdmin.value = false;
+        }
+
         // 监听后续 auth 变化
-        supabase.auth.onAuthStateChange((event: string, newSession: any) => {
+        supabase.auth.onAuthStateChange(async (event: string, newSession: any) => {
           console.log('[AuthStore] Auth state changed:', event);
           
           session.value = newSession;
           user.value = newSession?.user ?? null;
+
+          if (user.value) {
+            // @ts-ignore: admins table not yet in Database types
+            const { data } = await supabase.from('admins').select('user_id').eq('user_id', user.value.id).maybeSingle();
+            isAdmin.value = !!data;
+          } else {
+            isAdmin.value = false;
+          }
         });
 
       } catch (error) {
@@ -202,12 +219,15 @@ export const useAuthStore = () => {
       // 清除 sessionStorage
       sessionStorage.clear();
       
-      // 调用 signOut
-      await supabase.auth.signOut();
+      // @ts-ignore可能为空
+      if (supabase.auth) {
+        await supabase.auth.signOut();
+      }
       
       // 清除本地状态
       user.value = null;
       session.value = null;
+      isAdmin.value = false;
       
       // 跳转到登入页
       window.location.href = '/auth';
@@ -224,6 +244,7 @@ export const useAuthStore = () => {
     session: readonly(session),
     isLoading: readonly(isLoading),
     isInitialized: readonly(isInitialized),
+    isAdmin: readonly(isAdmin),
     
     // 计算属性
     isAuthenticated: computed(() => !!user.value),

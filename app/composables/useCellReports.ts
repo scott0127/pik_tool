@@ -5,6 +5,9 @@ export type ReportStatus = {
     addedDecors: Set<string>; // Set of decor_ids reported as 'missing_decor'
 };
 
+// Global cache registry to track which cells we've already asked Supabase about
+const fetchedCellIds = new Set<string>();
+
 export const useCellReports = () => {
     const supabase = useSupabaseClient<Database>();
     
@@ -36,13 +39,20 @@ export const useCellReports = () => {
     const fetchReportsForCells = async (cellIds: string[]) => {
         if (!cellIds.length) return;
 
+        // 1. Filter out cells that we have already fetched
+        const newCellIds = cellIds.filter(id => !fetchedCellIds.has(id));
+        if (!newCellIds.length) return;
+
         try {
             const { data, error } = await supabase
                 .from('cell_reports')
                 .select('s2_cell_id, report_type, decor_id')
-                .in('s2_cell_id', cellIds);
+                .in('s2_cell_id', newCellIds);
 
             if (error) throw error;
+            
+            // 2. Mark these cells as completely fetched regardless of whether they have data
+            newCellIds.forEach(id => fetchedCellIds.add(id));
 
             if (data) {
                 data.forEach(row => {

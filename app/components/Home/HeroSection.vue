@@ -37,7 +37,11 @@
        <div class="flex flex-col items-stretch w-full sm:w-[100%] md:w-max mx-auto md:mx-0 mt-8 gap-3 md:gap-4 relative z-10">
            
            <!-- Interactive Pikmin Spirits -->
-           <div class="bg-white/40 backdrop-blur-sm rounded-3xl md:rounded-[2rem] border border-white/50 shadow-sm p-4 w-full flex flex-col md:flex-row md:items-center md:justify-center gap-4 md:gap-2 hover:scale-105 transition-transform duration-300">
+           <div class="relative bg-white/40 backdrop-blur-sm rounded-3xl md:rounded-[2rem] border border-white/50 shadow-sm p-4 w-full flex flex-col md:flex-row md:items-center md:justify-center gap-4 md:gap-2 hover:scale-105 transition-transform duration-300">
+               <!-- Admin Settings Button -->
+               <button v-if="isAdmin" @click.stop="showSettingsModal = true" class="absolute -top-3 -right-3 z-50 bg-white shadow-md border border-gray-100 rounded-full p-2 text-gray-400 hover:text-emerald-500 hover:scale-110 transition-all">
+                  <Icon name="lucide:settings" class="w-4 h-4" />
+               </button>
                <!-- Row 1: Reverse Valentine Stickers -->
                <div class="flex items-center justify-center -space-x-2 md:-space-x-4 relative group h-14 cursor-none w-full md:w-auto">
                   <div v-for="(pikmin, index) in valentineSpirits" :key="pikmin.id" 
@@ -48,7 +52,7 @@
                   
                  <!-- Tooltip (appears on hover of container) -->
                  <div class="absolute bottom-full mb-3 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-all duration-300 text-[11px] font-bold text-pink-700 bg-white/95 shadow-md border border-pink-100/50 px-3.5 py-1.5 rounded-full pointer-events-none whitespace-nowrap z-40 transform group-hover:-translate-y-1">
-                     反向情人節貼紙
+                     {{ row1CategoryName }}
                  </div>
               </div>
 
@@ -62,7 +66,7 @@
                  
                  <!-- Tooltip (appears on hover of container) -->
                  <div class="absolute bottom-full mb-3 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-all duration-300 text-[11px] font-bold text-indigo-700 bg-white/95 shadow-md border border-indigo-100/50 px-3.5 py-1.5 rounded-full pointer-events-none whitespace-nowrap z-40 transform group-hover:-translate-y-1">
-                     彩色粉末
+                     {{ row2CategoryName }}
                  </div>
               </div>
            </div>
@@ -164,9 +168,9 @@
           這是您目前尚未收集到的活動顏色喔！快出門尋找它們吧！
         </p>
         
-        <!-- Section 1: Reverse Valentine Stickers -->
+        <!-- Section 1: Dynamic Row 1 -->
         <div v-if="missingValentine.length > 0" class="mb-8">
-            <h4 class="text-md font-bold text-gray-700 mb-3 border-l-4 border-pink-400 pl-2">反向情人節貼紙 (差 {{ missingValentine.length }} 種)</h4>
+            <h4 class="text-md font-bold text-gray-700 mb-3 border-l-4 border-pink-400 pl-2">{{ row1CategoryName }} (差 {{ missingValentine.length }} 種)</h4>
             <div class="grid grid-cols-4 sm:grid-cols-4 gap-3">
               <div v-for="spirit in missingValentine" :key="spirit.id" class="flex flex-col items-center p-2 rounded-xl bg-gray-50 border border-gray-100 hover:bg-pink-50 hover:border-pink-200 transition-colors group">
                  <div class="w-12 h-12 flex items-center justify-center mb-1 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3 drop-shadow-md">
@@ -179,9 +183,9 @@
             </div>
         </div>
 
-        <!-- Section 2: Colored Powder -->
+        <!-- Section 2: Dynamic Row 2 -->
         <div v-if="missingPowder.length > 0" class="mb-2">
-            <h4 class="text-md font-bold text-gray-700 mb-3 border-l-4 border-indigo-400 pl-2">彩色粉末-世界節慶 (差 {{ missingPowder.length }} 種)</h4>
+            <h4 class="text-md font-bold text-gray-700 mb-3 border-l-4 border-indigo-400 pl-2">{{ row2CategoryName }} (差 {{ missingPowder.length }} 種)</h4>
             <div class="grid grid-cols-4 sm:grid-cols-4 gap-3">
               <div v-for="spirit in missingPowder" :key="spirit.id" class="flex flex-col items-center p-2 rounded-xl bg-gray-50 border border-gray-100 hover:bg-indigo-50 hover:border-indigo-200 transition-colors group">
                  <div class="w-12 h-12 flex items-center justify-center mb-1 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3 drop-shadow-md">
@@ -206,12 +210,12 @@
          <button @click="showMissingModal = false" class="px-5 py-2.5 bg-white border border-gray-200 text-gray-700 rounded-xl font-medium hover:bg-gray-100 transition-colors shadow-sm">
            關閉
          </button>
-         <button v-if="missingValentine.length > 0" @click="navigateTo('/collection?category=reverse-valentine-sticker'); showMissingModal = false" class="px-5 py-2.5 bg-pink-500 text-white rounded-xl font-medium hover:bg-pink-600 transition-colors shadow-sm flex items-center gap-2">
-           去圖鑑打勾 (貼紙)
+         <button v-if="missingValentine.length > 0" @click="navigateTo('/collection?category=' + row1CategoryId); showMissingModal = false" class="px-5 py-2.5 bg-pink-500 text-white rounded-xl font-medium hover:bg-pink-600 transition-colors shadow-sm flex items-center gap-2">
+           去圖鑑打勾 (上排)
            <Icon name="lucide:arrow-right" class="w-4 h-4" />
          </button>
-         <button v-if="missingPowder.length > 0" @click="navigateTo('/collection?category=彩色粉末-世界節慶'); showMissingModal = false" class="px-5 py-2.5 bg-indigo-500 text-white rounded-xl font-medium hover:bg-indigo-600 transition-colors shadow-sm flex items-center gap-2">
-           去圖鑑打勾 (粉末)
+         <button v-if="missingPowder.length > 0" @click="navigateTo('/collection?category=' + row2CategoryId); showMissingModal = false" class="px-5 py-2.5 bg-indigo-500 text-white rounded-xl font-medium hover:bg-indigo-600 transition-colors shadow-sm flex items-center gap-2">
+           去圖鑑打勾 (下排)
            <Icon name="lucide:arrow-right" class="w-4 h-4" />
          </button>
          <button v-if="missingValentine.length === 0 && missingPowder.length === 0" @click="navigateTo('/collection'); showMissingModal = false" class="px-5 py-2.5 bg-emerald-600 text-white rounded-xl font-medium hover:bg-emerald-500 transition-colors shadow-sm flex items-center gap-2">
@@ -221,13 +225,24 @@
       </div>
     </div>
   </div>
+
+  <AdminHeroSettingsModal :is-open="showSettingsModal" @close="showSettingsModal = false" />
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
+import { useAuthStore } from '~/composables/useAuthStore';
+import { useSiteConfig } from '~/composables/useSiteConfig';
+import { useDecorData } from '~/composables/useDecorData';
+import AdminHeroSettingsModal from '~/components/Admin/HeroSettingsModal.vue';
 
 const { getStats, isCollected } = useCollection();
+const { isAdmin } = useAuthStore();
+const { fetchHeroConfig, heroFeaturedConfig } = useSiteConfig();
+const { getItemsByCategory, getImageUrl, getCategory } = useDecorData();
+
 const showMissingModal = ref(false);
+const showSettingsModal = ref(false);
 const stats = computed(() => getStats());
 
 // Tilt Logic
@@ -235,41 +250,54 @@ const heroContainer = ref<HTMLElement | null>(null);
 const tiltX = ref(0);
 const tiltY = ref(0);
 
-// Array of Reverse Valentine's Day Sticker
-const valentineSpirits = [
-    { type: 'red', name: '紅色', image: 'https://pikmin.wiki.gallery/images/a/a8/Decor_Red_Reverse_Valentine%27s_Day_Sticker.png', id: 'reverse-valentine-sticker_reverse_valentine_sticker_red' },
-    { type: 'yellow', name: '黃色', image: 'https://pikmin.wiki.gallery/images/0/0b/Decor_Yellow_Reverse_Valentine%27s_Day_Sticker.png', id: 'reverse-valentine-sticker_reverse_valentine_sticker_yellow' },
-    { type: 'blue', name: '藍色', image: 'https://pikmin.wiki.gallery/images/3/38/Decor_Blue_Reverse_Valentine%27s_Day_Sticker.png', id: 'reverse-valentine-sticker_reverse_valentine_sticker_blue' },
-    { type: 'purple', name: '紫色', image: 'https://pikmin.wiki.gallery/images/2/24/Decor_Purple_Reverse_Valentine%27s_Day_Sticker.png', id: 'reverse-valentine-sticker_reverse_valentine_sticker_purple' },
-    { type: 'white', name: '白色', image: 'https://pikmin.wiki.gallery/images/9/9e/Decor_White_Reverse_Valentine%27s_Day_Sticker.png', id: 'reverse-valentine-sticker_reverse_valentine_sticker_white' },
-    { type: 'rock', name: '岩石', image: 'https://pikmin.wiki.gallery/images/b/b8/Decor_Rock_Reverse_Valentine%27s_Day_Sticker.png', id: 'reverse-valentine-sticker_reverse_valentine_sticker_rock' },
-    { type: 'winged', name: '羽翅', image: 'https://pikmin.wiki.gallery/images/4/4a/Decor_Winged_Reverse_Valentine%27s_Day_Sticker.png', id: 'reverse-valentine-sticker_reverse_valentine_sticker_winged' }
-];
+onMounted(async () => {
+    await fetchHeroConfig();
+});
 
-// Array of Colored Powder
-const powderSpirits = [
-    { type: 'red', name: '紅色', image: '/decor_localimg/powder-red.png', id: 'colored-powder-world-festival_colored_powder_world_festival_red' },
-    { type: 'yellow', name: '黃色', image: '/decor_localimg/powder-yellow.png', id: 'colored-powder-world-festival_colored_powder_world_festival_yellow' },
-    { type: 'blue', name: '藍色', image: '/decor_localimg/powder-blue.png', id: 'colored-powder-world-festival_colored_powder_world_festival_blue' },
-    { type: 'purple', name: '紫色', image: '/decor_localimg/powder-purple.png', id: 'colored-powder-world-festival_colored_powder_world_festival_purple' },
-    { type: 'white', name: '白色', image: '/decor_localimg/powder-white.png', id: 'colored-powder-world-festival_colored_powder_world_festival_white' },
-    { type: 'rock', name: '岩石', image: '/decor_localimg/powder-rock.png', id: 'colored-powder-world-festival_colored_powder_world_festival_rock' },
-    { type: 'winged', name: '羽翅', image: '/decor_localimg/powder-pink.png', id: 'colored-powder-world-festival_colored_powder_world_festival_winged' },
-    { type: 'ice', name: '冰水', image: '/decor_localimg/powder-ice.png', id: 'colored-powder-world-festival_colored_powder_world_festival_ice' }
-];
+// Dynamic Categories
+const row1CategoryId = computed(() => heroFeaturedConfig.value?.row1 || 'reverse-valentine-sticker');
+const row2CategoryId = computed(() => heroFeaturedConfig.value?.row2 || '彩色粉末-世界節慶');
+
+const row1CategoryName = computed(() => getCategory(row1CategoryId.value)?.name || '未知分類');
+const row2CategoryName = computed(() => getCategory(row2CategoryId.value)?.name || '未知分類');
+
+const typeToZh = (type: string) => {
+    const map: Record<string, string> = { red: '紅色', yellow: '黃色', blue: '藍色', purple: '紫色', white: '白色', rock: '岩石', winged: '羽翅', ice: '冰水' };
+    return map[type] || type;
+};
+
+// Dynamic Array of Row 1
+const valentineSpirits = computed(() => {
+    return getItemsByCategory(row1CategoryId.value).map(item => ({
+        type: item.pikminType,
+        name: typeToZh(item.pikminType),
+        image: getImageUrl(item.categoryId, item.variantId, item.pikminType) || '',
+        id: item.id
+    }));
+});
+
+// Dynamic Array of Row 2
+const powderSpirits = computed(() => {
+    return getItemsByCategory(row2CategoryId.value).map(item => ({
+        type: item.pikminType,
+        name: typeToZh(item.pikminType),
+        image: getImageUrl(item.categoryId, item.variantId, item.pikminType) || '',
+        id: item.id
+    }));
+});
 
 // Combined for decorative floating display
 const combinedSpirits = computed(() => {
-    return [...valentineSpirits, ...powderSpirits];
+    return [...valentineSpirits.value, ...powderSpirits.value];
 });
 
 // Filtered missing counts
 const missingValentine = computed(() => {
-    return valentineSpirits.filter(spirit => !isCollected(spirit.id));
+    return valentineSpirits.value.filter(spirit => !isCollected(spirit.id));
 });
 
 const missingPowder = computed(() => {
-    return powderSpirits.filter(spirit => !isCollected(spirit.id));
+    return powderSpirits.value.filter(spirit => !isCollected(spirit.id));
 });
 
 const handleMouseMove = (e: MouseEvent) => {

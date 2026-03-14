@@ -4,6 +4,9 @@ import { useDecorData } from './useDecorData';
 const STORAGE_KEY = 'pikmin-bloom-collection';
 const CURRENT_VERSION = 1;
 
+// Global timeout registry for debouncing cloud syncs across all component callers
+let globalSyncTimeout: ReturnType<typeof setTimeout> | null = null;
+
 export function useCollection() {
   const { getAllDecorItems, getDecorDefinitions } = useDecorData();
   const supabase = useSupabaseClient();
@@ -181,7 +184,10 @@ export function useCollection() {
   const saveCollection = () => {
     saveToLocal();
     if (authStore.isAuthenticated.value) {
-      saveToCloud();
+      if (globalSyncTimeout) clearTimeout(globalSyncTimeout);
+      globalSyncTimeout = setTimeout(() => {
+        saveToCloud();
+      }, 2000);
     }
   };
 
