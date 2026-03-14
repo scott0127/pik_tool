@@ -3869,6 +3869,43 @@
     },
     {
       "category": {
+        "id": "彩色粉末-世界節慶",
+        "name": "彩色粉末-世界節慶",
+        "nameEn": "Colored Powder - World Celebration",
+        "type": "special",
+        "icon": "noto:bento-box"
+      },
+      "variants": [
+        {
+          "id": "colored_powder",
+          "name": "彩色粉末-世界節慶",
+          "nameEn": "Colored Powder - World Celebration",
+          "imageUrl": "/decor_localimg/powder-red.png",
+          "imageUrls": {
+            "red": "/decor_localimg/powder-red.png",
+            "yellow": "/decor_localimg/powder-yellow.png",
+            "blue": "/decor_localimg/powder-blue.png",
+            "white": "/decor_localimg/powder-white.png",
+            "purple": "/decor_localimg/powder-purple.png",
+            "rock": "/decor_localimg/powder-rock.png",
+            "winged": "/decor_localimg/powder-pink.png",
+            "ice": "/decor_localimg/powder-ice.png"
+          }
+        }
+      ],
+      "availablePikminTypes": [
+        "red",
+        "yellow",
+        "blue",
+        "white",
+        "purple",
+        "rock",
+        "winged",
+        "ice"
+      ]
+    },
+    {
+      "category": {
         "id": "golden-airplane",
         "name": "金色飛機玩具",
         "nameEn": "Golden Toy Airplane",

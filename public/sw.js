@@ -53,6 +53,11 @@ self.addEventListener('fetch', (event) => {
     // 跳過非同源請求 (除非您有快取跨域圖片的需求)
     if (url.origin !== self.location.origin) return;
 
+    // 開發者模式安全閥：不攔截任何 localhost / 127.0.0.1 的請求
+    if (url.hostname === 'localhost' || url.hostname === '127.0.0.1') {
+        return;
+    }
+
     // 開發者模式與 Vite HMR 繞過：絕對不要快取 Vite 的 websocket 和任何帶有 HMR 標記 (t= / v= / vite) 的模組
     if (
         url.pathname.includes('/@vite/') ||
