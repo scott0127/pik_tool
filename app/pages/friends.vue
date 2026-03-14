@@ -500,6 +500,24 @@
             </div>
           </div>
         </div>
+
+        <!-- Load More Button -->
+        <div v-if="posts.length > 0 && hasMorePosts" class="mt-8 flex justify-center animate-slide-up">
+          <button
+            @click="loadMore"
+            :disabled="loadingMore"
+            class="bg-white/80 hover:bg-white text-emerald-600 font-bold py-3 px-8 rounded-full shadow-sm hover:shadow-md transition-all border border-emerald-100 flex items-center gap-2"
+          >
+            <svg v-if="loadingMore" class="animate-spin -ml-1 mr-2 h-5 w-5 text-emerald-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            <svg v-else xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+            </svg>
+            {{ loadingMore ? $t('friends.loading') : '載入更多好友' }}
+          </button>
+        </div>
       </section>
     </div>
 
@@ -550,6 +568,12 @@ const loading = ref(false); // 預設不載入，等待 onMounted
 const error = ref<string | null>(null);
 const submitting = ref(false);
 const showCopyToast = ref(false);
+
+// Pagination State
+const currentOffset = ref(0);
+const hasMorePosts = ref(true);
+const loadingMore = ref(false);
+const POSTS_PER_PAGE = 20;
 
 // 導入地區常數
 import { FRIEND_REGIONS, ALL_REGION_OPTIONS } from '~/constants/regions';
@@ -640,8 +664,13 @@ onMounted(async () => {
   }
 });
 
-const fetchPosts = async () => {
-  loading.value = true;
+const fetchPosts = async (isLoadMore = false) => {
+  if (isLoadMore) {
+    loadingMore.value = true;
+  } else {
+    loading.value = true;
+    currentOffset.value = 0;
+  }
   error.value = null;
   
   try {
@@ -665,41 +694,59 @@ const fetchPosts = async () => {
     let query = manualClient
       .from('friend_posts')
       .select('*')
-      .order('created_at', { ascending: false });
+      .order('created_at', { ascending: false })
+      .range(currentOffset.value, currentOffset.value + POSTS_PER_PAGE - 1); // 每次拉取 20 筆
       
     // 合併篩選邏輯：地區 + 目的
-    // 因為在資料庫中我們把 regions 和 intents 都存在同一個叫做 `regions` 的字串陣列欄位裡，
-    // 所以查尋條件都可以合併在一起做 overlaps。
     let targetTags: string[] = [...selectedRegionFilters.value, ...selectedIntentFilters.value];
     
-    // 把只有選大類、沒選細項的大類地區全部加入
     selectedCategories.value.forEach(cat => {
       const optionsForCat = getOptionsForCategory(cat);
-      // 如果這個大類的細項都沒有被選，代表使用者想要整個大類
       const hasSpecificSelection = optionsForCat.some(opt => selectedRegionFilters.value.includes(opt));
       if (!hasSpecificSelection) {
         targetTags.push(...optionsForCat);
       }
     });
 
-    // 去重複
     targetTags = [...new Set(targetTags)];
 
     if (targetTags.length > 0) {
-      // 在 Supabase 中尋找 regions 陣列中包含 targetTags 任何一個的 post
       query = query.overlaps('regions', targetTags);
     }
 
     const { data, error: err } = await query;
 
     if (err) throw err;
-    posts.value = data || [];
+    
+    if (data) {
+      // 判斷是否還有下一頁
+      hasMorePosts.value = data.length === POSTS_PER_PAGE;
+      
+      if (isLoadMore) {
+        posts.value.push(...data);
+      } else {
+        posts.value = data;
+      }
+    } else {
+      hasMorePosts.value = false;
+      if (!isLoadMore) posts.value = [];
+    }
   } catch (e: any) {
     console.error('[Friends] Failed to fetch posts:', e.message);
     error.value = e.message || t('friends.error');
   } finally {
-    loading.value = false;
+    if (isLoadMore) {
+      loadingMore.value = false;
+    } else {
+      loading.value = false;
+    }
   }
+};
+
+const loadMore = async () => {
+  if (loadingMore.value || !hasMorePosts.value) return;
+  currentOffset.value += POSTS_PER_PAGE;
+  await fetchPosts(true);
 };
 
 const submitPost = async () => {
