@@ -2,7 +2,7 @@
   <!-- 3D Container -->
   <div 
     ref="heroContainer"
-    class="relative h-full w-full p-6 md:p-10 flex flex-col md:flex-row items-center justify-between gap-10 overflow-visible perspective-1000"
+    class="relative h-full w-full px-2 py-6 sm:px-6 md:p-10 flex flex-col md:flex-row items-center justify-between gap-10 overflow-visible perspective-1000"
     @mousemove="handleMouseMove"
     @mouseleave="resetTilt"
   >
@@ -33,36 +33,62 @@
         {{ $t('hero.subtitle.line2') }}
       </p>
 
-       <!-- Interactive Pikmin Spirits (8 Colors) -->
-       <div class="flex flex-wrap gap-4 justify-center md:justify-start">
-          <div class="flex items-center -space-x-4 p-4 bg-white/30 backdrop-blur-sm rounded-full border border-white/40 shadow-sm hover:scale-105 transition-transform duration-300 cursor-none relative group h-20">
-             <div v-for="(pikmin, index) in pikminSpirits" :key="pikmin.type" 
-                  class="w-12 h-16 transform transition-all duration-300 hover:scale-125 hover:-translate-y-4 hover:z-20 relative filter drop-shadow-md"
-                  :style="{ zIndex: index }">
-                  <img :src="pikmin.image" :alt="pikmin.type" class="w-full h-full object-contain" />
-             </div>
-            
-            <!-- Tooltip (appears on hover of container) -->
-            <div class="absolute bottom-full mb-3 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-all duration-300 text-[11px] font-bold text-emerald-700 bg-white/95 shadow-md border border-emerald-100/50 px-3.5 py-1.5 rounded-full pointer-events-none whitespace-nowrap z-30 transform group-hover:-translate-y-1">
-                {{ $t('hero.tooltip') }}
-            </div>
-         </div>
-       </div>
+       <!-- Interactive & Tracker Unified Container -->
+       <div class="flex flex-col items-stretch w-full sm:w-[100%] md:w-max mx-auto md:mx-0 mt-8 gap-3 md:gap-4 relative z-10">
+           
+           <!-- Interactive Pikmin Spirits -->
+           <div class="bg-white/40 backdrop-blur-sm rounded-3xl md:rounded-[2rem] border border-white/50 shadow-sm p-4 w-full flex flex-col md:flex-row md:items-center md:justify-center gap-4 md:gap-2 hover:scale-105 transition-transform duration-300">
+               <!-- Row 1: Reverse Valentine Stickers -->
+               <div class="flex items-center justify-center -space-x-2 md:-space-x-4 relative group h-14 cursor-none w-full md:w-auto">
+                  <div v-for="(pikmin, index) in valentineSpirits" :key="pikmin.id" 
+                       class="w-10 h-14 transform transition-all duration-300 hover:scale-125 hover:-translate-y-4 hover:z-20 relative filter drop-shadow-md"
+                       :style="{ zIndex: index }">
+                       <img :src="pikmin.image" :alt="pikmin.name" class="w-full h-full object-contain" />
+                  </div>
+                  
+                 <!-- Tooltip (appears on hover of container) -->
+                 <div class="absolute bottom-full mb-3 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-all duration-300 text-[11px] font-bold text-pink-700 bg-white/95 shadow-md border border-pink-100/50 px-3.5 py-1.5 rounded-full pointer-events-none whitespace-nowrap z-40 transform group-hover:-translate-y-1">
+                     反向情人節貼紙
+                 </div>
+              </div>
 
-       <!-- Missing Tracker Badge -->
-       <div class="mt-8 flex justify-center md:justify-start w-full">
-         <button @click="showMissingModal = true" class="group relative inline-flex flex-wrap items-center justify-center gap-3 px-6 py-3.5 text-sm md:text-[15px] font-medium text-emerald-800 bg-[#e7f9ec] backdrop-blur-sm shadow-[0_4px_15px_-4px_rgba(52,211,153,0.3)] rounded-full hover:bg-[#d5f5de] focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 overflow-hidden border border-emerald-100/60 hover:-translate-y-0.5 transition-all max-w-[95vw] md:max-w-none">
-            
-            <Icon name="lucide:search" class="text-xl text-emerald-600 shrink-0" />
+              <!-- Row 2: Colored Powder -->
+               <div class="flex items-center justify-center -space-x-2 md:-space-x-4 relative group h-14 cursor-none w-full md:w-auto">
+                  <div v-for="(pikmin, index) in powderSpirits" :key="pikmin.id" 
+                       class="w-10 h-14 transform transition-all duration-300 hover:scale-125 hover:-translate-y-4 hover:z-20 relative filter drop-shadow-md"
+                       :style="{ zIndex: index }">
+                       <img :src="pikmin.image" :alt="pikmin.name" class="w-full h-full object-contain" />
+                  </div>
+                 
+                 <!-- Tooltip (appears on hover of container) -->
+                 <div class="absolute bottom-full mb-3 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-all duration-300 text-[11px] font-bold text-indigo-700 bg-white/95 shadow-md border border-indigo-100/50 px-3.5 py-1.5 rounded-full pointer-events-none whitespace-nowrap z-40 transform group-hover:-translate-y-1">
+                     彩色粉末
+                 </div>
+              </div>
+           </div>
 
-            <div v-if="missingSpirits.length > 0" class="flex items-center flex-wrap justify-center gap-x-2 gap-y-1">
-              <span class="text-gray-700 whitespace-nowrap">你還差 <span class="text-emerald-700 font-extrabold text-lg mx-0.5">{{ missingSpirits.length }}</span> 種顏色就蒐集完了！</span>
-              <span class="text-emerald-600/90 border-b border-emerald-400 group-hover:text-emerald-700 group-hover:border-emerald-600 transition-colors whitespace-nowrap text-[13px] md:text-sm font-semibold pb-0.5">點擊看差誰</span>
-            </div>
-            <span v-else class="text-gray-700 tracking-wide font-normal">
-              🎉 太神啦！收集完畢！
-            </span>
-         </button>
+           <!-- Missing Tracker Badge -->
+           <button @click="showMissingModal = true" class="group relative w-full inline-flex flex-col md:flex-row items-center md:justify-between gap-2 md:gap-3 px-5 py-4 min-h-[56px] md:py-3.5 text-sm md:text-[15px] font-medium text-emerald-800 bg-[#e7f9ec] backdrop-blur-sm shadow-[0_4px_15px_-4px_rgba(52,211,153,0.3)] rounded-3xl md:rounded-[2rem] hover:bg-[#d5f5de] focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 overflow-hidden border border-emerald-100/60 transition-transform hover:-translate-y-0.5">
+              
+              <div class="flex items-center gap-2">
+                 <Icon name="lucide:search" class="text-xl text-emerald-600 shrink-0" />
+                 <span class="text-gray-700 font-bold whitespace-nowrap">本月皮克敏還少了:</span>
+              </div>
+
+              <div v-if="missingValentine.length > 0 || missingPowder.length > 0" class="flex items-center justify-center flex-wrap gap-2 w-full md:w-auto">
+                  <span v-if="missingValentine.length > 0" class="inline-flex items-center gap-1.5 bg-pink-100/80 text-pink-700 px-3 py-1 rounded-full text-xs md:text-sm font-bold border border-pink-200/60 transition-transform hover:scale-105">
+                    貼紙 <span class="bg-white rounded-full px-1.5 text-pink-800 shadow-sm">{{ missingValentine.length }}</span>
+                  </span>
+                  <span v-if="missingPowder.length > 0" class="inline-flex items-center gap-1.5 bg-indigo-100/80 text-indigo-700 px-3 py-1 rounded-full text-xs md:text-sm font-bold border border-indigo-200/60 transition-transform hover:scale-105">
+                    粉末 <span class="bg-white rounded-full px-1.5 text-indigo-800 shadow-sm">{{ missingPowder.length }}</span>
+                  </span>
+              </div>
+              <span v-else class="text-gray-700 tracking-wide font-normal px-2">
+                🎉 太神啦！近期活動收集完畢！
+              </span>
+
+              <span v-if="missingValentine.length > 0 || missingPowder.length > 0" class="text-emerald-600/90 border-b border-emerald-400 group-hover:text-emerald-700 group-hover:border-emerald-600 transition-colors whitespace-nowrap text-[13px] md:text-sm font-semibold pb-0.5 mt-1 md:mt-0 md:ml-1 self-center">點擊查看缺誰</span>
+           </button>
        </div>
     </div>
 
@@ -122,48 +148,74 @@
 
   <!-- Missing Pikmin Modal -->
   <div v-if="showMissingModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-sm animate-fade-in" @click.self="showMissingModal = false">
-    <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden animate-pop-in">
-      <div class="p-6 border-b border-gray-100 flex justify-between items-center bg-gradient-to-r from-emerald-50 to-teal-50">
+    <div class="bg-white rounded-3xl shadow-2xl w-full max-w-lg max-h-[90vh] flex flex-col overflow-hidden animate-pop-in">
+      <div class="p-5 border-b border-gray-100 flex justify-between items-center bg-gradient-to-r from-emerald-50 to-teal-50 shrink-0">
         <h3 class="text-xl font-bold text-emerald-800 flex items-center gap-2">
           <Icon name="lucide:search" class="text-emerald-500" />
-          還缺少的反向情人節貼紙
+          目前缺少的現時活動飾品
         </h3>
-        <button @click="showMissingModal = false" class="text-gray-400 hover:text-gray-600 transition-colors bg-white rounded-full p-1 shadow-sm border border-gray-100">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-          </svg>
+        <button @click="showMissingModal = false" class="text-gray-400 hover:text-gray-600 transition-colors bg-white rounded-full p-1.5 shadow-sm border border-gray-100">
+          <Icon name="lucide:x" class="w-5 h-5" />
         </button>
       </div>
       
-      <div class="p-6">
-        <p class="text-gray-600 text-sm mb-4 font-medium text-center bg-yellow-50 text-yellow-800 py-2 rounded-lg border border-yellow-200">
-          這是您目前還沒有收集到的顏色喔！快出門尋找它們吧！
+      <div class="p-6 overflow-y-auto flex-1 custom-scrollbar">
+        <p v-if="missingValentine.length > 0 || missingPowder.length > 0" class="text-gray-600 text-sm mb-6 font-medium text-center bg-yellow-50 text-yellow-800 py-2.5 rounded-xl border border-yellow-200">
+          這是您目前尚未收集到的活動顏色喔！快出門尋找它們吧！
         </p>
         
-        <div v-if="missingSpirits.length > 0" class="grid grid-cols-3 gap-4">
-          <div v-for="spirit in missingSpirits" :key="spirit.type" class="flex flex-col items-center p-3 rounded-2xl bg-gray-50 border border-gray-100 hover:bg-emerald-50 hover:border-emerald-200 transition-colors group">
-             <div class="w-16 h-16 flex items-center justify-center p-2 mb-2 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3 drop-shadow-md">
-                <img :src="spirit.image" :alt="spirit.type" class="w-full h-full object-contain filter grayscale group-hover:grayscale-0 opacity-70 group-hover:opacity-100 transition-all duration-300" />
-             </div>
-             <span class="text-xs font-bold text-gray-500 group-hover:text-emerald-700 capitalize">
-               {{ spirit.name }}
-             </span>
-          </div>
+        <!-- Section 1: Reverse Valentine Stickers -->
+        <div v-if="missingValentine.length > 0" class="mb-8">
+            <h4 class="text-md font-bold text-gray-700 mb-3 border-l-4 border-pink-400 pl-2">反向情人節貼紙 (差 {{ missingValentine.length }} 種)</h4>
+            <div class="grid grid-cols-4 sm:grid-cols-4 gap-3">
+              <div v-for="spirit in missingValentine" :key="spirit.id" class="flex flex-col items-center p-2 rounded-xl bg-gray-50 border border-gray-100 hover:bg-pink-50 hover:border-pink-200 transition-colors group">
+                 <div class="w-12 h-12 flex items-center justify-center mb-1 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3 drop-shadow-md">
+                    <img :src="spirit.image" :alt="spirit.name" class="w-full h-full object-contain filter grayscale group-hover:grayscale-0 opacity-70 group-hover:opacity-100 transition-all duration-300" />
+                 </div>
+                 <span class="text-[11px] font-bold text-gray-500 group-hover:text-pink-700 capitalize">
+                   {{ spirit.name }}
+                 </span>
+              </div>
+            </div>
         </div>
-        
-        <div v-else class="text-center py-8">
-          <div class="text-5xl mb-4">🏆</div>
-          <p class="text-emerald-600 font-bold text-lg">恭喜您！</p>
-          <p class="text-gray-500 text-sm mt-1">您已經集齊了所有反向情人節貼紙！</p>
+
+        <!-- Section 2: Colored Powder -->
+        <div v-if="missingPowder.length > 0" class="mb-2">
+            <h4 class="text-md font-bold text-gray-700 mb-3 border-l-4 border-indigo-400 pl-2">彩色粉末-世界節慶 (差 {{ missingPowder.length }} 種)</h4>
+            <div class="grid grid-cols-4 sm:grid-cols-4 gap-3">
+              <div v-for="spirit in missingPowder" :key="spirit.id" class="flex flex-col items-center p-2 rounded-xl bg-gray-50 border border-gray-100 hover:bg-indigo-50 hover:border-indigo-200 transition-colors group">
+                 <div class="w-12 h-12 flex items-center justify-center mb-1 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3 drop-shadow-md">
+                    <img :src="spirit.image" :alt="spirit.name" class="w-full h-full object-contain filter grayscale group-hover:grayscale-0 opacity-70 group-hover:opacity-100 transition-all duration-300" />
+                 </div>
+                 <span class="text-[11px] font-bold text-gray-500 group-hover:text-indigo-700 capitalize">
+                   {{ spirit.name }}
+                 </span>
+              </div>
+            </div>
+        </div>
+
+        <!-- Fully Collected State -->
+        <div v-if="missingValentine.length === 0 && missingPowder.length === 0" class="text-center py-10">
+          <div class="text-6xl mb-4 animate-bounce-gentle">🏆</div>
+          <p class="text-emerald-600 font-extrabold text-2xl">太神啦！</p>
+          <p class="text-gray-500 text-md mt-2">您已經集齊了所有當期活動飾品！</p>
         </div>
       </div>
       
-      <div class="p-4 bg-gray-50 border-t border-gray-100 flex justify-end gap-3">
-         <button @click="showMissingModal = false" class="px-6 py-2 bg-white border border-gray-200 text-gray-700 rounded-xl font-medium hover:bg-gray-100 transition-colors shadow-sm">
+      <div class="p-4 bg-gray-50 border-t border-gray-100 flex flex-wrap justify-end gap-3 shrink-0">
+         <button @click="showMissingModal = false" class="px-5 py-2.5 bg-white border border-gray-200 text-gray-700 rounded-xl font-medium hover:bg-gray-100 transition-colors shadow-sm">
            關閉
          </button>
-         <button @click="navigateTo('/collection?category=reverse-valentine-sticker')" class="px-6 py-2 bg-emerald-600 text-white rounded-xl font-medium hover:bg-emerald-500 transition-colors shadow-sm flex items-center gap-2">
-           去圖鑑打勾
+         <button v-if="missingValentine.length > 0" @click="navigateTo('/collection?category=reverse-valentine-sticker'); showMissingModal = false" class="px-5 py-2.5 bg-pink-500 text-white rounded-xl font-medium hover:bg-pink-600 transition-colors shadow-sm flex items-center gap-2">
+           去圖鑑打勾 (貼紙)
+           <Icon name="lucide:arrow-right" class="w-4 h-4" />
+         </button>
+         <button v-if="missingPowder.length > 0" @click="navigateTo('/collection?category=彩色粉末-世界節慶'); showMissingModal = false" class="px-5 py-2.5 bg-indigo-500 text-white rounded-xl font-medium hover:bg-indigo-600 transition-colors shadow-sm flex items-center gap-2">
+           去圖鑑打勾 (粉末)
+           <Icon name="lucide:arrow-right" class="w-4 h-4" />
+         </button>
+         <button v-if="missingValentine.length === 0 && missingPowder.length === 0" @click="navigateTo('/collection'); showMissingModal = false" class="px-5 py-2.5 bg-emerald-600 text-white rounded-xl font-medium hover:bg-emerald-500 transition-colors shadow-sm flex items-center gap-2">
+           去圖鑑
            <Icon name="lucide:arrow-right" class="w-4 h-4" />
          </button>
       </div>
@@ -183,7 +235,8 @@ const heroContainer = ref<HTMLElement | null>(null);
 const tiltX = ref(0);
 const tiltY = ref(0);
 
-const pikminSpirits = [
+// Array of Reverse Valentine's Day Sticker
+const valentineSpirits = [
     { type: 'red', name: '紅色', image: 'https://pikmin.wiki.gallery/images/a/a8/Decor_Red_Reverse_Valentine%27s_Day_Sticker.png', id: 'reverse-valentine-sticker_reverse_valentine_sticker_red' },
     { type: 'yellow', name: '黃色', image: 'https://pikmin.wiki.gallery/images/0/0b/Decor_Yellow_Reverse_Valentine%27s_Day_Sticker.png', id: 'reverse-valentine-sticker_reverse_valentine_sticker_yellow' },
     { type: 'blue', name: '藍色', image: 'https://pikmin.wiki.gallery/images/3/38/Decor_Blue_Reverse_Valentine%27s_Day_Sticker.png', id: 'reverse-valentine-sticker_reverse_valentine_sticker_blue' },
@@ -193,9 +246,30 @@ const pikminSpirits = [
     { type: 'winged', name: '羽翅', image: 'https://pikmin.wiki.gallery/images/4/4a/Decor_Winged_Reverse_Valentine%27s_Day_Sticker.png', id: 'reverse-valentine-sticker_reverse_valentine_sticker_winged' }
 ];
 
-const missingSpirits = computed(() => {
-    // 使用真實資料庫 ID 確認是否收集
-    return pikminSpirits.filter(spirit => !isCollected(spirit.id));
+// Array of Colored Powder
+const powderSpirits = [
+    { type: 'red', name: '紅色', image: '/decor_localimg/powder-red.png', id: 'colored-powder-world-festival_colored_powder_world_festival_red' },
+    { type: 'yellow', name: '黃色', image: '/decor_localimg/powder-yellow.png', id: 'colored-powder-world-festival_colored_powder_world_festival_yellow' },
+    { type: 'blue', name: '藍色', image: '/decor_localimg/powder-blue.png', id: 'colored-powder-world-festival_colored_powder_world_festival_blue' },
+    { type: 'purple', name: '紫色', image: '/decor_localimg/powder-purple.png', id: 'colored-powder-world-festival_colored_powder_world_festival_purple' },
+    { type: 'white', name: '白色', image: '/decor_localimg/powder-white.png', id: 'colored-powder-world-festival_colored_powder_world_festival_white' },
+    { type: 'rock', name: '岩石', image: '/decor_localimg/powder-rock.png', id: 'colored-powder-world-festival_colored_powder_world_festival_rock' },
+    { type: 'winged', name: '羽翅', image: '/decor_localimg/powder-pink.png', id: 'colored-powder-world-festival_colored_powder_world_festival_winged' },
+    { type: 'ice', name: '冰水', image: '/decor_localimg/powder-ice.png', id: 'colored-powder-world-festival_colored_powder_world_festival_ice' }
+];
+
+// Combined for decorative floating display
+const combinedSpirits = computed(() => {
+    return [...valentineSpirits, ...powderSpirits];
+});
+
+// Filtered missing counts
+const missingValentine = computed(() => {
+    return valentineSpirits.filter(spirit => !isCollected(spirit.id));
+});
+
+const missingPowder = computed(() => {
+    return powderSpirits.filter(spirit => !isCollected(spirit.id));
 });
 
 const handleMouseMove = (e: MouseEvent) => {
@@ -207,7 +281,7 @@ const handleMouseMove = (e: MouseEvent) => {
     const centerX = rect.width / 2;
     const centerY = rect.height / 2;
     
-    // Calculate rotation (max 15 degrees)
+    // Calculate rotation (max 10 degrees)
     tiltX.value = ((y - centerY) / centerY) * -10; 
     tiltY.value = ((x - centerX) / centerX) * 10;
 };
@@ -241,7 +315,7 @@ const textStyle = computed(() => ({
 .translate-z-\[30px\] { transform: translateZ(30px); }
 .translate-z-\[40px\] { transform: translateZ(40px); }
 
-/* Custom Keyframes if not in global css */
+/* Custom Keyframes */
 @keyframes float {
     0%, 100% { transform: translateY(0); }
     50% { transform: translateY(-10px); }
@@ -258,5 +332,16 @@ const textStyle = computed(() => ({
     transform: translateX(100%);
   }
 }
-</style>
 
+/* Custom Scrollbar for Modal if needed */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: #d1d5db;
+  border-radius: 20px;
+}
+</style>
