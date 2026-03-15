@@ -34,7 +34,7 @@
       </p>
 
        <!-- Interactive & Tracker Unified Container -->
-       <div class="flex flex-col items-stretch w-full sm:w-[100%] md:w-max mx-auto md:mx-0 mt-8 gap-3 md:gap-4 relative z-10">
+       <div class="flex flex-col items-stretch w-full sm:w-[100%] md:w-[100%] mx-auto md:mx-0 mt-8 gap-3 md:gap-4 relative z-10">
            
            <!-- Interactive Pikmin Spirits -->
            <div class="relative bg-white/40 backdrop-blur-sm rounded-3xl md:rounded-[2rem] border border-white/50 shadow-sm p-4 w-full flex flex-col md:flex-row md:items-center md:justify-center gap-4 md:gap-2 hover:scale-105 transition-transform duration-300">
