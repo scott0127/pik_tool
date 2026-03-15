@@ -48,11 +48,24 @@
         <!-- 更新內容 -->
         <div v-show="currentTab === 'update'" class="flex-1">
           <ul class="text-sm text-gray-600 leading-relaxed list-disc list-inside space-y-1">
-            <li>3/9 主頁現在會顯示<span class="text-green-600 font-medium">當月復刻的裝飾品</span>皮克敏了!</li>
+            <li>3/14 主頁現在會顯示<span class="text-green-600 font-medium">當月全新與復刻的裝飾品</span>皮克敏了!新增<span class="bg-gradient-to-r from-yellow-400 via-red-500 to-purple-600 bg-clip-text text-transparent font-bold">彩色粉末皮克敏系列</span></li>
             <li class="flex items-center gap-1 flex-wrap">新增 <span class="inline-flex items-center gap-0.5 bg-gray-900 text-white px-1.5 py-[1.5px] rounded-[5px] text-[11px] font-semibold tracking-wide shadow-sm" style="font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif;"><Icon name="lucide:apple" class="w-3 h-3 mb-[0.5px]"/> iOS</span> 專屬「加到主畫面」捷徑按鈕</li>
-            <li>好友功能可以為自己設定出沒區域了!，想拿外國/漂亮明信片嗎! 快去設定你的區域吧</li>
-            <li>3/7優化純種地圖精確度，機場、河流、公園區域判斷變得更準確了!</li>
-            <li>新增稀有廚師冰皮、鍬形蟲冰皮、橡栗冰皮</li>
+            <li>
+              <div class="flex items-start gap-3"> <!-- items-start 讓文字對齊網格頂部 -->
+                
+                <!-- 國旗網格容器 -->
+                <div class="grid grid-cols-2 gap-1 w-fit">
+                  <Icon name="circle-flags:tw" class="text-xl" />
+                  <Icon name="circle-flags:us" class="text-xl" />
+                  <!-- col-span-2 讓第三個國旗佔滿兩格並置中 -->
+                  <Icon name="circle-flags:jp" class="text-xl col-span-2 justify-self-center" />
+                </div>
+                
+                <span class="flex-1">
+                  好友功能可以為自己設定出沒區域了！想拿外國/漂亮明信片嗎！快去設定你的區域吧
+                </span>
+              </div>
+            </li>
           </ul>
         </div>
 
