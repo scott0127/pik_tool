@@ -50,6 +50,11 @@ export function useCollection() {
     }
   };
 
+  // Get valid DecorItem IDs from current decor.json
+  const getValidItemIds = (): Set<string> => {
+    return new Set(getAllDecorItems().map(item => item.id));
+  };
+
   // Save to Supabase (if logged in)
   const saveToCloud = async (): Promise<boolean> => {
     // Get current session directly from Supabase client
@@ -63,8 +68,15 @@ export function useCollection() {
     const userId = session.user.id;
     
     try {
+      // 過濾掉無效的幽靈 ID，只保存 decor.json 中存在的 ID
+      const validIds = getValidItemIds();
       const collectedItems = Object.keys(collectionState.value.collected)
-        .filter(id => collectionState.value.collected[id]);
+        .filter(id => collectionState.value.collected[id] && validIds.has(id));
+
+      const rawCount = Object.keys(collectionState.value.collected).filter(id => collectionState.value.collected[id]).length;
+      if (rawCount !== collectedItems.length) {
+        console.log(`[Collection] Filtered out ${rawCount - collectedItems.length} invalid/phantom IDs before saving`);
+      }
       
       console.log('[Collection] Saving to cloud for user:', userId, '-', collectedItems.length, 'items');
       
@@ -105,21 +117,9 @@ export function useCollection() {
     }
   };
 
-  // Merge two collections (union strategy: keep all collected items)
-  const mergeCollections = (local: Record<string, boolean>, cloud: Record<string, boolean>): Record<string, boolean> => {
-    const merged: Record<string, boolean> = { ...local };
-    
-    // Add all cloud items
-    Object.keys(cloud).forEach(id => {
-      if (cloud[id]) {
-        merged[id] = true;
-      }
-    });
-    
-    return merged;
-  };
-
   // Load from Supabase (if logged in)
+  // ☁️ 雲端優先策略：已登入時直接使用雲端資料，不做 UNION merge
+  // 這樣可以確保多裝置之間的資料一致性，也支援取消標記
   const loadFromCloud = async () => {
     // Get current session directly from Supabase client
     const { data: { session } } = await supabase.auth.getSession();
@@ -143,35 +143,51 @@ export function useCollection() {
       if (error && error.code !== 'PGRST116') throw error; // PGRST116 = not found
       
       if (data?.collected_items) {
+        // ☁️ 雲端優先：直接使用雲端資料取代本地
         const cloudCollected: Record<string, boolean> = {};
+        const validIds = getValidItemIds();
         (data.collected_items as string[]).forEach(id => {
-          cloudCollected[id] = true;
+          // 只導入 decor.json 中存在的有效 ID
+          if (validIds.has(id)) {
+            cloudCollected[id] = true;
+          }
         });
         
-        // 🔄 MERGE instead of OVERWRITE
-        const localCount = Object.keys(collectionState.value.collected).filter(id => collectionState.value.collected[id]).length;
+        const localCount = Object.keys(collectionState.value.collected)
+          .filter(id => collectionState.value.collected[id]).length;
         const cloudCount = (data.collected_items as string[]).length;
+        const validCloudCount = Object.keys(cloudCollected).length;
         
-        collectionState.value.collected = mergeCollections(collectionState.value.collected, cloudCollected);
+        if (cloudCount !== validCloudCount) {
+          console.log(`[Collection] Filtered out ${cloudCount - validCloudCount} invalid IDs from cloud data`);
+        }
         
-        const mergedCount = Object.keys(collectionState.value.collected).filter(id => collectionState.value.collected[id]).length;
+        // 直接用雲端資料取代本地（雲端 = 唯一真實來源）
+        collectionState.value.collected = cloudCollected;
         
-        console.log('[Collection] ✓ Merged collections:', {
-          local: localCount,
-          cloud: cloudCount,
-          merged: mergedCount,
-          gained: mergedCount - localCount
+        console.log('[Collection] ✓ Cloud-first sync:', {
+          previousLocal: localCount,
+          cloudRaw: cloudCount,
+          cloudValid: validCloudCount,
         });
         
-        saveToLocal(); // Sync merged data to local storage
+        saveToLocal(); // 同步到 localStorage 作為離線備份
         
-        // If we gained items from merge, sync back to cloud
-        if (mergedCount > cloudCount) {
-          console.log('[Collection] Local had more items, syncing back to cloud...');
+        // 如果有無效 ID 被過濾掉了，把清理後的資料存回雲端
+        if (cloudCount !== validCloudCount) {
+          console.log('[Collection] Cleaning up invalid IDs in cloud...');
           await saveToCloud();
         }
       } else {
-        console.log('[Collection] No cloud data found for this user');
+        // 雲端沒資料：如果本地有資料，推送到雲端作為初始資料
+        const localCount = Object.keys(collectionState.value.collected)
+          .filter(id => collectionState.value.collected[id]).length;
+        if (localCount > 0) {
+          console.log('[Collection] No cloud data found, pushing local data to cloud:', localCount, 'items');
+          await saveToCloud();
+        } else {
+          console.log('[Collection] No cloud data and no local data for this user');
+        }
       }
     } catch (e) {
       console.error('[Collection] Failed to load from cloud:', e);
