@@ -228,21 +228,34 @@ export function useCollection() {
   };
 
   // Mark all items in a category as collected
-  const collectAllInCategory = (categoryId: string) => {
+  // ⚡ 批次操作：立即存雲端，不走 debounce，確保大量變更不會因離開頁面而遺失
+  const collectAllInCategory = async (categoryId: string) => {
     const items = getAllDecorItems().filter(item => item.categoryId === categoryId);
     items.forEach(item => {
       collectionState.value.collected[item.id] = true;
     });
-    saveCollection();
+    saveToLocal();
+    // 取消任何待執行的 debounce，避免重複存
+    if (globalSyncTimeout) {
+      clearTimeout(globalSyncTimeout);
+      globalSyncTimeout = null;
+    }
+    await saveToCloud();
   };
 
   // Clear all collected items in a category
-  const clearCategory = (categoryId: string) => {
+  // ⚡ 批次操作：立即存雲端
+  const clearCategory = async (categoryId: string) => {
     const items = getAllDecorItems().filter(item => item.categoryId === categoryId);
     items.forEach(item => {
       delete collectionState.value.collected[item.id];
     });
-    saveCollection();
+    saveToLocal();
+    if (globalSyncTimeout) {
+      clearTimeout(globalSyncTimeout);
+      globalSyncTimeout = null;
+    }
+    await saveToCloud();
   };
 
   // Calculate collection statistics

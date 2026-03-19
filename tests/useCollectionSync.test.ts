@@ -608,3 +608,289 @@ describe('10. 往返一致性 (roundtrip)', () => {
     expect(newState['phantom_y']).toBeUndefined();
   });
 });
+
+// =========================================================================
+// 11. saveCollection 行為層測試（之前缺少的！）
+//     模擬 useCollection.ts 中 saveCollection / collectAllInCategory / clearCategory 
+//     的 debounce 與雲端呼叫行為
+// =========================================================================
+describe('11. saveCollection 行為層 — debounce vs 立即存', () => {
+
+  // --- 模擬 saveCollection 的行為 ---
+  type SaveCall = { type: 'local' | 'cloud'; timestamp: number; itemCount: number };
+
+  /** 模擬舊版 saveCollection（用 debounce） */
+  function simulateSaveCollection_old(
+    state: Record<string, boolean>,
+    isAuthenticated: boolean,
+    saveCalls: SaveCall[],
+    currentTime: number,
+    pendingTimeout: { id: number | null },
+  ) {
+    // saveToLocal 立即執行
+    saveCalls.push({ type: 'local', timestamp: currentTime, itemCount: countCollected(state) });
+    
+    // saveToCloud 走 debounce
+    if (isAuthenticated) {
+      if (pendingTimeout.id !== null) {
+        // 模擬 clearTimeout — 標記為取消
+        pendingTimeout.id = null;
+      }
+      // 設定 2 秒後的 timeout（用 currentTime + 2000 表示）
+      pendingTimeout.id = currentTime + 2000;
+    }
+  }
+
+  /** 模擬修復後的 collectAllInCategory（立即存） */
+  function simulateCollectAllInCategory_fixed(
+    state: Record<string, boolean>,
+    categoryId: string,
+    saveCalls: SaveCall[],
+    currentTime: number,
+    pendingTimeout: { id: number | null },
+  ) {
+    // 批量標記
+    allItems.filter(i => i.categoryId === categoryId).forEach(item => {
+      state[item.id] = true;
+    });
+    
+    // 立即 saveToLocal
+    saveCalls.push({ type: 'local', timestamp: currentTime, itemCount: countCollected(state) });
+    
+    // 取消任何 pending debounce
+    pendingTimeout.id = null;
+    
+    // 立即 saveToCloud（不走 debounce）
+    saveCalls.push({ type: 'cloud', timestamp: currentTime, itemCount: countCollected(state) });
+  }
+
+  /** 模擬舊版 collectAllInCategory（走 debounce，有 Bug） */
+  function simulateCollectAllInCategory_buggy(
+    state: Record<string, boolean>,
+    categoryId: string,
+    saveCalls: SaveCall[],
+    currentTime: number,
+    pendingTimeout: { id: number | null },
+    isAuthenticated: boolean,
+  ) {
+    // 批量標記
+    allItems.filter(i => i.categoryId === categoryId).forEach(item => {
+      state[item.id] = true;
+    });
+    
+    // 走 saveCollection（有 debounce）
+    simulateSaveCollection_old(state, isAuthenticated, saveCalls, currentTime, pendingTimeout);
+  }
+
+  /** 模擬時間推進：執行所有到期的 timeout */
+  function advanceTime(
+    targetTime: number,
+    pendingTimeout: { id: number | null },
+    saveCalls: SaveCall[],
+    state: Record<string, boolean>,
+  ) {
+    if (pendingTimeout.id !== null && pendingTimeout.id <= targetTime) {
+      saveCalls.push({ type: 'cloud', timestamp: pendingTimeout.id, itemCount: countCollected(state) });
+      pendingTimeout.id = null;
+    }
+  }
+
+  // --- 測試案例 ---
+
+  it('舊版 Bug：collectAllInCategory 走 debounce, 如果 isAuthenticated=false 則永遠不會存雲端', () => {
+    const state: Record<string, boolean> = {};
+    const saveCalls: SaveCall[] = [];
+    const pendingTimeout = { id: null as number | null };
+
+    // 使用者已登入但 authStore 沒偵測到（isAuthenticated = false）
+    simulateCollectAllInCategory_buggy(state, 'restaurant', saveCalls, 0, pendingTimeout, false);
+
+    // 推進時間到 10 秒後
+    advanceTime(10000, pendingTimeout, saveCalls, state);
+
+    const localSaves = saveCalls.filter(c => c.type === 'local');
+    const cloudSaves = saveCalls.filter(c => c.type === 'cloud');
+
+    // ⚠️ Bug：local 有存，cloud 永遠沒存！
+    expect(localSaves.length).toBe(1);
+    expect(cloudSaves.length).toBe(0); // ← 這就是之前的 Bug！
+    expect(localSaves[0].itemCount).toBeGreaterThan(0);
+  });
+
+  it('舊版 Bug：collectAllInCategory 走 debounce, 即使 isAuthenticated=true，2 秒內離開頁面也不會存', () => {
+    const state: Record<string, boolean> = {};
+    const saveCalls: SaveCall[] = [];
+    const pendingTimeout = { id: null as number | null };
+
+    simulateCollectAllInCategory_buggy(state, 'restaurant', saveCalls, 0, pendingTimeout, true);
+
+    // 使用者在 1 秒後離開頁面 — timeout 還沒到期
+    advanceTime(1000, pendingTimeout, saveCalls, state);
+
+    const cloudSaves = saveCalls.filter(c => c.type === 'cloud');
+    // ⚠️ Bug：離開頁面前 timeout 還沒執行 → cloud 沒存到！
+    expect(cloudSaves.length).toBe(0);
+    expect(pendingTimeout.id).toBe(2000); // timeout 排在 2000ms，但使用者已經走了
+  });
+
+  it('舊版 Bug：collectAllInCategory 走 debounce, 等滿 2 秒才會存到雲端', () => {
+    const state: Record<string, boolean> = {};
+    const saveCalls: SaveCall[] = [];
+    const pendingTimeout = { id: null as number | null };
+
+    simulateCollectAllInCategory_buggy(state, 'restaurant', saveCalls, 0, pendingTimeout, true);
+
+    // 推進到 2 秒後 — timeout 到期
+    advanceTime(2000, pendingTimeout, saveCalls, state);
+
+    const cloudSaves = saveCalls.filter(c => c.type === 'cloud');
+    expect(cloudSaves.length).toBe(1); // 2 秒後才存到
+    expect(cloudSaves[0].timestamp).toBe(2000);
+  });
+
+  it('修復後：collectAllInCategory 立即存雲端，不受 isAuthenticated 限制', () => {
+    const state: Record<string, boolean> = {};
+    const saveCalls: SaveCall[] = [];
+    const pendingTimeout = { id: null as number | null };
+
+    // 修復後的版本：直接呼叫 saveToCloud，不走 authStore 判斷
+    simulateCollectAllInCategory_fixed(state, 'restaurant', saveCalls, 0, pendingTimeout);
+
+    const localSaves = saveCalls.filter(c => c.type === 'local');
+    const cloudSaves = saveCalls.filter(c => c.type === 'cloud');
+
+    // ✅ 修復後：local 和 cloud 都在 T=0 立即存
+    expect(localSaves.length).toBe(1);
+    expect(cloudSaves.length).toBe(1);
+    expect(cloudSaves[0].timestamp).toBe(0); // 立即！不是 2 秒後
+    expect(cloudSaves[0].itemCount).toBeGreaterThan(0);
+  });
+
+  it('修復後：collectAllInCategory 會取消之前 pending 的 debounce', () => {
+    const state: Record<string, boolean> = {};
+    const saveCalls: SaveCall[] = [];
+    const pendingTimeout = { id: null as number | null };
+
+    // T=0: 使用者先單獨標記了一個（走 debounce → timeout 排在 T=2000）
+    state[allItems[0].id] = true;
+    simulateSaveCollection_old(state, true, saveCalls, 0, pendingTimeout);
+    expect(pendingTimeout.id).toBe(2000);
+
+    // T=500ms: 使用者按「全部蒐集」
+    simulateCollectAllInCategory_fixed(state, 'restaurant', saveCalls, 500, pendingTimeout);
+
+    // debounce 應該被取消了
+    expect(pendingTimeout.id).toBeNull();
+
+    // 推進到 3 秒 — 舊的 debounce 不應再觸發
+    advanceTime(3000, pendingTimeout, saveCalls, state);
+
+    const cloudSaves = saveCalls.filter(c => c.type === 'cloud');
+    // 只有 collectAllInCategory 的那次立即存，沒有 debounce 的重複存
+    expect(cloudSaves.length).toBe(1);
+    expect(cloudSaves[0].timestamp).toBe(500);
+  });
+
+  it('修復後：clearCategory 也立即存雲端', () => {
+    const state: Record<string, boolean> = {};
+    const saveCalls: SaveCall[] = [];
+    const pendingTimeout = { id: null as number | null };
+
+    // 先標記整個 category
+    allItems.filter(i => i.categoryId === 'restaurant').forEach(item => {
+      state[item.id] = true;
+    });
+    const beforeCount = countCollected(state);
+    expect(beforeCount).toBeGreaterThan(0);
+
+    // clearCategory（修復後用同樣的立即存邏輯）
+    allItems.filter(i => i.categoryId === 'restaurant').forEach(item => {
+      delete state[item.id];
+    });
+    saveCalls.push({ type: 'local', timestamp: 0, itemCount: countCollected(state) });
+    pendingTimeout.id = null;
+    saveCalls.push({ type: 'cloud', timestamp: 0, itemCount: countCollected(state) });
+
+    const cloudSaves = saveCalls.filter(c => c.type === 'cloud');
+    expect(cloudSaves.length).toBe(1);
+    expect(cloudSaves[0].timestamp).toBe(0); // 立即
+    expect(cloudSaves[0].itemCount).toBe(0); // 清空了
+  });
+
+  it('單個 toggleCollected 仍然走 debounce（這是正確行為，減少 API 呼叫）', () => {
+    const state: Record<string, boolean> = {};
+    const saveCalls: SaveCall[] = [];
+    const pendingTimeout = { id: null as number | null };
+
+    // 快速連續標記 5 個
+    for (let i = 0; i < 5; i++) {
+      state[allItems[i].id] = true;
+      simulateSaveCollection_old(state, true, saveCalls, i * 100, pendingTimeout);
+    }
+
+    // 所有 local 都立即存了
+    const localSaves = saveCalls.filter(c => c.type === 'local');
+    expect(localSaves.length).toBe(5);
+
+    // 但 cloud 還沒存（debounce 中）
+    const cloudSavesBeforeTimeout = saveCalls.filter(c => c.type === 'cloud');
+    expect(cloudSavesBeforeTimeout.length).toBe(0);
+
+    // 最後一次操作在 T=400，timeout 在 T=2400
+    expect(pendingTimeout.id).toBe(2400);
+
+    // 推進到 T=2400
+    advanceTime(2400, pendingTimeout, saveCalls, state);
+
+    const cloudSavesAfter = saveCalls.filter(c => c.type === 'cloud');
+    expect(cloudSavesAfter.length).toBe(1); // 只存了一次（合併了 5 次操作）
+    expect(cloudSavesAfter[0].itemCount).toBe(5);
+  });
+
+  it('批次操作後再做單個操作 → 單個操作走新的 debounce', () => {
+    const state: Record<string, boolean> = {};
+    const saveCalls: SaveCall[] = [];
+    const pendingTimeout = { id: null as number | null };
+
+    // T=0: collectAllInCategory（立即存雲端）
+    simulateCollectAllInCategory_fixed(state, 'cafe', saveCalls, 0, pendingTimeout);
+    const cafeCount = allItems.filter(i => i.categoryId === 'cafe').length;
+
+    // T=1000: 使用者又單獨取消了一個（走 debounce）
+    state[allItems.find(i => i.categoryId === 'cafe')!.id] = false;
+    simulateSaveCollection_old(state, true, saveCalls, 1000, pendingTimeout);
+
+    // 此時 cloud 已經存了一次（批次操作的），debounce 排了一個新的
+    const cloudSavesBeforeTimeout = saveCalls.filter(c => c.type === 'cloud');
+    expect(cloudSavesBeforeTimeout.length).toBe(1); // 只有批次的那次
+
+    // T=3000: debounce 到期
+    advanceTime(3000, pendingTimeout, saveCalls, state);
+
+    const cloudSavesAfter = saveCalls.filter(c => c.type === 'cloud');
+    expect(cloudSavesAfter.length).toBe(2); // 批次 + debounce 各一次
+    expect(cloudSavesAfter[1].itemCount).toBe(cafeCount - 1); // 少了一個取消的
+  });
+
+  it('連續按兩次 collectAllInCategory → 兩次都立即存，不會互相干擾', () => {
+    const state: Record<string, boolean> = {};
+    const saveCalls: SaveCall[] = [];
+    const pendingTimeout = { id: null as number | null };
+
+    // T=0: collectAll restaurant
+    simulateCollectAllInCategory_fixed(state, 'restaurant', saveCalls, 0, pendingTimeout);
+    const restaurantCount = allItems.filter(i => i.categoryId === 'restaurant').length;
+
+    // T=500: collectAll cafe
+    simulateCollectAllInCategory_fixed(state, 'cafe', saveCalls, 500, pendingTimeout);
+    const cafeCount = allItems.filter(i => i.categoryId === 'cafe').length;
+
+    const cloudSaves = saveCalls.filter(c => c.type === 'cloud');
+    expect(cloudSaves.length).toBe(2);
+    expect(cloudSaves[0].timestamp).toBe(0);
+    expect(cloudSaves[0].itemCount).toBe(restaurantCount);
+    expect(cloudSaves[1].timestamp).toBe(500);
+    expect(cloudSaves[1].itemCount).toBe(restaurantCount + cafeCount);
+  });
+});
+
