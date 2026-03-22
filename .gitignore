@@ -29,5 +29,5 @@ supabase/migration_*.sql
 # Shared internal folder
 .shared/
 
-# Ignore specific workflows
-.agent/workflows/ui-ux-pro-max.md
+# Ignore agent directory
+.agent/

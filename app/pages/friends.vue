@@ -30,162 +30,255 @@
       </div>
 
       <!-- Post Form (登入用戶) -->
-      <div v-if="user" class="glass rounded-3xl p-6 mb-8 animate-slide-up" style="animation-delay: 0.1s;">
-        <h2 class="text-lg font-bold text-gray-800 mb-5 flex items-center gap-2">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-emerald-500" viewBox="0 0 20 20" fill="currentColor">
-            <path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z" />
-            <path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clip-rule="evenodd" />
-          </svg>
-          {{ $t('friends.form.title') }}
-        </h2>
+      <div v-if="user" class="glass rounded-3xl p-6 sm:p-8 mb-10 slide-up relative overflow-visible z-10">
+        <!-- Decorative Elements -->
+        <div class="absolute -top-6 -right-6 w-24 h-24 bg-gradient-to-br from-emerald-300 to-teal-400 rounded-full blur-2xl opacity-40 pointer-events-none float"></div>
+        <div class="absolute -bottom-10 -left-10 w-32 h-32 bg-gradient-to-tr from-yellow-200 to-orange-300 rounded-full blur-2xl opacity-30 pointer-events-none float-delayed"></div>
         
-        <form @submit.prevent="submitPost" class="space-y-4">
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label class="block text-sm font-semibold text-gray-700 mb-2">
-                <span class="flex items-center gap-1.5">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
-                  </svg>
-                  {{ $t('friends.form.label_name') }}
-                </span>
-              </label>
-              <input
-                v-model="newPost.username"
-                type="text"
-                required
-                maxlength="20"
-                class="input-field"
-                :placeholder="$t('friends.form.placeholder_name')"
-              >
+        <div class="relative z-10">
+          <div class="flex items-center gap-3 mb-8">
+            <div class="flex items-center justify-center w-12 h-12 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-2xl shadow-lg shadow-emerald-200/50 transform -rotate-6">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+              </svg>
             </div>
-            <div>
-              <label class="block text-sm font-semibold text-gray-700 mb-2">
-                <span class="flex items-center gap-1.5">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
-                    <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
-                  </svg>
-                  {{ $t('friends.form.label_code') }}
-                </span>
-              </label>
-              <input
-                v-model="newPost.friendCode"
-                type="text"
-                required
-                class="input-field font-mono tracking-wider"
-                placeholder="1234 5678 9012"
-                @input="formatFriendCode"
-              >
-            </div>
+            <h2 class="text-2xl font-extrabold text-gray-800 tracking-tight">
+              {{ $t('friends.form.title') }}
+            </h2>
           </div>
           
-          <!-- Intent Selector (NEW) -->
-          <div>
-            <label class="block text-sm font-semibold text-gray-700 mb-2">
-              <span class="flex items-center gap-1.5">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-emerald-500" viewBox="0 0 20 20" fill="currentColor">
-                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm-1.5-3.879l-3-3a1 1 0 011.414-1.414L9 11.586l4.293-4.293a1 1 0 011.414 1.414l-5 5a1 1 0 01-1.414 0z" clip-rule="evenodd" />
-                </svg>
-                交友目的 (自由選填，最多 2 個)
-              </span>
-            </label>
-            <div class="flex flex-wrap gap-2">
-              <button
-                v-for="intent in FRIEND_INTENTS"
-                :key="intent.id"
-                type="button"
-                @click="toggleIntent(intent.id)"
-                :disabled="!newPost.intents.includes(intent.id) && newPost.intents.length >= 2"
-                class="px-3 py-1.5 rounded-xl border text-sm font-medium transition-all duration-200 flex items-center gap-1.5 shadow-sm"
-                :class="[
-                  newPost.intents.includes(intent.id) 
-                    ? intent.colorClass
-                    : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50 hover:border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed'
-                ]"
-              >
-                <span>{{ intent.icon }}</span>
-                <span>{{ intent.label }}</span>
-              </button>
-            </div>
-            <p v-if="newPost.intents.length === 2" class="text-xs text-amber-500 mt-2 font-medium flex items-center gap-1">
-               已達到目的上限 (2 個)
-            </p>
-          </div>
-          
-          <!-- Region Selector -->
-          <div>
-            <label class="block text-sm font-semibold text-gray-700 mb-2">
-              <span class="flex items-center gap-1.5">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
-                  <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" />
-                </svg>
-                常駐地區 (自由選填，最多 2 個)
-              </span>
-            </label>
-            <div class="flex flex-wrap gap-2">
-              <div v-for="group in FRIEND_REGIONS" :key="group.label" class="w-full mb-1">
-                <p class="text-xs font-semibold text-gray-400 mb-1.5 ml-1">{{ group.label }}</p>
-                <div class="flex flex-wrap gap-1.5">
-                  <button
-                    v-for="region in group.options"
-                    :key="region"
-                    type="button"
-                    @click="toggleRegion(region)"
-                    :disabled="!newPost.regions.includes(region) && newPost.regions.length >= 2"
-                    class="px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200 border"
-                    :class="[
-                      newPost.regions.includes(region) 
-                        ? 'bg-emerald-100 border-emerald-300 text-emerald-800 shadow-sm' 
-                        : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50 hover:border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed'
-                    ]"
+          <form @submit.prevent="submitPost" class="space-y-7">
+            <!-- Basic Info: Name & Code -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <!-- Name Input -->
+              <div class="group">
+                <label class="block text-[15px] font-bold text-gray-700 mb-2 ml-1">
+                  <span class="flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-blue-400 shadow-sm shadow-blue-200"></span>
+                    {{ $t('friends.form.label_name') }}
+                  </span>
+                </label>
+                <div class="relative transition-transform duration-300 group-hover:-translate-y-0.5">
+                  <input
+                    v-model="newPost.username"
+                    type="text"
+                    required
+                    maxlength="20"
+                    class="input-field pl-11 text-lg font-bold"
+                    :placeholder="$t('friends.form.placeholder_name')"
                   >
-                    {{ region }}
-                  </button>
+                  <div class="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-400 group-focus-within:text-blue-500 transition-colors" viewBox="0 0 20 20" fill="currentColor">
+                      <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
+                    </svg>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Code Input -->
+              <div class="group">
+                <label class="block text-[15px] font-bold text-gray-700 mb-2 ml-1">
+                  <span class="flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-rose-400 shadow-sm shadow-rose-200"></span>
+                    {{ $t('friends.form.label_code') }}
+                  </span>
+                </label>
+                <div class="relative transition-transform duration-300 group-hover:-translate-y-0.5">
+                  <input
+                    v-model="newPost.friendCode"
+                    type="tel"
+                    required
+                    class="input-field pl-11 text-lg font-mono tracking-[0.15em] font-bold transition-all duration-300"
+                    :class="isValidFriendCode ? 'border-emerald-400 focus:border-emerald-500 focus:ring-emerald-100 bg-emerald-50/40 text-emerald-700 shadow-[0_0_15px_rgba(16,185,129,0.15)]' : 'text-gray-700 focus:border-rose-400 focus:ring-rose-100 group-hover:border-rose-200'"
+                    placeholder="1234 5678 9012"
+                    @input="formatFriendCode"
+                  >
+                  <div class="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 transition-all duration-300" :class="isValidFriendCode ? 'text-emerald-500 scale-110 drop-shadow-sm' : 'text-gray-400 group-focus-within:text-rose-500'" viewBox="0 0 20 20" fill="currentColor">
+                      <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
+                    </svg>
+                  </div>
                 </div>
               </div>
             </div>
-            <p v-if="newPost.regions.length === 2" class="text-xs text-amber-500 mt-2 font-medium flex items-center gap-1">
-               已達到地區上限 (2 個)
-            </p>
-          </div>
+            
+            <div class="w-full h-px bg-gradient-to-r from-transparent via-gray-300/50 to-transparent"></div>
+            
+            <!-- Intent Selector -->
+            <div>
+              <div class="flex items-center justify-between mb-3 ml-1">
+                <label class="block text-[15px] font-bold text-gray-700">
+                  <span class="flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-amber-400 shadow-sm shadow-amber-200"></span>
+                    交友目的
+                    <span class="text-sm font-semibold text-gray-400 bg-gray-100 px-2 py-0.5 rounded-md ml-1">最多 2 個</span>
+                  </span>
+                </label>
+                <span v-if="newPost.intents.length === 2" class="text-xs text-white font-bold bg-amber-500 px-2.5 py-1 rounded-full pop-in shadow-sm shadow-amber-200">
+                  已達上限
+                </span>
+              </div>
+              
+              <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                <button
+                  v-for="intent in FRIEND_INTENTS"
+                  :key="intent.id"
+                  type="button"
+                  @click="toggleIntent(intent.id)"
+                  :disabled="!newPost.intents.includes(intent.id) && newPost.intents.length >= 2"
+                  class="relative overflow-hidden group p-3.5 rounded-2xl border-2 transition-all duration-300 flex flex-col items-center justify-center gap-1.5 min-h-[80px] cursor-pointer active:translate-y-1 active:shadow-inner"
+                  :class="[
+                    newPost.intents.includes(intent.id) 
+                      ? `${intent.colorClass.replace(/bg-\w+-50/, 'bg-white').replace(/border-\w+-200/, 'border-[color:currentColor]').replace(/text-\w+-600/, intent.colorClass.match(/text-\w+-600/)?.[0] || 'text-gray-800')} shadow-md scale-[1.03]`
+                      : 'bg-white/80 border-transparent text-gray-500 hover:bg-white hover:border-gray-200 hover:shadow-md disabled:opacity-50 hover:-translate-y-1'
+                  ]"
+                >
+                  <!-- Active Background Glow -->
+                  <div v-if="newPost.intents.includes(intent.id)" class="absolute inset-0 opacity-10 bg-currentColor"></div>
+                  
+                  <span class="text-2xl transition-transform duration-300 group-hover:scale-125 group-active:scale-95 z-10 drop-shadow-sm">{{ intent.icon }}</span>
+                  <span class="text-sm font-extrabold tracking-wide z-10">{{ intent.label }}</span>
+                </button>
+              </div>
+              
+              <!-- Custom Postcard Input -->
+              <div v-if="newPost.intents.includes('postcard')" class="mt-3 slide-up">
+                <div class="bg-blue-50 border-2 border-blue-200 p-3 rounded-2xl flex flex-col sm:flex-row items-center gap-3 shadow-inner">
+                  <span class="text-[15px] font-extrabold text-blue-800 flex-shrink-0 whitespace-nowrap px-2">我想要 👉</span>
+                  <input 
+                    v-model="newPost.postcardInput" 
+                    type="text" 
+                    class="input-field !py-2 !px-4 !bg-white !shadow-sm !rounded-xl !text-blue-900 font-bold placeholder-blue-300 !border-blue-200 focus:!border-blue-400 focus:!ring-blue-100 flex-1 text-center sm:text-left text-lg" 
+                    placeholder="台北、火車、郵局..." 
+                    maxlength="10"
+                  />
+                  <span class="text-[15px] font-extrabold text-blue-800 flex-shrink-0 whitespace-nowrap px-2">明信片 💌</span>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Toggle Advanced Settings (iOS Style) -->
+            <div class="pt-4 pb-2">
+              <button 
+                type="button" 
+                @click="showAdvancedSettings = !showAdvancedSettings"
+                class="group flex items-center justify-between w-full p-4 rounded-2xl bg-white/70 backdrop-blur-md shadow-[0_2px_12px_rgba(0,0,0,0.03)] border border-gray-100/80 hover:bg-white hover:shadow-[0_4px_20px_rgba(0,0,0,0.06)] active:scale-[0.98] transition-all duration-400 ease-[cubic-bezier(0.25,1,0.5,1)]"
+              >
+                <div class="flex items-center gap-3.5">
+                  <div class="w-9 h-9 rounded-full flex items-center justify-center transition-colors duration-300" :class="showAdvancedSettings ? 'bg-emerald-500 text-white shadow-md shadow-emerald-500/20' : 'bg-emerald-50 text-emerald-500 group-hover:bg-emerald-100'">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4.5 h-4.5" viewBox="0 0 20 20" fill="currentColor">
+                      <path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd" />
+                    </svg>
+                  </div>
+                  <div class="flex flex-col items-start gap-0.5">
+                    <span class="text-[15px] font-bold transition-colors duration-300" :class="showAdvancedSettings ? 'text-emerald-600' : 'text-gray-800 group-hover:text-emerald-600'">{{ showAdvancedSettings ? '隱藏進階選項' : '新增常駐地區與留言' }}</span>
+                    <span v-show="!showAdvancedSettings" class="text-[12px] font-semibold text-gray-400">完整名片能獲得更精準的媒合</span>
+                  </div>
+                </div>
+                <div class="w-8 h-8 rounded-full flex items-center justify-center text-gray-300 group-hover:text-emerald-500 transition-colors">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 transition-transform duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)]" :class="showAdvancedSettings ? 'rotate-180' : ''" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                  </svg>
+                </div>
+              </button>
+            </div>
+            
+            <!-- Advanced Settings Container -->
+            <div v-show="showAdvancedSettings" class="space-y-7 origin-top transition-all duration-300">
+              <div class="w-full h-px bg-gradient-to-r from-transparent via-gray-300/50 to-transparent"></div>
+              
+              <!-- Region Selector -->
+            <div>
+              <div class="flex items-center justify-between mb-3 ml-1">
+                <label class="block text-[15px] font-bold text-gray-700">
+                  <span class="flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 shadow-sm shadow-emerald-200"></span>
+                    常駐地區
+                    <span class="text-sm font-semibold text-gray-400 bg-gray-100 px-2 py-0.5 rounded-md ml-1">最多 2 個</span>
+                  </span>
+                </label>
+                <span v-if="newPost.regions.length === 2" class="text-xs text-white font-bold bg-emerald-500 px-2.5 py-1 rounded-full pop-in shadow-sm shadow-emerald-200">
+                  已達上限
+                </span>
+              </div>
+              
+              <div class="bg-gray-50/80 rounded-3xl p-4 sm:p-5 border border-gray-200/60 shadow-inner space-y-5">
+                <div v-for="group in FRIEND_REGIONS" :key="group.label" class="w-full">
+                  <h4 class="text-xs font-black text-gray-400/80 mb-2.5 uppercase tracking-[0.2em] pl-1 flex items-center gap-2">
+                    <span>{{ group.label }}</span>
+                    <span class="h-px bg-gray-200 flex-1 rounded-full"></span>
+                  </h4>
+                  <div class="flex flex-wrap gap-2.5">
+                    <button
+                      v-for="region in group.options"
+                      :key="region"
+                      type="button"
+                      @click="toggleRegion(region)"
+                      :disabled="!newPost.regions.includes(region) && newPost.regions.length >= 2"
+                      class="relative px-4 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 select-none active:scale-[0.92] flex-grow sm:flex-grow-0 text-center border-2 overflow-hidden group/btn"
+                      :class="[
+                        newPost.regions.includes(region) 
+                          ? 'bg-emerald-500 border-emerald-400 text-white shadow-[0_4px_12px_rgba(16,185,129,0.3)] scale-[1.02] active:bg-emerald-600 active:shadow-inner' 
+                          : 'bg-white border-transparent text-gray-600 hover:bg-gray-50 hover:border-gray-200 hover:shadow-md shadow-sm disabled:opacity-40 disabled:hover:scale-100 disabled:hover:shadow-none active:bg-gray-100'
+                      ]"
+                    >
+                      <!-- Sublet click ripple/glow effect overlay -->
+                      <div v-show="newPost.regions.includes(region)" class="absolute inset-0 bg-white opacity-0 group-active/btn:opacity-20 transition-opacity"></div>
+                      <span class="relative z-10">{{ region }}</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
 
-          <div>
-            <label class="block text-sm font-semibold text-gray-700 mb-2">
-              <span class="flex items-center gap-1.5">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
-                  <path fill-rule="evenodd" d="M18 13V5a2 2 0 00-2-2H4a2 2 0 00-2 2v8a2 2 0 002 2h3l3 3 3-3h3a2 2 0 002-2zM5 7a1 1 0 011-1h8a1 1 0 110 2H6a1 1 0 01-1-1zm1 3a1 1 0 100 2h3a1 1 0 100-2H6z" clip-rule="evenodd" />
+            <!-- Message Textarea -->
+            <div class="group">
+              <label class="block text-[15px] font-bold text-gray-700 mb-2 ml-1">
+                <span class="flex items-center gap-2">
+                  <span class="w-2 h-2 rounded-full bg-purple-400 shadow-sm shadow-purple-200"></span>
+                  想說的話 
+                  <span class="text-sm font-normal text-gray-400 ml-1">(選填)</span>
+                </span>
+              </label>
+              <div class="relative transition-transform duration-300 group-hover:-translate-y-0.5">
+                <textarea
+                  v-model="newPost.message"
+                  rows="3"
+                  maxlength="100"
+                  class="input-field resize-none !px-5 !py-4 font-medium text-[15px]"
+                  :placeholder="$t('friends.form.placeholder_message')"
+                ></textarea>
+                <div class="absolute bottom-3 right-4 text-xs font-black px-2.5 py-1 rounded-lg transition-colors" 
+                     :class="newPost.message.length >= 90 ? 'bg-red-100 text-red-600' : 'bg-gray-100 text-gray-400'">
+                  {{ newPost.message.length }} / 100
+                </div>
+              </div>
+            </div>
+            </div>
+            <!-- End of Advanced Settings -->
+
+            <!-- Submit Button -->
+            <div class="pt-4 flex justify-end">
+              <button
+                type="button"
+                @click="submitPost"
+                :disabled="submitting || !isValidFriendCode || !newPost.username.trim()"
+                class="btn-primary w-full sm:w-auto sm:min-w-[240px] !py-4 !text-lg flex items-center justify-center gap-3 disabled:opacity-60 disabled:pointer-events-none"
+              >
+                <svg v-if="submitting" class="animate-spin h-6 w-6" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none" />
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                 </svg>
-                {{ $t('friends.form.label_message') }}
-              </span>
-            </label>
-            <textarea
-              v-model="newPost.message"
-              rows="2"
-              maxlength="100"
-              class="input-field resize-none"
-              :placeholder="$t('friends.form.placeholder_message')"
-            ></textarea>
-            <p class="text-xs text-gray-400 mt-1 text-right">{{ newPost.message.length }} / 100</p>
-          </div>
-
-          <div class="flex justify-end">
-            <button
-              type="button"
-              @click="submitPost"
-              :disabled="submitting || !isValidFriendCode"
-              class="btn-primary flex items-center gap-2"
-            >
-              <svg v-if="submitting" class="animate-spin h-5 w-5" viewBox="0 0 24 24">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none" />
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-              </svg>
-              <svg v-else xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-8.707l-3-3a1 1 0 00-1.414 1.414L10.586 9H7a1 1 0 100 2h3.586l-1.293 1.293a1 1 0 101.414 1.414l3-3a1 1 0 000-1.414z" clip-rule="evenodd" />
-              </svg>
-              <span>{{ submitting ? $t('friends.form.submitting') : $t('friends.form.submit') }}</span>
-            </button>
-          </div>
-        </form>
+                <template v-else>
+                  <span class="tracking-wide">{{ $t('friends.form.submit') }}</span>
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 transform transition-transform group-hover:translate-x-1" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-8.707l-3-3a1 1 0 00-1.414 1.414L10.586 9H7a1 1 0 100 2h3.586l-1.293 1.293a1 1 0 101.414 1.414l3-3a1 1 0 000-1.414z" clip-rule="evenodd" />
+                  </svg>
+                </template>
+              </button>
+            </div>
+          </form>
+        </div>
       </div>
 
       <!-- Login Prompt -->
@@ -217,79 +310,81 @@
           </span>
         </h2>
         
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3">
+        <!-- Mobile Swipe Hint -->
+        <p class="text-[12px] font-bold text-emerald-500 mb-3 md:hidden flex items-center gap-1.5 animate-pulse ml-1 opacity-80">
+          <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+          向右滑動卡片查看更多
+        </p>
+
+        <div class="flex overflow-x-auto snap-x snap-mandatory gap-3 sm:gap-4 pb-4 px-1 -mx-1 scrollbar-hide py-2">
           <div
             v-for="post in recommendedPosts"
             :key="`rec-${post.id}`"
-            class="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-xl p-3 border border-indigo-100 hover:shadow-md transition-all duration-300 group"
+            class="snap-start shrink-0 w-[240px] relative overflow-hidden bg-white/80 backdrop-blur-xl rounded-[24px] p-3.5 shadow-[0_8px_30px_rgb(0,0,0,0.06)] border border-white/80 hover:-translate-y-1 hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)] transition-all duration-300 group flex flex-col"
           >
-            <div class="flex items-center gap-2 mb-2">
-              <div class="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-100 to-purple-100 flex items-center justify-center shadow-sm shrink-0 overflow-hidden p-0.5">
-                <img :src="getPikminAvatar(post.username)" :alt="post.username" class="w-full h-full object-contain" loading="lazy" />
+            <!-- Header: Avatar + User Info -->
+            <div class="flex items-center gap-2.5 mb-3">
+              <div class="relative shrink-0">
+                <div class="w-10 h-10 rounded-full overflow-hidden bg-gradient-to-tr from-emerald-50 to-teal-50 p-0.5 shadow-sm border border-emerald-100/50 group-hover:shadow-md transition-shadow duration-300">
+                  <img :src="getPikminAvatar(post.username)" :alt="post.username" class="w-full h-full object-contain bg-white rounded-full group-hover:scale-110 group-hover:-rotate-6 transition-transform duration-500" loading="lazy" />
+                </div>
+                <div class="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-emerald-400 rounded-full border-[2px] border-white shadow-sm"></div>
               </div>
-              <div class="overflow-hidden flex-1">
-                <h3 class="font-bold text-gray-800 text-sm truncate">{{ post.username }}</h3>
-                <p class="text-[10px] text-gray-400 flex items-center gap-0.5">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-2.5 w-2.5" viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd" />
-                  </svg>
-                  {{ formatDate(post.created_at) }}
-                </p>
+              <div class="flex-1 min-w-0">
+                <h3 class="font-extrabold text-gray-900 text-[14px] truncate leading-tight transition-colors duration-300 group-hover:text-emerald-600">{{ post.username }}</h3>
+                <p class="text-[10px] font-bold text-gray-400 mt-0.5">{{ formatDate(post.created_at) }}</p>
               </div>
-            </div>
-            
-            <div 
-              class="bg-white rounded-lg px-2 py-2 mb-2 border border-indigo-100 cursor-pointer hover:bg-indigo-50 transition-colors shadow-[inset_0_2px_4px_rgba(0,0,0,0.02)]"
-              @click="copyCode(post.friend_code)"
-              :title="$t('friends.copy_tooltip')"
-            >
-              <p class="font-mono text-xs font-bold text-indigo-600 tracking-wider text-center">
-                {{ formatDisplayCode(post.friend_code) }}
-              </p>
             </div>
 
-            <div class="flex-1 flex flex-col justify-between">
-              <!-- Intent Tags (Small) -->
-              <div v-if="getPostIntents(post.regions).length > 0" class="flex flex-wrap gap-1 mb-2">
+            <!-- Friend Code Box (iOS style inset) -->
+            <div 
+              @click="copyCode(post.friend_code)"
+              class="bg-gray-50/90 rounded-[14px] p-2 mb-3 flex items-center justify-between cursor-pointer active:scale-95 transition-transform group/code shadow-[inset_0_2px_4px_rgba(0,0,0,0.02)] border border-gray-200/50"
+              :title="$t('friends.copy_tooltip')"
+            >
+              <span class="font-mono text-[12px] font-extrabold text-emerald-600 tracking-wider pl-1.5 flex-1 text-center group-hover/code:scale-105 transition-transform origin-left">
+                {{ formatDisplayCode(post.friend_code) }}
+              </span>
+              <div class="w-6 h-6 rounded-full bg-white shadow-sm flex items-center justify-center text-emerald-400 group-hover/code:text-emerald-600 group-hover/code:shadow transition-all shrink-0 group-hover/code:rotate-12">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 20 20" fill="currentColor"><path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" /><path d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z" /></svg>
+              </div>
+            </div>
+
+            <!-- Tags Section -->
+            <div class="flex-1 flex flex-col gap-2 mb-3">
+              <div v-if="getPostIntents(post.regions).length > 0" class="flex flex-wrap gap-1">
                 <span 
                   v-for="intentId in getPostIntents(post.regions)" 
                   :key="`rec-${post.id}-intent-${intentId}`" 
-                  class="px-1.5 py-[2px] rounded text-[10px] font-semibold border flex items-center gap-1 shadow-sm"
+                  class="px-2 py-0.5 rounded-lg text-[10px] font-extrabold flex items-center gap-1 shadow-sm border border-black/5 transition-transform hover:scale-105 cursor-default"
                   :class="getIntentColor(intentId)"
-                  :title="getIntentLabel(intentId)"
                 >
-                  <span class="text-[12px] leading-none">{{ getIntentIcon(intentId) }}</span>
+                  <span class="text-[12px] leading-none drop-shadow-sm">{{ getIntentIcon(intentId) }}</span>
                   <span class="leading-none">{{ getIntentLabel(intentId) }}</span>
                 </span>
               </div>
-
-              <!-- Region Tags (Small) -->
-              <div v-if="getPostRegions(post.regions).length > 0" class="flex flex-wrap gap-1 mb-2">
-                <span v-for="region in getPostRegions(post.regions)" :key="`rec-${post.id}-region-${region}`" class="px-1.5 py-[2px] bg-white text-gray-500 border border-gray-200 rounded text-[10px] font-bold shadow-[0_1px_2px_rgba(0,0,0,0.02)]">
+              <div v-if="getPostRegions(post.regions).length > 0" class="flex flex-wrap gap-1">
+                <span v-for="region in getPostRegions(post.regions)" :key="`rec-${post.id}-region-${region}`" class="px-2 py-0.5 bg-gray-100 text-gray-500 border border-gray-200/50 rounded-lg text-[10px] font-extrabold shadow-sm transition-transform hover:scale-105 cursor-default">
                   {{ region.split(' ')[0] }}
                 </span>
               </div>
             </div>
 
-            <!-- User Message (Small and truncated) -->
-            <div v-if="post.message" class="mb-2">
-              <p class="text-xs text-gray-600 bg-white/70 rounded p-1.5 border border-indigo-50/50 line-clamp-2 leading-relaxed" :title="post.message">
-                {{ post.message }}
-              </p>
+            <!-- Message (iOS style bubble) -->
+            <div v-if="post.message" class="bg-emerald-50/60 rounded-[14px] p-2.5 mb-3 border border-emerald-100/50 relative group-hover:bg-emerald-100/50 transition-colors">
+              <div class="absolute -top-1 left-4 w-2 h-2 bg-emerald-50/60 rotate-45 border-l border-t border-emerald-100/50 group-hover:bg-emerald-100/50 transition-colors"></div>
+              <p class="text-[11px] text-gray-600 font-bold leading-relaxed line-clamp-2 relative z-10" :title="post.message">{{ post.message }}</p>
             </div>
+            
+            <div v-else class="flex-1"></div>
 
-            <div class="flex flex-wrap justify-between items-end mt-auto gap-2">
-               <button
-                @click="copyCode(post.friend_code)"
-                class="text-[11px] font-medium text-white bg-indigo-500 hover:bg-indigo-600 px-2.5 py-1 rounded-md flex items-center gap-1 shadow-sm transition-colors w-full justify-center"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
-                  <path d="M8 2a1 1 0 000 2h2a1 1 0 100-2H8z" />
-                  <path d="M3 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v6h-4.586l1.293-1.293a1 1 0 00-1.414-1.414l-3 3a1 1 0 000 1.414l3 3a1 1 0 001.414-1.414L10.414 13H15v3a2 2 0 01-2 2H5a2 2 0 01-2-2V5zM15 11h2a1 1 0 110 2h-2v-2z" />
-                </svg>
-                複製代碼
-              </button>
-            </div>
+            <!-- Action Button -->
+            <button
+              @click="copyCode(post.friend_code)"
+              class="w-full bg-emerald-500 hover:bg-emerald-600 text-white rounded-[14px] py-2.5 text-[12px] font-extrabold transition-all duration-300 shadow-[0_4px_12px_rgba(16,185,129,0.25)] active:scale-95 flex items-center justify-center gap-1.5 mt-auto group/btn"
+            >
+              <span class="group-hover/btn:scale-110 transition-transform">加為好友</span>
+            </button>
           </div>
         </div>
       </section>
@@ -331,7 +426,7 @@
               <button
                 @click="clearIntentFilters"
                 class="px-4 py-1.5 rounded-full text-sm font-medium transition-colors border shadow-sm"
-                :class="selectedIntentFilters.length === 0 ? 'bg-indigo-500 text-white border-indigo-600' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'"
+                :class="selectedIntentFilters.length === 0 ? 'bg-emerald-500 text-white border-emerald-600' : 'bg-white text-gray-600 border-gray-200 hover:bg-emerald-50 hover:text-emerald-600 hover:border-emerald-200'"
               >
                 所有目的
               </button>
@@ -340,7 +435,7 @@
                 :key="`filter-intent-${intent.id}`"
                 @click="toggleIntentFilter(intent.id)"
                 class="px-3 py-1.5 rounded-full text-sm font-medium transition-colors border flex items-center gap-1"
-                :class="selectedIntentFilters.includes(intent.id) ? 'bg-indigo-50 border-indigo-300 text-indigo-700 shadow-sm' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'"
+                :class="selectedIntentFilters.includes(intent.id) ? 'bg-emerald-50 border-emerald-300 text-emerald-700 shadow-sm' : 'bg-white text-gray-600 border-gray-200 hover:bg-emerald-50 hover:text-emerald-600 hover:border-emerald-200'"
               >
                 <span>{{ intent.icon }}</span>
                 <span>{{ intent.label }}</span>
@@ -421,81 +516,70 @@
         </div>
 
         <!-- Posts Grid -->
-        <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div v-else class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
           <div
             v-for="(post, index) in posts"
             :key="post.id"
-            class="glass rounded-2xl p-5 transition-all duration-300 hover:shadow-2xl hover:scale-[1.01] animate-pop-in"
+            class="bg-white/80 backdrop-blur-xl rounded-[28px] p-5 shadow-[0_8px_30px_rgb(0,0,0,0.05)] border border-white/80 hover:-translate-y-1 hover:shadow-[0_8px_30px_rgb(0,0,0,0.1)] transition-all duration-300 animate-pop-in flex flex-col"
             :style="{ animationDelay: `${index * 0.05}s` }"
           >
-            <div class="flex items-start justify-between mb-3">
-              <div class="flex items-center gap-3">
-                <div class="w-11 h-11 rounded-full bg-gradient-to-br from-pink-100 to-rose-100 flex items-center justify-center shadow-lg overflow-hidden p-0.5">
-                  <img :src="getPikminAvatar(post.username)" :alt="post.username" class="w-full h-full object-contain" loading="lazy" />
+            <!-- User Header -->
+            <div class="flex items-center justify-between mb-4">
+              <div class="flex items-center gap-3.5">
+                <div class="relative shrink-0">
+                  <div class="w-14 h-14 rounded-full bg-gradient-to-tr from-emerald-50 to-teal-50 p-0.5 shadow-sm border border-emerald-100/50">
+                    <img :src="getPikminAvatar(post.username)" :alt="post.username" class="w-full h-full object-contain bg-white rounded-full" loading="lazy" />
+                  </div>
                 </div>
                 <div>
-                  <h3 class="font-bold text-gray-800">{{ post.username }}</h3>
-                  <p class="text-xs text-gray-400 flex items-center gap-1">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
-                      <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd" />
-                    </svg>
-                    {{ formatDate(post.created_at) }}
-                  </p>
+                  <h3 class="font-extrabold text-gray-900 text-base leading-tight">{{ post.username }}</h3>
+                  <p class="text-xs font-bold text-gray-400 mt-1">{{ formatDate(post.created_at) }}</p>
                 </div>
               </div>
-              <button
+              
+              <!-- Friend Code Compact Badge -->
+              <div 
                 @click="copyCode(post.friend_code)"
-                class="p-2.5 text-gray-400 hover:text-emerald-500 hover:bg-emerald-50 rounded-xl transition-all duration-200"
+                class="bg-emerald-50/80 text-emerald-600 px-3 py-1.5 rounded-[12px] font-mono text-[13px] font-extrabold tracking-widest shadow-[inset_0_2px_4px_rgba(0,0,0,0.02)] border border-emerald-200/50 cursor-pointer active:scale-95 transition-transform flex items-center gap-1.5 group shrink-0"
                 :title="$t('friends.copy_code')"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                  <path d="M8 2a1 1 0 000 2h2a1 1 0 100-2H8z" />
-                  <path d="M3 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v6h-4.586l1.293-1.293a1 1 0 00-1.414-1.414l-3 3a1 1 0 000 1.414l3 3a1 1 0 001.414-1.414L10.414 13H15v3a2 2 0 01-2 2H5a2 2 0 01-2-2V5zM15 11h2a1 1 0 110 2h-2v-2z" />
-                </svg>
-              </button>
+                 {{ formatDisplayCode(post.friend_code) }}
+                 <svg class="w-4 h-4 text-emerald-400 group-hover:text-emerald-600 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+              </div>
             </div>
             
-            <!-- Friend Code Display -->
-            <div class="bg-gradient-to-r from-emerald-50 to-teal-50 rounded-xl px-4 py-3 mb-3 border border-emerald-100">
-              <p class="text-lg font-mono font-bold text-emerald-600 tracking-widest text-center select-all">
-                {{ formatDisplayCode(post.friend_code) }}
-              </p>
-            </div>
-            
-            <!-- Intent Tags -->
-            <div v-if="getPostIntents(post.regions).length > 0" class="flex flex-wrap gap-1.5 mb-2">
+            <!-- Tags Row -->
+            <div class="flex flex-wrap gap-2 mb-4 pl-1">
               <span 
                 v-for="intentId in getPostIntents(post.regions)" 
                 :key="`${post.id}-intent-${intentId}`" 
-                class="px-2 py-0.5 rounded text-xs font-semibold flex items-center gap-1 border"
+                class="px-2.5 py-1 rounded-xl text-xs font-extrabold flex items-center gap-1.5 shadow-sm border border-black/5"
                 :class="getIntentColor(intentId)"
               >
-                <span>{{ getIntentIcon(intentId) }}</span>
+                <span class="text-[14px] leading-none drop-shadow-sm">{{ getIntentIcon(intentId) }}</span>
                 <span>{{ getIntentLabel(intentId) }}</span>
               </span>
-            </div>
-
-            <!-- Region Tags -->
-            <div v-if="getPostRegions(post.regions).length > 0" class="flex flex-wrap gap-1.5 mb-3">
-              <span v-for="region in getPostRegions(post.regions)" :key="`${post.id}-region-${region}`" class="px-2 py-0.5 bg-gray-50 text-gray-600 border border-gray-200 rounded text-xs font-bold">
+              <span v-for="region in getPostRegions(post.regions)" :key="`${post.id}-region-${region}`" class="px-2.5 py-1 bg-gray-100/80 text-gray-500 rounded-xl text-xs font-extrabold shadow-sm border border-black/5">
                 📍 {{ region.split(' ')[0] }}
               </span>
             </div>
             
-            <p v-if="post.message" class="text-gray-600 text-sm leading-relaxed bg-white/50 rounded-lg p-3">
+            <!-- Message Bubble -->
+            <p v-if="post.message" class="bg-gray-50/80 text-gray-600 text-[13px] font-bold leading-relaxed rounded-2xl p-3.5 border border-gray-100/50 shadow-[inset_0_2px_4px_rgba(0,0,0,0.02)]">
               {{ post.message }}
             </p>
+            <div v-else class="flex-1"></div>
             
             <!-- Delete Button -->
-            <div v-if="user && post.user_id === user.id" class="mt-3 pt-3 border-t border-gray-100">
+            <div v-if="user && post.user_id === user.id" class="mt-4 pt-4 border-t border-gray-100/50 flex justify-end">
               <button
                 @click="deletePost(post.id)"
-                class="text-xs text-red-400 hover:text-red-600 flex items-center gap-1.5 transition-colors"
+                class="text-xs font-extrabold text-red-500 hover:text-white bg-red-50 hover:bg-red-500 px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1 active:scale-95"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
                   <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
                 </svg>
-                {{ $t('friends.delete') }}
+                刪除我的文章
               </button>
             </div>
           </div>
@@ -593,12 +677,15 @@ function getPikminAvatar(username: string): string {
   return PIKMIN_AVATAR_URLS[index];
 }
 
+const showAdvancedSettings = ref(false);
+
 const newPost = ref({
   username: '',
   friendCode: '',
   message: '',
   regions: [] as string[],
   intents: [] as string[],
+  postcardInput: '',
 });
 
 // 切換選擇目的
@@ -780,7 +867,22 @@ const submitPost = async () => {
     }
     
     // 為了不更動後端資料庫架構，我們將 intents 和 regions 結合存在 `regions` 欄位中
-    const combinedTags = [...newPost.value.regions, ...newPost.value.intents];
+    const finalIntents = newPost.value.intents.map(intentId => {
+      // 處理客製化明信片
+      if (intentId === 'postcard' && newPost.value.postcardInput.trim()) {
+        return `postcard:${newPost.value.postcardInput.trim()}`;
+      }
+      return intentId;
+    });
+
+    // 如果有客製化明信片，同時保留 'postcard' base tag 讓搜尋可以 match
+    if (newPost.value.intents.includes('postcard') && newPost.value.postcardInput.trim()) {
+      if (!finalIntents.includes('postcard')) {
+        finalIntents.push('postcard');
+      }
+    }
+
+    const combinedTags = [...newPost.value.regions, ...finalIntents];
     
     const { data, error } = await supabase.from('friend_posts').insert({
       user_id: actualUserId,
@@ -798,6 +900,7 @@ const submitPost = async () => {
     newPost.value.message = '';
     newPost.value.regions = [];
     newPost.value.intents = [];
+    newPost.value.postcardInput = '';
     await fetchPosts();
   } catch (e: any) {
     console.error('Failed to submit post:', e);
@@ -869,9 +972,12 @@ const shuffleArray = <T>(array: T[]): T[] => {
 };
 
 const refreshRecommendations = () => {
+  // 過濾出有自我介紹(message)的玩家
+  const eligiblePosts = posts.value.filter(p => p.message && p.message.trim() !== '');
+
   // 不論有沒有篩選，少於或等於10個直接全秀(打亂排列)，不輪播
-  if (posts.value.length <= 10) {
-    recommendedPosts.value = shuffleArray(posts.value);
+  if (eligiblePosts.length <= 10) {
+    recommendedPosts.value = shuffleArray(eligiblePosts);
     return;
   }
 
@@ -884,7 +990,7 @@ const refreshRecommendations = () => {
     nextBatch.push(...recommendationQueue.value);
     
     // 2. 產生新的一輪洗牌名單 (基於過濾後的清單)
-    const newShuffled = shuffleArray(posts.value);
+    const newShuffled = shuffleArray(eligiblePosts);
     
     // 3. 計算還缺多少
     const remainingNeeded = needed - nextBatch.length;
@@ -919,7 +1025,8 @@ watch(posts, (newPosts) => {
   if (newPosts.length > 0) {
     // 推薦系統應該基於全部使用者，所以如果目前沒有篩選條件，就更新推薦
     if (selectedCategories.value.length === 0 && selectedRegionFilters.value.length === 0) {
-      recommendationQueue.value = shuffleArray(newPosts);
+      const eligiblePosts = newPosts.filter(p => p.message && p.message.trim() !== '');
+      recommendationQueue.value = shuffleArray(eligiblePosts);
       startRecommendationTimer();
     }
   }
@@ -937,13 +1044,43 @@ const getPostRegions = (tags: string[] | null) => {
 
 const getPostIntents = (tags: string[] | null) => {
   if (!tags) return [];
-  return tags.filter(tag => ALL_INTENT_OPTIONS.includes(tag));
+  const validTags = tags.filter(tag => 
+    ALL_INTENT_OPTIONS.includes(tag) || 
+    ['mushroom', 'postcard'].includes(tag) || // Legacy support
+    tag.startsWith('postcard:')
+  );
+  
+  // Deduplicate base 'postcard' if 'postcard:xxx' exists
+  const hasDynamicPostcard = validTags.some(t => t.startsWith('postcard:'));
+  return validTags.filter(t => {
+    if (t === 'postcard' && hasDynamicPostcard) return false;
+    return true;
+  });
 };
 
 const getIntentObj = (id: string) => FRIEND_INTENTS.find(i => i.id === id);
-const getIntentIcon = (id: string) => getIntentObj(id)?.icon || '';
-const getIntentLabel = (id: string) => getIntentObj(id)?.label || id;
-const getIntentColor = (id: string) => getIntentObj(id)?.colorClass || 'bg-gray-100 text-gray-800 border-gray-200';
+
+const getIntentIcon = (id: string) => {
+  if (id === 'mushroom') return '🍄';
+  if (id.startsWith('postcard')) return '💌';
+  return getIntentObj(id)?.icon || '';
+};
+
+const getIntentLabel = (id: string) => {
+  if (id === 'mushroom') return '打蘑菇';
+  if (id === 'postcard') return '交換明信片';
+  if (id.startsWith('postcard:')) {
+    const value = id.split(':')[1];
+    return `想要 ${value} 明信片`;
+  }
+  return getIntentObj(id)?.label || id;
+};
+
+const getIntentColor = (id: string) => {
+  if (id === 'mushroom') return 'bg-red-50 text-red-600 border-red-200';
+  if (id.startsWith('postcard:')) return 'bg-blue-50 text-blue-600 border-blue-200 bg-opacity-70 backdrop-blur-sm shadow-sm';
+  return getIntentObj(id)?.colorClass || 'bg-gray-100 text-gray-800 border-gray-200';
+};
 
 const getOptionsForCategory = (label: string) => {
   return FRIEND_REGIONS.find(g => g.label === label)?.options || [];

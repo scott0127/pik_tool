@@ -5,20 +5,28 @@ export interface IntentGroup {
   label: string;
   icon: string;
   colorClass: string;
+  hasInput?: boolean;
 }
 
 export const FRIEND_INTENTS: IntentGroup[] = [
   {
-    id: 'mushroom',
-    label: '打蘑菇',
+    id: 'mushroom_invite',
+    label: '我想找人打菇',
     icon: '🍄',
     colorClass: 'bg-red-50 text-red-600 border-red-200 hover:bg-red-100',
   },
   {
+    id: 'mushroom_carry',
+    label: '我有戰力打蘑菇',
+    icon: '🔥',
+    colorClass: 'bg-orange-50 text-orange-600 border-orange-200 hover:bg-orange-100',
+  },
+  {
     id: 'postcard',
-    label: '交換明信片',
+    label: '我想要明信片',
     icon: '💌',
     colorClass: 'bg-blue-50 text-blue-600 border-blue-200 hover:bg-blue-100',
+    hasInput: true,
   },
   {
     id: 'gift',
@@ -34,7 +42,7 @@ export const FRIEND_INTENTS: IntentGroup[] = [
   },
   {
     id: 'overseas',
-    label: '海外好友',
+    label: '我是海外好友',
     icon: '🌍',
     colorClass: 'bg-indigo-50 text-indigo-600 border-indigo-200 hover:bg-indigo-100',
   }
