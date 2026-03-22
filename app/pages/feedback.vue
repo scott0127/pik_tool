@@ -160,6 +160,8 @@
 
 <script setup lang="ts">
 const { t } = useI18n();
+const authStore = useAuthStore();
+const supabase = useSupabaseClient();
 
 const feedbackTypes = computed(() => [
   { id: 'suggestion', icon: '💡', label: t('feedback.types.suggestion') },
@@ -177,6 +179,8 @@ const form = ref({
 const submitting = ref(false);
 const showSuccess = ref(false);
 
+const user = computed(() => authStore.user.value);
+
 const deviceInfo = computed(() => {
   if (import.meta.client) {
     const ua = navigator.userAgent;
@@ -193,20 +197,19 @@ const submitFeedback = async () => {
   submitting.value = true;
   
   try {
-    // 這裡可以整合實際的回饋提交邏輯
-    // 例如發送到 Supabase、Google Forms、或其他後端服務
+    // 整合 Supabase 提交邏輯
+    const finalMessage = `${form.value.message}\n\n--- 📱 裝置資訊 ---\n${deviceInfo.value}`;
     
-    // 模擬 API 請求
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    // 將回饋資料記錄到 console（開發環境）
-    console.log('Feedback submitted:', {
+    const insertData = {
       type: form.value.type,
-      email: form.value.email,
-      message: form.value.message,
-      deviceInfo: deviceInfo.value,
-      timestamp: new Date().toISOString(),
-    });
+      message: finalMessage,
+      ...(form.value.email ? { email: form.value.email } : {}),
+      ...(user.value?.id ? { user_id: user.value.id } : {})
+    };
+
+    const { error } = await supabase.from('feedbacks').insert(insertData);
+
+    if (error) throw error;
     
     // 顯示成功訊息
     showSuccess.value = true;

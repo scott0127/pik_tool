@@ -582,6 +582,7 @@
 <script setup lang="ts">
 const authStore = useAuthStore();
 const router = useRouter();
+const supabase = useSupabaseClient();
 const { getStats } = useCollection();
 const { canInstallIos, canInstallAndroid, triggerIosPrompt, triggerAndroidPrompt } = usePwaInstall();
 
@@ -639,16 +640,16 @@ const submitFeedback = async () => {
   feedbackSubmitting.value = true;
   
   try {
-    // 模擬 API 請求
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    // 將回饋資料記錄到 console（開發環境）
-    console.log('Feedback submitted:', {
+    const insertData = {
       type: feedbackForm.value.type,
-      email: feedbackForm.value.email,
       message: feedbackForm.value.message,
-      timestamp: new Date().toISOString(),
-    });
+      ...(feedbackForm.value.email ? { email: feedbackForm.value.email } : {}),
+      ...(user.value?.id ? { user_id: user.value.id } : {})
+    };
+
+    const { error } = await supabase.from('feedbacks').insert(insertData);
+
+    if (error) throw error;
     
     // 關閉表單並顯示成功訊息
     showFeedbackModal.value = false;
