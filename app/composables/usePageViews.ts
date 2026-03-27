@@ -4,6 +4,11 @@ export const usePageViews = () => {
 
   // Increment page views counter
   const incrementPageViews = async () => {
+    // Check if already incremented in this session to save egress
+    if (import.meta.client && sessionStorage.getItem('has_incremented_views')) {
+      return getPageViews(); // Just fetch the current count instead of incrementing
+    }
+
     try {
       const { data, error } = await supabase.rpc('increment_page_views');
       
@@ -12,6 +17,11 @@ export const usePageViews = () => {
         return null;
       }
       
+      // Mark as incremented for this browser session
+      if (import.meta.client) {
+        sessionStorage.setItem('has_incremented_views', 'true');
+      }
+
       pageViews.value = data;
       return data;
     } catch (err) {

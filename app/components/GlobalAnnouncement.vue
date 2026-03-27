@@ -50,9 +50,7 @@
           <ul class="text-sm text-gray-600 leading-relaxed list-disc list-inside space-y-1">
             <li>
               <span class="inline-flex items-center gap-1.5 align-middle">
-                <span class="inline-flex items-center justify-center p-0.5 rounded-full bg-white shadow-[0_2px_8px_rgba(0,0,0,0.08)] border border-red-100">
-                  <img src="/mario.png" alt="Mario" class="w-6 h-6 object-contain" />
-                </span>
+                
                 預計 4/1 號更新馬力歐飾品皮克敏 
               </span>
             </li>

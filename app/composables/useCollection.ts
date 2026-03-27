@@ -203,7 +203,7 @@ export function useCollection() {
       if (globalSyncTimeout) clearTimeout(globalSyncTimeout);
       globalSyncTimeout = setTimeout(() => {
         saveToCloud();
-      }, 2000);
+      }, 5000); // Increased from 2s to 5s to reduce UPSERT frequency
     }
   };
 
