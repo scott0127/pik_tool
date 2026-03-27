@@ -5,8 +5,13 @@ export type ReportStatus = {
     addedDecors: Set<string>; // Set of decor_ids reported as 'missing_decor'
 };
 
-// Global cache registry to track which cells we've already asked Supabase about
+// Global cache registry to track which cells we've already asked Supabase about (in-memory)
 const fetchedCellIds = new Set<string>();
+
+// LocalStorage Cache Key & TTL
+const CACHE_KEY = 'pikmin-cell-reports-cache';
+const CACHE_VERSION = 1;
+const CACHE_TTL = 12 * 60 * 60 * 1000; // 12 hours in milliseconds
 
 export const useCellReports = () => {
     const supabase = useSupabaseClient<Database>();
@@ -21,6 +26,97 @@ export const useCellReports = () => {
         }
         return cellReports.get(cellId)!;
     };
+
+    // --- LocalStorage Cache Implementation ---
+    
+    // Process cache data from localStorage
+    const loadCache = () => {
+        if (!import.meta.client) return false;
+        try {
+            const raw = localStorage.getItem(CACHE_KEY);
+            if (!raw) return false;
+            
+            const cache = JSON.parse(raw);
+            if (cache.version !== CACHE_VERSION) {
+                localStorage.removeItem(CACHE_KEY);
+                return false;
+            }
+
+            const now = Date.now();
+            let hasExpiredItems = false;
+            let loadedCount = 0;
+
+            // Load valid cache items
+            for (const [cellId, data] of Object.entries(cache.cells || {})) {
+                // @ts-ignore
+                if (now - data.ts > CACHE_TTL) {
+                    hasExpiredItems = true;
+                    continue;
+                }
+                
+                // Set memory state
+                cellReports.set(cellId, {
+                    // @ts-ignore
+                    isNotPure: !!data.np,
+                    // @ts-ignore
+                    addedDecors: new Set(data.ad || [])
+                });
+                fetchedCellIds.add(cellId);
+                loadedCount++;
+            }
+
+            // Clean up if we had expired items
+            if (hasExpiredItems) {
+                saveCache();
+            }
+            
+            return loadedCount > 0;
+        } catch (e) {
+            console.error('[CellReports] Failed to load cache:', e);
+            localStorage.removeItem(CACHE_KEY);
+            return false;
+        }
+    };
+
+    // Save current memory state to localStorage
+    const saveCache = () => {
+        if (!import.meta.client) return;
+        try {
+            const now = Date.now();
+            const cellsToSave: Record<string, any> = {};
+            
+            // Note: We're only saving cells that are in memory currently. 
+            // If the map has 10,000 cells long-term, this might grow. 
+            // We limit the save to recently fetched cells if possible, but for now we save all known.
+            
+            // To prevent unbounded growth, optionally limit max cells to save (e.g. 5000)
+            let count = 0;
+            const entries = Array.from(cellReports.entries());
+            
+            for (const [cellId, status] of entries) {
+                if (count > 5000) break; // Arbitrary safe limit for localStorage
+                cellsToSave[cellId] = {
+                    ts: now,
+                    np: status.isNotPure,
+                    ad: Array.from(status.addedDecors)
+                };
+                count++;
+            }
+            
+            localStorage.setItem(CACHE_KEY, JSON.stringify({
+                version: CACHE_VERSION,
+                cells: cellsToSave
+            }));
+        } catch (e) {
+            console.error('[CellReports] Failed to save cache:', e);
+        }
+    };
+    
+    // Run loadCache once on initialization
+    if (import.meta.client && cellReports.size === 0) {
+        loadCache();
+    }
+    // -----------------------------------------
 
     // Helper check
     const isReportedNotPure = (cellId: string): boolean => {
@@ -39,7 +135,7 @@ export const useCellReports = () => {
     const fetchReportsForCells = async (cellIds: string[]) => {
         if (!cellIds.length) return;
 
-        // 1. Filter out cells that we have already fetched
+        // 1. Filter out cells that we have already fetched (in-memory or from loaded LocalStorage)
         const newCellIds = cellIds.filter(id => !fetchedCellIds.has(id));
         if (!newCellIds.length) return;
 
@@ -64,6 +160,9 @@ export const useCellReports = () => {
                     }
                 });
             }
+            
+            // 3. Save to localStorage cache after fetching new data
+            saveCache();
         } catch (e) {
             console.error('[CellReports] Fetch error:', e);
         }
@@ -83,6 +182,9 @@ export const useCellReports = () => {
             if (status.addedDecors.has(decorId)) return; // Already reported
             status.addedDecors.add(decorId);
         }
+        
+        // Save to cache immediately so optimistic update persists reload
+        saveCache();
 
         // Send to DB
         // @ts-ignore - Supabase type definitions might be lagging behind migration

@@ -48,6 +48,14 @@
         <!-- 更新內容 -->
         <div v-show="currentTab === 'update'" class="flex-1">
           <ul class="text-sm text-gray-600 leading-relaxed list-disc list-inside space-y-1">
+            <li>
+              <span class="inline-flex items-center gap-1.5 align-middle">
+                <span class="inline-flex items-center justify-center p-0.5 rounded-full bg-white shadow-[0_2px_8px_rgba(0,0,0,0.08)] border border-red-100">
+                  <img src="/mario.png" alt="Mario" class="w-6 h-6 object-contain" />
+                </span>
+                預計 4/1 號更新馬力歐飾品皮克敏 
+              </span>
+            </li>
             <li>3/14 主頁現在會顯示<span class="text-green-600 font-medium">當月全新與復刻的裝飾品</span>皮克敏了!新增<span class="bg-gradient-to-r from-yellow-400 via-red-500 to-purple-600 bg-clip-text text-transparent font-bold">彩色粉末皮克敏系列</span></li>
             <li class="flex items-center gap-1 flex-wrap">新增 <span class="inline-flex items-center gap-0.5 bg-gray-900 text-white px-1.5 py-[1.5px] rounded-[5px] text-[11px] font-semibold tracking-wide shadow-sm" style="font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif;"><Icon name="lucide:apple" class="w-3 h-3 mb-[0.5px]"/> iOS</span> 專屬「加到主畫面」捷徑按鈕</li>
             <li>
@@ -66,7 +74,6 @@
                 </span>
               </div>
             </li>
-            <li>3/24 修正了回饋功能無法送出的 Bug</li>
           </ul>
         </div>
 
