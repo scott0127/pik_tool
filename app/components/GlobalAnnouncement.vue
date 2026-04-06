@@ -51,7 +51,7 @@
             <li>
               <span class="inline-flex items-center gap-1.5 align-middle">
                 
-                預計 4/1 號更新馬力歐飾品皮克敏 
+                4/6 號更新馬力歐飾品皮克敏、荷蘭小木鞋皮克敏
               </span>
             </li>
             <li>3/14 主頁現在會顯示<span class="text-green-600 font-medium">當月全新與復刻的裝飾品</span>皮克敏了!新增<span class="bg-gradient-to-r from-yellow-400 via-red-500 to-purple-600 bg-clip-text text-transparent font-bold">彩色粉末皮克敏系列</span></li>

@@ -1856,12 +1856,18 @@
           "nameEn": "Mario Hat",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/7/7d/Decor_Blue_Mario_Hat.png/100px-Decor_Blue_Mario_Hat.png",
           "imageUrls": {
-            "blue": "https://pikmin.wiki.gallery/images/thumb/7/7d/Decor_Blue_Mario_Hat.png/100px-Decor_Blue_Mario_Hat.png"
+            "blue": "https://pikmin.wiki.gallery/images/9/96/Decor_Blue_Super_Mario_Keychain.png",
+            "red": "https://pikmin.wiki.gallery/images/thumb/9/92/Decor_Red_Super_Mario_Keychain.png/64px-Decor_Red_Super_Mario_Keychain.png",
+            "purple": "https://pikmin.wiki.gallery/images/thumb/4/42/Decor_Purple_Super_Mario_Keychain.png/188px-Decor_Purple_Super_Mario_Keychain.png",
+            "yellow": "https://pikmin.wiki.gallery/images/b/b0/Decor_Yellow_Super_Mario_Keychain.png"
           }
         }
       ],
       "availablePikminTypes": [
-        "blue"
+        "red",
+        "blue",
+        "purple",
+        "yellow"
       ]
     },
     {
@@ -3891,6 +3897,43 @@
             "rock": "/decor_localimg/powder-rock.png",
             "winged": "/decor_localimg/powder-pink.png",
             "ice": "/decor_localimg/powder-ice.png"
+          }
+        }
+      ],
+      "availablePikminTypes": [
+        "red",
+        "yellow",
+        "blue",
+        "white",
+        "purple",
+        "rock",
+        "winged",
+        "ice"
+      ]
+    },
+    {
+      "category": {
+        "id": "荷蘭小木鞋",
+        "name": "荷蘭小木鞋",
+        "nameEn": "Klompen Keychain",
+        "type": "special",
+        "icon": "noto:bento-box"
+      },
+      "variants": [
+        {
+          "id": "Klompen Keychain",
+          "name": "荷蘭小木鞋",
+          "nameEn": "Klompen Keychain",
+          "imageUrl": "https://pikmin.wiki.gallery/images/thumb/8/82/Decor_Red_Klompen_Keychain.png/109px-Decor_Red_Klompen_Keychain.png",
+          "imageUrls": {
+            "red": "https://pikmin.wiki.gallery/images/thumb/8/82/Decor_Red_Klompen_Keychain.png/109px-Decor_Red_Klompen_Keychain.png",
+            "yellow": "https://pikmin.wiki.gallery/images/thumb/6/66/Decor_Yellow_Klompen_Keychain.png/100px-Decor_Yellow_Klompen_Keychain.png",
+            "blue": "https://pikmin.wiki.gallery/images/thumb/b/b3/Decor_Blue_Klompen_Keychain.png/113px-Decor_Blue_Klompen_Keychain.png",
+            "white": "https://pikmin.wiki.gallery/images/thumb/a/a1/Decor_White_Klompen_Keychain.png/118px-Decor_White_Klompen_Keychain.png",
+            "purple": "https://pikmin.wiki.gallery/images/thumb/c/c7/Decor_Purple_Klompen_Keychain.png/144px-Decor_Purple_Klompen_Keychain.png",
+            "rock": "https://pikmin.wiki.gallery/images/thumb/9/9f/Decor_Rock_Klompen_Keychain.png/150px-Decor_Rock_Klompen_Keychain.png",
+            "winged": "https://pikmin.wiki.gallery/images/thumb/4/4a/Decor_Winged_Klompen_Keychain.png/131px-Decor_Winged_Klompen_Keychain.png",
+            "ice": "https://pikmin.wiki.gallery/images/thumb/5/51/Decor_Ice_Klompen_Keychain.png/117px-Decor_Ice_Klompen_Keychain.png"
           }
         }
       ],
