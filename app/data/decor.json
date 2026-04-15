@@ -869,7 +869,8 @@
             "white": "https://pikmin.wiki.gallery/images/thumb/b/b9/Decor_White_Clover.png/100px-Decor_White_Clover.png",
             "purple": "https://pikmin.wiki.gallery/images/thumb/b/b6/Decor_Purple_Clover.png/100px-Decor_Purple_Clover.png",
             "rock": "https://pikmin.wiki.gallery/images/thumb/c/c3/Decor_Rock_Clover.png/100px-Decor_Rock_Clover.png",
-            "winged": "https://pikmin.wiki.gallery/images/thumb/3/3c/Decor_Winged_Clover.png/100px-Decor_Winged_Clover.png"
+            "winged": "https://pikmin.wiki.gallery/images/thumb/3/3c/Decor_Winged_Clover.png/100px-Decor_Winged_Clover.png",
+            "ice": "https://pikmin.wiki.gallery/images/thumb/8/87/Decor_Ice_Clover.png/132px-Decor_Ice_Clover.png"
           }
         },
         {
@@ -884,7 +885,40 @@
             "white": "https://pikmin.wiki.gallery/images/thumb/c/cf/Decor_White_Four-Leaf_Clover.png/100px-Decor_White_Four-Leaf_Clover.png",
             "purple": "https://pikmin.wiki.gallery/images/thumb/e/e4/Decor_Purple_Four-Leaf_Clover.png/100px-Decor_Purple_Four-Leaf_Clover.png",
             "rock": "https://pikmin.wiki.gallery/images/thumb/8/8f/Decor_Rock_Four-Leaf_Clover.png/100px-Decor_Rock_Four-Leaf_Clover.png",
-            "winged": "https://pikmin.wiki.gallery/images/thumb/1/13/Decor_Winged_Four-Leaf_Clover.png/100px-Decor_Winged_Four-Leaf_Clover.png"
+            "winged": "https://pikmin.wiki.gallery/images/thumb/1/13/Decor_Winged_Four-Leaf_Clover.png/100px-Decor_Winged_Four-Leaf_Clover.png",
+            "ice": "https://pikmin.wiki.gallery/images/thumb/2/20/Decor_Ice_Four-Leaf_Clover.png/132px-Decor_Ice_Four-Leaf_Clover.png"
+          }
+        },
+        {
+          "id": "clover_rare",
+          "name": "三葉草(稀有)",
+          "nameEn": "Clover (Rare)",
+          "imageUrl": "https://pikmin.wiki.gallery/images/thumb/3/33/Decor_Red_Clover_%28Rare%29.png/150px-Decor_Red_Clover_%28Rare%29.png",
+          "imageUrls": {
+            "red": "https://pikmin.wiki.gallery/images/thumb/5/5e/Decor_Red_Clover.png/100px-Decor_Red_Clover.png",
+            "yellow": "https://pikmin.wiki.gallery/images/thumb/d/de/Decor_Yellow_Clover_%28Rare%29.png/150px-Decor_Yellow_Clover_%28Rare%29.png",
+            "blue": "https://pikmin.wiki.gallery/images/thumb/f/f4/Decor_Blue_Clover_%28Rare%29.png/150px-Decor_Blue_Clover_%28Rare%29.png",
+            "white": "https://pikmin.wiki.gallery/images/f/fa/Decor_White_Clover_%28Rare%29.png",
+            "purple": "https://pikmin.wiki.gallery/images/thumb/3/3e/Decor_Purple_Clover_%28Rare%29.png/150px-Decor_Purple_Clover_%28Rare%29.png",
+            "rock": "https://pikmin.wiki.gallery/images/thumb/f/f0/Decor_Rock_Clover_%28Rare%29.png/150px-Decor_Rock_Clover_%28Rare%29.png",
+            "winged": "https://pikmin.wiki.gallery/images/thumb/9/91/Decor_Winged_Clover_%28Rare%29.png/150px-Decor_Winged_Clover_%28Rare%29.png",
+            "ice": "https://pikmin.wiki.gallery/images/thumb/9/9b/Decor_Ice_Clover_%28Rare%29.png/132px-Decor_Ice_Clover_%28Rare%29.png"
+          }
+        },
+        {
+          "id": "four-leaf_clover_rare",
+          "name": "四葉草(稀有)",
+          "nameEn": "Four-Leaf Clover (Rare)",
+          "imageUrl": "https://pikmin.wiki.gallery/images/thumb/8/83/Decor_Red_Four-Leaf_Clover_%28Rare%29.png/150px-Decor_Red_Four-Leaf_Clover_%28Rare%29.png",
+          "imageUrls": {
+            "red": "https://pikmin.wiki.gallery/images/thumb/8/83/Decor_Red_Four-Leaf_Clover_%28Rare%29.png/150px-Decor_Red_Four-Leaf_Clover_%28Rare%29.png",
+            "yellow": "https://pikmin.wiki.gallery/images/thumb/2/2d/Decor_Yellow_Four-Leaf_Clover_%28Rare%29.png/150px-Decor_Yellow_Four-Leaf_Clover_%28Rare%29.png",
+            "blue": "https://pikmin.wiki.gallery/images/thumb/d/de/Decor_Blue_Four-Leaf_Clover_%28Rare%29.png/150px-Decor_Blue_Four-Leaf_Clover_%28Rare%29.png",
+            "white": "https://pikmin.wiki.gallery/images/a/a9/Decor_White_Four-Leaf_Clover_%28Rare%29.png",
+            "purple": "https://pikmin.wiki.gallery/images/thumb/d/d8/Decor_Purple_Four-Leaf_Clover_%28Rare%29.png/150px-Decor_Purple_Four-Leaf_Clover_%28Rare%29.png",
+            "rock": "https://pikmin.wiki.gallery/images/thumb/a/a6/Decor_Rock_Four-Leaf_Clover_%28Rare%29.png/150px-Decor_Rock_Four-Leaf_Clover_%28Rare%29.png",
+            "winged": "https://pikmin.wiki.gallery/images/thumb/4/40/Decor_Winged_Four-Leaf_Clover_%28Rare%29.png/150px-Decor_Winged_Four-Leaf_Clover_%28Rare%29.png",
+            "ice": "https://pikmin.wiki.gallery/images/thumb/a/ad/Decor_Ice_Four-Leaf_Clover_%28Rare%29.png/132px-Decor_Ice_Four-Leaf_Clover_%28Rare%29.png"
           }
         }
       ],
@@ -895,7 +929,8 @@
         "white",
         "purple",
         "rock",
-        "winged"
+        "winged",
+        "ice"
       ]
     },
     {

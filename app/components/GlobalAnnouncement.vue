@@ -50,7 +50,7 @@
           <ul class="text-sm text-gray-600 leading-relaxed list-disc list-inside space-y-1">
             <li>
               <span class="inline-flex items-center gap-1.5 align-middle">
-                4/15 號更新韓國泡菜皮克敏
+                4/15 號更新韓國泡菜皮克敏、三葉草/四葉草(稀有)皮克敏，三葉草/四葉草冰皮
               </span>
             </li>
             <li>
