@@ -1833,12 +1833,26 @@
           "nameEn": "Kimchi",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/b/b4/Decor_Purple_Kimchi.png/100px-Decor_Purple_Kimchi.png",
           "imageUrls": {
-            "purple": "https://pikmin.wiki.gallery/images/thumb/b/b4/Decor_Purple_Kimchi.png/100px-Decor_Purple_Kimchi.png"
+            "red": "https://pikmin.wiki.gallery/images/thumb/a/a4/Decor_Red_Kimchi.png/150px-Decor_Red_Kimchi.png",
+            "yellow": "https://pikmin.wiki.gallery/images/thumb/3/31/Decor_Yellow_Kimchi.png/110px-Decor_Yellow_Kimchi.png",
+            "blue": "https://pikmin.wiki.gallery/images/thumb/c/cf/Decor_Blue_Kimchi.png/121px-Decor_Blue_Kimchi.png",
+            "white": "https://pikmin.wiki.gallery/images/thumb/b/ba/Decor_White_Kimchi.png/150px-Decor_White_Kimchi.png",
+            "purple": "https://pikmin.wiki.gallery/images/thumb/b/b4/Decor_Purple_Kimchi.png/150px-Decor_Purple_Kimchi.png",
+            "rock": "https://pikmin.wiki.gallery/images/thumb/f/f2/Decor_Rock_Kimchi.png/150px-Decor_Rock_Kimchi.png",
+            "winged": "https://pikmin.wiki.gallery/images/thumb/b/bb/Decor_Winged_Kimchi.png/150px-Decor_Winged_Kimchi.png",
+            "ice": "https://pikmin.wiki.gallery/images/thumb/4/43/Decor_Ice_Kimchi.png/141px-Decor_Ice_Kimchi.png"
           }
         }
       ],
       "availablePikminTypes": [
-        "purple"
+        "red",
+        "yellow",
+        "blue",
+        "white",
+        "purple",
+        "rock",
+        "winged",
+        "ice"
       ]
     },
     {

@@ -50,7 +50,11 @@
           <ul class="text-sm text-gray-600 leading-relaxed list-disc list-inside space-y-1">
             <li>
               <span class="inline-flex items-center gap-1.5 align-middle">
-                
+                4/15 號更新韓國泡菜皮克敏
+              </span>
+            </li>
+            <li>
+              <span class="inline-flex items-center gap-1.5 align-middle">
                 4/6 號更新馬力歐飾品皮克敏、荷蘭小木鞋皮克敏
               </span>
             </li>
