@@ -654,7 +654,9 @@ const { decorRules, getDecorRule } = useDecorRules();
 const { fetchPOIs, isLoading, error, dataSource, preloadAllRegions } = useLocalFirstPOI();
 const { searchLocation, isSearching, searchError } = useGeocoding();
 // [NEW] Cell Reports Logic
-const { reportedCellIds, fetchReportsForCells, submitReport, isReported, isReportedNotPure, getAddedDecors, hasAddedDecor } = useCellReports();
+const { fetchReportsForCells, submitReport, isReported, isReportedNotPure, getAddedDecors, hasAddedDecor } = useCellReports();
+const REPORT_FETCH_MIN_ZOOM = 17;
+let reportFetchTimer: ReturnType<typeof setTimeout> | null = null;
 const user = useSupabaseUser(); // Get user state for UI checks
 const { 
   config: s2Config,
@@ -1105,10 +1107,12 @@ const onMapMoveEnd = () => {
       associatePOIsToCells();
     }
     
-    // [NEW] Fetch reports for visible cells
-    const cellIds = s2Cells.value.map(c => c.cellId);
-    if (cellIds.length > 0) {
-        fetchReportsForCells(cellIds);
+    if (reportFetchTimer) clearTimeout(reportFetchTimer);
+    if (mapZoom.value >= REPORT_FETCH_MIN_ZOOM) {
+      reportFetchTimer = setTimeout(() => {
+        const cellIds = s2Cells.value.map(c => c.cellId);
+        if (cellIds.length > 0) fetchReportsForCells(cellIds);
+      }, 450);
     }
   }
 
@@ -1765,6 +1769,9 @@ onUnmounted(() => {
   }
   if (searchDebounceTimer) {
     clearTimeout(searchDebounceTimer);
+  }
+  if (reportFetchTimer) {
+    clearTimeout(reportFetchTimer);
   }
   window.removeEventListener('resize', updateWindowWidth);
   leafletMap = null;

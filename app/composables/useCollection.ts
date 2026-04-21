@@ -3,9 +3,15 @@ import { useDecorData } from './useDecorData';
 
 const STORAGE_KEY = 'pikmin-bloom-collection';
 const CURRENT_VERSION = 1;
+const CLOUD_SYNC_DEBOUNCE_MS = 15000;
+const CLOUD_SYNC_DEBOUNCE_SECONDS = CLOUD_SYNC_DEBOUNCE_MS / 1000;
 
 // Global timeout registry for debouncing cloud syncs across all component callers
 let globalSyncTimeout: ReturnType<typeof setTimeout> | null = null;
+let globalCountdownInterval: ReturnType<typeof setInterval> | null = null;
+
+// Sync status type
+type SyncStatus = 'idle' | 'pending' | 'syncing' | 'success' | 'error';
 
 export function useCollection() {
   const { getAllDecorItems, getDecorDefinitions } = useDecorData();
@@ -22,6 +28,12 @@ export function useCollection() {
   // Sync status
   const isSyncing = useState('collection-syncing', () => false);
   const lastSyncTime = useState<string | null>('collection-last-sync', () => null);
+
+  // Debounced upload UI state
+  const syncStatus = useState<SyncStatus>('collection-sync-status', () => 'idle');
+  const syncCountdown = useState<number>('collection-sync-countdown', () => 0);
+  const hasPendingChanges = useState<boolean>('collection-has-pending', () => false);
+  const lastSyncedSignature = useState<string | null>('collection-last-synced-signature', () => null);
 
   // Load from localStorage on client side
   const loadCollection = () => {
@@ -55,23 +67,70 @@ export function useCollection() {
     return new Set(getAllDecorItems().map(item => item.id));
   };
 
+  // Start countdown timer
+  const startCountdown = () => {
+    syncCountdown.value = CLOUD_SYNC_DEBOUNCE_SECONDS;
+    syncStatus.value = 'pending';
+    hasPendingChanges.value = true;
+
+    // Clear existing interval
+    if (globalCountdownInterval) {
+      clearInterval(globalCountdownInterval);
+      globalCountdownInterval = null;
+    }
+
+    globalCountdownInterval = setInterval(() => {
+      syncCountdown.value = Math.max(0, syncCountdown.value - 1);
+      if (syncCountdown.value <= 0) {
+        if (globalCountdownInterval) {
+          clearInterval(globalCountdownInterval);
+          globalCountdownInterval = null;
+        }
+      }
+    }, 1000);
+  };
+
+  // Stop countdown timer
+  const stopCountdown = () => {
+    if (globalCountdownInterval) {
+      clearInterval(globalCountdownInterval);
+      globalCountdownInterval = null;
+    }
+    syncCountdown.value = 0;
+  };
+
+  // Set sync result status and auto-reset after delay
+  const setSyncResult = (status: 'success' | 'error') => {
+    syncStatus.value = status;
+    hasPendingChanges.value = false;
+    setTimeout(() => {
+      // Only reset if status hasn't changed (e.g. user keeps 'error' so they can retry)
+      if (syncStatus.value === 'success') {
+        syncStatus.value = 'idle';
+      }
+    }, 3000);
+  };
+
   // Save to Supabase (if logged in)
-  const saveToCloud = async (): Promise<boolean> => {
-    // Get current session directly from Supabase client
-    const { data: { session } } = await supabase.auth.getSession();
-    
-    if (!session?.user?.id) {
+  const saveToCloud = async (force = false): Promise<boolean> => {
+    const userId = authStore.user.value?.id;
+    if (!userId) {
       console.log('[Collection] No active session, skip cloud sync');
+      syncStatus.value = 'idle';
+      hasPendingChanges.value = false;
       return false;
     }
-    
-    const userId = session.user.id;
-    
+
     try {
       // 過濾掉無效的幽靈 ID，只保存 decor.json 中存在的 ID
       const validIds = getValidItemIds();
       const collectedItems = Object.keys(collectionState.value.collected)
         .filter(id => collectionState.value.collected[id] && validIds.has(id));
+      const signature = collectedItems.slice().sort().join('|');
+
+      if (!force && lastSyncedSignature.value === signature) {
+        return true;
+      }
 
       const rawCount = Object.keys(collectionState.value.collected).filter(id => collectionState.value.collected[id]).length;
       if (rawCount !== collectedItems.length) {
@@ -108,11 +167,14 @@ export function useCollection() {
         }
       }
       
+      lastSyncedSignature.value = signature;
       lastSyncTime.value = new Date().toISOString();
       console.log('[Collection] ✓ Saved to cloud successfully');
+      setSyncResult('success');
       return true;
     } catch (e) {
       console.error('[Collection] Failed to save to cloud:', e);
+      setSyncResult('error');
       return false;
     }
   };
@@ -121,15 +183,11 @@ export function useCollection() {
   // ☁️ 雲端優先策略：已登入時直接使用雲端資料，不做 UNION merge
   // 這樣可以確保多裝置之間的資料一致性，也支援取消標記
   const loadFromCloud = async () => {
-    // Get current session directly from Supabase client
-    const { data: { session } } = await supabase.auth.getSession();
-    
-    if (!session?.user?.id) {
+    const userId = authStore.user.value?.id;
+    if (!userId) {
       console.log('[Collection] No active session, skip loading from cloud');
       return;
     }
-    
-    const userId = session.user.id;
     console.log('[Collection] Loading from cloud for user:', userId);
     
     isSyncing.value = true;
@@ -176,7 +234,7 @@ export function useCollection() {
         // 如果有無效 ID 被過濾掉了，把清理後的資料存回雲端
         if (cloudCount !== validCloudCount) {
           console.log('[Collection] Cleaning up invalid IDs in cloud...');
-          await saveToCloud();
+          await saveToCloud(true);
         }
       } else {
         // 雲端沒資料：如果本地有資料，推送到雲端作為初始資料
@@ -184,7 +242,7 @@ export function useCollection() {
           .filter(id => collectionState.value.collected[id]).length;
         if (localCount > 0) {
           console.log('[Collection] No cloud data found, pushing local data to cloud:', localCount, 'items');
-          await saveToCloud();
+          await saveToCloud(true);
         } else {
           console.log('[Collection] No cloud data and no local data for this user');
         }
@@ -200,10 +258,15 @@ export function useCollection() {
   const saveCollection = () => {
     saveToLocal();
     if (authStore.isAuthenticated.value) {
+      // Reset debounce timer
       if (globalSyncTimeout) clearTimeout(globalSyncTimeout);
+      // Start/reset countdown display
+      startCountdown();
       globalSyncTimeout = setTimeout(() => {
+        stopCountdown();
+        syncStatus.value = 'syncing';
         saveToCloud();
-      }, 5000); // Increased from 2s to 5s to reduce UPSERT frequency
+      }, CLOUD_SYNC_DEBOUNCE_MS);
     }
   };
 
@@ -227,6 +290,17 @@ export function useCollection() {
     saveCollection();
   };
 
+  // Force sync — manually trigger cloud save, clearing any pending debounce
+  const forceSync = async (): Promise<boolean> => {
+    if (globalSyncTimeout) {
+      clearTimeout(globalSyncTimeout);
+      globalSyncTimeout = null;
+    }
+    stopCountdown();
+    syncStatus.value = 'syncing';
+    return await saveToCloud(true);
+  };
+
   // Mark all items in a category as collected
   // ⚡ 批次操作：立即存雲端，不走 debounce，確保大量變更不會因離開頁面而遺失
   const collectAllInCategory = async (categoryId: string) => {
@@ -240,7 +314,9 @@ export function useCollection() {
       clearTimeout(globalSyncTimeout);
       globalSyncTimeout = null;
     }
-    await saveToCloud();
+    stopCountdown();
+    syncStatus.value = 'syncing';
+    await saveToCloud(true);
   };
 
   // Clear all collected items in a category
@@ -255,7 +331,9 @@ export function useCollection() {
       clearTimeout(globalSyncTimeout);
       globalSyncTimeout = null;
     }
-    await saveToCloud();
+    stopCountdown();
+    syncStatus.value = 'syncing';
+    await saveToCloud(true);
   };
 
   // Calculate collection statistics
@@ -377,10 +455,20 @@ export function useCollection() {
     }
   };
 
+  // Cleanup function for component unmounting
+  const cleanupSyncTimers = () => {
+    // Don't clear the actual sync timers (they're global),
+    // but components can call this for local cleanup if needed
+  };
+
   return {
     collectionState: readonly(collectionState),
     isSyncing: readonly(isSyncing),
     lastSyncTime: readonly(lastSyncTime),
+    // Debounced upload UI state
+    syncStatus: readonly(syncStatus),
+    syncCountdown: readonly(syncCountdown),
+    hasPendingChanges: readonly(hasPendingChanges),
     loadCollection,
     loadFromCloud,
     toggleCollected,
@@ -388,11 +476,13 @@ export function useCollection() {
     setCollected,
     collectAllInCategory,
     clearCategory,
+    forceSync,
     getStats,
     exportCollection,
     importCollection,
     resetCollection,
     clearLocalData,
+    cleanupSyncTimers,
   };
 }
 

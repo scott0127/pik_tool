@@ -630,7 +630,6 @@
 </template>
 
 <script setup lang="ts">
-import { createClient } from '@supabase/supabase-js'
 
 interface FriendPost {
   id: string;
@@ -761,26 +760,9 @@ const fetchPosts = async (isLoadMore = false) => {
   error.value = null;
   
   try {
-    // 取得 Supabase 設定 (從現有的 Nuxt Client 提取)
-    const sbUrl = (supabase as any).supabaseUrl || (supabase as any).auth?.url;
-    const sbKey = (supabase as any).supabaseKey || (supabase as any).auth?.headers?.['apikey'];
-
-    if (!sbUrl || !sbKey) {
-      throw new Error('無法取得 Supabase 連線設定');
-    }
-
-    // 建立一個獨立的 Client 來繞過 Nuxt 模組可能的狀態死鎖
-    const manualClient = createClient(sbUrl, sbKey, {
-      auth: {
-        persistSession: false,
-        autoRefreshToken: false,
-      }
-    });
-    
-    // 使用手動 Client 查詢
-    let query = manualClient
+    let query = supabase
       .from('friend_posts')
-      .select('*')
+      .select('id,user_id,username,friend_code,message,regions,created_at')
       .order('created_at', { ascending: false })
       .range(currentOffset.value, currentOffset.value + POSTS_PER_PAGE - 1); // 每次拉取 20 筆
       
@@ -960,6 +942,7 @@ const formatDate = (dateStr: string) => {
 const recommendedPosts = ref<FriendPost[]>([]);
 const recommendationQueue = ref<FriendPost[]>([]);
 let recommendTimer: any = null;
+let filterFetchTimer: ReturnType<typeof setTimeout> | null = null;
 
 // Fisher-Yates Shuffle
 const shuffleArray = <T>(array: T[]): T[] => {
@@ -1132,10 +1115,14 @@ const clearAllFilters = () => {
 
 // 當選擇的地區或分區改變時，重新 fetch
 watch([selectedRegionFilters, selectedCategories, selectedIntentFilters], () => {
-  fetchPosts();
+  if (filterFetchTimer) clearTimeout(filterFetchTimer);
+  filterFetchTimer = setTimeout(() => {
+    fetchPosts();
+  }, 250);
 }, { deep: true });
 
 onUnmounted(() => {
   if (recommendTimer) clearInterval(recommendTimer);
+  if (filterFetchTimer) clearTimeout(filterFetchTimer);
 });
 </script>

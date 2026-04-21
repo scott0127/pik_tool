@@ -144,6 +144,15 @@
         "alerts": {
             "collected_all": "「{category}」已經全部蒐集完成了！",
             "confirm_collect_all": "確定要將「{category}」的 {count} 隻皮克敏全部標記為已蒐集嗎？\n（其中有 {uncollected} 隻尚未蒐集）"
+        },
+        "sync": {
+            "countdown": "{n} 秒後自動上傳",
+            "syncing": "上傳中...",
+            "success": "上傳成功 ✓",
+            "error": "上傳失敗",
+            "force_upload": "立即上傳",
+            "retry": "重試",
+            "unsaved_warning": "您有未儲存的變更，確定要離開嗎？"
         }
     },
     "time": {

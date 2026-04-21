@@ -249,6 +249,9 @@
     </div>
 
 
+    <!-- Sync Status Bar -->
+    <SyncStatusBar />
+
     <!-- Floating Navigation Buttons -->
     <Transition
       enter-active-class="transition duration-300"
@@ -297,6 +300,7 @@ import { DECOR_CATEGORY_TYPES, PIKMIN_TYPE_NAMES, type PikminType, type DecorCat
 const route = useRoute();
 const { t, locale } = useI18n();
 const { isCollected, collectAllInCategory } = useCollection();
+const { hasPendingChanges } = useCollection();
 const { getAllDecorItems, getDecorDefinitions, getItemsByCategoryType, searchItems, getItemsByCategory } = useDecorData();
 
 // Filter state
@@ -357,11 +361,23 @@ onMounted(() => {
   
   // Scroll listener
   window.addEventListener('scroll', handleScroll);
+  
+  // Warn user if they try to leave with unsaved changes
+  window.addEventListener('beforeunload', handleBeforeUnload);
 });
 
 onUnmounted(() => {
   window.removeEventListener('scroll', handleScroll);
+  window.removeEventListener('beforeunload', handleBeforeUnload);
 });
+
+const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+  if (hasPendingChanges.value) {
+    e.preventDefault();
+    // Modern browsers ignore custom messages, but returnValue is still needed
+    e.returnValue = '';
+  }
+};
 
 const handleScroll = () => {
   showScrollTop.value = window.scrollY > 500;

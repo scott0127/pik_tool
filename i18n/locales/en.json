@@ -144,6 +144,15 @@
         "alerts": {
             "collected_all": "\"{category}\" is already fully collected!",
             "confirm_collect_all": "Confirm collecting all {count} Pikmin in \"{category}\"?\n({uncollected} uncollected items)"
+        },
+        "sync": {
+            "countdown": "Auto-upload in {n}s",
+            "syncing": "Uploading...",
+            "success": "Upload successful ✓",
+            "error": "Upload failed",
+            "force_upload": "Upload Now",
+            "retry": "Retry",
+            "unsaved_warning": "You have unsaved changes. Are you sure you want to leave?"
         }
     },
     "time": {

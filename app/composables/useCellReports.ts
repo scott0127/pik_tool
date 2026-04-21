@@ -12,9 +12,12 @@ const fetchedCellIds = new Set<string>();
 const CACHE_KEY = 'pikmin-cell-reports-cache';
 const CACHE_VERSION = 1;
 const CACHE_TTL = 12 * 60 * 60 * 1000; // 12 hours in milliseconds
+const FETCH_BATCH_SIZE = 180;
+const MAX_BATCHES_PER_CALL = 2;
 
 export const useCellReports = () => {
     const supabase = useSupabaseClient<Database>();
+    const user = useSupabaseUser();
     
     // State: Map cellId -> ReportStatus
     const cellReports = reactive<Map<string, ReportStatus>>(new Map());
@@ -140,24 +143,49 @@ export const useCellReports = () => {
         if (!newCellIds.length) return;
 
         try {
-            const { data, error } = await supabase
-                .from('cell_reports')
-                .select('s2_cell_id, report_type, decor_id')
-                .in('s2_cell_id', newCellIds);
+            const limitedCellIds = newCellIds.slice(0, FETCH_BATCH_SIZE * MAX_BATCHES_PER_CALL);
+            for (let i = 0; i < limitedCellIds.length; i += FETCH_BATCH_SIZE) {
+                const batchCellIds = limitedCellIds.slice(i, i + FETCH_BATCH_SIZE);
+                let summaryRows: Array<{ s2_cell_id: string; is_not_pure: boolean; added_decors: string[] | null }> | null = null;
+                const { data: rpcData, error: rpcError } = await supabase
+                    // @ts-ignore: RPC is created by SQL migration
+                    .rpc('get_cell_reports_summary', { cell_ids: batchCellIds });
 
-            if (error) throw error;
-            
-            // 2. Mark these cells as completely fetched regardless of whether they have data
-            newCellIds.forEach(id => fetchedCellIds.add(id));
+                if (!rpcError) {
+                    summaryRows = rpcData as Array<{ s2_cell_id: string; is_not_pure: boolean; added_decors: string[] | null }> | null;
+                } else {
+                    const { data, error } = await supabase
+                        .from('cell_reports')
+                        .select('s2_cell_id, report_type, decor_id')
+                        .in('s2_cell_id', batchCellIds);
 
-            if (data) {
-                data.forEach(row => {
+                    if (error) throw error;
+                    const grouped = new Map<string, { is_not_pure: boolean; added_decors: Set<string> }>();
+                    (data || []).forEach(row => {
+                        if (!grouped.has(row.s2_cell_id)) {
+                            grouped.set(row.s2_cell_id, { is_not_pure: false, added_decors: new Set() });
+                        }
+                        const bucket = grouped.get(row.s2_cell_id)!;
+                        if (row.report_type === 'not_pure') bucket.is_not_pure = true;
+                        if (row.report_type === 'missing_decor' && row.decor_id) bucket.added_decors.add(row.decor_id);
+                    });
+                    summaryRows = Array.from(grouped.entries()).map(([s2_cell_id, value]) => ({
+                        s2_cell_id,
+                        is_not_pure: value.is_not_pure,
+                        added_decors: Array.from(value.added_decors),
+                    }));
+                }
+
+                // 2. Mark batch as fetched regardless of whether it has data
+                batchCellIds.forEach(id => fetchedCellIds.add(id));
+
+                if (!summaryRows) continue;
+                summaryRows.forEach(row => {
                     const status = getReportStatus(row.s2_cell_id);
-                    if (row.report_type === 'not_pure') {
+                    if (row.is_not_pure) {
                         status.isNotPure = true;
-                    } else if (row.report_type === 'missing_decor' && row.decor_id) {
-                        status.addedDecors.add(row.decor_id);
                     }
+                    (row.added_decors || []).forEach(decorId => status.addedDecors.add(decorId));
                 });
             }
             
@@ -170,8 +198,7 @@ export const useCellReports = () => {
 
     // Submit a report
     const submitReport = async (cellId: string, reportType: 'not_pure' | 'missing_decor', decorId?: string) => {
-        const user = await supabase.auth.getUser();
-        if (!user.data.user) throw new Error('必須登入才能回報');
+        if (!user.value?.id) throw new Error('必須登入才能回報');
 
         // Optimistic Update
         const status = getReportStatus(cellId);
@@ -192,7 +219,7 @@ export const useCellReports = () => {
             .from('cell_reports')
             .insert({
                 s2_cell_id: cellId,
-                user_id: user.data.user.id,
+                user_id: user.value.id,
                 report_type: reportType,
                 decor_id: decorId || null
             });
