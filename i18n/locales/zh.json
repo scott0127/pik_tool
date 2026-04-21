@@ -148,6 +148,7 @@
         "sync": {
             "countdown": "{n} 秒後自動上傳",
             "syncing": "上傳中...",
+            "retrying": "重試中 ({k}/{n})",
             "success": "上傳成功 ✓",
             "error": "上傳失敗",
             "force_upload": "立即上傳",

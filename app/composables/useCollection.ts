@@ -10,6 +10,11 @@ const CLOUD_SYNC_DEBOUNCE_SECONDS = CLOUD_SYNC_DEBOUNCE_MS / 1000;
 let globalSyncTimeout: ReturnType<typeof setTimeout> | null = null;
 let globalCountdownInterval: ReturnType<typeof setInterval> | null = null;
 
+// Cooldown for loadFromCloud to avoid redundant egress
+const CLOUD_LOAD_COOLDOWN_MS = 5 * 60 * 1000; // 5 minutes
+let lastCloudLoadTime: number = 0;
+let lastCloudLoadUserId: string | null = null;
+
 // Sync status type
 type SyncStatus = 'idle' | 'pending' | 'syncing' | 'success' | 'error';
 
@@ -33,6 +38,7 @@ export function useCollection() {
   const syncStatus = useState<SyncStatus>('collection-sync-status', () => 'idle');
   const syncCountdown = useState<number>('collection-sync-countdown', () => 0);
   const hasPendingChanges = useState<boolean>('collection-has-pending', () => false);
+  const syncRetryAttempt = useState<number>('collection-sync-retry', () => 0);
   const lastSyncedSignature = useState<string | null>('collection-last-synced-signature', () => null);
 
   // Load from localStorage on client side
@@ -103,6 +109,7 @@ export function useCollection() {
   const setSyncResult = (status: 'success' | 'error') => {
     syncStatus.value = status;
     hasPendingChanges.value = false;
+    syncRetryAttempt.value = 0;
     setTimeout(() => {
       // Only reset if status hasn't changed (e.g. user keeps 'error' so they can retry)
       if (syncStatus.value === 'success') {
@@ -111,7 +118,62 @@ export function useCollection() {
     }, 3000);
   };
 
-  // Save to Supabase (if logged in)
+  // Helper: race a promise against a timeout
+  const withTimeout = <T>(promise: PromiseLike<T>, ms: number, label: string): Promise<T> => {
+    return new Promise((resolve, reject) => {
+      const timer = setTimeout(() => {
+        reject(new Error(`[Collection] ${label} timed out after ${ms / 1000}s`));
+      }, ms);
+      promise.then(
+        (val) => { clearTimeout(timer); resolve(val); },
+        (err) => { clearTimeout(timer); reject(err); },
+      );
+    });
+  };
+
+  const SAVE_TIMEOUT_MS = 10000; // 10 seconds — anything longer is abnormal
+  const MAX_SAVE_RETRIES = 3;
+
+  // Core upsert logic (single attempt)
+  const attemptSaveToCloud = async (userId: string, collectedItems: string[]): Promise<void> => {
+    // Try upsert first
+    const upsertResult = await withTimeout(
+      supabase
+        .from('user_collections')
+        .upsert({
+          user_id: userId,
+          collected_items: collectedItems,
+          updated_at: new Date().toISOString(),
+        }, {
+          onConflict: 'user_id',
+        }),
+      SAVE_TIMEOUT_MS,
+      'Upsert'
+    ) as { error: any };
+
+    if (upsertResult?.error) {
+      console.warn('[Collection] Upsert failed:', upsertResult.error);
+
+      // Try insert if upsert failed (might be first time)
+      const insertResult = await withTimeout(
+        supabase
+          .from('user_collections')
+          .insert({
+            user_id: userId,
+            collected_items: collectedItems,
+            updated_at: new Date().toISOString(),
+          }),
+        SAVE_TIMEOUT_MS,
+        'Insert fallback'
+      ) as { error: any };
+
+      if (insertResult?.error && insertResult.error.code !== '23505') { // 23505 = unique violation
+        throw insertResult.error;
+      }
+    }
+  };
+
+  // Save to Supabase (if logged in) — with timeout + auto-retry
   const saveToCloud = async (force = false): Promise<boolean> => {
     const userId = authStore.user.value?.id;
     if (!userId) {
@@ -136,42 +198,38 @@ export function useCollection() {
       if (rawCount !== collectedItems.length) {
         console.log(`[Collection] Filtered out ${rawCount - collectedItems.length} invalid/phantom IDs before saving`);
       }
-      
-      console.log('[Collection] Saving to cloud for user:', userId, '-', collectedItems.length, 'items');
-      
-      // Try upsert first
-      const { error: upsertError } = await supabase
-        .from('user_collections')
-        .upsert({
-          user_id: userId,
-          collected_items: collectedItems,
-          updated_at: new Date().toISOString(),
-        }, {
-          onConflict: 'user_id',
-        });
-      
-      if (upsertError) {
-        console.error('[Collection] Upsert failed:', upsertError);
-        
-        // Try insert if upsert failed (might be first time)
-        const { error: insertError } = await supabase
-          .from('user_collections')
-          .insert({
-            user_id: userId,
-            collected_items: collectedItems,
-            updated_at: new Date().toISOString(),
-          });
-        
-        if (insertError && insertError.code !== '23505') { // 23505 = unique violation (already exists)
-          throw insertError;
+
+      // Retry loop with timeout
+      let lastError: unknown = null;
+      for (let attempt = 1; attempt <= MAX_SAVE_RETRIES; attempt++) {
+        try {
+          console.log(`[Collection] Saving to cloud (attempt ${attempt}/${MAX_SAVE_RETRIES}) for user: ${userId} - ${collectedItems.length} items`);
+          syncRetryAttempt.value = attempt;
+          await attemptSaveToCloud(userId, collectedItems);
+
+          // Success
+          syncRetryAttempt.value = 0;
+          lastSyncedSignature.value = signature;
+          lastSyncTime.value = new Date().toISOString();
+          console.log('[Collection] ✓ Saved to cloud successfully');
+          setSyncResult('success');
+          return true;
+        } catch (err) {
+          lastError = err;
+          console.warn(`[Collection] Attempt ${attempt}/${MAX_SAVE_RETRIES} failed:`, err instanceof Error ? err.message : err);
+          if (attempt < MAX_SAVE_RETRIES) {
+            // Short delay before retry (1s, 2s)
+            const delay = attempt * 1000;
+            console.log(`[Collection] Retrying in ${delay / 1000}s...`);
+            await new Promise(r => setTimeout(r, delay));
+          }
         }
       }
-      
-      lastSyncedSignature.value = signature;
-      lastSyncTime.value = new Date().toISOString();
-      console.log('[Collection] ✓ Saved to cloud successfully');
-      setSyncResult('success');
-      return true;
+
+      // All retries exhausted
+      console.error('[Collection] All save attempts failed:', lastError);
+      setSyncResult('error');
+      return false;
     } catch (e) {
       console.error('[Collection] Failed to save to cloud:', e);
       setSyncResult('error');
@@ -182,12 +240,19 @@ export function useCollection() {
   // Load from Supabase (if logged in)
   // ☁️ 雲端優先策略：已登入時直接使用雲端資料，不做 UNION merge
   // 這樣可以確保多裝置之間的資料一致性，也支援取消標記
-  const loadFromCloud = async () => {
+  const loadFromCloud = async (force = false) => {
     const userId = authStore.user.value?.id;
     if (!userId) {
       console.log('[Collection] No active session, skip loading from cloud');
       return;
     }
+
+    // Skip if we already loaded for this user within cooldown period
+    if (!force && lastCloudLoadUserId === userId && (Date.now() - lastCloudLoadTime) < CLOUD_LOAD_COOLDOWN_MS) {
+      console.log(`[Collection] Skipping cloud load — last loaded ${Math.round((Date.now() - lastCloudLoadTime) / 1000)}s ago for same user`);
+      return;
+    }
+
     console.log('[Collection] Loading from cloud for user:', userId);
     
     isSyncing.value = true;
@@ -251,6 +316,9 @@ export function useCollection() {
       console.error('[Collection] Failed to load from cloud:', e);
     } finally {
       isSyncing.value = false;
+      // Record successful load time regardless of result (even empty = valid)
+      lastCloudLoadTime = Date.now();
+      lastCloudLoadUserId = userId;
     }
   };
 
@@ -469,6 +537,7 @@ export function useCollection() {
     syncStatus: readonly(syncStatus),
     syncCountdown: readonly(syncCountdown),
     hasPendingChanges: readonly(hasPendingChanges),
+    syncRetryAttempt: readonly(syncRetryAttempt),
     loadCollection,
     loadFromCloud,
     toggleCollected,

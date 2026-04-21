@@ -30,7 +30,7 @@
         </button>
       </div>
 
-      <!-- Syncing: spinner -->
+      <!-- Syncing: spinner + retry info -->
       <div
         v-else-if="syncStatus === 'syncing'"
         class="sync-bar sync-bar-syncing"
@@ -41,7 +41,12 @@
             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
           </svg>
           <span class="text-xs sm:text-sm font-medium text-gray-700">
-            {{ $t('collection.sync.syncing') }}
+            <template v-if="syncRetryAttempt > 1">
+              {{ $t('collection.sync.retrying', { k: syncRetryAttempt, n: 3 }) }}
+            </template>
+            <template v-else>
+              {{ $t('collection.sync.syncing') }}
+            </template>
           </span>
         </div>
       </div>
@@ -82,7 +87,7 @@
 </template>
 
 <script setup lang="ts">
-const { syncStatus, syncCountdown, hasPendingChanges, forceSync } = useCollection();
+const { syncStatus, syncCountdown, hasPendingChanges, syncRetryAttempt, forceSync } = useCollection();
 const authStore = useAuthStore();
 
 const isVisible = computed(() => {

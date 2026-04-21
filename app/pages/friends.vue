@@ -658,6 +658,49 @@ const hasMorePosts = ref(true);
 const loadingMore = ref(false);
 const POSTS_PER_PAGE = 20;
 
+// --- Friends Cache (reduce Supabase egress) ---
+const FRIENDS_CACHE_KEY = 'pikmin-friends-cache-v1';
+const FRIENDS_CACHE_TTL = 2 * 60 * 1000; // 2 minutes
+
+interface FriendsCache {
+  data: FriendPost[];
+  filterSig: string;
+  ts: number;
+}
+
+const buildFilterSignature = (): string => {
+  const parts = [
+    ...selectedRegionFilters.value.sort(),
+    ...selectedCategories.value.sort(),
+    ...selectedIntentFilters.value.sort(),
+  ];
+  return parts.join('|') || '__all__';
+};
+
+const readFriendsCache = (sig: string): FriendPost[] | null => {
+  if (!import.meta.client) return null;
+  try {
+    const raw = sessionStorage.getItem(FRIENDS_CACHE_KEY);
+    if (!raw) return null;
+    const cache: FriendsCache = JSON.parse(raw);
+    if (cache.filterSig !== sig) return null;
+    if (Date.now() - cache.ts > FRIENDS_CACHE_TTL) return null;
+    return cache.data;
+  } catch { return null; }
+};
+
+const writeFriendsCache = (data: FriendPost[], sig: string) => {
+  if (!import.meta.client) return;
+  try {
+    const cache: FriendsCache = { data, filterSig: sig, ts: Date.now() };
+    sessionStorage.setItem(FRIENDS_CACHE_KEY, JSON.stringify(cache));
+  } catch { /* noop */ }
+};
+
+const invalidateFriendsCache = () => {
+  if (import.meta.client) sessionStorage.removeItem(FRIENDS_CACHE_KEY);
+};
+
 // 導入地區常數
 import { FRIEND_REGIONS, ALL_REGION_OPTIONS } from '~/constants/regions';
 import { FRIEND_INTENTS, ALL_INTENT_OPTIONS } from '~/constants/intents';
@@ -760,11 +803,24 @@ const fetchPosts = async (isLoadMore = false) => {
   error.value = null;
   
   try {
+    // Check cache for first page (non-loadMore) requests
+    if (!isLoadMore) {
+      const sig = buildFilterSignature();
+      const cached = readFriendsCache(sig);
+      if (cached) {
+        posts.value = cached;
+        hasMorePosts.value = cached.length === POSTS_PER_PAGE;
+        console.log('[Friends] Using cached data:', cached.length, 'posts');
+        loading.value = false;
+        return;
+      }
+    }
+
     let query = supabase
       .from('friend_posts')
       .select('id,user_id,username,friend_code,message,regions,created_at')
       .order('created_at', { ascending: false })
-      .range(currentOffset.value, currentOffset.value + POSTS_PER_PAGE - 1); // 每次拉取 20 筆
+      .range(currentOffset.value, currentOffset.value + POSTS_PER_PAGE - 1);
       
     // 合併篩選邏輯：地區 + 目的
     let targetTags: string[] = [...selectedRegionFilters.value, ...selectedIntentFilters.value];
@@ -788,13 +844,14 @@ const fetchPosts = async (isLoadMore = false) => {
     if (err) throw err;
     
     if (data) {
-      // 判斷是否還有下一頁
       hasMorePosts.value = data.length === POSTS_PER_PAGE;
       
       if (isLoadMore) {
         posts.value.push(...data);
       } else {
         posts.value = data;
+        // Save to cache (first page only)
+        writeFriendsCache(data, buildFilterSignature());
       }
     } else {
       hasMorePosts.value = false;
@@ -883,6 +940,7 @@ const submitPost = async () => {
     newPost.value.regions = [];
     newPost.value.intents = [];
     newPost.value.postcardInput = '';
+    invalidateFriendsCache();
     await fetchPosts();
   } catch (e: any) {
     console.error('Failed to submit post:', e);
@@ -903,6 +961,7 @@ const deletePost = async (postId: string) => {
       .eq('id', postId);
     
     if (error) throw error;
+    invalidateFriendsCache();
     await fetchPosts();
   } catch (e) {
     console.error('Failed to delete post:', e);
@@ -1116,9 +1175,11 @@ const clearAllFilters = () => {
 // 當選擇的地區或分區改變時，重新 fetch
 watch([selectedRegionFilters, selectedCategories, selectedIntentFilters], () => {
   if (filterFetchTimer) clearTimeout(filterFetchTimer);
+  // Invalidate cache so the new filter combination goes to Supabase
+  invalidateFriendsCache();
   filterFetchTimer = setTimeout(() => {
     fetchPosts();
-  }, 250);
+  }, 800);
 }, { deep: true });
 
 onUnmounted(() => {

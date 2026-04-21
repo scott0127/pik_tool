@@ -148,6 +148,7 @@
         "sync": {
             "countdown": "Auto-upload in {n}s",
             "syncing": "Uploading...",
+            "retrying": "Retrying ({k}/{n})",
             "success": "Upload successful ✓",
             "error": "Upload failed",
             "force_upload": "Upload Now",

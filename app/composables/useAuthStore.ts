@@ -45,25 +45,35 @@ export const useAuthStore = () => {
         
         console.log('[AuthStore] Initial session:', !!currentSession);
 
+        const fetchAdminStatus = async (userId: string) => {
+          try {
+            // @ts-ignore: admins table not yet in Database types
+            const { data } = await supabase.from('admins').select('user_id').eq('user_id', userId).maybeSingle();
+            isAdmin.value = !!data;
+          } catch (e) {
+            console.error('[AuthStore] Failed to fetch admin status:', e);
+            isAdmin.value = false;
+          }
+        };
+
         if (user.value) {
-          // @ts-ignore: admins table not yet in Database types
-          const { data } = await supabase.from('admins').select('user_id').eq('user_id', user.value.id).maybeSingle();
-          isAdmin.value = !!data;
+          await fetchAdminStatus(user.value.id);
         } else {
           isAdmin.value = false;
         }
 
         // 监听后续 auth 变化
-        supabase.auth.onAuthStateChange(async (event: string, newSession: any) => {
+        // CRITICAL FIX: Do NOT use `await` on Supabase API calls inside this listener.
+        // It causes a known deadlock in the Supabase queue, making all subsequent queries hang!
+        supabase.auth.onAuthStateChange((event: string, newSession: any) => {
           console.log('[AuthStore] Auth state changed:', event);
           
           session.value = newSession;
           user.value = newSession?.user ?? null;
 
           if (user.value) {
-            // @ts-ignore: admins table not yet in Database types
-            const { data } = await supabase.from('admins').select('user_id').eq('user_id', user.value.id).maybeSingle();
-            isAdmin.value = !!data;
+            // Fire and forget (do not await)
+            fetchAdminStatus(user.value.id);
           } else {
             isAdmin.value = false;
           }
