@@ -50,12 +50,7 @@
           <ul class="text-sm text-gray-600 leading-relaxed list-disc list-inside space-y-1">
             <li>
               <span class="inline-flex items-center gap-1.5 align-middle">
-                4/15 號更新韓國泡菜皮克敏、三葉草/四葉草(稀有)皮克敏，三葉草/四葉草冰皮
-              </span>
-            </li>
-            <li>
-              <span class="inline-flex items-center gap-1.5 align-middle">
-                4/6 號更新馬力歐飾品皮克敏、荷蘭小木鞋皮克敏
+                4/26 號更新地圖，優化地圖面積邏輯與準確度。
               </span>
             </li>
             <li>3/14 主頁現在會顯示<span class="text-green-600 font-medium">當月全新與復刻的裝飾品</span>皮克敏了!新增<span class="bg-gradient-to-r from-yellow-400 via-red-500 to-purple-600 bg-clip-text text-transparent font-bold">彩色粉末皮克敏系列</span></li>
