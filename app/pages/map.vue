@@ -52,7 +52,7 @@
               <LPopup v-if="isGridMode">
                 <div class="min-w-[200px] p-2">
                   <div class="font-bold text-gray-800 text-sm mb-2 flex items-center gap-2">
-                    <span>🔲</span>
+                    <Icon name="lucide:grid-3x3" class="w-4 h-4 text-emerald-600" />
                     <span>S2 Cell L17</span>
                   </div>
                   <div class="text-xs text-gray-500 mb-3 font-mono break-all">
@@ -68,7 +68,8 @@
                         :key="decorId"
                         class="inline-flex items-center gap-1 px-2 py-1 bg-emerald-50 text-emerald-700 rounded text-xs"
                       >
-                        <span>{{ getDecorInfo(decorId)?.icon }}</span>
+                        <Icon v-if="getDecorInfo(decorId)?.iconName" :name="getDecorInfo(decorId)!.iconName!" class="w-3.5 h-3.5" />
+                        <span v-else>{{ getDecorInfo(decorId)?.icon }}</span>
                         <span>{{ getDecorInfo(decorId)?.name }}</span>
                       </span>
                       
@@ -79,9 +80,10 @@
                         class="inline-flex items-center gap-1 px-2 py-1 bg-blue-50 text-blue-700 rounded text-xs border border-blue-200"
                         :title="$t('map.cell_info.user_reported')"
                       >
-                        <span>{{ getDecorInfo(decorId)?.icon }}</span>
+                        <Icon v-if="getDecorInfo(decorId)?.iconName" :name="getDecorInfo(decorId)!.iconName!" class="w-3.5 h-3.5" />
+                        <span v-else>{{ getDecorInfo(decorId)?.icon }}</span>
                         <span>{{ getDecorInfo(decorId)?.name }}</span>
-                        <span class="text-[10px]">👤</span>
+                        <Icon name="lucide:user" class="w-3 h-3 text-blue-400" />
                       </span>
                     </div>
 
@@ -98,7 +100,7 @@
                       <div class="space-y-1">
                           <!-- Not Pure Warning -->
                           <div v-if="isReported(cell.cellId)" class="w-full bg-purple-50 text-purple-700 font-bold px-2 py-1.5 rounded flex items-center gap-1.5 border border-purple-200 text-xs text-left">
-                              <span>⚠️</span>
+                              <Icon name="lucide:alert-triangle" class="w-3.5 h-3.5 shrink-0" />
                               <span>{{ $t('map.report.impure_warning') }}</span>
                           </div>
                            
@@ -116,9 +118,9 @@
                               <!-- Report Missing Decor -->
                               <button 
                                   @click="openDecorSelector(cell.cellId)"
-                                  class="col-span-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-600 hover:text-emerald-700 px-2 py-1.5 rounded border border-emerald-200 hover:border-emerald-300 text-xs font-medium transition-colors flex items-center justify-center gap-1"
+                                  class="col-span-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-600 hover:text-emerald-700 px-2 py-1.5 rounded border border-emerald-200 hover:border-emerald-300 text-xs font-medium transition-colors flex items-center justify-center gap-1 cursor-pointer"
                               >
-                                  <span>➕</span>
+                                  <Icon name="lucide:plus" class="w-3.5 h-3.5" />
                                   <span>{{ $t('map.report.missing') }}</span>
                               </button>
                            </div>
@@ -146,7 +148,8 @@
               <LPopup>
                 <div class="min-w-[160px] p-1">
                   <div class="text-xs text-gray-600 flex items-center gap-2 mb-2">
-                    <span class="text-lg">{{ getDecorInfo(Array.from(cell.decorTypes)[0])?.icon }}</span>
+                    <Icon v-if="getDecorInfo(Array.from(cell.decorTypes)[0])?.iconName" :name="getDecorInfo(Array.from(cell.decorTypes)[0])!.iconName!" class="w-5 h-5" />
+                    <span v-else class="text-lg">{{ getDecorInfo(Array.from(cell.decorTypes)[0])?.icon }}</span>
                     <span class="font-bold">{{ getDecorInfo(Array.from(cell.decorTypes)[0])?.name }}</span>
                     <span class="text-emerald-600 text-[10px] border border-emerald-200 px-1 rounded bg-emerald-50">{{ $t('map.modes.pure') }}</span>
                   </div>
@@ -154,7 +157,7 @@
                   <!-- Report Status / Action -->
                   <div class="text-xs border-t border-gray-100 pt-2 mt-1">
                       <div v-if="isReported(cell.cellId)" class="bg-purple-50 text-purple-700 font-bold px-2 py-1.5 rounded flex items-center gap-1.5 border border-purple-200 mb-1">
-                          <span>⚠️</span>
+                          <Icon name="lucide:alert-triangle" class="w-3.5 h-3.5 shrink-0" />
                           <span>{{ $t('map.report.impure_warning') }}</span>
                       </div>
                        <button 
@@ -183,33 +186,14 @@
                   :icon-size="[0, 0]"
                   class-name="cell-badge-container"
                 >
-                  <!-- 自定義 HTML 內容 - 確保點擊事件能穿透到下層 LMarker/LPopup -->
-                  <div 
-                    class="absolute -translate-x-1/2 -translate-y-1/2 flex flex-col items-center pointer-events-none"
-                    style="width: 80px;"
-                  >
-                    <!-- 飾品圖示群組 (Top) -->
-                    <div class="flex items-center justify-center gap-0.5 mb-0.5 bg-white/95 rounded-full px-1.5 py-1 shadow-sm border border-emerald-100 backdrop-blur-sm">
-                        <!-- 顯示前 3 個圖示 (No text here) -->
-                        <div 
-                            v-for="decorId in Array.from(getEffectiveDecors(cell)).slice(0, 3)" 
-                            :key="decorId"
-                            class="w-4 h-4 flex items-center justify-center"
-                        >
-                            <span class="text-sm leading-none">
-                            {{ getDecorInfo(decorId)?.icon }}
-                            </span>
-                        </div>
-                        <span v-if="getEffectiveDecors(cell).size > 3" class="text-[10px] text-gray-400 leading-none">...</span>
-                    </div>
-                    
-                    <!-- 底部徽章群組 -->
-                    <div class="flex items-center gap-1 mt-0.5">
-                        <!-- 飾品總數徽章 (Moved Here) -->
-                        <div class="bg-gray-800 text-white text-[10px] md:text-xs font-bold px-1.5 py-0.5 rounded-full shadow-sm border border-white">
-                            {{ getEffectiveDecors(cell).size }}{{$t('map.cell_info.types_unit')}}
-                        </div>
-                    </div>
+                  <!-- 放射狀徽章組件 -->
+                  <div class="absolute -translate-x-1/2 -translate-y-1/2 pointer-events-none">
+                    <MapRadialBadge
+                      :items="getRadialItems(cell)"
+                      :count="getEffectiveDecors(cell).size"
+                      :size="90"
+                      :max-display="7"
+                    />
                   </div>
                 </LIcon>
               </LMarker>
@@ -253,8 +237,8 @@
                 <div v-else class="text-4xl mb-2">{{ poi.decorIcon }}</div>
                 <div class="font-bold text-gray-800 text-base mb-1">{{ poi.name }}</div>
                 <div class="text-sm text-emerald-600 font-medium mb-2">{{ poi.decorName }}</div>
-                <div class="text-xs text-gray-400">
-                  📍 {{ poi.lat.toFixed(5) }}, {{ poi.lon.toFixed(5) }}
+                <div class="text-xs text-gray-400 flex items-center justify-center gap-1">
+                  <Icon name="lucide:map-pin" class="w-3 h-3" /> {{ poi.lat.toFixed(5) }}, {{ poi.lon.toFixed(5) }}
                 </div>
               </div>
             </LPopup>
@@ -293,7 +277,7 @@
                     <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[24px] h-[24px] bg-blue-900 rounded-full overflow-hidden border border-blue-300/50 flex items-center justify-center">
                       <!-- Radar Sweep Animation -->
                       <div class="absolute inset-0 bg-gradient-to-tr from-green-400/0 via-green-400/50 to-green-400/0 animate-spin origin-bottom-left" style="width: 50%; height: 50%; top: 50%; left: 50%;"></div>
-                      <span class="relative z-10 text-[10px]">📡</span>
+                      <Icon name="lucide:radar" class="relative z-10 w-3 h-3 text-green-300" />
                     </div>
                   </div>
                   
@@ -306,7 +290,7 @@
                   <!-- Persistent Hint Label -->
                   <div class="absolute top-full left-1/2 -translate-x-1/2 mt-2 whitespace-nowrap pointer-events-none z-[1000]">
                     <div class="bg-gray-900/80 backdrop-blur text-white text-[10px] px-2 py-1 rounded-full shadow-lg border border-white/20 flex items-center gap-1">
-                       <span>✋</span>
+                       <Icon name="lucide:hand" class="w-3 h-3" />
                        <span>可拖曳</span>
                     </div>
                   </div>
@@ -316,7 +300,7 @@
                 <div class="text-center p-1">
                   <div class="font-bold text-blue-600 mb-0.5">掃描器範圍</div>
                   <div class="text-[10px] text-gray-500 mb-2 flex flex-col gap-0.5">
-                    <span class="text-blue-500">🔵 範圍：120m</span>
+                    <span class="text-blue-500 flex items-center gap-1"><Icon name="lucide:scan" class="w-3 h-3" /> 範圍：120m</span>
                   </div>
                   <button 
                     @click="scannerPinLocation = null"
@@ -476,7 +460,7 @@
                 class="md:hidden absolute right-0 top-full mt-2 w-56 bg-gray-900/95 text-white text-xs rounded-xl p-3 shadow-xl z-[2000] backdrop-blur-sm border border-emerald-500/30"
               >
                 <div class="flex items-start gap-2">
-                  <span class="text-lg">🦄</span>
+                  <Icon name="lucide:sparkles" class="w-5 h-5 text-emerald-400 shrink-0" />
                   <div>
                     <div class="font-bold text-emerald-300 mb-1">純種區模式</div>
                     <p class="leading-relaxed">此區域僅判定為一種飾品（或路邊），不混雜其他類型，專為精準鎖定設計。</p>
@@ -567,10 +551,10 @@
           v-if="showSearchResult"
           class="absolute top-28 md:top-32 left-1/2 -translate-x-1/2 bg-white rounded-xl px-4 py-2 shadow-lg z-[1000] border border-emerald-200"
         >
-          <span class="text-sm text-emerald-600 font-medium">
-            🎉 找到 {{ fetchedPoints.length }} 個飾品地點！
-            <span v-if="dataSource === 'local'" class="ml-1 text-xs bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded-full">📦 本地</span>
-            <span v-else-if="dataSource === 'api'" class="ml-1 text-xs bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded-full">🌐 API</span>
+          <span class="text-sm text-emerald-600 font-medium inline-flex items-center gap-1.5">
+            <Icon name="lucide:check-circle" class="w-4 h-4" /> 找到 {{ fetchedPoints.length }} 個飾品地點！
+            <span v-if="dataSource === 'local'" class="ml-1 text-xs bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded-full inline-flex items-center gap-1"><Icon name="lucide:hard-drive" class="w-3 h-3" /> 本地</span>
+            <span v-else-if="dataSource === 'api'" class="ml-1 text-xs bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded-full inline-flex items-center gap-1"><Icon name="lucide:globe" class="w-3 h-3" /> API</span>
           </span>
         </div>
       </Transition>
@@ -586,9 +570,9 @@
       >
         <div
           v-if="isSingleMode && (isSingleTypeCellsLoading || isSingleTypeCellsRendering)"
-          class="absolute top-16 left-1/2 -translate-x-1/2 bg-white rounded-full px-3 py-1 shadow-md z-[1000] border border-emerald-200 text-xs text-emerald-700 flex items-center gap-2"
+          class="absolute top-16 left-1/2 -translate-x-1/2 bg-white rounded-full px-3 py-1.5 shadow-md z-[1000] border border-emerald-200 text-xs text-emerald-700 flex items-center gap-2"
         >
-          <span class="animate-spin">⏳</span>
+          <svg class="animate-spin w-3.5 h-3.5 text-emerald-500" viewBox="0 0 24 24" fill="none"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" /><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
           <span>純種區載入中…</span>
         </div>
 
@@ -607,7 +591,7 @@
           v-if="showGridZoomWarning && isGridMode"
           class="absolute bottom-20 left-1/2 -translate-x-1/2 bg-gray-900/90 text-white rounded-full px-4 py-2 shadow-xl z-[1000] backdrop-blur-sm border border-gray-700 flex items-center gap-2"
         >
-          <span class="text-xl">🔍</span>
+          <Icon name="lucide:zoom-in" class="w-5 h-5 text-blue-400" />
           <div class="flex flex-col">
             <span class="font-bold text-sm">請放大地圖以顯示網格</span>
             <span class="text-[10px] text-gray-400">目前縮放等級: {{ mapZoom }} (需 ≥ {{ GRID_MIN_ZOOM }})</span>
@@ -1585,6 +1569,18 @@ const getIconSizeClass = (): string => {
   if (zoom >= 16) return 'size-md';
   if (zoom >= 15) return 'size-sm';
   return 'size-xs';
+};
+
+// 將 cell 的 decor Set 轉換為 RadialBadge 元件格式
+const getRadialItems = (cell: any) => {
+  return Array.from(getEffectiveDecors(cell)).map((decorId: string) => {
+    const info = getDecorInfo(decorId);
+    return {
+      id: decorId,
+      iconName: info?.iconName,
+      icon: info?.icon,
+    };
+  });
 };
 
 // 獲取飾品資訊

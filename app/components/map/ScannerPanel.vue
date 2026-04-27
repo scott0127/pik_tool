@@ -22,7 +22,7 @@
         <div class="flex items-center justify-between mb-4 relative z-10">
           <div class="flex items-center gap-2">
             <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center">
-              <span class="text-sm">📡</span>
+              <Icon name="lucide:radar" class="w-4 h-4" />
             </div>
             <div>
               <h3 class="font-bold text-gray-800 leading-tight">探測器預測</h3>
@@ -34,9 +34,7 @@
             @click="$emit('close')"
             class="w-8 h-8 rounded-full bg-gray-100 text-gray-500 flex items-center justify-center hover:bg-gray-200 hover:text-gray-700 transition-colors active:scale-95"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-            </svg>
+            <Icon name="lucide:x" class="h-4 w-4" />
           </button>
         </div>
 
@@ -50,7 +48,7 @@
 
           <!-- Empty State -->
           <div v-else-if="predictedDecors.length === 0" class="flex flex-col items-center justify-center py-6 gap-2 opacity-80">
-            <span class="text-4xl filter grayscale opacity-50">🍃</span>
+            <Icon name="lucide:leaf" class="w-10 h-10 text-gray-300" />
             <p class="text-sm text-gray-500 font-medium">附近好像什麼都沒有...</p>
             <p class="text-xs text-gray-400">試著移動掃描器到其他地方</p>
           </div>
@@ -72,7 +70,8 @@
                     :key="decor.id"
                     class="flex flex-col items-center justify-center w-[60px] h-[68px] bg-white rounded-2xl shadow-sm border border-gray-100 hover:shadow-md hover:-translate-y-1 transition-all"
                   >
-                    <span class="text-2xl mb-1 drop-shadow-sm">{{ decor.icon }}</span>
+                    <Icon v-if="decor.iconName" :name="decor.iconName" class="w-7 h-7 mb-1 drop-shadow-sm" />
+                    <span v-else class="text-2xl mb-1 drop-shadow-sm">{{ decor.icon }}</span>
                     <span class="text-[10px] text-gray-600 font-medium w-full text-center truncate px-1">{{ decor.name }}</span>
                   </div>
                 </TransitionGroup>
@@ -96,7 +95,7 @@
              </div>
 
              <div class="bg-blue-50 border border-blue-100 rounded-xl p-2.5 flex items-start gap-2">
-                <span class="text-blue-500 mt-0.5">ℹ️</span>
+                <Icon name="lucide:info" class="w-4 h-4 text-blue-500 mt-0.5 shrink-0" />
                 <p class="text-xs text-blue-700 leading-relaxed font-medium">
                   真實遊戲通常只會顯示最多 6 種圖示。使用雷達必定會出現在清單中顯示的其中一種飾品。
                 </p>

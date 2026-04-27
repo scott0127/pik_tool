@@ -1,6 +1,6 @@
 <template>
   <div class="space-y-6 pb-8">
-    <!-- Page Header -->
+    <!-- -->
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
       <div>
         <h1 class="text-3xl font-extrabold text-gray-800 flex items-center gap-3">
@@ -25,99 +25,127 @@
     </div>
 
     <!-- Filters Section -->
-    <div class="card space-y-5">
-      <!-- Search -->
-      <div>
-        <label class="text-sm font-semibold text-gray-600 mb-2 block">{{ $t('collection.filters.search_label') }}</label>
-        <SearchBar 
-          v-model="searchQuery"
-          :placeholder="$t('collection.filters.search_placeholder')"
-        />
-      </div>
+    <div class="relative bg-white/80 backdrop-blur-xl rounded-3xl shadow-sm border border-emerald-100/50 p-6 md:p-8 mb-10 z-10 overflow-hidden transition-all duration-300 hover:shadow-md">
+      <div class="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-emerald-100/40 to-teal-50/40 rounded-full blur-3xl -z-10 translate-x-1/3 -translate-y-1/3 pointer-events-none"></div>
+      <div class="absolute bottom-0 left-0 w-64 h-64 bg-gradient-to-tr from-purple-50/40 to-pink-50/40 rounded-full blur-3xl -z-10 -translate-x-1/3 translate-y-1/3 pointer-events-none"></div>
 
-      <!-- Category Type Filter -->
-      <div>
-        <label class="text-sm font-semibold text-gray-600 mb-2 block">{{ $t('collection.filters.category_type') }}</label>
-        <CategoryNav 
-          :selected="selectedCategoryType"
-          @select="selectedCategoryType = $event"
-        />
-      </div>
-
-      <!-- Pikmin Type Filter -->
-      <div>
-        <label class="text-sm font-semibold text-gray-600 mb-2 block">{{ $t('collection.filters.pikmin_type') }}</label>
-        <PikminFilter 
-          :selected="selectedPikminType"
-          @select="selectedPikminType = $event"
-        />
-      </div>
-
-      <!-- Collection Status Filter -->
-      <div>
-        <label class="text-sm font-semibold text-gray-600 mb-2 block">{{ $t('collection.filters.status') }}</label>
-        <div class="flex flex-wrap gap-2">
-          <button
-            v-for="filter in collectionFilters"
-            :key="filter.value"
-            @click="collectionFilter = filter.value"
-            class="category-tag"
-            :class="[collectionFilter === filter.value ? 'category-tag-active' : 'category-tag-inactive']"
-          >
-            <span>{{ filter.icon }}</span>
-            <span>{{ filter.label }}</span>
-          </button>
-        </div>
-      </div>
-
-      <!-- Active Filters Summary & Clear -->
-      <Transition
-        enter-active-class="transition duration-200"
-        enter-from-class="opacity-0 -translate-y-2"
-        enter-to-class="opacity-100 translate-y-0"
-        leave-active-class="transition duration-150"
-        leave-from-class="opacity-100 translate-y-0"
-        leave-to-class="opacity-0 -translate-y-2"
-      >
-        <div 
-          v-if="hasActiveFilters"
-          class="flex items-center justify-between bg-emerald-50 rounded-xl p-3"
-        >
-          <div class="flex items-center gap-2 flex-wrap">
-            <span class="text-sm text-emerald-700 font-medium">{{ $t('collection.filters.active_label') }}</span>
-            <span v-if="searchQuery" class="inline-flex items-center gap-1 px-2 py-1 bg-emerald-100 text-emerald-700 rounded-lg text-xs font-medium">
-              🔍 {{ searchQuery }}
-              <button @click="searchQuery = ''" class="hover:text-emerald-900">×</button>
-            </span>
-            <span v-if="selectedCategoryType" class="inline-flex items-center gap-1 px-2 py-1 bg-emerald-100 text-emerald-700 rounded-lg text-xs font-medium">
-              🎯 {{ getCategoryTypeName(selectedCategoryType) }}
-              <button @click="selectedCategoryType = null" class="hover:text-emerald-900">×</button>
-            </span>
-            <span v-if="selectedPikminType" class="inline-flex items-center gap-1 px-2 py-1 bg-emerald-100 text-emerald-700 rounded-lg text-xs font-medium">
-              🌈 {{ PIKMIN_TYPE_NAMES[selectedPikminType] }}
-              <button @click="selectedPikminType = null" class="hover:text-emerald-900">×</button>
-            </span>
-            <span v-if="collectionFilter !== 'all'" class="inline-flex items-center gap-1 px-2 py-1 bg-emerald-100 text-emerald-700 rounded-lg text-xs font-medium">
-              ✅ {{ collectionFilters.find(f => f.value === collectionFilter)?.label }}
-              <button @click="collectionFilter = 'all'" class="hover:text-emerald-900">×</button>
-            </span>
-            <span v-if="isLimitedMode" class="inline-flex items-center gap-1 px-2 py-1 bg-amber-100 text-amber-700 rounded-lg text-xs font-medium">
-              ⚠️ {{ $t('collection.filters.limited') }}
-              <button @click="isLimitedMode = false" class="hover:text-amber-900">×</button>
-            </span>
-            <span v-if="selectedCategoryId" class="inline-flex items-center gap-1 px-2 py-1 bg-purple-100 text-purple-700 rounded-lg text-xs font-medium">
-              📁 {{ getCategoryName(selectedCategoryId) }}
-              <button @click="selectedCategoryId = null" class="hover:text-purple-900">×</button>
-            </span>
+      <div class="space-y-8">
+        <div class="flex flex-col lg:flex-row gap-6 lg:items-end">
+          <div class="flex-1 w-full relative group">
+            <label class="text-sm font-semibold text-gray-600 mb-3 flex items-center gap-2">
+              <span class="text-base"></span> {{ $t('collection.filters.search_label') }}
+            </label>
+            <div class="relative transition-all duration-300 group-focus-within:ring-4 ring-emerald-500/10 rounded-2xl">
+              <SearchBar 
+                v-model="searchQuery"
+                :placeholder="$t('collection.filters.search_placeholder')"
+                class="w-full shadow-sm border-gray-200"
+              />
+            </div>
           </div>
-          <button 
-            @click="clearAllFilters"
-            class="text-sm text-emerald-600 hover:text-emerald-800 font-medium whitespace-nowrap"
-          >
-            {{ $t('collection.filters.clear') }}
-          </button>
+
+          <div class="w-full lg:w-auto shrink-0">
+            <label class="text-sm font-semibold text-gray-600 mb-3 flex items-center gap-2">
+              <span class="text-base">📊</span> {{ $t('collection.filters.status') }}
+            </label>
+            <div class="flex flex-wrap gap-2">
+              <button
+                v-for="filter in collectionFilters"
+                :key="filter.value"
+                @click="collectionFilter = filter.value"
+                class="category-tag"
+                :class="[collectionFilter === filter.value ? 'category-tag-active' : 'category-tag-inactive']"
+              >
+                <span>{{ filter.icon }}</span>
+                <span>{{ filter.label }}</span>
+              </button>
+            </div>
+          </div>
         </div>
-      </Transition>
+
+        <div class="h-px w-full bg-gradient-to-r from-transparent via-emerald-200/50 to-transparent"></div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <div>
+            <label class="text-sm font-semibold text-gray-600 mb-3 flex items-center gap-2">
+              <span class="text-base">📁</span> {{ $t('collection.filters.category_type') }}
+            </label>
+            <CategoryNav 
+              :selected="selectedCategoryType"
+              @select="selectedCategoryType = $event"
+              class="w-full"
+            />
+          </div>
+
+          <div>
+            <label class="text-sm font-semibold text-gray-600 mb-3 flex items-center gap-2">
+              <span class="text-base">🌱</span> {{ $t('collection.filters.pikmin_type') }}
+            </label>
+            <PikminFilter 
+              :selected="selectedPikminType"
+              @select="selectedPikminType = $event"
+              class="w-full"
+            />
+          </div>
+        </div>
+
+        <Transition
+          enter-active-class="transition duration-300 ease-out"
+          enter-from-class="opacity-0 -translate-y-4 scale-95"
+          enter-to-class="opacity-100 translate-y-0 scale-100"
+          leave-active-class="transition duration-200 ease-in"
+          leave-from-class="opacity-100 translate-y-0 scale-100"
+          leave-to-class="opacity-0 -translate-y-4 scale-95"
+        >
+          <div 
+            v-if="hasActiveFilters"
+            class="flex flex-col sm:flex-row sm:items-center justify-between bg-emerald-50/50 border border-emerald-100 rounded-2xl p-4 gap-4 mt-4"
+          >
+            <div class="flex items-center gap-2 flex-wrap">
+              <span class="text-sm text-emerald-800 font-bold mr-2">{{ $t('collection.filters.active_label') }}</span>
+              
+              <span v-if="searchQuery" class="group inline-flex items-center gap-1.5 px-3 py-1.5 bg-white text-emerald-700 border border-emerald-200 rounded-xl text-sm font-medium shadow-sm transition-all hover:border-emerald-300 hover:shadow">
+                <span class="opacity-70">🔍</span> {{ searchQuery }}
+                <button @click="searchQuery = ''" class="w-5 h-5 flex items-center justify-center rounded-full bg-emerald-100 text-emerald-600 hover:bg-emerald-500 hover:text-white transition-colors ml-1">×</button>
+              </span>
+              
+              <span v-if="selectedCategoryType" class="group inline-flex items-center gap-1.5 px-3 py-1.5 bg-white text-emerald-700 border border-emerald-200 rounded-xl text-sm font-medium shadow-sm transition-all hover:border-emerald-300 hover:shadow">
+                <span class="opacity-70">📁</span> {{ getCategoryTypeName(selectedCategoryType) }}
+                <button @click="selectedCategoryType = null" class="w-5 h-5 flex items-center justify-center rounded-full bg-emerald-100 text-emerald-600 hover:bg-emerald-500 hover:text-white transition-colors ml-1">×</button>
+              </span>
+              
+              <span v-if="selectedPikminType" class="group inline-flex items-center gap-1.5 px-3 py-1.5 bg-white text-emerald-700 border border-emerald-200 rounded-xl text-sm font-medium shadow-sm transition-all hover:border-emerald-300 hover:shadow">
+                <span class="opacity-70">🌱</span> {{ PIKMIN_TYPE_NAMES[selectedPikminType] }}
+                <button @click="selectedPikminType = null" class="w-5 h-5 flex items-center justify-center rounded-full bg-emerald-100 text-emerald-600 hover:bg-emerald-500 hover:text-white transition-colors ml-1">×</button>
+              </span>
+              
+              <span v-if="collectionFilter !== 'all'" class="group inline-flex items-center gap-1.5 px-3 py-1.5 bg-white text-emerald-700 border border-emerald-200 rounded-xl text-sm font-medium shadow-sm transition-all hover:border-emerald-300 hover:shadow">
+                <span class="opacity-70">{{ collectionFilters.find(f => f.value === collectionFilter)?.icon }}</span> 
+                {{ collectionFilters.find(f => f.value === collectionFilter)?.label }}
+                <button @click="collectionFilter = 'all'" class="w-5 h-5 flex items-center justify-center rounded-full bg-emerald-100 text-emerald-600 hover:bg-emerald-500 hover:text-white transition-colors ml-1">×</button>
+              </span>
+
+              <span v-if="isLimitedMode" class="group inline-flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-amber-50 to-orange-50 text-amber-700 border border-amber-200 rounded-xl text-sm font-medium shadow-sm transition-all hover:border-amber-300 hover:shadow">
+                <span class="opacity-70">⚠️</span> {{ $t('collection.filters.limited') }}
+                <button @click="isLimitedMode = false" class="w-5 h-5 flex items-center justify-center rounded-full bg-amber-200 text-amber-700 hover:bg-amber-500 hover:text-white transition-colors ml-1">×</button>
+              </span>
+
+              <span v-if="selectedCategoryId" class="group inline-flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-purple-50 to-fuchsia-50 text-purple-700 border border-purple-200 rounded-xl text-sm font-medium shadow-sm transition-all hover:border-purple-300 hover:shadow">
+                <span class="opacity-70">📁</span> {{ getCategoryName(selectedCategoryId) }}
+                <button @click="selectedCategoryId = null" class="w-5 h-5 flex items-center justify-center rounded-full bg-purple-200 text-purple-700 hover:bg-purple-500 hover:text-white transition-colors ml-1">×</button>
+              </span>
+            </div>
+
+            <button 
+              @click="clearAllFilters"
+              class="shrink-0 flex items-center gap-2 px-4 py-2 bg-white text-gray-500 hover:text-red-600 border border-gray-200 hover:border-red-200 rounded-xl text-sm font-bold shadow-sm transition-all hover:bg-red-50 focus:ring-2 focus:ring-red-200 outline-none"
+            >
+              <span class="text-lg leading-none">🗑️</span>
+              {{ $t('collection.filters.clear') }}
+            </button>
+          </div>
+        </Transition>
+      </div>
     </div>
 
     <!-- Results Section -->

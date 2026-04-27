@@ -96,11 +96,11 @@
             "collected": "已蒐集"
         },
         "filters": {
-            "search_label": "🔍 搜尋",
+            "search_label": "搜尋",
             "search_placeholder": "搜尋飾品名稱...",
-            "category_type": "🎯 入手方式",
-            "pikmin_type": "🌈 皮克敏種類",
-            "status": "✅ 狀態",
+            "category_type": "入手方式",
+            "pikmin_type": "皮克敏種類",
+            "status": "狀態",
             "status_all": "全部",
             "status_collected": "已蒐集",
             "status_uncollected": "未蒐集",

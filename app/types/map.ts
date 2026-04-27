@@ -2,6 +2,7 @@ export interface DecorRule {
   id: string;
   name: string;
   icon: string;
+  iconName?: string; // Iconify icon ID (e.g., 'noto:fork-and-knife-with-plate')
   iconUrl?: string; // 選填：自訂圖標 URL（若提供則優先顯示）
   tags: string[]; // 格式: "key=value"
   region?: 'JP' | 'TW'; // Optional: Restrict rule to specific region
