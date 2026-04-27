@@ -108,6 +108,7 @@ function buildOverpassQuery(bbox: BoundingBox): string {
       if (key && value) {
         queries.push(`  node["${key}"="${value}"](${bboxStr});`);
         queries.push(`  way["${key}"="${value}"](${bboxStr});`);
+        queries.push(`  relation["${key}"="${value}"](${bboxStr});`);
       }
     }
   }
@@ -234,7 +235,11 @@ async function fetchOverpass(query: string): Promise<OverpassResponse> {
         const response = await fetch(server, {
           method: 'POST',
           body: query,
-          headers: { 'Content-Type': 'text/plain' },
+          headers: {
+            'Content-Type': 'text/plain; charset=UTF-8',
+            'User-Agent': 'pikmin-osm-fetcher/1.0',
+            'Accept': 'application/json,text/plain,*/*',
+          },
         });
 
         if (response.status === 429) {
@@ -299,9 +304,47 @@ function transformToPOIs(response: OverpassResponse): POIData[] {
       element.tags['name:en'] ||
       `未命名${matchedRule.name}`;
 
-    // 如果元素有幾何特徵或是多邊形/線段的邊界點，展開為所有涵蓋到的 S2 L17 Cell
+    const geometries: { lat: number; lon: number }[][] = [];
     if (element.geometry && element.geometry.length > 0) {
-      const cells = getCoveredCellsL17(element.geometry);
+      geometries.push(element.geometry);
+    }
+    if (element.members) {
+      for (const member of element.members) {
+        if (member.geometry && member.geometry.length > 0) {
+          geometries.push(member.geometry);
+        }
+      }
+    }
+
+    // 如果元素有幾何特徵或是 relation members 的邊界點，展開為所有涵蓋到的 S2 L17 Cell
+    if (geometries.length > 0) {
+      const allCells = new Map<string, { lat: number; lon: number; key: string }>();
+      for (const geometry of geometries) {
+        const cells = getCoveredCellsL17(geometry);
+        for (const cell of cells) {
+          allCells.set(cell.key, cell);
+        }
+      }
+
+      const cells = Array.from(allCells.values());
+
+      if (cells.length === 0 && element.center) {
+        const id = baseId;
+        if (!seenIds.has(id)) {
+          seenIds.add(id);
+          pois.push({
+            id,
+            lat: element.center.lat,
+            lon: element.center.lon,
+            name,
+            decorType: matchedRule.id,
+            decorName: matchedRule.name,
+            decorIcon: matchedRule.icon,
+          });
+        }
+        continue;
+      }
+
       for (const cell of cells) {
         const id = `${baseId}-${cell.key}`;
         if (seenIds.has(id)) continue;

@@ -797,9 +797,9 @@ onMounted(() => {
 
 // 地圖設定 - 預設台北車站，縮放層級 16 (避免 Overpass API 超時)
 const mapCenter = ref<[number, number]>([25.0478, 121.5170]); // 台北車站
-const mapZoom = ref(16);
+const mapZoom = ref(17);
 const mapRef = ref();
-const MIN_ZOOM_FOR_QUERY = 16; // 最小查詢縮放層級
+const MIN_ZOOM_FOR_QUERY = 17; // 最小查詢縮放層級
 
 // ⚠️ 重要：使用 shallowRef 避免 Vue 對 Leaflet 物件進行深層響應式監聯
 // 這是 Vue + Leaflet 效能優化的關鍵！
@@ -822,9 +822,8 @@ const viewMode = ref<MapViewMode>('grid');
 const isGridMode = computed(() => viewMode.value === 'grid');
 const isPinMode = computed(() => viewMode.value === 'pin');
 const isSingleMode = computed(() => viewMode.value === 'single');
-// S2 Grid L17 visibility: matches user request "zoom > 15" -> zoom >= 16
-// S2 Grid L17 visibility: matches user request "zoom > 15" -> zoom >= 16
-const canRenderGrid = computed(() => mapZoom.value >= 16);
+// S2 Grid L17 visibility: zoom >= 17 to prevent extreme lag from 4000+ polygons
+const canRenderGrid = computed(() => mapZoom.value >= 17);
 const badgeCells = computed(() => (isSingleMode.value ? singleTypeCellsInView.value : s2Cells.value));
 // Computed property for grid cells to ensure they only render in Grid Mode (not Single Mode residue)
 // Computed property for grid cells to ensure they render in both Grid and Single Mode (but not mixed inappropriately)
@@ -844,7 +843,7 @@ let pureModeHintTimer: ReturnType<typeof setTimeout> | null = null;
 // Zoom Warning State
 const showGridZoomWarning = ref(false);
 let gridZoomWarningTimer: ReturnType<typeof setTimeout> | null = null;
-const GRID_MIN_ZOOM = 16;
+const GRID_MIN_ZOOM = 17;
 
 watch(viewMode, (mode) => {
   handleViewModeChange(mode);

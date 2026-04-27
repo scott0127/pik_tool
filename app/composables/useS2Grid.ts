@@ -140,14 +140,11 @@ export function useS2Grid() {
     const queue: string[] = [];
 
     // 動態調整 maxCells 基於縮放層級
-    // Zoom 17+: 螢幕範圍小，cell 數量少
-    // Zoom 16: 螢幕範圍大，需要更多 cell
-    // Zoom 15: 螢幕範圍更大，需要非常多 cell
-    let maxLimit = 3000;
-    if (mapZoom >= 18) maxLimit = 1500;      // Zoom 18+: 範圍很小，1500 綽綽有餘
-    else if (mapZoom === 17) maxLimit = 3500; // Zoom 17: 一般需要 1000-2000，設 3500 確保大螢幕邊角覆蓋
-    else if (mapZoom === 16) maxLimit = 4000; // Zoom 16: Reduced from 7000 to 4000 for performance
-    else if (mapZoom <= 15) maxLimit = 10000; // Zoom 15: 範圍極大，設 10000 作為硬上限
+    // Vue 渲染超過 2000 個 LPolygon 會發生嚴重卡頓與破圖 (Leaflet DOM Overload)
+    let maxLimit = 1500;
+    if (mapZoom >= 18) maxLimit = 800;        // Zoom 18+: 原本較少
+    else if (mapZoom === 17) maxLimit = 1800; // Zoom 17: 安全上限 1800，確保畫面不破圖
+    else maxLimit = 500; // 防呆機制，理論上由 UI (mapZoom >= 17) 擋住了
 
     const SAFETY_MAX_CELLS = maxLimit;
 

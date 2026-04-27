@@ -12,7 +12,7 @@
       "lon": 120.41163569851926,
       "name": "肉粽角沙灘",
       "decorType": "beach",
-      "decorName": "海灘",
+      "decorName": "海邊",
       "decorIcon": "🏖️"
     },
     {
@@ -21,7 +21,7 @@
       "lon": 120.41163569851926,
       "name": "肉粽角沙灘",
       "decorType": "beach",
-      "decorName": "海灘",
+      "decorName": "海邊",
       "decorIcon": "🏖️"
     },
     {
@@ -30,7 +30,7 @@
       "lon": 120.41235598407519,
       "name": "肉粽角沙灘",
       "decorType": "beach",
-      "decorName": "海灘",
+      "decorName": "海邊",
       "decorIcon": "🏖️"
     },
     {
@@ -39,7 +39,7 @@
       "lon": 120.41307626561536,
       "name": "肉粽角沙灘",
       "decorType": "beach",
-      "decorName": "海灘",
+      "decorName": "海邊",
       "decorIcon": "🏖️"
     },
     {
@@ -48,7 +48,7 @@
       "lon": 120.41379654313943,
       "name": "肉粽角沙灘",
       "decorType": "beach",
-      "decorName": "海灘",
+      "decorName": "海邊",
       "decorIcon": "🏖️"
     },
     {
@@ -57,7 +57,7 @@
       "lon": 120.41451681664716,
       "name": "肉粽角沙灘",
       "decorType": "beach",
-      "decorName": "海灘",
+      "decorName": "海邊",
       "decorIcon": "🏖️"
     },
     {
@@ -66,7 +66,7 @@
       "lon": 120.41523708613829,
       "name": "肉粽角沙灘",
       "decorType": "beach",
-      "decorName": "海灘",
+      "decorName": "海邊",
       "decorIcon": "🏖️"
     },
     {
@@ -75,7 +75,7 @@
       "lon": 120.41379654313943,
       "name": "肉粽角沙灘",
       "decorType": "beach",
-      "decorName": "海灘",
+      "decorName": "海邊",
       "decorIcon": "🏖️"
     },
     {
@@ -84,7 +84,7 @@
       "lon": 120.41451681664716,
       "name": "肉粽角沙灘",
       "decorType": "beach",
-      "decorName": "海灘",
+      "decorName": "海邊",
       "decorIcon": "🏖️"
     },
     {
@@ -93,7 +93,7 @@
       "lon": 120.41523708613829,
       "name": "肉粽角沙灘",
       "decorType": "beach",
-      "decorName": "海灘",
+      "decorName": "海邊",
       "decorIcon": "🏖️"
     },
     {
@@ -102,7 +102,7 @@
       "lon": 120.41235598407519,
       "name": "肉粽角沙灘",
       "decorType": "beach",
-      "decorName": "海灘",
+      "decorName": "海邊",
       "decorIcon": "🏖️"
     },
     {
@@ -112,7 +112,7 @@
       "name": "未命名水邊",
       "decorType": "waterside",
       "decorName": "水邊",
-      "decorIcon": "💧"
+      "decorIcon": "🌊"
     },
     {
       "id": "way-923849665-1/22031022020022123",
@@ -121,7 +121,7 @@
       "name": "未命名水邊",
       "decorType": "waterside",
       "decorName": "水邊",
-      "decorIcon": "💧"
+      "decorIcon": "🌊"
     },
     {
       "id": "way-923849665-1/22031022020022130",
@@ -130,7 +130,7 @@
       "name": "未命名水邊",
       "decorType": "waterside",
       "decorName": "水邊",
-      "decorIcon": "💧"
+      "decorIcon": "🌊"
     },
     {
       "id": "way-923849665-1/22031022020022023",
@@ -139,7 +139,7 @@
       "name": "未命名水邊",
       "decorType": "waterside",
       "decorName": "水邊",
-      "decorIcon": "💧"
+      "decorIcon": "🌊"
     },
     {
       "id": "way-923849665-1/22031022020022020",
@@ -148,7 +148,7 @@
       "name": "未命名水邊",
       "decorType": "waterside",
       "decorName": "水邊",
-      "decorIcon": "💧"
+      "decorIcon": "🌊"
     },
     {
       "id": "way-923849665-1/22031022020311211",
@@ -157,7 +157,7 @@
       "name": "未命名水邊",
       "decorType": "waterside",
       "decorName": "水邊",
-      "decorIcon": "💧"
+      "decorIcon": "🌊"
     },
     {
       "id": "way-923849665-1/22031022020022132",
@@ -166,7 +166,7 @@
       "name": "未命名水邊",
       "decorType": "waterside",
       "decorName": "水邊",
-      "decorIcon": "💧"
+      "decorIcon": "🌊"
     },
     {
       "id": "way-923849665-1/22031022020022131",
@@ -175,7 +175,214 @@
       "name": "未命名水邊",
       "decorType": "waterside",
       "decorName": "水邊",
-      "decorIcon": "💧"
+      "decorIcon": "🌊"
+    },
+    {
+      "id": "way-933153631-1/22031022020022031",
+      "lat": 24.11870367663093,
+      "lon": 120.4166776130694,
+      "name": "未命名橋樑",
+      "decorType": "bridge",
+      "decorName": "橋樑",
+      "decorIcon": "🌉"
+    },
+    {
+      "id": "way-933153631-1/22031022020022002",
+      "lat": 24.118545968874297,
+      "lon": 120.41739787050892,
+      "name": "未命名橋樑",
+      "decorType": "bridge",
+      "decorName": "橋樑",
+      "decorIcon": "🌉"
+    },
+    {
+      "id": "way-933153631-1/22031022020022003",
+      "lat": 24.118388258231917,
+      "lon": 120.41811812393064,
+      "name": "未命名橋樑",
+      "decorType": "bridge",
+      "decorName": "橋樑",
+      "decorIcon": "🌉"
+    },
+    {
+      "id": "way-933153631-1/22031022020023110",
+      "lat": 24.118230544703895,
+      "lon": 120.41883837333432,
+      "name": "未命名橋樑",
+      "decorType": "bridge",
+      "decorName": "橋樑",
+      "decorIcon": "🌉"
+    },
+    {
+      "id": "way-933153631-1/22031022020023111",
+      "lat": 24.118900123687585,
+      "lon": 120.41883837333432,
+      "name": "未命名橋樑",
+      "decorType": "bridge",
+      "decorName": "橋樑",
+      "decorIcon": "🌉"
+    },
+    {
+      "id": "way-933153631-1/22031022020023112",
+      "lat": 24.11874240398241,
+      "lon": 120.41955861871963,
+      "name": "未命名橋樑",
+      "decorType": "bridge",
+      "decorName": "橋樑",
+      "decorIcon": "🌉"
+    },
+    {
+      "id": "way-933153631-1/22031022020023121",
+      "lat": 24.118584681391773,
+      "lon": 120.42027886008628,
+      "name": "未命名橋樑",
+      "decorType": "bridge",
+      "decorName": "橋樑",
+      "decorIcon": "🌉"
+    },
+    {
+      "id": "way-933153631-1/22031022020023122",
+      "lat": 24.118426955915805,
+      "lon": 120.4209990974341,
+      "name": "未命名橋樑",
+      "decorType": "bridge",
+      "decorName": "橋樑",
+      "decorIcon": "🌉"
+    },
+    {
+      "id": "way-933153631-1/22031022020023211",
+      "lat": 24.118269227554624,
+      "lon": 120.4217193307627,
+      "name": "未命名橋樑",
+      "decorType": "bridge",
+      "decorName": "橋樑",
+      "decorIcon": "🌉"
+    },
+    {
+      "id": "way-933153631-1/22031022020020122",
+      "lat": 24.118938792753536,
+      "lon": 120.4217193307627,
+      "name": "未命名橋樑",
+      "decorType": "bridge",
+      "decorName": "橋樑",
+      "decorIcon": "🌉"
+    },
+    {
+      "id": "way-933153631-1/22031022020020121",
+      "lat": 24.118781058215394,
+      "lon": 120.42243956007178,
+      "name": "未命名橋樑",
+      "decorType": "bridge",
+      "decorName": "橋樑",
+      "decorIcon": "🌉"
+    },
+    {
+      "id": "way-933153631-1/22031022020020112",
+      "lat": 24.118623320792217,
+      "lon": 120.42315978536107,
+      "name": "未命名橋樑",
+      "decorType": "bridge",
+      "decorName": "橋樑",
+      "decorIcon": "🌉"
+    },
+    {
+      "id": "way-933153631-1/22031022020020111",
+      "lat": 24.118465580484127,
+      "lon": 120.42388000663038,
+      "name": "未命名橋樑",
+      "decorType": "bridge",
+      "decorName": "橋樑",
+      "decorIcon": "🌉"
+    },
+    {
+      "id": "way-933153631-1/22031022020031000",
+      "lat": 24.118307837291255,
+      "lon": 120.42460022387928,
+      "name": "未命名橋樑",
+      "decorType": "bridge",
+      "decorName": "橋樑",
+      "decorIcon": "🌉"
+    },
+    {
+      "id": "way-933153631-1/22031022020031001",
+      "lat": 24.11897738870454,
+      "lon": 120.42460022387928,
+      "name": "未命名橋樑",
+      "decorType": "bridge",
+      "decorName": "橋樑",
+      "decorIcon": "🌉"
+    },
+    {
+      "id": "way-933153631-1/22031022020031002",
+      "lat": 24.118819639334895,
+      "lon": 120.42532043710759,
+      "name": "未命名橋樑",
+      "decorType": "bridge",
+      "decorName": "橋樑",
+      "decorIcon": "🌉"
+    },
+    {
+      "id": "way-933153631-1/22031022020031013",
+      "lat": 24.11866188708064,
+      "lon": 120.42604064631502,
+      "name": "未命名橋樑",
+      "decorType": "bridge",
+      "decorName": "橋樑",
+      "decorIcon": "🌉"
+    },
+    {
+      "id": "way-933153631-1/22031022020031012",
+      "lat": 24.118504131941904,
+      "lon": 120.42676085150117,
+      "name": "未命名橋樑",
+      "decorType": "bridge",
+      "decorName": "橋樑",
+      "decorIcon": "🌉"
+    },
+    {
+      "id": "way-933153631-1/22031022020031321",
+      "lat": 24.118346373918804,
+      "lon": 120.42748105266594,
+      "name": "未命名橋樑",
+      "decorType": "bridge",
+      "decorName": "橋樑",
+      "decorIcon": "🌉"
+    },
+    {
+      "id": "way-933153631-1/22031022020031313",
+      "lat": 24.118858147345943,
+      "lon": 120.42820124980892,
+      "name": "未命名橋樑",
+      "decorType": "bridge",
+      "decorName": "橋樑",
+      "decorIcon": "🌉"
+    },
+    {
+      "id": "way-933153631-1/22031022020031302",
+      "lat": 24.118700380262084,
+      "lon": 120.42892144292983,
+      "name": "未命名橋樑",
+      "decorType": "bridge",
+      "decorName": "橋樑",
+      "decorIcon": "🌉"
+    },
+    {
+      "id": "way-933153631-1/22031022020031301",
+      "lat": 24.118542610294163,
+      "lon": 120.42964163202839,
+      "name": "未命名橋樑",
+      "decorType": "bridge",
+      "decorName": "橋樑",
+      "decorIcon": "🌉"
+    },
+    {
+      "id": "way-933153631-1/22031022020032032",
+      "lat": 24.118384837442303,
+      "lon": 120.43036181710437,
+      "name": "未命名橋樑",
+      "decorType": "bridge",
+      "decorName": "橋樑",
+      "decorIcon": "🌉"
     }
   ]
 }

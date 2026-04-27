@@ -4,29 +4,53 @@ import { fileURLToPath } from 'url';
 import { writeFileSync, existsSync, mkdirSync, readFileSync } from 'fs';
 import { REGIONS } from './regions.js';
 import type { OverpassResponse, POIData, BoundingBox } from './types';
+// ============ Decor Rules（與 useDecorRules.ts 保持同步）============
+// 基於 Pikmin Bloom Wiki (pikminwiki.com/Decor_Pikmin) 官方 OSM 標籤 + 台灣在地化擴充
 const DECOR_RULES = [
-  { id: 'restaurant', name: '餐廳', icon: '🍽️', tags: ['amenity=restaurant', 'amenity=food_court'] },
+  // 餐飲類
+  { id: 'restaurant', name: '餐廳', icon: '🍽️', tags: ['amenity=restaurant'] },
   { id: 'cafe', name: '咖啡廳', icon: '☕', tags: ['amenity=cafe'] },
-  { id: 'sweetshop', name: '甜點店', icon: '🍩', tags: ['shop=pastry', 'shop=chocolate', 'shop=confectionery'] },
-  { id: 'movie-theater', name: '電影院', icon: '🍿', tags: ['amenity=cinema'] },
-  { id: 'pharmacy', name: '藥局', icon: '💊', tags: ['amenity=pharmacy'] },
-  { id: 'zoo', name: '動物園', icon: '🦁', tags: ['tourism=zoo'] },
-  { id: 'forest', name: '森林', icon: '🌲', tags: ['landuse=forest', 'natural=wood'] },
-  { id: 'waterside', name: '水邊', icon: '💧', tags: ['waterway=river', 'waterway=stream', 'natural=water'] },
-  { id: 'post-office', name: '郵局', icon: '📮', tags: ['amenity=post_office'] },
-  { id: 'art-gallery', name: '美術館', icon: '🖼️', tags: ['tourism=museum', 'tourism=gallery'] },
-  { id: 'airport', name: '機場', icon: '✈️', tags: ['aeroway=aerodrome', 'aeroway=terminal'] },
-  { id: 'station', name: '車站', icon: '🚉', tags: ['railway=station', 'public_transport=station'] },
-  { id: 'beach', name: '海灘', icon: '🏖️', tags: ['natural=beach'] },
-  { id: 'burger', name: '漢堡店', icon: '🍔', tags: ['amenity=fast_food'] },
-  { id: 'convenience-store', name: '便利商店', icon: '🏪', tags: ['shop=convenience'] },
-  { id: 'supermarket', name: '超市', icon: '🛒', tags: ['shop=supermarket'] },
+  { id: 'sweetshop', name: '甜點店', icon: '🍰', tags: ['shop=pastry', 'shop=confectionery', 'shop=chocolate'] },
   { id: 'bakery', name: '麵包店', icon: '🥐', tags: ['shop=bakery'] },
-  { id: 'hair-salon', name: '美髮院', icon: '✂️', tags: ['shop=hairdresser'] },
-  { id: 'clothing-store', name: '服飾店', icon: '👕', tags: ['shop=clothes'] },
-  { id: 'park', name: '公園', icon: '🌳', tags: ['leisure=park'] },
-  { id: 'library', name: '圖書館', icon: '📚', tags: ['amenity=library'] },
-  { id: 'hospital', name: '醫院', icon: '🏥', tags: ['amenity=hospital', 'amenity=clinic'] },
+  { id: 'burger', name: '漢堡店', icon: '🍔', tags: ['amenity=fast_food'] },
+  { id: 'italian', name: '義式餐廳', icon: '🍕', tags: ['cuisine=pizza', 'cuisine=italian', 'cuisine=mediterranean', 'cuisine=pasta'] },
+  { id: 'ramen', name: '拉麵店', icon: '🥡', tags: ['cuisine=ramen', 'cuisine=noodle', 'cuisine=chinese', 'cuisine=udon', 'cuisine=soba'] },
+  { id: 'sushi', name: '壽司店', icon: '🍣', tags: ['cuisine=sushi'] },
+  { id: 'curry', name: '咖哩餐廳', icon: '🍛', tags: ['cuisine=curry', 'cuisine=indian', 'cuisine=sri_lankan'] },
+  { id: 'korean', name: '韓式餐廳', icon: '🇰🇷', tags: ['cuisine=korean'] },
+  { id: 'taco', name: '墨西哥餐廳', icon: '🌮', tags: ['cuisine=mexican'] },
+  // 購物類
+  { id: 'convenience', name: '便利商店', icon: '🏪', tags: ['shop=convenience'] },
+  { id: 'supermarket', name: '超市', icon: '🛒', tags: ['shop=supermarket', 'shop=greengrocer'] },
+  { id: 'cosmetics', name: '化妝品商店', icon: '💄', tags: ['shop=department_store', 'shop=cosmetics', 'shop=beauty'] },
+  { id: 'clothing', name: '服飾店', icon: '👔', tags: ['shop=clothes', 'shop=shoes', 'shop=fashion'] },
+  { id: 'electronics', name: '電器行', icon: '🔌', tags: ['shop=appliance', 'shop=electronics', 'shop=computer', 'shop=mobile_phone'] },
+  { id: 'hardware', name: '五金行', icon: '🔧', tags: ['shop=doityourself', 'shop=hardware', 'shop=tools'] },
+  { id: 'library', name: '圖書館／書店', icon: '📚', tags: ['amenity=library', 'shop=books'] },
+  // 生活服務類
+  { id: 'pharmacy', name: '藥局', icon: '💊', tags: ['amenity=pharmacy', 'shop=chemist', 'healthcare=pharmacy'] },
+  { id: 'hair_salon', name: '美髮院', icon: '💇', tags: ['shop=hairdresser'] },
+  { id: 'laundry', name: '自主洗衣店&乾洗店', icon: '🧺', tags: ['shop=laundry', 'shop=dry_cleaning'] },
+  { id: 'post_office', name: '郵局', icon: '✉️', tags: ['amenity=post_office', 'amenity=post_box'] },
+  { id: 'hotel', name: '飯店', icon: '🏨', tags: ['tourism=hotel', 'tourism=motel', 'tourism=hostel', 'tourism=guest_house'] },
+  { id: 'university', name: '大學&學院', icon: '🎓', tags: ['amenity=university', 'amenity=college', 'building=university'] },
+  { id: 'movie_theater', name: '電影院', icon: '🎬', tags: ['amenity=cinema'] },
+  // 交通類
+  { id: 'station', name: '車站', icon: '🚂', tags: ['railway=station', 'building=train_station', 'railway=subway_entrance', 'public_transport=station'] },
+  { id: 'bus_stop', name: '公車站', icon: '🚌', tags: ['highway=bus_stop', 'amenity=bus_station', 'public_transport=platform'] },
+  { id: 'airport', name: '機場', icon: '✈️', tags: ['aeroway=aerodrome', 'aeroway=terminal', 'aeroway=gate'] },
+  { id: 'bridge', name: '橋樑', icon: '🌉', tags: ['bridge=yes', 'man_made=bridge'] },
+  // 戶外休閒類
+  { id: 'park', name: '公園', icon: '🍀', tags: ['leisure=park', 'leisure=garden', 'leisure=playground', 'landuse=village_green'] },
+  { id: 'forest', name: '森林', icon: '🌲', tags: ['natural=wood', 'landuse=forest'] },
+  { id: 'waterside', name: '水邊', icon: '🌊', tags: ['natural=water', 'natural=wetland', 'waterway=river', 'waterway=stream', 'waterway=canal'] },
+  { id: 'beach', name: '海邊', icon: '🏖️', tags: ['natural=beach'] },
+  { id: 'mountain', name: '山丘', icon: '⛰️', tags: ['natural=peak', 'natural=cliff', 'natural=bare_rock'] },
+  { id: 'zoo', name: '動物園', icon: '🦁', tags: ['tourism=zoo', 'tourism=aquarium'] },
+  { id: 'theme_park', name: '主題樂園', icon: '🎢', tags: ['tourism=theme_park', 'leisure=water_park'] },
+  { id: 'art_gallery', name: '美術館', icon: '🎨', tags: ['tourism=museum', 'tourism=gallery', 'shop=art', 'amenity=arts_centre'] },
+  { id: 'stadium', name: '體育館', icon: '🏟️', tags: ['leisure=stadium', 'leisure=sports_centre', 'building=stadium'] },
+  { id: 'shrine', name: '神社', icon: '⛩️', tags: ['amenity=place_of_worship'] },
 ];
 // @ts-ignore
 import { S2 } from 's2-geometry';
@@ -68,6 +92,7 @@ function buildOverpassQuery(bbox: BoundingBox): string {
       if (key && value) {
         queries.push(`  node["${key}"="${value}"](${bboxStr});`);
         queries.push(`  way["${key}"="${value}"](${bboxStr});`);
+        queries.push(`  relation["${key}"="${value}"](${bboxStr});`);
       }
     }
   }
@@ -90,7 +115,11 @@ async function fetchOverpass(query: string): Promise<OverpassResponse> {
         const response = await fetch(server, {
           method: 'POST',
           body: query,
-          headers: { 'Content-Type': 'text/plain' },
+          headers: {
+            'Content-Type': 'text/plain; charset=UTF-8',
+            'User-Agent': 'pikmin-osm-fetcher/1.0',
+            'Accept': 'application/json,text/plain,*/*',
+          },
         });
 
         if (response.status === 429) {
@@ -183,6 +212,24 @@ function getCoveredCellsL17(geometry: {lat: number, lon: number}[]): {lat: numbe
   return Array.from(coveredCells.values());
 }
 
+function getElementGeometries(element: OverpassResponse['elements'][number]): { lat: number; lon: number }[][] {
+  const geometries: { lat: number; lon: number }[][] = [];
+
+  if (element.geometry && element.geometry.length > 0) {
+    geometries.push(element.geometry);
+  }
+
+  if (element.members) {
+    for (const member of element.members) {
+      if (member.geometry && member.geometry.length > 0) {
+        geometries.push(member.geometry);
+      }
+    }
+  }
+
+  return geometries;
+}
+
 function transformToPOIs(response: OverpassResponse): POIData[] {
   const pois: POIData[] = [];
   const seenIds = new Set<string>();
@@ -212,8 +259,29 @@ function transformToPOIs(response: OverpassResponse): POIData[] {
       element.tags['name:en'] ||
       `未命名${matchedRule.name}`;
 
-    if (element.geometry && element.geometry.length > 0) {
-      const cells = getCoveredCellsL17(element.geometry);
+    const geometries = getElementGeometries(element);
+
+    if (geometries.length > 0) {
+      const allCells = new Map<string, { lat: number; lon: number; key: string }>();
+
+      for (const geometry of geometries) {
+        const cells = getCoveredCellsL17(geometry);
+        for (const cell of cells) {
+          allCells.set(cell.key, cell);
+        }
+      }
+
+      const cells = Array.from(allCells.values());
+
+      if (cells.length === 0 && element.center) {
+        const id = baseId;
+        if (!seenIds.has(id)) {
+          seenIds.add(id);
+          pois.push({ id, lat: element.center.lat, lon: element.center.lon, name, decorType: matchedRule.id, decorName: matchedRule.name, decorIcon: matchedRule.icon });
+        }
+        continue;
+      }
+
       for (const cell of cells) {
         const id = `${baseId}-${cell.key}`;
         if (seenIds.has(id)) continue;

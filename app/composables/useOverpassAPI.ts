@@ -29,9 +29,10 @@ export function useOverpassAPI() {
         // 解析 "key=value" 格式
         const [key, value] = tag.split('=');
         if (key && value) {
-          // 查詢 node 和 way 兩種類型
+          // 查詢 node、way、relation 三種類型
           queries.push(`  node["${key}"="${value}"](${bbox});`);
           queries.push(`  way["${key}"="${value}"](${bbox});`);
+          queries.push(`  relation["${key}"="${value}"](${bbox});`);
         }
       }
     }

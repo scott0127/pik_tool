@@ -7,22 +7,31 @@
   },
   "pois": [
     {
-      "id": "node-957800679",
-      "lat": 22.3484571,
-      "lon": 120.3784629,
-      "name": "琉球衛生所",
-      "decorType": "hospital",
-      "decorName": "醫院",
-      "decorIcon": "🏥"
-    },
-    {
       "id": "node-957800683",
       "lat": 22.3481881,
       "lon": 120.3782307,
       "name": "琉球鄉圖書館",
       "decorType": "library",
-      "decorName": "圖書館",
+      "decorName": "圖書館／書店",
       "decorIcon": "📚"
+    },
+    {
+      "id": "node-2331350050",
+      "lat": 22.3389596,
+      "lon": 120.3769829,
+      "name": "南山延王母宮金督府",
+      "decorType": "shrine",
+      "decorName": "神社",
+      "decorIcon": "⛩️"
+    },
+    {
+      "id": "node-2361916578",
+      "lat": 22.3276348,
+      "lon": 120.3633046,
+      "name": "尖山腳五王宮",
+      "decorType": "shrine",
+      "decorName": "神社",
+      "decorIcon": "⛩️"
     },
     {
       "id": "node-2406541583",
@@ -31,7 +40,43 @@
       "name": "白沙尾渡船碼頭",
       "decorType": "station",
       "decorName": "車站",
-      "decorIcon": "🚉"
+      "decorIcon": "🚂"
+    },
+    {
+      "id": "node-2406619349",
+      "lat": 22.3423829,
+      "lon": 120.3685954,
+      "name": "五連宮",
+      "decorType": "shrine",
+      "decorName": "神社",
+      "decorIcon": "⛩️"
+    },
+    {
+      "id": "node-2406646227",
+      "lat": 22.3226793,
+      "lon": 120.3583881,
+      "name": "福安宮",
+      "decorType": "shrine",
+      "decorName": "神社",
+      "decorIcon": "⛩️"
+    },
+    {
+      "id": "node-2406646384",
+      "lat": 22.3382662,
+      "lon": 120.3709722,
+      "name": "南天宮",
+      "decorType": "shrine",
+      "decorName": "神社",
+      "decorIcon": "⛩️"
+    },
+    {
+      "id": "node-2406736044",
+      "lat": 22.3549333,
+      "lon": 120.3809432,
+      "name": "靈山寺",
+      "decorType": "shrine",
+      "decorName": "神社",
+      "decorIcon": "⛩️"
     },
     {
       "id": "node-2406736191",
@@ -43,22 +88,49 @@
       "decorIcon": "🍽️"
     },
     {
+      "id": "node-2406736192",
+      "lat": 22.3522753,
+      "lon": 120.3788824,
+      "name": "椰林渡假村",
+      "decorType": "hotel",
+      "decorName": "飯店",
+      "decorIcon": "🏨"
+    },
+    {
       "id": "node-2406748530",
       "lat": 22.33452,
       "lon": 120.3744629,
       "name": "大福渡船碼頭遊客中心",
       "decorType": "station",
       "decorName": "車站",
-      "decorIcon": "🚉"
+      "decorIcon": "🚂"
     },
     {
       "id": "node-2406907443",
       "lat": 22.3531879,
       "lon": 120.3818738,
       "name": "7-Eleven",
-      "decorType": "convenience-store",
+      "decorType": "convenience",
       "decorName": "便利商店",
       "decorIcon": "🏪"
+    },
+    {
+      "id": "node-2406907720",
+      "lat": 22.3432418,
+      "lon": 120.3709357,
+      "name": "未命名神社",
+      "decorType": "shrine",
+      "decorName": "神社",
+      "decorIcon": "⛩️"
+    },
+    {
+      "id": "node-2406907770",
+      "lat": 22.3462672,
+      "lon": 120.366319,
+      "name": "未命名神社",
+      "decorType": "shrine",
+      "decorName": "神社",
+      "decorIcon": "⛩️"
     },
     {
       "id": "node-2406907803",
@@ -68,6 +140,15 @@
       "decorType": "restaurant",
       "decorName": "餐廳",
       "decorIcon": "🍽️"
+    },
+    {
+      "id": "node-2482642899",
+      "lat": 22.3324271,
+      "lon": 120.3684421,
+      "name": "大寮山",
+      "decorType": "mountain",
+      "decorName": "山丘",
+      "decorIcon": "⛰️"
     },
     {
       "id": "node-3938771517",
@@ -95,6 +176,24 @@
       "decorType": "cafe",
       "decorName": "咖啡廳",
       "decorIcon": "☕"
+    },
+    {
+      "id": "node-4182412682",
+      "lat": 22.3412451,
+      "lon": 120.378899,
+      "name": "琉球嶼山",
+      "decorType": "mountain",
+      "decorName": "山丘",
+      "decorIcon": "⛰️"
+    },
+    {
+      "id": "node-4358415491",
+      "lat": 22.3405001,
+      "lon": 120.37001,
+      "name": "中華電信小琉球中興會館",
+      "decorType": "hotel",
+      "decorName": "飯店",
+      "decorIcon": "🏨"
     },
     {
       "id": "node-4362218091",
@@ -182,7 +281,7 @@
       "lat": 22.3387888,
       "lon": 120.3699421,
       "name": "7-Eleven",
-      "decorType": "convenience-store",
+      "decorType": "convenience",
       "decorName": "便利商店",
       "decorIcon": "🏪"
     },
@@ -193,7 +292,7 @@
       "name": "王老師手工麻花卷",
       "decorType": "sweetshop",
       "decorName": "甜點店",
-      "decorIcon": "🍩"
+      "decorIcon": "🍰"
     },
     {
       "id": "node-5283600323",
@@ -205,6 +304,15 @@
       "decorIcon": "🍽️"
     },
     {
+      "id": "node-5287536376",
+      "lat": 22.353681,
+      "lon": 120.3810927,
+      "name": "未命名郵局",
+      "decorType": "post_office",
+      "decorName": "郵局",
+      "decorIcon": "✉️"
+    },
+    {
       "id": "node-5287612834",
       "lat": 22.3531543,
       "lon": 120.3819382,
@@ -212,6 +320,69 @@
       "decorType": "cafe",
       "decorName": "咖啡廳",
       "decorIcon": "☕"
+    },
+    {
+      "id": "node-5287677636",
+      "lat": 22.3531835,
+      "lon": 120.3731978,
+      "name": "望海亭",
+      "decorType": "bus_stop",
+      "decorName": "公車站",
+      "decorIcon": "🚌"
+    },
+    {
+      "id": "node-5287679111",
+      "lat": 22.3445547,
+      "lon": 120.362731,
+      "name": "生態廊道",
+      "decorType": "bus_stop",
+      "decorName": "公車站",
+      "decorIcon": "🚌"
+    },
+    {
+      "id": "node-5590480948",
+      "lat": 22.3310107,
+      "lon": 120.3628608,
+      "name": "小琉球 教官の818密室 民宿",
+      "decorType": "hotel",
+      "decorName": "飯店",
+      "decorIcon": "🏨"
+    },
+    {
+      "id": "node-5801220316",
+      "lat": 22.348311,
+      "lon": 120.377868,
+      "name": "未命名郵局",
+      "decorType": "post_office",
+      "decorName": "郵局",
+      "decorIcon": "✉️"
+    },
+    {
+      "id": "node-5801220402",
+      "lat": 22.352334,
+      "lon": 120.38211,
+      "name": "未命名郵局",
+      "decorType": "post_office",
+      "decorName": "郵局",
+      "decorIcon": "✉️"
+    },
+    {
+      "id": "node-5801220405",
+      "lat": 22.348437,
+      "lon": 120.378632,
+      "name": "未命名郵局",
+      "decorType": "post_office",
+      "decorName": "郵局",
+      "decorIcon": "✉️"
+    },
+    {
+      "id": "node-5801220762",
+      "lat": 22.340321,
+      "lon": 120.370694,
+      "name": "未命名郵局",
+      "decorType": "post_office",
+      "decorName": "郵局",
+      "decorIcon": "✉️"
     },
     {
       "id": "node-6261815959",
@@ -223,6 +394,15 @@
       "decorIcon": "🍽️"
     },
     {
+      "id": "node-6261845503",
+      "lat": 22.3477373,
+      "lon": 120.3883407,
+      "name": "龍蝦洞海景民宿",
+      "decorType": "hotel",
+      "decorName": "飯店",
+      "decorIcon": "🏨"
+    },
+    {
       "id": "node-6315733074",
       "lat": 22.3530236,
       "lon": 120.3818876,
@@ -230,6 +410,24 @@
       "decorType": "restaurant",
       "decorName": "餐廳",
       "decorIcon": "🍽️"
+    },
+    {
+      "id": "node-6315733075",
+      "lat": 22.3519859,
+      "lon": 120.3841709,
+      "name": "賢濱民宿",
+      "decorType": "hotel",
+      "decorName": "飯店",
+      "decorIcon": "🏨"
+    },
+    {
+      "id": "node-6315733077",
+      "lat": 22.3529606,
+      "lon": 120.3810684,
+      "name": "蔡老師民宿",
+      "decorType": "hotel",
+      "decorName": "飯店",
+      "decorIcon": "🏨"
     },
     {
       "id": "node-6315733078",
@@ -241,6 +439,42 @@
       "decorIcon": "🍽️"
     },
     {
+      "id": "node-6315733080",
+      "lat": 22.3525292,
+      "lon": 120.382027,
+      "name": "蘇宅",
+      "decorType": "hotel",
+      "decorName": "飯店",
+      "decorIcon": "🏨"
+    },
+    {
+      "id": "node-6315733082",
+      "lat": 22.352802,
+      "lon": 120.3743991,
+      "name": "八村度假村",
+      "decorType": "hotel",
+      "decorName": "飯店",
+      "decorIcon": "🏨"
+    },
+    {
+      "id": "node-6316326058",
+      "lat": 22.3527665,
+      "lon": 120.3742484,
+      "name": "南洋渡假海景莊園",
+      "decorType": "hotel",
+      "decorName": "飯店",
+      "decorIcon": "🏨"
+    },
+    {
+      "id": "node-6316408761",
+      "lat": 22.3526531,
+      "lon": 120.3739455,
+      "name": "地中海渡假旅店",
+      "decorType": "hotel",
+      "decorName": "飯店",
+      "decorIcon": "🏨"
+    },
+    {
       "id": "node-6317277382",
       "lat": 22.3526398,
       "lon": 120.3809998,
@@ -250,13 +484,76 @@
       "decorIcon": "🍽️"
     },
     {
+      "id": "node-6317277383",
+      "lat": 22.3530404,
+      "lon": 120.3808278,
+      "name": "吉樂多民宿",
+      "decorType": "hotel",
+      "decorName": "飯店",
+      "decorIcon": "🏨"
+    },
+    {
+      "id": "node-6317277384",
+      "lat": 22.3531772,
+      "lon": 120.3813321,
+      "name": "琉夏萊",
+      "decorType": "hotel",
+      "decorName": "飯店",
+      "decorIcon": "🏨"
+    },
+    {
+      "id": "node-6317277985",
+      "lat": 22.3510422,
+      "lon": 120.3774842,
+      "name": "阿念達浪漫會館",
+      "decorType": "hotel",
+      "decorName": "飯店",
+      "decorIcon": "🏨"
+    },
+    {
       "id": "node-6317277988",
       "lat": 22.350739,
       "lon": 120.3800103,
       "name": "全家便利商店",
-      "decorType": "convenience-store",
+      "decorType": "convenience",
       "decorName": "便利商店",
       "decorIcon": "🏪"
+    },
+    {
+      "id": "node-6317277989",
+      "lat": 22.3525036,
+      "lon": 120.3808975,
+      "name": "萊家莉民宿",
+      "decorType": "hotel",
+      "decorName": "飯店",
+      "decorIcon": "🏨"
+    },
+    {
+      "id": "node-6317277990",
+      "lat": 22.3529411,
+      "lon": 120.3808684,
+      "name": "藍沙民宿",
+      "decorType": "hotel",
+      "decorName": "飯店",
+      "decorIcon": "🏨"
+    },
+    {
+      "id": "node-6317277991",
+      "lat": 22.3541562,
+      "lon": 120.3815529,
+      "name": "琉球鄉樂齡學習中心",
+      "decorType": "art_gallery",
+      "decorName": "美術館",
+      "decorIcon": "🎨"
+    },
+    {
+      "id": "node-6317277992",
+      "lat": 22.3515802,
+      "lon": 120.3779925,
+      "name": "自然也",
+      "decorType": "hotel",
+      "decorName": "飯店",
+      "decorIcon": "🏨"
     },
     {
       "id": "node-6317277993",
@@ -268,6 +565,24 @@
       "decorIcon": "🍽️"
     },
     {
+      "id": "node-6317277996",
+      "lat": 22.3516798,
+      "lon": 120.3751286,
+      "name": "花鹿旅店",
+      "decorType": "hotel",
+      "decorName": "飯店",
+      "decorIcon": "🏨"
+    },
+    {
+      "id": "node-6317277997",
+      "lat": 22.352502,
+      "lon": 120.3808464,
+      "name": "琉心花園民宿",
+      "decorType": "hotel",
+      "decorName": "飯店",
+      "decorIcon": "🏨"
+    },
+    {
       "id": "node-6317277998",
       "lat": 22.3520386,
       "lon": 120.3802747,
@@ -275,6 +590,24 @@
       "decorType": "cafe",
       "decorName": "咖啡廳",
       "decorIcon": "☕"
+    },
+    {
+      "id": "node-6317277999",
+      "lat": 22.3534613,
+      "lon": 120.380775,
+      "name": "牽手旅店",
+      "decorType": "hotel",
+      "decorName": "飯店",
+      "decorIcon": "🏨"
+    },
+    {
+      "id": "node-6317278000",
+      "lat": 22.3509777,
+      "lon": 120.3801117,
+      "name": "亮晶晶民宿",
+      "decorType": "hotel",
+      "decorName": "飯店",
+      "decorIcon": "🏨"
     },
     {
       "id": "node-6317278002",
@@ -304,6 +637,51 @@
       "decorIcon": "🍽️"
     },
     {
+      "id": "node-6317291344",
+      "lat": 22.3518752,
+      "lon": 120.3737513,
+      "name": "輪廓",
+      "decorType": "hotel",
+      "decorName": "飯店",
+      "decorIcon": "🏨"
+    },
+    {
+      "id": "node-6317291345",
+      "lat": 22.3512638,
+      "lon": 120.3743016,
+      "name": "朵小路民宿",
+      "decorType": "hotel",
+      "decorName": "飯店",
+      "decorIcon": "🏨"
+    },
+    {
+      "id": "node-6317897503",
+      "lat": 22.3228431,
+      "lon": 120.3616724,
+      "name": "觀音石",
+      "decorType": "bus_stop",
+      "decorName": "公車站",
+      "decorIcon": "🚌"
+    },
+    {
+      "id": "node-6317897506",
+      "lat": 22.3423401,
+      "lon": 120.3642135,
+      "name": "杉板灣",
+      "decorType": "hotel",
+      "decorName": "飯店",
+      "decorIcon": "🏨"
+    },
+    {
+      "id": "node-6317897507",
+      "lat": 22.3527734,
+      "lon": 120.3801794,
+      "name": "辰光民宿",
+      "decorType": "hotel",
+      "decorName": "飯店",
+      "decorIcon": "🏨"
+    },
+    {
       "id": "node-6318548372",
       "lat": 22.3420913,
       "lon": 120.3639055,
@@ -331,6 +709,159 @@
       "decorIcon": "🛒"
     },
     {
+      "id": "node-6319911986",
+      "lat": 22.3506767,
+      "lon": 120.3741772,
+      "name": "黃隆宮",
+      "decorType": "shrine",
+      "decorName": "神社",
+      "decorIcon": "⛩️"
+    },
+    {
+      "id": "node-6319911987",
+      "lat": 22.33298,
+      "lon": 120.3643085,
+      "name": "天仙宮",
+      "decorType": "shrine",
+      "decorName": "神社",
+      "decorIcon": "⛩️"
+    },
+    {
+      "id": "node-6319911988",
+      "lat": 22.3388789,
+      "lon": 120.3699836,
+      "name": "白燈樓宿旅",
+      "decorType": "hotel",
+      "decorName": "飯店",
+      "decorIcon": "🏨"
+    },
+    {
+      "id": "node-6319911989",
+      "lat": 22.3444488,
+      "lon": 120.3678427,
+      "name": "海明珠民宿",
+      "decorType": "hotel",
+      "decorName": "飯店",
+      "decorIcon": "🏨"
+    },
+    {
+      "id": "node-6319911991",
+      "lat": 22.3466726,
+      "lon": 120.3763979,
+      "name": "國王旅店",
+      "decorType": "hotel",
+      "decorName": "飯店",
+      "decorIcon": "🏨"
+    },
+    {
+      "id": "node-6319911992",
+      "lat": 22.3340326,
+      "lon": 120.3656399,
+      "name": "南海雅築",
+      "decorType": "hotel",
+      "decorName": "飯店",
+      "decorIcon": "🏨"
+    },
+    {
+      "id": "node-6319911993",
+      "lat": 22.3432649,
+      "lon": 120.3669536,
+      "name": "上杉看海旅店",
+      "decorType": "hotel",
+      "decorName": "飯店",
+      "decorIcon": "🏨"
+    },
+    {
+      "id": "node-6319911995",
+      "lat": 22.3340225,
+      "lon": 120.3654974,
+      "name": "姚池宮",
+      "decorType": "shrine",
+      "decorName": "神社",
+      "decorIcon": "⛩️"
+    },
+    {
+      "id": "node-6319911997",
+      "lat": 22.338271,
+      "lon": 120.3657004,
+      "name": "南海之醉",
+      "decorType": "hotel",
+      "decorName": "飯店",
+      "decorIcon": "🏨"
+    },
+    {
+      "id": "node-6319911998",
+      "lat": 22.3467113,
+      "lon": 120.3701751,
+      "name": "拉美民宿",
+      "decorType": "hotel",
+      "decorName": "飯店",
+      "decorIcon": "🏨"
+    },
+    {
+      "id": "node-6319912001",
+      "lat": 22.3339168,
+      "lon": 120.3658737,
+      "name": "南風民宿網",
+      "decorType": "hotel",
+      "decorName": "飯店",
+      "decorIcon": "🏨"
+    },
+    {
+      "id": "node-6319912002",
+      "lat": 22.3440458,
+      "lon": 120.3670701,
+      "name": "小火雞旅店",
+      "decorType": "hotel",
+      "decorName": "飯店",
+      "decorIcon": "🏨"
+    },
+    {
+      "id": "node-6319912003",
+      "lat": 22.3490336,
+      "lon": 120.3716652,
+      "name": "彼空映旅宿",
+      "decorType": "hotel",
+      "decorName": "飯店",
+      "decorIcon": "🏨"
+    },
+    {
+      "id": "node-6319912004",
+      "lat": 22.3458781,
+      "lon": 120.3753322,
+      "name": "航海家民宿",
+      "decorType": "hotel",
+      "decorName": "飯店",
+      "decorIcon": "🏨"
+    },
+    {
+      "id": "node-6319912006",
+      "lat": 22.3374128,
+      "lon": 120.3672423,
+      "name": "清海民宿",
+      "decorType": "hotel",
+      "decorName": "飯店",
+      "decorIcon": "🏨"
+    },
+    {
+      "id": "node-6319912007",
+      "lat": 22.3401396,
+      "lon": 120.3698127,
+      "name": "琉球教會",
+      "decorType": "shrine",
+      "decorName": "神社",
+      "decorIcon": "⛩️"
+    },
+    {
+      "id": "node-6319912008",
+      "lat": 22.3476663,
+      "lon": 120.3706982,
+      "name": "彩茶花園民宿",
+      "decorType": "hotel",
+      "decorName": "飯店",
+      "decorIcon": "🏨"
+    },
+    {
       "id": "node-6320091954",
       "lat": 22.3486769,
       "lon": 120.378941,
@@ -344,7 +875,7 @@
       "lat": 22.3487152,
       "lon": 120.3787495,
       "name": "7-Eleven",
-      "decorType": "convenience-store",
+      "decorType": "convenience",
       "decorName": "便利商店",
       "decorIcon": "🏪"
     },
@@ -355,7 +886,7 @@
       "name": "龍鑽烘炸手工麻花捲",
       "decorType": "sweetshop",
       "decorName": "甜點店",
-      "decorIcon": "🍩"
+      "decorIcon": "🍰"
     },
     {
       "id": "node-6320091958",
@@ -376,6 +907,195 @@
       "decorIcon": "💊"
     },
     {
+      "id": "node-6734690341",
+      "lat": 22.3496392,
+      "lon": 120.3679195,
+      "name": "全德國小",
+      "decorType": "bus_stop",
+      "decorName": "公車站",
+      "decorIcon": "🚌"
+    },
+    {
+      "id": "node-6734690342",
+      "lat": 22.3518272,
+      "lon": 120.3705762,
+      "name": "沙瑪基",
+      "decorType": "bus_stop",
+      "decorName": "公車站",
+      "decorIcon": "🚌"
+    },
+    {
+      "id": "node-6734690343",
+      "lat": 22.3544914,
+      "lon": 120.3754324,
+      "name": "美人洞",
+      "decorType": "bus_stop",
+      "decorName": "公車站",
+      "decorIcon": "🚌"
+    },
+    {
+      "id": "node-6734690344",
+      "lat": 22.3540846,
+      "lon": 120.3810154,
+      "name": "花瓶岩 (遊客中心)",
+      "decorType": "bus_stop",
+      "decorName": "公車站",
+      "decorIcon": "🚌"
+    },
+    {
+      "id": "node-6734690345",
+      "lat": 22.3511872,
+      "lon": 120.3850856,
+      "name": "觀光碼頭",
+      "decorType": "bus_stop",
+      "decorName": "公車站",
+      "decorIcon": "🚌"
+    },
+    {
+      "id": "node-6821273694",
+      "lat": 22.3527548,
+      "lon": 120.3830306,
+      "name": "水晶渡假民宿",
+      "decorType": "hotel",
+      "decorName": "飯店",
+      "decorIcon": "🏨"
+    },
+    {
+      "id": "node-6821273696",
+      "lat": 22.3526585,
+      "lon": 120.3831785,
+      "name": "海豚灣民宿",
+      "decorType": "hotel",
+      "decorName": "飯店",
+      "decorIcon": "🏨"
+    },
+    {
+      "id": "node-6821273697",
+      "lat": 22.3526312,
+      "lon": 120.3832321,
+      "name": "白龍宮旅館",
+      "decorType": "hotel",
+      "decorName": "飯店",
+      "decorIcon": "🏨"
+    },
+    {
+      "id": "node-6821286243",
+      "lat": 22.3533685,
+      "lon": 120.3824227,
+      "name": "琉球好民宿",
+      "decorType": "hotel",
+      "decorName": "飯店",
+      "decorIcon": "🏨"
+    },
+    {
+      "id": "node-6822194205",
+      "lat": 22.3357948,
+      "lon": 120.3617075,
+      "name": "蛤板灣",
+      "decorType": "bus_stop",
+      "decorName": "公車站",
+      "decorIcon": "🚌"
+    },
+    {
+      "id": "node-6822194206",
+      "lat": 22.3386206,
+      "lon": 120.3624652,
+      "name": "山豬溝",
+      "decorType": "bus_stop",
+      "decorName": "公車站",
+      "decorIcon": "🚌"
+    },
+    {
+      "id": "node-6822194207",
+      "lat": 22.3407406,
+      "lon": 120.3639954,
+      "name": "杉福漁港",
+      "decorType": "bus_stop",
+      "decorName": "公車站",
+      "decorIcon": "🚌"
+    },
+    {
+      "id": "node-6822220899",
+      "lat": 22.3454455,
+      "lon": 120.3872636,
+      "name": "龍蝦洞",
+      "decorType": "bus_stop",
+      "decorName": "公車站",
+      "decorIcon": "🚌"
+    },
+    {
+      "id": "node-6822220900",
+      "lat": 22.3347385,
+      "lon": 120.3742458,
+      "name": "大福漁港",
+      "decorType": "bus_stop",
+      "decorName": "公車站",
+      "decorIcon": "🚌"
+    },
+    {
+      "id": "node-6822220901",
+      "lat": 22.3401166,
+      "lon": 120.3818656,
+      "name": "旭日亭",
+      "decorType": "bus_stop",
+      "decorName": "公車站",
+      "decorIcon": "🚌"
+    },
+    {
+      "id": "node-6822220902",
+      "lat": 22.3318972,
+      "lon": 120.3713201,
+      "name": "大福亭",
+      "decorType": "bus_stop",
+      "decorName": "公車站",
+      "decorIcon": "🚌"
+    },
+    {
+      "id": "node-6822220903",
+      "lat": 22.3260039,
+      "lon": 120.3658926,
+      "name": "厚石砲臺",
+      "decorType": "bus_stop",
+      "decorName": "公車站",
+      "decorIcon": "🚌"
+    },
+    {
+      "id": "node-6822220904",
+      "lat": 22.3252937,
+      "lon": 120.353803,
+      "name": "未命名公車站",
+      "decorType": "bus_stop",
+      "decorName": "公車站",
+      "decorIcon": "🚌"
+    },
+    {
+      "id": "node-6822220905",
+      "lat": 22.3251672,
+      "lon": 120.3534597,
+      "name": "落日亭",
+      "decorType": "bus_stop",
+      "decorName": "公車站",
+      "decorIcon": "🚌"
+    },
+    {
+      "id": "node-6822220906",
+      "lat": 22.3303813,
+      "lon": 120.3559086,
+      "name": "烏鬼洞",
+      "decorType": "bus_stop",
+      "decorName": "公車站",
+      "decorIcon": "🚌"
+    },
+    {
+      "id": "node-6822220907",
+      "lat": 22.3318488,
+      "lon": 120.3588563,
+      "name": "長春亭 (番子厝)",
+      "decorType": "bus_stop",
+      "decorName": "公車站",
+      "decorIcon": "🚌"
+    },
+    {
       "id": "node-6824090558",
       "lat": 22.3534294,
       "lon": 120.3812396,
@@ -383,6 +1103,15 @@
       "decorType": "restaurant",
       "decorName": "餐廳",
       "decorIcon": "🍽️"
+    },
+    {
+      "id": "node-6908750683",
+      "lat": 22.3445711,
+      "lon": 120.3763351,
+      "name": "三仙宮",
+      "decorType": "shrine",
+      "decorName": "神社",
+      "decorIcon": "⛩️"
     },
     {
       "id": "node-6908801863",
@@ -394,6 +1123,24 @@
       "decorIcon": "🍽️"
     },
     {
+      "id": "node-6910843573",
+      "lat": 22.3445077,
+      "lon": 120.3874272,
+      "name": "1302 海景渡假民宿",
+      "decorType": "hotel",
+      "decorName": "飯店",
+      "decorIcon": "🏨"
+    },
+    {
+      "id": "node-6965954985",
+      "lat": 22.341922,
+      "lon": 120.3845498,
+      "name": "Deepsoul",
+      "decorType": "hotel",
+      "decorName": "飯店",
+      "decorIcon": "🏨"
+    },
+    {
       "id": "node-7013405185",
       "lat": 22.3513162,
       "lon": 120.3808448,
@@ -401,6 +1148,15 @@
       "decorType": "burger",
       "decorName": "漢堡店",
       "decorIcon": "🍔"
+    },
+    {
+      "id": "node-7262704177",
+      "lat": 22.3514622,
+      "lon": 120.3847631,
+      "name": "城隍廟",
+      "decorType": "shrine",
+      "decorName": "神社",
+      "decorIcon": "⛩️"
     },
     {
       "id": "node-7617087885",
@@ -428,6 +1184,24 @@
       "decorType": "cafe",
       "decorName": "咖啡廳",
       "decorIcon": "☕"
+    },
+    {
+      "id": "node-7619867985",
+      "lat": 22.3289434,
+      "lon": 120.3594834,
+      "name": "小麻雀的家",
+      "decorType": "hotel",
+      "decorName": "飯店",
+      "decorIcon": "🏨"
+    },
+    {
+      "id": "node-7631342986",
+      "lat": 22.3347227,
+      "lon": 120.3664108,
+      "name": "小島停琉",
+      "decorType": "library",
+      "decorName": "圖書館／書店",
+      "decorIcon": "📚"
     },
     {
       "id": "node-7654550085",
@@ -493,6 +1267,15 @@
       "decorIcon": "🍽️"
     },
     {
+      "id": "node-8843521933",
+      "lat": 22.3501533,
+      "lon": 120.3830615,
+      "name": "大海的天空",
+      "decorType": "hotel",
+      "decorName": "飯店",
+      "decorIcon": "🏨"
+    },
+    {
       "id": "node-10777465929",
       "lat": 22.3417704,
       "lon": 120.3643613,
@@ -524,18 +1307,18 @@
       "lat": 22.3524469,
       "lon": 120.3821649,
       "name": "Ole Ola",
-      "decorType": "clothing-store",
+      "decorType": "clothing",
       "decorName": "服飾店",
-      "decorIcon": "👕"
+      "decorIcon": "👔"
     },
     {
       "id": "node-10777516552",
       "lat": 22.3528596,
       "lon": 120.3821772,
       "name": "未命名服飾店",
-      "decorType": "clothing-store",
+      "decorType": "clothing",
       "decorName": "服飾店",
-      "decorIcon": "👕"
+      "decorIcon": "👔"
     },
     {
       "id": "node-10777516609",
@@ -551,9 +1334,9 @@
       "lat": 22.3393157,
       "lon": 120.3701592,
       "name": "未命名服飾店",
-      "decorType": "clothing-store",
+      "decorType": "clothing",
       "decorName": "服飾店",
-      "decorIcon": "👕"
+      "decorIcon": "👔"
     },
     {
       "id": "node-10779316337",
@@ -581,6 +1364,33 @@
       "decorType": "restaurant",
       "decorName": "餐廳",
       "decorIcon": "🍽️"
+    },
+    {
+      "id": "node-11007953705",
+      "lat": 22.3452661,
+      "lon": 120.3748249,
+      "name": "黑背包民宿",
+      "decorType": "hotel",
+      "decorName": "飯店",
+      "decorIcon": "🏨"
+    },
+    {
+      "id": "node-11027996420",
+      "lat": 22.3273739,
+      "lon": 120.3651386,
+      "name": "和德堂",
+      "decorType": "shrine",
+      "decorName": "神社",
+      "decorIcon": "⛩️"
+    },
+    {
+      "id": "node-11222887499",
+      "lat": 22.3433281,
+      "lon": 120.3726481,
+      "name": "頂上福山",
+      "decorType": "mountain",
+      "decorName": "山丘",
+      "decorIcon": "⛰️"
     },
     {
       "id": "node-11278570431",
@@ -616,7 +1426,7 @@
       "name": "寶哥手作麻花捲",
       "decorType": "sweetshop",
       "decorName": "甜點店",
-      "decorIcon": "🍩"
+      "decorIcon": "🍰"
     },
     {
       "id": "node-12198922345",
@@ -2522,9 +3332,9 @@
       "lat": 22.351077319638335,
       "lon": 120.38065962473866,
       "name": "琉球郵局",
-      "decorType": "post-office",
+      "decorType": "post_office",
       "decorName": "郵局",
-      "decorIcon": "📮"
+      "decorIcon": "✉️"
     },
     {
       "id": "way-372689679-1/22032033133313031",
@@ -2532,7 +3342,7 @@
       "lon": 120.35976460353226,
       "name": "蛤板灣 (威尼斯沙灘)",
       "decorType": "beach",
-      "decorName": "海灘",
+      "decorName": "海邊",
       "decorIcon": "🏖️"
     },
     {
@@ -2541,7 +3351,7 @@
       "lon": 120.35976460353226,
       "name": "蛤板灣 (威尼斯沙灘)",
       "decorType": "beach",
-      "decorName": "海灘",
+      "decorName": "海邊",
       "decorIcon": "🏖️"
     },
     {
@@ -2550,7 +3360,7 @@
       "lon": 120.36048517747389,
       "name": "蛤板灣 (威尼斯沙灘)",
       "decorType": "beach",
-      "decorName": "海灘",
+      "decorName": "海邊",
       "decorIcon": "🏖️"
     },
     {
@@ -2559,7 +3369,7 @@
       "lon": 120.36048517747389,
       "name": "蛤板灣 (威尼斯沙灘)",
       "decorType": "beach",
-      "decorName": "海灘",
+      "decorName": "海邊",
       "decorIcon": "🏖️"
     },
     {
@@ -2568,7 +3378,7 @@
       "lon": 120.35904402559567,
       "name": "蛤板灣 (威尼斯沙灘)",
       "decorType": "beach",
-      "decorName": "海灘",
+      "decorName": "海邊",
       "decorIcon": "🏖️"
     },
     {
@@ -2577,7 +3387,7 @@
       "lon": 120.38930485601708,
       "name": "中澳沙灘",
       "decorType": "beach",
-      "decorName": "海灘",
+      "decorName": "海邊",
       "decorIcon": "🏖️"
     },
     {
@@ -2586,7 +3396,7 @@
       "lon": 120.38858444210695,
       "name": "中澳沙灘",
       "decorType": "beach",
-      "decorName": "海灘",
+      "decorName": "海邊",
       "decorIcon": "🏖️"
     },
     {
@@ -2595,7 +3405,7 @@
       "lon": 120.38930485601708,
       "name": "中澳沙灘",
       "decorType": "beach",
-      "decorName": "海灘",
+      "decorName": "海邊",
       "decorIcon": "🏖️"
     },
     {
@@ -2604,7 +3414,7 @@
       "lon": 120.38858444210695,
       "name": "中澳沙灘",
       "decorType": "beach",
-      "decorName": "海灘",
+      "decorName": "海邊",
       "decorIcon": "🏖️"
     },
     {
@@ -2613,7 +3423,7 @@
       "lon": 120.38786402419043,
       "name": "中澳沙灘",
       "decorType": "beach",
-      "decorName": "海灘",
+      "decorName": "海邊",
       "decorIcon": "🏖️"
     },
     {
@@ -2622,7 +3432,7 @@
       "lon": 120.38714360226788,
       "name": "中澳沙灘",
       "decorType": "beach",
-      "decorName": "海灘",
+      "decorName": "海邊",
       "decorIcon": "🏖️"
     },
     {
@@ -2631,7 +3441,7 @@
       "lon": 120.38642317633952,
       "name": "中澳沙灘",
       "decorType": "beach",
-      "decorName": "海灘",
+      "decorName": "海邊",
       "decorIcon": "🏖️"
     },
     {
@@ -2640,7 +3450,7 @@
       "lon": 120.38642317633952,
       "name": "中澳沙灘",
       "decorType": "beach",
-      "decorName": "海灘",
+      "decorName": "海邊",
       "decorIcon": "🏖️"
     },
     {
@@ -2649,7 +3459,7 @@
       "lon": 120.38786402419043,
       "name": "中澳沙灘",
       "decorType": "beach",
-      "decorName": "海灘",
+      "decorName": "海邊",
       "decorIcon": "🏖️"
     },
     {
@@ -2658,7 +3468,7 @@
       "lon": 120.38858444210695,
       "name": "中澳沙灘",
       "decorType": "beach",
-      "decorName": "海灘",
+      "decorName": "海邊",
       "decorIcon": "🏖️"
     },
     {
@@ -2667,7 +3477,7 @@
       "lon": 120.38858444210695,
       "name": "中澳沙灘",
       "decorType": "beach",
-      "decorName": "海灘",
+      "decorName": "海邊",
       "decorIcon": "🏖️"
     },
     {
@@ -2676,7 +3486,7 @@
       "lon": 120.38930485601708,
       "name": "中澳沙灘",
       "decorType": "beach",
-      "decorName": "海灘",
+      "decorName": "海邊",
       "decorIcon": "🏖️"
     },
     {
@@ -2685,8 +3495,35 @@
       "lon": 120.38858444210695,
       "name": "中澳沙灘",
       "decorType": "beach",
-      "decorName": "海灘",
+      "decorName": "海邊",
       "decorIcon": "🏖️"
+    },
+    {
+      "id": "way-524812412-1/22032033022301213",
+      "lat": 22.346456426675175,
+      "lon": 120.37705727487423,
+      "name": "三隆宮",
+      "decorType": "shrine",
+      "decorName": "神社",
+      "decorIcon": "⛩️"
+    },
+    {
+      "id": "way-524812412-1/22032033022301220",
+      "lat": 22.34712687754593,
+      "lon": 120.37705727487423,
+      "name": "三隆宮",
+      "decorType": "shrine",
+      "decorName": "神社",
+      "decorIcon": "⛩️"
+    },
+    {
+      "id": "way-524812412-1/22032033022301202",
+      "lat": 22.346604933970447,
+      "lon": 120.37633679289479,
+      "name": "三隆宮",
+      "decorType": "shrine",
+      "decorName": "神社",
+      "decorIcon": "⛩️"
     },
     {
       "id": "way-630709652-1/22032033133021021",
@@ -2695,7 +3532,7 @@
       "name": "大福亭天然泳池",
       "decorType": "waterside",
       "decorName": "水邊",
-      "decorIcon": "💧"
+      "decorIcon": "🌊"
     },
     {
       "id": "way-630709652-1/22032033133021012",
@@ -2704,7 +3541,286 @@
       "name": "大福亭天然泳池",
       "decorType": "waterside",
       "decorName": "水邊",
-      "decorIcon": "💧"
+      "decorIcon": "🌊"
+    },
+    {
+      "id": "way-674642341-1/22032033133322101",
+      "lat": 22.341082987922267,
+      "lon": 120.36408798724824,
+      "name": "上杉福安宮",
+      "decorType": "shrine",
+      "decorName": "神社",
+      "decorIcon": "⛩️"
+    },
+    {
+      "id": "way-674642341-1/22032033133322030",
+      "lat": 22.34123140485714,
+      "lon": 120.36336743328553,
+      "name": "上杉福安宮",
+      "decorType": "shrine",
+      "decorName": "神社",
+      "decorIcon": "⛩️"
+    },
+    {
+      "id": "way-674642341-1/22032033133322033",
+      "lat": 22.340560888729797,
+      "lon": 120.36336743328553,
+      "name": "上杉福安宮",
+      "decorType": "shrine",
+      "decorName": "神社",
+      "decorIcon": "⛩️"
+    },
+    {
+      "id": "way-674642341-1/22032033133322100",
+      "lat": 22.34041247530746,
+      "lon": 120.36408798724824,
+      "name": "上杉福安宮",
+      "decorType": "shrine",
+      "decorName": "神社",
+      "decorIcon": "⛩️"
+    },
+    {
+      "id": "way-674642342-1/22032033133322101",
+      "lat": 22.341082987922267,
+      "lon": 120.36408798724824,
+      "name": "上杉萬年宮",
+      "decorType": "shrine",
+      "decorName": "神社",
+      "decorIcon": "⛩️"
+    },
+    {
+      "id": "way-674642342-1/22032033133322030",
+      "lat": 22.34123140485714,
+      "lon": 120.36336743328553,
+      "name": "上杉萬年宮",
+      "decorType": "shrine",
+      "decorName": "神社",
+      "decorIcon": "⛩️"
+    },
+    {
+      "id": "way-674674597-1/22032033133322133",
+      "lat": 22.34242401349738,
+      "lon": 120.36408798724824,
+      "name": "南國海岸",
+      "decorType": "hotel",
+      "decorName": "飯店",
+      "decorIcon": "🏨"
+    },
+    {
+      "id": "way-674674597-1/22032033133322203",
+      "lat": 22.34294609630616,
+      "lon": 120.36480853721434,
+      "name": "南國海岸",
+      "decorType": "hotel",
+      "decorName": "飯店",
+      "decorIcon": "🏨"
+    },
+    {
+      "id": "way-674674597-1/22032033133322200",
+      "lat": 22.343094526457122,
+      "lon": 120.36408798724824,
+      "name": "南國海岸",
+      "decorType": "hotel",
+      "decorName": "飯店",
+      "decorIcon": "🏨"
+    },
+    {
+      "id": "way-674674597-1/22032033133322130",
+      "lat": 22.342275586858783,
+      "lon": 120.36480853721434,
+      "name": "南國海岸",
+      "decorType": "hotel",
+      "decorName": "飯店",
+      "decorIcon": "🏨"
+    },
+    {
+      "id": "way-674681583-1/22032033022302020",
+      "lat": 22.350402765524798,
+      "lon": 120.37417532294876,
+      "name": "未命名神社",
+      "decorType": "shrine",
+      "decorName": "神社",
+      "decorIcon": "⛩️"
+    },
+    {
+      "id": "way-675802210-1/22032033022302030",
+      "lat": 22.34958378684117,
+      "lon": 120.37489581693183,
+      "name": "未命名神社",
+      "decorType": "shrine",
+      "decorName": "神社",
+      "decorIcon": "⛩️"
+    },
+    {
+      "id": "way-675802210-1/22032033022302033",
+      "lat": 22.348913325094166,
+      "lon": 120.37489581693183,
+      "name": "未命名神社",
+      "decorType": "shrine",
+      "decorName": "神社",
+      "decorIcon": "⛩️"
+    },
+    {
+      "id": "way-675806791-1/22032033133012030",
+      "lat": 22.33788410283276,
+      "lon": 120.36985227504692,
+      "name": "碧雲寺",
+      "decorType": "shrine",
+      "decorName": "神社",
+      "decorIcon": "⛩️"
+    },
+    {
+      "id": "way-675806793-1/22032033133012032",
+      "lat": 22.338406153099193,
+      "lon": 120.37057279302957,
+      "name": "南天宮",
+      "decorType": "shrine",
+      "decorName": "神社",
+      "decorIcon": "⛩️"
+    },
+    {
+      "id": "way-675806793-1/22032033133012001",
+      "lat": 22.33825771640915,
+      "lon": 120.37129330701293,
+      "name": "南天宮",
+      "decorType": "shrine",
+      "decorName": "神社",
+      "decorIcon": "⛩️"
+    },
+    {
+      "id": "way-675806805-1/22032033133012313",
+      "lat": 22.335053750442412,
+      "lon": 120.37057279302957,
+      "name": "佛池寺",
+      "decorType": "shrine",
+      "decorName": "神社",
+      "decorIcon": "⛩️"
+    },
+    {
+      "id": "way-675806805-1/22032033133012302",
+      "lat": 22.334383270263775,
+      "lon": 120.37057279302957,
+      "name": "佛池寺",
+      "decorType": "shrine",
+      "decorName": "神社",
+      "decorIcon": "⛩️"
+    },
+    {
+      "id": "way-675806808-1/22032033133013031",
+      "lat": 22.334460057894315,
+      "lon": 120.37345482496505,
+      "name": "萬聖府",
+      "decorType": "shrine",
+      "decorName": "神社",
+      "decorIcon": "⛩️"
+    },
+    {
+      "id": "way-675806808-1/22032033133013020",
+      "lat": 22.334311628065503,
+      "lon": 120.37417532294876,
+      "name": "萬聖府",
+      "decorType": "shrine",
+      "decorName": "神社",
+      "decorIcon": "⛩️"
+    },
+    {
+      "id": "way-675806809-1/22032033133013023",
+      "lat": 22.33498209079214,
+      "lon": 120.37417532294876,
+      "name": "福安宮",
+      "decorType": "shrine",
+      "decorName": "神社",
+      "decorIcon": "⛩️"
+    },
+    {
+      "id": "way-675806810-1/22032033133013023",
+      "lat": 22.33498209079214,
+      "lon": 120.37417532294876,
+      "name": "水興宮",
+      "decorType": "shrine",
+      "decorName": "神社",
+      "decorIcon": "⛩️"
+    },
+    {
+      "id": "way-675806810-1/22032033133013132",
+      "lat": 22.335652553636837,
+      "lon": 120.37417532294876,
+      "name": "水興宮",
+      "decorType": "shrine",
+      "decorName": "神社",
+      "decorIcon": "⛩️"
+    },
+    {
+      "id": "way-679340605-1/22032033022233330",
+      "lat": 22.34600174179403,
+      "lon": 120.36624962515543,
+      "name": "未命名神社",
+      "decorType": "shrine",
+      "decorName": "神社",
+      "decorIcon": "⛩️"
+    },
+    {
+      "id": "way-679340605-1/22032033022233323",
+      "lat": 22.346672244900187,
+      "lon": 120.36624962515543,
+      "name": "未命名神社",
+      "decorType": "shrine",
+      "decorName": "神社",
+      "decorIcon": "⛩️"
+    },
+    {
+      "id": "way-679340618-1/22032033022300313",
+      "lat": 22.34578144915077,
+      "lon": 120.37057279302957,
+      "name": "代清宮",
+      "decorType": "shrine",
+      "decorName": "神社",
+      "decorIcon": "⛩️"
+    },
+    {
+      "id": "way-679340618-1/22032033022300310",
+      "lat": 22.34645193129639,
+      "lon": 120.37057279302957,
+      "name": "代清宮",
+      "decorType": "shrine",
+      "decorName": "神社",
+      "decorIcon": "⛩️"
+    },
+    {
+      "id": "way-679340621-1/22032033022300313",
+      "lat": 22.34578144915077,
+      "lon": 120.37057279302957,
+      "name": "未命名神社",
+      "decorType": "shrine",
+      "decorName": "神社",
+      "decorIcon": "⛩️"
+    },
+    {
+      "id": "way-679340621-1/22032033022300302",
+      "lat": 22.345632973817487,
+      "lon": 120.37129330701293,
+      "name": "未命名神社",
+      "decorType": "shrine",
+      "decorName": "神社",
+      "decorIcon": "⛩️"
+    },
+    {
+      "id": "way-680988927-1/22032033022330122",
+      "lat": 22.346388248840896,
+      "lon": 120.38714360226788,
+      "name": "池隆宮",
+      "decorType": "shrine",
+      "decorName": "神社",
+      "decorIcon": "⛩️"
+    },
+    {
+      "id": "way-680988927-1/22032033022330211",
+      "lat": 22.34653680415259,
+      "lon": 120.38642317633952,
+      "name": "池隆宮",
+      "decorType": "shrine",
+      "decorName": "神社",
+      "decorIcon": "⛩️"
     },
     {
       "id": "way-680988959-1/22032033022330321",
@@ -2713,7 +3829,7 @@
       "name": "未命名水邊",
       "decorType": "waterside",
       "decorName": "水邊",
-      "decorIcon": "💧"
+      "decorIcon": "🌊"
     },
     {
       "id": "way-680988999-1/22032033022330131",
@@ -2737,27 +3853,27 @@
       "id": "way-683599379-1/22032033022330113",
       "lat": 22.34676152518421,
       "lon": 120.38858444210695,
-      "name": "未命名海灘",
+      "name": "未命名海邊",
       "decorType": "beach",
-      "decorName": "海灘",
+      "decorName": "海邊",
       "decorIcon": "🏖️"
     },
     {
       "id": "way-683599379-1/22032033022330110",
       "lat": 22.34661295833056,
       "lon": 120.38930485601708,
-      "name": "未命名海灘",
+      "name": "未命名海邊",
       "decorType": "beach",
-      "decorName": "海灘",
+      "decorName": "海邊",
       "decorIcon": "🏖️"
     },
     {
       "id": "way-683599379-1/22032033022330112",
       "lat": 22.346091130189393,
       "lon": 120.38858444210695,
-      "name": "未命名海灘",
+      "name": "未命名海邊",
       "decorType": "beach",
-      "decorName": "海灘",
+      "decorName": "海邊",
       "decorIcon": "🏖️"
     },
     {
@@ -2857,7 +3973,7 @@
       "name": "未命名水邊",
       "decorType": "waterside",
       "decorName": "水邊",
-      "decorIcon": "💧"
+      "decorIcon": "🌊"
     },
     {
       "id": "way-684298403-1/22032033022333123",
@@ -2866,7 +3982,7 @@
       "name": "未命名水邊",
       "decorType": "waterside",
       "decorName": "水邊",
-      "decorIcon": "💧"
+      "decorIcon": "🌊"
     },
     {
       "id": "way-684298415-1/22032033022333210",
@@ -3082,7 +4198,7 @@
       "name": "未命名水邊",
       "decorType": "waterside",
       "decorName": "水邊",
-      "decorIcon": "💧"
+      "decorIcon": "🌊"
     },
     {
       "id": "way-685714316-1/22032033022331300",
@@ -3091,7 +4207,16 @@
       "name": "未命名水邊",
       "decorType": "waterside",
       "decorName": "水邊",
-      "decorIcon": "💧"
+      "decorIcon": "🌊"
+    },
+    {
+      "id": "way-685714323-1/22032033022331012",
+      "lat": 22.349961233660114,
+      "lon": 120.38282098662097,
+      "name": "未命名神社",
+      "decorType": "shrine",
+      "decorName": "神社",
+      "decorIcon": "⛩️"
     },
     {
       "id": "way-685714334-1/22032033022330230",
@@ -3463,6 +4588,15 @@
       "decorIcon": "🌲"
     },
     {
+      "id": "way-701953106-1/22032033022331102",
+      "lat": 22.351896306142095,
+      "lon": 120.37993916277105,
+      "name": "柔依流居民宿",
+      "decorType": "hotel",
+      "decorName": "飯店",
+      "decorIcon": "🏨"
+    },
+    {
       "id": "way-701953135-1/22032033022320133",
       "lat": 22.354951353990536,
       "lon": 120.381380082703,
@@ -3553,13 +4687,85 @@
       "decorIcon": "🌲"
     },
     {
+      "id": "way-727901180-1/22032033022330330",
+      "lat": 22.351526797061165,
+      "lon": 120.3849823124666,
+      "name": "玉勅鳳邑琉球城隍廟",
+      "decorType": "shrine",
+      "decorName": "神社",
+      "decorIcon": "⛩️"
+    },
+    {
+      "id": "way-727901183-1/22032033022320110",
+      "lat": 22.35264292854717,
+      "lon": 120.38282098662097,
+      "name": "福泉宮",
+      "decorType": "shrine",
+      "decorName": "神社",
+      "decorIcon": "⛩️"
+    },
+    {
+      "id": "way-727904408-1/22032033022320102",
+      "lat": 22.353461923416894,
+      "lon": 120.38210053666387,
+      "name": "水仙宮",
+      "decorType": "shrine",
+      "decorName": "神社",
+      "decorIcon": "⛩️"
+    },
+    {
+      "id": "way-727904408-1/22032033022320103",
+      "lat": 22.352791495904423,
+      "lon": 120.38210053666387,
+      "name": "水仙宮",
+      "decorType": "shrine",
+      "decorName": "神社",
+      "decorIcon": "⛩️"
+    },
+    {
+      "id": "way-732708868-1/22032033022331101",
+      "lat": 22.35174775384311,
+      "lon": 120.38065962473866,
+      "name": "阿雅娜",
+      "decorType": "hotel",
+      "decorName": "飯店",
+      "decorIcon": "🏨"
+    },
+    {
+      "id": "way-732708868-1/22032033022331132",
+      "lat": 22.351077319638335,
+      "lon": 120.38065962473866,
+      "name": "阿雅娜",
+      "decorType": "hotel",
+      "decorName": "飯店",
+      "decorIcon": "🏨"
+    },
+    {
+      "id": "way-1071238907-1/22032033133310330",
+      "lat": 22.325210142287368,
+      "lon": 120.35976460353226,
+      "name": "未命名橋樑",
+      "decorType": "bridge",
+      "decorName": "橋樑",
+      "decorIcon": "🌉"
+    },
+    {
+      "id": "way-1071238907-1/22032033133201001",
+      "lat": 22.324539611558983,
+      "lon": 120.35976460353226,
+      "name": "未命名橋樑",
+      "decorType": "bridge",
+      "decorName": "橋樑",
+      "decorIcon": "🌉"
+    },
+    {
       "id": "way-1155049494-1/22032033022330213",
       "lat": 22.34735576583844,
       "lon": 120.38570274640568,
       "name": "琉球共融公園",
       "decorType": "park",
       "decorName": "公園",
-      "decorIcon": "🌳"
+      "decorIcon": "🍀"
     },
     {
       "id": "way-1155049494-1/22032033022330210",
@@ -3568,7 +4774,7 @@
       "name": "琉球共融公園",
       "decorType": "park",
       "decorName": "公園",
-      "decorIcon": "🌳"
+      "decorIcon": "🍀"
     },
     {
       "id": "way-1155049494-1/22032033022330203",
@@ -3577,7 +4783,7 @@
       "name": "琉球共融公園",
       "decorType": "park",
       "decorName": "公園",
-      "decorIcon": "🌳"
+      "decorIcon": "🍀"
     },
     {
       "id": "way-1155049494-1/22032033022330202",
@@ -3586,7 +4792,7 @@
       "name": "琉球共融公園",
       "decorType": "park",
       "decorName": "公園",
-      "decorIcon": "🌳"
+      "decorIcon": "🍀"
     },
     {
       "id": "way-1155049494-1/22032033022330212",
@@ -3595,7 +4801,7 @@
       "name": "琉球共融公園",
       "decorType": "park",
       "decorName": "公園",
-      "decorIcon": "🌳"
+      "decorIcon": "🍀"
     },
     {
       "id": "way-1155049494-1/22032033022330211",
@@ -3604,7 +4810,70 @@
       "name": "琉球共融公園",
       "decorType": "park",
       "decorName": "公園",
-      "decorIcon": "🌳"
+      "decorIcon": "🍀"
+    },
+    {
+      "id": "way-1187625595-1/22032033133012023",
+      "lat": 22.33721361867051,
+      "lon": 120.36985227504692,
+      "name": "琉球聖后宮",
+      "decorType": "shrine",
+      "decorName": "神社",
+      "decorIcon": "⛩️"
+    },
+    {
+      "id": "way-1187625610-1/22032033133012030",
+      "lat": 22.33788410283276,
+      "lon": 120.36985227504692,
+      "name": "未命名水邊",
+      "decorType": "waterside",
+      "decorName": "水邊",
+      "decorIcon": "🌊"
+    },
+    {
+      "id": "way-1187625610-1/22032033133012031",
+      "lat": 22.33773567233363,
+      "lon": 120.37057279302957,
+      "name": "未命名水邊",
+      "decorType": "waterside",
+      "decorName": "水邊",
+      "decorIcon": "🌊"
+    },
+    {
+      "id": "way-1187625610-1/22032033133012023",
+      "lat": 22.33721361867051,
+      "lon": 120.36985227504692,
+      "name": "未命名水邊",
+      "decorType": "waterside",
+      "decorName": "水邊",
+      "decorIcon": "🌊"
+    },
+    {
+      "id": "way-1187633350-1/22032033133311202",
+      "lat": 22.32752440855159,
+      "lon": 120.36480853721434,
+      "name": "未命名神社",
+      "decorType": "shrine",
+      "decorName": "神社",
+      "decorIcon": "⛩️"
+    },
+    {
+      "id": "way-1187639592-1/22032033133322313",
+      "lat": 22.34406189882047,
+      "lon": 120.36264687532645,
+      "name": "玉敇天海宮 (施工中)",
+      "decorType": "shrine",
+      "decorName": "神社",
+      "decorIcon": "⛩️"
+    },
+    {
+      "id": "way-1187639592-1/22032033133322312",
+      "lat": 22.343391378721975,
+      "lon": 120.36264687532645,
+      "name": "玉敇天海宮 (施工中)",
+      "decorType": "shrine",
+      "decorName": "神社",
+      "decorIcon": "⛩️"
     },
     {
       "id": "way-1187646072-1/22032033133322313",
@@ -3619,27 +4888,27 @@
       "id": "way-1187717446-1/22032033133322021",
       "lat": 22.342720858737735,
       "lon": 120.36264687532645,
-      "name": "未命名海灘",
+      "name": "未命名海邊",
       "decorType": "beach",
-      "decorName": "海灘",
+      "decorName": "海邊",
       "decorIcon": "🏖️"
     },
     {
       "id": "way-1187717447-1/22032033133322021",
       "lat": 22.342720858737735,
       "lon": 120.36264687532645,
-      "name": "未命名海灘",
+      "name": "未命名海邊",
       "decorType": "beach",
-      "decorName": "海灘",
+      "decorName": "海邊",
       "decorIcon": "🏖️"
     },
     {
       "id": "way-1187717447-1/22032033133322020",
       "lat": 22.34205033886803,
       "lon": 120.36264687532645,
-      "name": "未命名海灘",
+      "name": "未命名海邊",
       "decorType": "beach",
-      "decorName": "海灘",
+      "decorName": "海邊",
       "decorIcon": "🏖️"
     },
     {
@@ -3682,9 +4951,9 @@
       "id": "way-1211295538-1/22032033133322022",
       "lat": 22.34257243745707,
       "lon": 120.36336743328553,
-      "name": "未命名海灘",
+      "name": "未命名海邊",
       "decorType": "beach",
-      "decorName": "海灘",
+      "decorName": "海邊",
       "decorIcon": "🏖️"
     },
     {
@@ -3700,73 +4969,190 @@
       "id": "way-1211295558-1/22032033022232333",
       "lat": 22.350695265899898,
       "lon": 120.36624962515543,
-      "name": "未命名海灘",
+      "name": "未命名海邊",
       "decorType": "beach",
-      "decorName": "海灘",
+      "decorName": "海邊",
       "decorIcon": "🏖️"
     },
     {
       "id": "way-1211295560-1/22032033022233022",
       "lat": 22.348458634230614,
       "lon": 120.36408798724824,
-      "name": "未命名海灘",
+      "name": "未命名海邊",
       "decorType": "beach",
-      "decorName": "海灘",
+      "decorName": "海邊",
       "decorIcon": "🏖️"
     },
     {
       "id": "way-1211295560-1/22032033022233023",
       "lat": 22.349129148210046,
       "lon": 120.36408798724824,
-      "name": "未命名海灘",
+      "name": "未命名海邊",
       "decorType": "beach",
-      "decorName": "海灘",
+      "decorName": "海邊",
       "decorIcon": "🏖️"
     },
     {
       "id": "way-1211295560-1/22032033022233020",
       "lat": 22.348980686451387,
       "lon": 120.36480853721434,
-      "name": "未命名海灘",
+      "name": "未命名海邊",
       "decorType": "beach",
-      "decorName": "海灘",
+      "decorName": "海邊",
       "decorIcon": "🏖️"
     },
     {
       "id": "way-1211295560-1/22032033022233001",
       "lat": 22.35017323626116,
       "lon": 120.3655290831835,
-      "name": "未命名海灘",
+      "name": "未命名海邊",
       "decorType": "beach",
-      "decorName": "海灘",
+      "decorName": "海邊",
       "decorIcon": "🏖️"
     },
     {
       "id": "way-1211295560-1/22032033022233002",
       "lat": 22.34950272908126,
       "lon": 120.3655290831835,
-      "name": "未命名海灘",
+      "name": "未命名海邊",
       "decorType": "beach",
-      "decorName": "海灘",
+      "decorName": "海邊",
       "decorIcon": "🏖️"
     },
     {
       "id": "way-1211295560-1/22032033022233031",
       "lat": 22.34965119703115,
       "lon": 120.36480853721434,
-      "name": "未命名海灘",
+      "name": "未命名海邊",
       "decorType": "beach",
-      "decorName": "海灘",
+      "decorName": "海邊",
       "decorIcon": "🏖️"
     },
     {
       "id": "way-1211295560-1/22032033022233311",
       "lat": 22.34778812036337,
       "lon": 120.36408798724824,
-      "name": "未命名海灘",
+      "name": "未命名海邊",
       "decorType": "beach",
-      "decorName": "海灘",
+      "decorName": "海邊",
       "decorIcon": "🏖️"
+    },
+    {
+      "id": "way-1223190718-1/22032033133310103",
+      "lat": 22.329452741200868,
+      "lon": 120.35544107599878,
+      "name": "悠活小島民宿",
+      "decorType": "hotel",
+      "decorName": "飯店",
+      "decorIcon": "🏨"
+    },
+    {
+      "id": "way-1223190718-1/22032033133310102",
+      "lat": 22.329304423988162,
+      "lon": 120.35616167390572,
+      "name": "悠活小島民宿",
+      "decorType": "hotel",
+      "decorName": "飯店",
+      "decorIcon": "🏨"
+    },
+    {
+      "id": "way-1223190719-1/22032033133313221",
+      "lat": 22.331316071412672,
+      "lon": 120.35616167390572,
+      "name": "小琉球太子宮",
+      "decorType": "shrine",
+      "decorName": "神社",
+      "decorIcon": "⛩️"
+    },
+    {
+      "id": "way-1223210960-1/22032033133201010",
+      "lat": 22.323050245299235,
+      "lon": 120.36048517747389,
+      "name": "慈善宮",
+      "decorType": "shrine",
+      "decorName": "神社",
+      "decorIcon": "⛩️"
+    },
+    {
+      "id": "way-1223210960-1/22032033133200301",
+      "lat": 22.322901937452755,
+      "lon": 120.36120574742034,
+      "name": "慈善宮",
+      "decorType": "shrine",
+      "decorName": "神社",
+      "decorIcon": "⛩️"
+    },
+    {
+      "id": "way-1268710177-1/22032033133313210",
+      "lat": 22.331689950226828,
+      "lon": 120.35760285773881,
+      "name": "琉行之道",
+      "decorType": "bridge",
+      "decorName": "橋樑",
+      "decorIcon": "🌉"
+    },
+    {
+      "id": "way-1268710177-1/22032033133313213",
+      "lat": 22.331838286849145,
+      "lon": 120.35688226781917,
+      "name": "琉行之道",
+      "decorType": "bridge",
+      "decorName": "橋樑",
+      "decorIcon": "🌉"
+    },
+    {
+      "id": "way-1268710182-1/22032033133313130",
+      "lat": 22.332212149885954,
+      "lon": 120.3583234436644,
+      "name": "琉行之道",
+      "decorType": "bridge",
+      "decorName": "橋樑",
+      "decorIcon": "🌉"
+    },
+    {
+      "id": "way-1268710182-1/22032033133313203",
+      "lat": 22.332360492699888,
+      "lon": 120.35760285773881,
+      "name": "琉行之道",
+      "decorType": "bridge",
+      "decorName": "橋樑",
+      "decorIcon": "🌉"
+    },
+    {
+      "id": "way-1268710188-1/22032033133313030",
+      "lat": 22.33325652044649,
+      "lon": 120.35976460353226,
+      "name": "琉行之道",
+      "decorType": "bridge",
+      "decorName": "橋樑",
+      "decorIcon": "🌉"
+    },
+    {
+      "id": "way-1268710192-1/22032033133313032",
+      "lat": 22.33377869134757,
+      "lon": 120.36048517747389,
+      "name": "南興宮",
+      "decorType": "shrine",
+      "decorName": "神社",
+      "decorIcon": "⛩️"
+    },
+    {
+      "id": "way-1268710199-1/22032033133303010",
+      "lat": 22.329601055735015,
+      "lon": 120.3547204740986,
+      "name": "海仙壇",
+      "decorType": "shrine",
+      "decorName": "神社",
+      "decorIcon": "⛩️"
+    },
+    {
+      "id": "way-1268712092-1/22032033022301131",
+      "lat": 22.344593571500088,
+      "lon": 120.37633679289479,
+      "name": "三仙宮",
+      "decorType": "shrine",
+      "decorName": "神社",
+      "decorIcon": "⛩️"
     },
     {
       "id": "way-1273536801-1/22032033133322210",
@@ -3775,7 +5161,7 @@
       "name": "未命名水邊",
       "decorType": "waterside",
       "decorName": "水邊",
-      "decorIcon": "💧"
+      "decorIcon": "🌊"
     },
     {
       "id": "way-1273536801-1/22032033133322123",
@@ -3784,7 +5170,7 @@
       "name": "未命名水邊",
       "decorType": "waterside",
       "decorName": "水邊",
-      "decorIcon": "💧"
+      "decorIcon": "🌊"
     },
     {
       "id": "way-1273536801-1/22032033133322122",
@@ -3793,7 +5179,7 @@
       "name": "未命名水邊",
       "decorType": "waterside",
       "decorName": "水邊",
-      "decorIcon": "💧"
+      "decorIcon": "🌊"
     },
     {
       "id": "way-1273536801-1/22032033133322211",
@@ -3802,7 +5188,7 @@
       "name": "未命名水邊",
       "decorType": "waterside",
       "decorName": "水邊",
-      "decorIcon": "💧"
+      "decorIcon": "🌊"
     },
     {
       "id": "way-1273536802-1/22032033022331313",
@@ -3811,7 +5197,7 @@
       "name": "未命名水邊",
       "decorType": "waterside",
       "decorName": "水邊",
-      "decorIcon": "💧"
+      "decorIcon": "🌊"
     },
     {
       "id": "way-1273536802-1/22032033022331302",
@@ -3820,7 +5206,7 @@
       "name": "未命名水邊",
       "decorType": "waterside",
       "decorName": "水邊",
-      "decorIcon": "💧"
+      "decorIcon": "🌊"
     },
     {
       "id": "way-1273536803-1/22032033022331320",
@@ -3829,7 +5215,16 @@
       "name": "未命名水邊",
       "decorType": "waterside",
       "decorName": "水邊",
-      "decorIcon": "💧"
+      "decorIcon": "🌊"
+    },
+    {
+      "id": "way-1299511328-1/22032033022333200",
+      "lat": 22.343706641889142,
+      "lon": 120.38714360226788,
+      "name": "未命名橋樑",
+      "decorType": "bridge",
+      "decorName": "橋樑",
+      "decorIcon": "🌉"
     },
     {
       "id": "way-1299511329-1/22032033022333132",
@@ -3838,7 +5233,7 @@
       "name": "未命名水邊",
       "decorType": "waterside",
       "decorName": "水邊",
-      "decorIcon": "💧"
+      "decorIcon": "🌊"
     },
     {
       "id": "way-1299511329-1/22032033022333133",
@@ -3847,7 +5242,7 @@
       "name": "未命名水邊",
       "decorType": "waterside",
       "decorName": "水邊",
-      "decorIcon": "💧"
+      "decorIcon": "🌊"
     },
     {
       "id": "way-1299511329-1/22032033022333200",
@@ -3856,7 +5251,7 @@
       "name": "未命名水邊",
       "decorType": "waterside",
       "decorName": "水邊",
-      "decorIcon": "💧"
+      "decorIcon": "🌊"
     },
     {
       "id": "way-1299511329-1/22032033022333201",
@@ -3865,33 +5260,33 @@
       "name": "未命名水邊",
       "decorType": "waterside",
       "decorName": "水邊",
-      "decorIcon": "💧"
+      "decorIcon": "🌊"
     },
     {
       "id": "way-1299511340-1/22032033133311122",
       "lat": 22.325886702534195,
       "lon": 120.36624962515543,
-      "name": "未命名海灘",
+      "name": "未命名海邊",
       "decorType": "beach",
-      "decorName": "海灘",
+      "decorName": "海邊",
       "decorIcon": "🏖️"
     },
     {
       "id": "way-1299511340-1/22032033133311121",
       "lat": 22.325216203069328,
       "lon": 120.36624962515543,
-      "name": "未命名海灘",
+      "name": "未命名海邊",
       "decorType": "beach",
-      "decorName": "海灘",
+      "decorName": "海邊",
       "decorIcon": "🏖️"
     },
     {
       "id": "way-1299511340-1/22032033133311123",
       "lat": 22.326035050205252,
       "lon": 120.3655290831835,
-      "name": "未命名海灘",
+      "name": "未命名海邊",
       "decorType": "beach",
-      "decorName": "海灘",
+      "decorName": "海邊",
       "decorIcon": "🏖️"
     },
     {
@@ -3901,7 +5296,7 @@
       "name": "未命名水邊",
       "decorType": "waterside",
       "decorName": "水邊",
-      "decorIcon": "💧"
+      "decorIcon": "🌊"
     },
     {
       "id": "way-1299511343-1/22032033133201001",
@@ -3910,7 +5305,7 @@
       "name": "未命名水邊",
       "decorType": "waterside",
       "decorName": "水邊",
-      "decorIcon": "💧"
+      "decorIcon": "🌊"
     },
     {
       "id": "way-1299511343-1/22032033133201032",
@@ -3919,7 +5314,7 @@
       "name": "未命名水邊",
       "decorType": "waterside",
       "decorName": "水邊",
-      "decorIcon": "💧"
+      "decorIcon": "🌊"
     },
     {
       "id": "way-1299511343-1/22032033133201031",
@@ -3928,7 +5323,7 @@
       "name": "未命名水邊",
       "decorType": "waterside",
       "decorName": "水邊",
-      "decorIcon": "💧"
+      "decorIcon": "🌊"
     },
     {
       "id": "way-1299511343-1/22032033133201030",
@@ -3937,7 +5332,7 @@
       "name": "未命名水邊",
       "decorType": "waterside",
       "decorName": "水邊",
-      "decorIcon": "💧"
+      "decorIcon": "🌊"
     },
     {
       "id": "way-1299511343-1/22032033133201023",
@@ -3946,7 +5341,7 @@
       "name": "未命名水邊",
       "decorType": "waterside",
       "decorName": "水邊",
-      "decorIcon": "💧"
+      "decorIcon": "🌊"
     },
     {
       "id": "way-1299511343-1/22032033133201133",
@@ -3955,7 +5350,7 @@
       "name": "未命名水邊",
       "decorType": "waterside",
       "decorName": "水邊",
-      "decorIcon": "💧"
+      "decorIcon": "🌊"
     }
   ]
 }
