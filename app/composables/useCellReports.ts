@@ -9,6 +9,7 @@ export type ReportStatus = {
 // Global cache registry to track which cells we've already asked Supabase about (in-memory)
 const fetchedCellIds = new Set<string>();
 const cellReports = reactive<Map<string, ReportStatus>>(new Map());
+const cellReportsVersion = ref(0);
 let cacheLoaded = false;
 
 // LocalStorage Cache Key & TTL
@@ -28,6 +29,10 @@ export const useCellReports = () => {
             cellReports.set(cellId, { isNotPure: false, addedDecors: new Set(), removedDecors: new Set() });
         }
         return cellReports.get(cellId)!;
+    };
+
+    const bumpReportsVersion = () => {
+        cellReportsVersion.value++;
     };
 
     // --- LocalStorage Cache Implementation ---
@@ -73,6 +78,10 @@ export const useCellReports = () => {
             // Clean up if we had expired items
             if (hasExpiredItems) {
                 saveCache();
+            }
+
+            if (loadedCount > 0) {
+                bumpReportsVersion();
             }
             
             return loadedCount > 0;
@@ -193,6 +202,9 @@ export const useCellReports = () => {
                     (row.added_decors || []).forEach(decorId => status.addedDecors.add(decorId));
                     (row.removed_decors || []).forEach(decorId => status.removedDecors.add(decorId));
                 });
+                if (summaryRows.length > 0) {
+                    bumpReportsVersion();
+                }
             }
             
             // 3. Save to localStorage cache after fetching new data
@@ -233,6 +245,7 @@ export const useCellReports = () => {
             if (status.removedDecors.has(decorId)) return; // Already reported
             status.removedDecors.add(decorId);
         }
+        bumpReportsVersion();
         
         // Save to cache immediately so optimistic update persists reload
         saveCache();
@@ -254,6 +267,7 @@ export const useCellReports = () => {
             // Only remove from set if not added by others (actually we can't distinguish here easily without full sync, but good enough for optimistic revert)
             if (reportType === 'missing_decor' && decorId) status.addedDecors.delete(decorId);
             if (reportType === 'extra_decor' && decorId) status.removedDecors.delete(decorId);
+            bumpReportsVersion();
             saveCache();
              
             // Ignore duplicate key error for decor reports as well
@@ -262,6 +276,7 @@ export const useCellReports = () => {
                 if (reportType === 'not_pure') status.isNotPure = true;
                 if (reportType === 'missing_decor' && decorId) status.addedDecors.add(decorId);
                 if (reportType === 'extra_decor' && decorId) status.removedDecors.add(decorId);
+                bumpReportsVersion();
                 saveCache();
                 return;
             }
@@ -279,6 +294,7 @@ export const useCellReports = () => {
         getAddedDecors,
         getRemovedDecors,
         hasAddedDecor,
-        hasRemovedDecor
+        hasRemovedDecor,
+        cellReportsVersion: readonly(cellReportsVersion)
     };
 };

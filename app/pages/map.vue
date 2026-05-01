@@ -666,7 +666,7 @@ const { decorRules, getDecorRule } = useDecorRules();
 const { fetchPOIs, isLoading, error, dataSource, preloadAllRegions } = useLocalFirstPOI();
 const { searchLocation, isSearching, searchError } = useGeocoding();
 // [NEW] Cell Reports Logic
-const { fetchReportsForCells, submitReport, isReported, isReportedNotPure, getAddedDecors, getRemovedDecors } = useCellReports();
+const { fetchReportsForCells, submitReport, isReported, isReportedNotPure, getAddedDecors, getRemovedDecors, cellReportsVersion } = useCellReports();
 const REPORT_FETCH_MIN_ZOOM = 17;
 let reportFetchTimer: ReturnType<typeof setTimeout> | null = null;
 let visibilityFrameId: number | null = null;
@@ -687,7 +687,7 @@ const {
   getCellStyle,
   getCellCenter,
   getCellVertices,
-  calculateRadarPrediction,
+  calculateDistance,
 } = useS2Grid();
 
 // [NEW] Helper to get effective decor types (Local + Reported)
@@ -913,13 +913,29 @@ const isScannerCalculating = ref(false);
 // ⚠️ 使用 shallowRef 來儲存 POI 點位，避免 Vue 對每個點位物件進行深層監聽
 const fetchedPoints = shallowRef<POIPoint[]>([]);
 
+const calculateEffectiveRadarPrediction = (scannerLat: number, scannerLng: number, radius: number = 100): Set<string> => {
+    const detectedDecors = new Set<string>();
+
+    displayedGridCells.value.forEach(cell => {
+        if (!cell.center) return;
+        const distance = calculateDistance(scannerLat, scannerLng, cell.center.lat, cell.center.lng);
+        if (distance > radius) return;
+
+        getEffectiveDecors(cell).forEach(decorId => {
+            detectedDecors.add(decorId);
+        });
+    });
+
+    return detectedDecors;
+};
+
 let scannerDebounceTimer: ReturnType<typeof setTimeout> | null = null;
-watch([scannerPinLocation, fetchedPoints], ([newLoc]) => {
+watch([scannerPinLocation, fetchedPoints, cellReportsVersion], ([newLoc]) => {
     if (newLoc && isScannerMode.value) {
         if (scannerDebounceTimer) clearTimeout(scannerDebounceTimer);
         isScannerCalculating.value = true;
         scannerDebounceTimer = setTimeout(() => {
-            scannerPredictedDecors.value = calculateRadarPrediction(newLoc[0], newLoc[1], 100);
+            scannerPredictedDecors.value = calculateEffectiveRadarPrediction(newLoc[0], newLoc[1], 100);
             isScannerCalculating.value = false;
         }, 300); // 300ms debounce
     }
