@@ -50,8 +50,9 @@ export const useSiteConfig = () => {
         .maybeSingle();
       
       if (data && !error && data.value) {
-        heroFeaturedConfig.value = data.value as any;
-        writeCache(heroFeaturedConfig.value);
+        const nextConfig = data.value as { row1: string; row2: string };
+        heroFeaturedConfig.value = nextConfig;
+        writeCache(nextConfig);
       } else {
         heroFeaturedConfig.value = defaultConfig;
       }

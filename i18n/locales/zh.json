@@ -106,7 +106,10 @@
             "status_uncollected": "未蒐集",
             "active_label": "篩選條件：",
             "limited": "僅顯示限定",
-            "clear": "清除全部"
+            "clear": "清除全部",
+            "title": "篩選條件",
+            "expand": "展開篩選器",
+            "collapse": "收合"
         },
         "sections": {
             "regular": {
@@ -131,11 +134,15 @@
         },
         "actions": {
             "collect_all": "全部標記為已蒐集",
-            "collect_all_tooltip": "將此分類的所有皮克敏標記為已蒐集"
+            "collect_all_tooltip": "將此分類的所有皮克敏標記為已蒐集",
+            "expand_all": "全部展開",
+            "collapse_all": "全部收合"
         },
         "scroll": {
             "special": "跳至特殊飾品",
-            "top": "回到頂端"
+            "top": "回到頂端",
+            "bottom": "跳到最底",
+            "categories": "所有分類"
         },
         "types": {
             "uncollected_regular": "待收集（一般）",
@@ -239,10 +246,15 @@
         "report": {
             "title": "回報缺漏飾品",
             "subtitle": "請選擇此地點實際存在的飾品類型",
+            "extra_title": "回報多餘飾品",
+            "extra_subtitle": "請選擇此網格實際不會出現的飾品類型",
             "reported": "已回報",
             "footer": "點擊圖示即可送出回報。您的貢獻能讓地圖更準確！",
             "error_pure": "回報錯誤 (非純種)",
             "missing": "回報缺漏飾品",
+            "extra": "回報多餘飾品",
+            "no_missing_options": "這個網格目前沒有可回報缺漏的飾品。",
+            "no_extra_options": "這個網格目前沒有可回報多餘的飾品。",
             "pure_zone": "純種區",
             "impure_warning": "有人回報這格不純！"
         },
@@ -258,7 +270,8 @@
             "pure": "純種",
             "medium": "混合",
             "mixed": "雜亂",
-            "user_reported": "玩家回報"
+            "user_reported": "玩家回報",
+            "user_reported_extra": "玩家回報多餘"
         },
         "search": {
             "placeholder": "搜尋地點",

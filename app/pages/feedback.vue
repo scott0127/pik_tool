@@ -161,7 +161,7 @@
 <script setup lang="ts">
 const { t } = useI18n();
 const authStore = useAuthStore();
-const supabase = useSupabaseClient();
+const supabase = useSupabaseClient<any>();
 
 const feedbackTypes = computed(() => [
   { id: 'suggestion', icon: '💡', label: t('feedback.types.suggestion') },

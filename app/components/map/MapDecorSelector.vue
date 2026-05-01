@@ -14,12 +14,17 @@
     >
       <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[80vh] flex flex-col overflow-hidden">
         <!-- Header -->
-        <div class="p-4 border-b border-gray-100 flex items-center justify-between bg-emerald-50">
+        <div
+          :class="[
+            'p-4 border-b border-gray-100 flex items-center justify-between',
+            mode === 'extra' ? 'bg-red-50' : 'bg-emerald-50'
+          ]"
+        >
             <div class="flex items-center gap-2">
-            <span class="text-2xl">➕</span>
+            <Icon :name="mode === 'extra' ? 'lucide:minus-circle' : 'lucide:plus-circle'" :class="['w-6 h-6', mode === 'extra' ? 'text-red-600' : 'text-emerald-600']" />
             <div>
-              <h3 class="font-bold text-gray-800">{{ $t('map.report.title') }}</h3>
-              <p class="text-xs text-gray-500">{{ $t('map.report.subtitle') }}</p>
+              <h3 class="font-bold text-gray-800">{{ $t(mode === 'extra' ? 'map.report.extra_title' : 'map.report.title') }}</h3>
+              <p class="text-xs text-gray-500">{{ $t(mode === 'extra' ? 'map.report.extra_subtitle' : 'map.report.subtitle') }}</p>
             </div>
           </div>
           <button @click="$emit('update:modelValue', false)" class="text-gray-400 hover:text-gray-600 p-2">
@@ -31,23 +36,30 @@
 
         <!-- List -->
         <div class="overflow-y-auto p-4 grid grid-cols-4 gap-2">
+          <div v-if="displayDecors.length === 0" class="col-span-4 py-10 text-center text-sm text-gray-500">
+            {{ $t(mode === 'extra' ? 'map.report.no_extra_options' : 'map.report.no_missing_options') }}
+          </div>
           <button
-            v-for="decor in allDecors"
+            v-for="decor in displayDecors"
             :key="decor.id"
             @click="toggleDecorReport(decor.id)"
             :disabled="loading"
             :class="[
               'flex flex-col items-center justify-center p-2 rounded-xl border transition-all text-center h-24',
-              hasAddedDecor(cellId!, decor.id)
-                ? 'bg-emerald-100 border-emerald-500 ring-2 ring-emerald-200 cursor-default opacity-50'
-                : 'bg-gray-50 border-gray-100 hover:bg-emerald-50 hover:border-emerald-200 hover:shadow-md'
+              isAlreadyReported(decor.id)
+                ? mode === 'extra'
+                  ? 'bg-red-100 border-red-500 ring-2 ring-red-200 cursor-default opacity-50'
+                  : 'bg-emerald-100 border-emerald-500 ring-2 ring-emerald-200 cursor-default opacity-50'
+                : mode === 'extra'
+                  ? 'bg-gray-50 border-gray-100 hover:bg-red-50 hover:border-red-200 hover:shadow-md'
+                  : 'bg-gray-50 border-gray-100 hover:bg-emerald-50 hover:border-emerald-200 hover:shadow-md'
             ]"
           >
             <div class="text-3xl mb-1">{{ decor.icon }}</div>
             <div class="text-xs text-gray-700 font-medium leading-tight line-clamp-2">
                 {{ $t('decor_types.' + decor.id) }}
             </div>
-            <div v-if="hasAddedDecor(cellId!, decor.id)" class="text-[10px] text-emerald-700 font-bold mt-1">
+            <div v-if="isAlreadyReported(decor.id)" :class="['text-[10px] font-bold mt-1', mode === 'extra' ? 'text-red-700' : 'text-emerald-700']">
                 {{ $t('map.report.reported') }}
             </div>
           </button>
@@ -70,6 +82,8 @@ const props = defineProps<{
   modelValue: boolean;
   cellId: string | null;
   allDecors: DecorRule[];
+  mode?: 'missing' | 'extra';
+  availableDecorIds?: string[];
 }>();
 
 const emit = defineEmits<{
@@ -78,22 +92,35 @@ const emit = defineEmits<{
 
 // We can perform reports here directly, or emit "report" event.
 // Since the original code did it inline, doing it here encapsulates it well.
-const { submitReport, hasAddedDecor } = useCellReports();
+const { submitReport, hasAddedDecor, hasRemovedDecor } = useCellReports();
 const { t } = useI18n();
 const loading = ref(false);
+const mode = computed(() => props.mode || 'missing');
+const displayDecors = computed(() => {
+    if (!props.availableDecorIds) return props.allDecors;
+    const allowed = new Set(props.availableDecorIds);
+    return props.allDecors.filter(decor => allowed.has(decor.id));
+});
+
+const isAlreadyReported = (decorId: string) => {
+    if (!props.cellId) return false;
+    return mode.value === 'extra'
+        ? hasRemovedDecor(props.cellId, decorId)
+        : hasAddedDecor(props.cellId, decorId);
+};
 
 const toggleDecorReport = async (decorId: string) => {
     if (!props.cellId) return;
     
     // Check if already added (optimistic check)
-    if (hasAddedDecor(props.cellId, decorId)) {
+    if (isAlreadyReported(decorId)) {
         alert(t('map.report.already_reported', '您已經回報過這個飾品了！')); 
         return; 
     }
 
     try {
         loading.value = true;
-        await submitReport(props.cellId, 'missing_decor', decorId);
+        await submitReport(props.cellId, mode.value === 'extra' ? 'extra_decor' : 'missing_decor', decorId);
         // Keep open for multi-select
     } catch (e: any) {
         alert(t('map.report.report_failed', '回報失敗：') + (e.message || t('map.error_unknown', '未知錯誤')));

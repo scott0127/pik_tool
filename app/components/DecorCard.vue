@@ -11,7 +11,7 @@
     ></div>
     
     <div 
-      class="relative bg-white/80 backdrop-blur rounded-2xl overflow-hidden transition-all duration-300 shadow-lg z-10"
+      class="liquid-glass-soft liquid-glass-dynamic relative rounded-2xl overflow-hidden transition-all duration-300 z-10"
       :class="[
         isRareVariant 
           ? (isCollected 
@@ -26,8 +26,8 @@
       <div 
         class="relative aspect-square p-3 overflow-hidden"
         :class="isRareVariant 
-          ? 'bg-gradient-to-br from-amber-50 via-yellow-50/80 to-orange-50' 
-          : 'bg-gradient-to-br from-gray-50 via-white to-gray-100'"
+          ? 'bg-gradient-to-br from-amber-50/70 via-yellow-50/45 to-orange-50/50' 
+          : 'bg-gradient-to-br from-white/58 via-white/34 to-emerald-50/34'"
       >
         <!-- Background pattern -->
         <div class="absolute inset-0" :class="isRareVariant ? 'opacity-10' : 'opacity-5'">
@@ -35,7 +35,7 @@
             class="absolute inset-0" 
             :style="isRareVariant 
               ? 'background-image: radial-gradient(circle, #fbbf24 1px, transparent 1px); background-size: 16px 16px;'
-              : 'background-image: radial-gradient(circle, #22c55e 1px, transparent 1px); background-size: 20px 20px;'"
+              : 'background-image: radial-gradient(circle, #00b92f 1px, transparent 1px); background-size: 20px 20px;'"
           ></div>
         </div>
 
@@ -58,7 +58,7 @@
 
         <!-- Pikmin Type Badge -->
         <div 
-          class="absolute top-2 right-2 w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold shadow-lg transform group-hover:scale-110 transition-transform"
+          class="absolute top-2 right-2 w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold shadow-lg ring-1 ring-white/70 transform group-hover:scale-110 transition-transform"
           :class="pikminBadgeClass"
         >
           {{ pikminTypeShort }}
@@ -67,9 +67,9 @@
         <!-- Rare Sparkle -->
         <div 
           v-if="variant?.isRare"
-          class="absolute top-2 left-2 text-yellow-400 text-lg sparkle"
+          class="absolute top-2 left-2 text-yellow-400 sparkle"
         >
-          ✨
+          <Icon name="lucide:sparkles" class="w-5 h-5 drop-shadow-sm" />
         </div>
 
         <!-- Collected Checkmark -->
@@ -83,7 +83,7 @@
         >
           <div 
             v-if="isCollected"
-            class="absolute bottom-2 right-2 w-8 h-8 bg-emerald-500 rounded-xl flex items-center justify-center shadow-lg"
+            class="absolute bottom-2 right-2 w-8 h-8 bg-emerald-500/95 rounded-xl flex items-center justify-center shadow-lg ring-1 ring-white/70 backdrop-blur"
           >
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" viewBox="0 0 20 20" fill="currentColor">
               <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
@@ -96,11 +96,11 @@
       </div>
 
       <!-- Info Section -->
-      <div class="p-3 text-center border-t border-gray-100">
-        <p class="text-sm font-bold text-gray-700 truncate" :title="locale === 'en' ? variant?.nameEn : variant?.name">
+      <div class="p-3 text-center border-t border-white/60 bg-white/24">
+        <p class="text-sm font-extrabold text-gray-900 truncate" :title="locale === 'en' ? variant?.nameEn : variant?.name">
           {{ (locale === 'en' ? variant?.nameEn : variant?.name) || 'Unknown' }}
         </p>
-        <p class="text-xs text-gray-400 truncate mt-0.5" :title="locale === 'en' ? variant?.name : variant?.nameEn">
+        <p class="text-xs text-gray-600 truncate mt-0.5 font-semibold" :title="locale === 'en' ? variant?.name : variant?.nameEn">
           {{ (locale === 'en' ? variant?.name : variant?.nameEn) || '' }}
         </p>
       </div>

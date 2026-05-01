@@ -404,7 +404,7 @@
           
           <!-- Refresh Button -->
           <button
-            @click="fetchPosts"
+            @click="() => fetchPosts()"
             :disabled="loading"
             class="p-2 rounded-xl hover:bg-white/60 transition-colors text-gray-500 hover:text-emerald-600"
             :title="$t('friends.refresh')"
@@ -497,7 +497,7 @@
             {{ $t('friends.error') }}
           </p>
           <p class="mt-2 text-sm">{{ error }}</p>
-          <button @click="fetchPosts" class="mt-4 text-sm underline hover:text-red-700">{{ $t('friends.retry') }}</button>
+          <button @click="() => fetchPosts()" class="mt-4 text-sm underline hover:text-red-700">{{ $t('friends.retry') }}</button>
         </div>
 
         <!-- Loading -->
@@ -645,6 +645,17 @@ const supabase = useSupabaseClient();
 const authStore = useAuthStore();
 const { t } = useI18n();
 const user = computed(() => authStore.user.value);
+const {
+  getPikminAvatar,
+  formatFriendCodeValue,
+  formatDisplayCode,
+  getPostRegions,
+  getPostIntents,
+  getIntentIcon,
+  getIntentLabel,
+  getIntentColor,
+  getOptionsForCategory,
+} = useFriendPostHelpers();
 
 const posts = ref<FriendPost[]>([]);
 const loading = ref(false); // 預設不載入，等待 onMounted
@@ -702,22 +713,8 @@ const invalidateFriendsCache = () => {
 };
 
 // 導入地區常數
-import { FRIEND_REGIONS, ALL_REGION_OPTIONS } from '~/constants/regions';
-import { FRIEND_INTENTS, ALL_INTENT_OPTIONS } from '~/constants/intents';
-import scrapedImages from '../../scraped_images.json';
-
-// 皮克敏頭像：從 scraped_images.json 取得所有圖片 URL
-const PIKMIN_AVATAR_URLS = Object.values(scrapedImages) as string[];
-
-// 根據 username 產生一個穩定的 hash 對應到固定的皮克敏圖片
-function getPikminAvatar(username: string): string {
-  let hash = 0;
-  for (let i = 0; i < username.length; i++) {
-    hash = ((hash << 5) - hash + username.charCodeAt(i)) | 0;
-  }
-  const index = Math.abs(hash) % PIKMIN_AVATAR_URLS.length;
-  return PIKMIN_AVATAR_URLS[index];
-}
+import { FRIEND_REGIONS } from '~/constants/regions';
+import { FRIEND_INTENTS } from '~/constants/intents';
 
 const showAdvancedSettings = ref(false);
 
@@ -759,26 +756,7 @@ const isValidFriendCode = computed(() => {
 // 格式化輸入的好友代碼
 const formatFriendCode = (e: Event) => {
   const input = e.target as HTMLInputElement;
-  let value = input.value.replace(/\D/g, ''); // 只保留數字
-  if (value.length > 12) value = value.slice(0, 12);
-  
-  // 格式化為 XXXX XXXX XXXX
-  const parts = [];
-  for (let i = 0; i < value.length; i += 4) {
-    parts.push(value.slice(i, i + 4));
-  }
-  newPost.value.friendCode = parts.join(' ');
-};
-
-// 顯示格式化的代碼
-const formatDisplayCode = (code: string) => {
-  if (!code) return '';
-  const digits = code.replace(/\D/g, '');
-  const parts = [];
-  for (let i = 0; i < digits.length; i += 4) {
-    parts.push(digits.slice(i, i + 4));
-  }
-  return parts.join(' ');
+  newPost.value.friendCode = formatFriendCodeValue(input.value);
 };
 
 // Load posts on mount
@@ -810,7 +788,7 @@ const fetchPosts = async (isLoadMore = false) => {
       if (cached) {
         posts.value = cached;
         hasMorePosts.value = cached.length === POSTS_PER_PAGE;
-        console.log('[Friends] Using cached data:', cached.length, 'posts');
+        if (import.meta.dev) console.debug('[Friends] Using cached data:', cached.length, 'posts');
         loading.value = false;
         return;
       }
@@ -947,7 +925,7 @@ const submitPost = async () => {
     alert(`發布失敗：${e.message || '請稍後再試'}`);
   } finally {
     submitting.value = false;
-    console.log('[Friends] Done, submitting set to false');
+    if (import.meta.dev) console.debug('[Friends] Done, submitting set to false');
   }
 };
 
@@ -972,8 +950,10 @@ const copyCode = async (code: string) => {
   try {
     await navigator.clipboard.writeText(code.replace(/\s/g, ''));
     showCopyToast.value = true;
-    setTimeout(() => {
+    if (copyToastTimer) clearTimeout(copyToastTimer);
+    copyToastTimer = setTimeout(() => {
       showCopyToast.value = false;
+      copyToastTimer = null;
     }, 2000);
   } catch (e) {
     console.error('Failed to copy:', e);
@@ -1000,15 +980,21 @@ const formatDate = (dateStr: string) => {
 // --- Recommendation Logic ---
 const recommendedPosts = ref<FriendPost[]>([]);
 const recommendationQueue = ref<FriendPost[]>([]);
-let recommendTimer: any = null;
+let recommendTimer: ReturnType<typeof setInterval> | null = null;
 let filterFetchTimer: ReturnType<typeof setTimeout> | null = null;
+let copyToastTimer: ReturnType<typeof setTimeout> | null = null;
 
 // Fisher-Yates Shuffle
 const shuffleArray = <T>(array: T[]): T[] => {
   const newArr = [...array];
   for (let i = newArr.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
-    [newArr[i], newArr[j]] = [newArr[j], newArr[i]];
+    const current = newArr[i];
+    const swap = newArr[j];
+    if (current !== undefined && swap !== undefined) {
+      newArr[i] = swap;
+      newArr[j] = current;
+    }
   }
   return newArr;
 };
@@ -1078,56 +1064,6 @@ const selectedCategories = ref<string[]>([]);
 const selectedRegionFilters = ref<string[]>([]);
 const selectedIntentFilters = ref<string[]>([]);
 
-// Helper Functions for separating regions and intents on display
-const getPostRegions = (tags: string[] | null) => {
-  if (!tags) return [];
-  return tags.filter(tag => ALL_REGION_OPTIONS.includes(tag));
-};
-
-const getPostIntents = (tags: string[] | null) => {
-  if (!tags) return [];
-  const validTags = tags.filter(tag => 
-    ALL_INTENT_OPTIONS.includes(tag) || 
-    ['mushroom', 'postcard'].includes(tag) || // Legacy support
-    tag.startsWith('postcard:')
-  );
-  
-  // Deduplicate base 'postcard' if 'postcard:xxx' exists
-  const hasDynamicPostcard = validTags.some(t => t.startsWith('postcard:'));
-  return validTags.filter(t => {
-    if (t === 'postcard' && hasDynamicPostcard) return false;
-    return true;
-  });
-};
-
-const getIntentObj = (id: string) => FRIEND_INTENTS.find(i => i.id === id);
-
-const getIntentIcon = (id: string) => {
-  if (id === 'mushroom') return '🍄';
-  if (id.startsWith('postcard')) return '💌';
-  return getIntentObj(id)?.icon || '';
-};
-
-const getIntentLabel = (id: string) => {
-  if (id === 'mushroom') return '打蘑菇';
-  if (id === 'postcard') return '交換明信片';
-  if (id.startsWith('postcard:')) {
-    const value = id.split(':')[1];
-    return `想要 ${value} 明信片`;
-  }
-  return getIntentObj(id)?.label || id;
-};
-
-const getIntentColor = (id: string) => {
-  if (id === 'mushroom') return 'bg-red-50 text-red-600 border-red-200';
-  if (id.startsWith('postcard:')) return 'bg-blue-50 text-blue-600 border-blue-200 bg-opacity-70 backdrop-blur-sm shadow-sm';
-  return getIntentObj(id)?.colorClass || 'bg-gray-100 text-gray-800 border-gray-200';
-};
-
-const getOptionsForCategory = (label: string) => {
-  return FRIEND_REGIONS.find(g => g.label === label)?.options || [];
-};
-
 const toggleCategoryFilter = (cat: string) => {
   const idx = selectedCategories.value.indexOf(cat);
   if (idx > -1) {
@@ -1183,7 +1119,17 @@ watch([selectedRegionFilters, selectedCategories, selectedIntentFilters], () => 
 }, { deep: true });
 
 onUnmounted(() => {
-  if (recommendTimer) clearInterval(recommendTimer);
-  if (filterFetchTimer) clearTimeout(filterFetchTimer);
+  if (recommendTimer) {
+    clearInterval(recommendTimer);
+    recommendTimer = null;
+  }
+  if (filterFetchTimer) {
+    clearTimeout(filterFetchTimer);
+    filterFetchTimer = null;
+  }
+  if (copyToastTimer) {
+    clearTimeout(copyToastTimer);
+    copyToastTimer = null;
+  }
 });
 </script>

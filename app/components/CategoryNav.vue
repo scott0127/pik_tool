@@ -82,7 +82,7 @@
     >
       <div 
         v-if="selected && selectedInfo"
-        class="flex items-start gap-2 px-3 py-2 bg-gray-50 rounded-xl text-sm"
+        class="liquid-glass-soft flex items-start gap-2 px-3 py-2 rounded-xl text-sm"
       >
         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400 mt-0.5 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor">
           <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
@@ -194,17 +194,24 @@ const selectedInfo = computed(() => {
 
 <style scoped>
 .filter-chip {
-  @apply inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-medium transition-all duration-200 cursor-pointer border-2;
+  @apply inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-bold transition-all duration-200 cursor-pointer border;
   /* Allow text wrapping on mobile, prevent on larger screens */
   @apply break-words;
   min-width: fit-content;
 }
 
 .filter-chip-active {
-  @apply bg-emerald-500 text-white border-emerald-500 shadow-lg shadow-emerald-200;
+  @apply text-white border-white/60 shadow-lg shadow-emerald-900/10;
+  background: linear-gradient(135deg, rgba(0, 185, 47, 0.96), rgba(0, 133, 35, 0.88));
 }
 
 .filter-chip-inactive {
-  @apply bg-white/80 text-gray-600 border-white/80 hover:border-emerald-300 hover:bg-emerald-50 hover:text-emerald-700;
+  @apply text-gray-700 border-white/75 hover:border-emerald-300/80 hover:text-emerald-800;
+  background: rgba(255, 255, 255, 0.54);
+  box-shadow:
+    0 8px 18px rgba(0, 133, 35, 0.08),
+    0 1px 8px rgba(255, 255, 255, 0.68) inset;
+  backdrop-filter: blur(16px) saturate(1.35);
+  -webkit-backdrop-filter: blur(16px) saturate(1.35);
 }
 </style>

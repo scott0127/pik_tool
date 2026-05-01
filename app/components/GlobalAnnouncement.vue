@@ -11,7 +11,7 @@
       v-if="isVisible" 
       class="fixed inset-x-0 bottom-0 sm:top-16 sm:bottom-auto sm:right-4 sm:left-auto z-[9999] p-4 flex justify-center sm:justify-end pointer-events-none"
     >
-      <div class="pointer-events-auto max-w-md w-full bg-white border-l-4 border-emerald-500 shadow-xl rounded-r-lg p-4 flex flex-col gap-3">
+      <div class="glass-surface-readable announcement-panel pointer-events-auto max-w-md w-full rounded-3xl p-4 flex flex-col gap-3">
         <!-- 頂部標題與關閉按鈕 -->
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-2">
@@ -25,20 +25,24 @@
               <button 
                 @click="currentTab = 'update'" 
                 class="px-2 py-1 text-xs rounded-full transition-colors"
-                :class="currentTab === 'update' ? 'bg-emerald-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'"
+                :class="currentTab === 'update' ? 'bg-emerald-500 text-white shadow-sm' : 'glass-control text-gray-700 hover:text-emerald-700'"
               >
                 📢 更新
               </button>
               <button 
                 @click="currentTab = 'event'" 
                 class="px-2 py-1 text-xs rounded-full transition-colors"
-                :class="currentTab === 'event' ? 'bg-green-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'"
+                :class="currentTab === 'event' ? 'bg-green-500 text-white shadow-sm' : 'glass-control text-gray-700 hover:text-emerald-700'"
               >
                 🎉 活動
               </button>
             </div>
           </div>
-          <button @click="isVisible = false" class="shrink-0 text-gray-400 hover:text-gray-600 transition-colors">
+          <button
+            @click="isVisible = false"
+            class="announcement-close-button shrink-0 w-8 h-8 rounded-full flex items-center justify-center transition-all"
+            aria-label="關閉公告"
+          >
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
               <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
             </svg>
@@ -47,14 +51,14 @@
 
         <!-- 更新內容 -->
         <div v-show="currentTab === 'update'" class="flex-1">
-          <ul class="text-sm text-gray-600 leading-relaxed list-disc list-inside space-y-1">
+          <ul class="announcement-copy text-sm leading-relaxed list-disc list-inside space-y-1">
             <li>
               <span class="inline-flex items-center gap-1.5 align-middle">
                 4/26 號更新地圖，優化地圖面積邏輯與準確度。
               </span>
             </li>
             <li>3/14 主頁現在會顯示<span class="text-green-600 font-medium">當月全新與復刻的裝飾品</span>皮克敏了!新增<span class="bg-gradient-to-r from-yellow-400 via-red-500 to-purple-600 bg-clip-text text-transparent font-bold">彩色粉末皮克敏系列</span></li>
-            <li class="flex items-center gap-1 flex-wrap">新增 <span class="inline-flex items-center gap-0.5 bg-gray-900 text-white px-1.5 py-[1.5px] rounded-[5px] text-[11px] font-semibold tracking-wide shadow-sm" style="font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif;"><Icon name="lucide:apple" class="w-3 h-3 mb-[0.5px]"/> iOS</span> 專屬「加到主畫面」捷徑按鈕</li>
+            <li class="flex items-center gap-1 flex-wrap">新增 <span class="ios-badge inline-flex items-center gap-0.5 bg-gray-900 text-white px-1.5 py-[1.5px] rounded-[5px] text-[11px] font-semibold tracking-wide shadow-sm" style="font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif;"><Icon name="lucide:apple" class="w-3 h-3 mb-[0.5px]"/> iOS</span> 專屬「加到主畫面」捷徑按鈕</li>
             <li>
               <div class="flex items-start gap-3"> <!-- items-start 讓文字對齊網格頂部 -->
                 
@@ -84,7 +88,7 @@
               class="w-20 h-20 rounded-lg border border-gray-200 shrink-0"
             />
             <!-- 活動說明 -->
-            <div class="text-sm text-gray-600 space-y-1">
+            <div class="announcement-copy text-sm space-y-1">
               <p class="font-medium text-green-600">🚶 走路集點優惠！</p>
               <p class="text-xs">邊玩 Pikmin Bloom 邊用 LINE 散步趣集點</p>
               <p class="text-xs">最高可獲 <span class="font-bold text-orange-500">10,000 點</span></p>
@@ -92,7 +96,7 @@
                 邀請碼：
                 <button 
                   @click="copyInviteCode"
-                  class="font-mono bg-gray-100 px-1.5 py-0.5 rounded hover:bg-emerald-100 active:bg-emerald-200 transition-colors cursor-pointer inline-flex items-center gap-1"
+                  class="font-mono glass-control px-1.5 py-0.5 rounded active:bg-emerald-200 transition-colors cursor-pointer inline-flex items-center gap-1"
                   :title="copied ? '已複製！' : '點擊複製'"
                 >
                   G79K77XF
@@ -109,7 +113,7 @@
         </div>
 
         <!-- 進度條 -->
-        <div class="w-full bg-gray-100 rounded-full h-1 overflow-hidden">
+        <div class="w-full glass-control rounded-full h-1 overflow-hidden">
           <div class="bg-emerald-500 h-full transition-all duration-[10000ms] ease-linear w-full" :class="{ '!w-0': startProgress }"></div>
         </div>
       </div>
@@ -124,14 +128,32 @@ const currentTab = ref<'update' | 'event'>('update'); // 預設先顯示更新
 const copied = ref(false);
 
 const INVITE_CODE = 'G79K77XF';
+const timers: ReturnType<typeof setTimeout>[] = [];
+let copyResetTimer: ReturnType<typeof setTimeout> | null = null;
+
+const schedule = (callback: () => void, delay: number) => {
+  const timer = setTimeout(() => {
+    const index = timers.indexOf(timer);
+    if (index >= 0) timers.splice(index, 1);
+    callback();
+  }, delay);
+  timers.push(timer);
+  return timer;
+};
+
+const scheduleCopyReset = () => {
+  if (copyResetTimer) clearTimeout(copyResetTimer);
+  copyResetTimer = setTimeout(() => {
+    copied.value = false;
+    copyResetTimer = null;
+  }, 2000);
+};
 
 async function copyInviteCode() {
   try {
     await navigator.clipboard.writeText(INVITE_CODE);
     copied.value = true;
-    setTimeout(() => {
-      copied.value = false;
-    }, 2000);
+    scheduleCopyReset();
   } catch (err) {
     // Fallback for older browsers
     const textArea = document.createElement('textarea');
@@ -141,28 +163,69 @@ async function copyInviteCode() {
     document.execCommand('copy');
     document.body.removeChild(textArea);
     copied.value = true;
-    setTimeout(() => {
-      copied.value = false;
-    }, 2000);
+    scheduleCopyReset();
   }
 }
 
 onMounted(() => {
   // Start progress bar animation slightly after mount
-  setTimeout(() => {
+  schedule(() => {
     startProgress.value = true;
   }, 100);
 
   // 3秒後自動切換到活動分頁
-  setTimeout(() => {
+  schedule(() => {
     if (currentTab.value === 'update') {
       currentTab.value = 'event';
     }
   }, 3000);
 
   // 10秒後自動隱藏
-  setTimeout(() => {
+  schedule(() => {
     isVisible.value = false;
   }, 10000);
 });
+
+onBeforeUnmount(() => {
+  timers.splice(0).forEach(clearTimeout);
+  if (copyResetTimer) {
+    clearTimeout(copyResetTimer);
+    copyResetTimer = null;
+  }
+});
 </script>
+
+<style scoped>
+.announcement-panel :deep(*) {
+  -webkit-text-stroke: 0;
+  paint-order: normal;
+}
+
+.announcement-copy {
+  color: rgb(15 23 42 / 0.9);
+  text-shadow: none;
+}
+
+.announcement-close-button {
+  color: rgb(31 41 55);
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(75, 85, 99, 0.28);
+  box-shadow:
+    0 1px 6px rgba(255, 255, 255, 0.82) inset,
+    0 3px 10px rgba(15, 23, 42, 0.12);
+}
+
+.announcement-close-button:hover {
+  color: rgb(3 7 18);
+  background: rgba(255, 255, 255, 0.92);
+  border-color: rgba(31, 41, 55, 0.42);
+}
+
+.ios-badge,
+.ios-badge :deep(*) {
+  color: #fff;
+  -webkit-text-stroke: 0;
+  paint-order: normal;
+  text-shadow: none;
+}
+</style>

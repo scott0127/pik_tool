@@ -1,42 +1,151 @@
 <template>
-  <div class="space-y-6 pb-8">
-    <!-- -->
-    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-      <div>
-        <h1 class="text-3xl font-extrabold text-gray-800 flex items-center gap-3">
-          <span class="text-4xl">📖</span>
-          <span class="text-gradient">{{ $t('collection.title') }}</span>
-        </h1>
-        <p class="text-gray-500 mt-1">{{ $t('collection.subtitle') }}</p>
+  <div class="space-y-6 pb-8 relative">
+    <!-- Decorative floating elements -->
+    <div
+      class="absolute top-0 left-0 w-full h-[400px] overflow-hidden pointer-events-none -z-10"
+    >
+      <div class="deco-leaf deco-leaf-1">
+        <Icon name="lucide:leaf" class="w-6 h-6 text-emerald-300/30" />
       </div>
-      
+      <div class="deco-leaf deco-leaf-2">
+        <Icon name="lucide:flower-2" class="w-5 h-5 text-pink-300/25" />
+      </div>
+      <div class="deco-leaf deco-leaf-3">
+        <Icon name="lucide:sparkles" class="w-4 h-4 text-amber-300/30" />
+      </div>
+      <div class="deco-leaf deco-leaf-4">
+        <Icon name="lucide:leaf" class="w-8 h-8 text-teal-300/20" />
+      </div>
+      <div class="deco-leaf deco-leaf-5">
+        <Icon name="lucide:star" class="w-3 h-3 text-purple-300/25" />
+      </div>
+    </div>
+
+    <!-- -->
+    <div
+      class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
+    >
+      <div>
+        <h1
+          class="text-3xl font-extrabold text-gray-800 flex items-center gap-3"
+        >
+          <span
+            class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center shadow-lg shadow-emerald-200"
+          >
+            <Icon name="lucide:book-open" class="w-5 h-5 text-white" />
+          </span>
+          <span class="text-gradient">{{ $t("collection.title") }}</span>
+        </h1>
+        <p class="readable-on-art text-slate-700 font-semibold mt-1">{{ $t("collection.subtitle") }}</p>
+      </div>
+
       <!-- Quick stats -->
-      <div class="flex items-center gap-4 bg-white/60 rounded-2xl px-4 py-2">
+      <div class="liquid-glass-soft liquid-glass-dynamic flex items-center gap-4 rounded-2xl px-4 py-2">
         <div class="text-right">
-          <p class="text-xs text-gray-500">{{ $t('collection.stats.showing') }}</p>
-          <p class="text-lg font-bold text-emerald-600">{{ filteredItems.length }} {{ $t('collection.stats.items') }}</p>
+          <p class="text-xs text-gray-500">
+            {{ $t("collection.stats.showing") }}
+          </p>
+          <p class="text-lg font-bold text-emerald-600">
+            {{ filteredItems.length }} {{ $t("collection.stats.items") }}
+          </p>
         </div>
         <div class="w-px h-8 bg-gray-200"></div>
         <div class="text-right">
-          <p class="text-xs text-gray-500">{{ $t('collection.stats.collected') }}</p>
+          <p class="text-xs text-gray-500">
+            {{ $t("collection.stats.collected") }}
+          </p>
           <p class="text-lg font-bold text-emerald-600">{{ collectedCount }}</p>
         </div>
       </div>
     </div>
 
     <!-- Filters Section -->
-    <div class="relative bg-white/80 backdrop-blur-xl rounded-3xl shadow-sm border border-emerald-100/50 p-6 md:p-8 mb-10 z-10 overflow-hidden transition-all duration-300 hover:shadow-md">
-      <div class="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-emerald-100/40 to-teal-50/40 rounded-full blur-3xl -z-10 translate-x-1/3 -translate-y-1/3 pointer-events-none"></div>
-      <div class="absolute bottom-0 left-0 w-64 h-64 bg-gradient-to-tr from-purple-50/40 to-pink-50/40 rounded-full blur-3xl -z-10 -translate-x-1/3 translate-y-1/3 pointer-events-none"></div>
+    <div
+      class="liquid-glass-2026 liquid-glass-readable liquid-glass-dynamic relative rounded-3xl p-5 md:p-6 mb-6 z-10 transition-all duration-300"
+    >
+      <!-- Background gradients wrapper (clipped) -->
+      <div class="absolute inset-0 overflow-hidden rounded-3xl pointer-events-none -z-10">
+        <div
+          class="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-emerald-100/40 to-teal-50/40 rounded-full blur-3xl translate-x-1/3 -translate-y-1/3"
+        ></div>
+        <div
+          class="absolute bottom-0 left-0 w-64 h-64 bg-gradient-to-tr from-purple-50/40 to-pink-50/40 rounded-full blur-3xl -translate-x-1/3 translate-y-1/3"
+        ></div>
+      </div>
 
-      <div class="space-y-8">
+      <!-- Collapsed: compact summary bar -->
+      <div
+        class="flex items-center gap-3"
+        :class="{
+          'md:hidden': isFilterExpanded,
+          'mb-0': !isFilterExpanded,
+          'mb-6 md:mb-0': isFilterExpanded,
+        }"
+      >
+        <div class="flex-1 relative group">
+          <SearchBar
+            v-model="searchQuery"
+            :placeholder="$t('collection.filters.search_placeholder')"
+            class="w-full shadow-sm border-gray-200"
+          />
+        </div>
+        <div
+          v-if="activeFilterCount > 0"
+          class="liquid-glass-chip px-3 py-1.5 text-emerald-800 text-sm"
+        >
+          <Icon name="lucide:filter" class="w-3.5 h-3.5" />
+          <span>{{ activeFilterCount }}</span>
+        </div>
+        <button
+          @click="isFilterExpanded = true"
+          class="liquid-glass-soft relative flex items-center gap-2 px-4 py-2.5 text-emerald-800 rounded-xl text-sm font-bold transition-all"
+        >
+          <Icon name="lucide:sliders-horizontal" class="w-4 h-4" />
+          <span class="hidden sm:inline">{{
+            $t("collection.filters.expand")
+          }}</span>
+          <Icon name="lucide:chevron-down" class="w-4 h-4" />
+          
+          <ClientOnly>
+            <ThreeFilterHint />
+          </ClientOnly>
+        </button>
+      </div>
+
+      <!-- Expanded: full filter panel -->
+      <div v-if="isFilterExpanded" class="hidden md:block space-y-6">
+        <!-- Collapse toggle header -->
+        <div class="flex items-center justify-between">
+          <span
+            class="text-sm font-bold text-gray-500 uppercase tracking-wider flex items-center gap-2"
+          >
+            <Icon
+              name="lucide:sliders-horizontal"
+              class="w-4 h-4 text-emerald-500"
+            />
+            {{ $t("collection.filters.title") }}
+          </span>
+          <button
+            @click="isFilterExpanded = false"
+            class="liquid-glass-soft flex items-center gap-1.5 px-3 py-1.5 text-gray-600 hover:text-gray-800 rounded-lg text-xs font-bold transition-all"
+          >
+            <Icon name="lucide:chevron-up" class="w-3.5 h-3.5" />
+            {{ $t("collection.filters.collapse") }}
+          </button>
+        </div>
+
         <div class="flex flex-col lg:flex-row gap-6 lg:items-end">
           <div class="flex-1 w-full relative group">
-            <label class="text-sm font-semibold text-gray-600 mb-3 flex items-center gap-2">
-              <span class="text-base"></span> {{ $t('collection.filters.search_label') }}
+            <label
+              class="text-sm font-semibold text-gray-600 mb-3 flex items-center gap-2"
+            >
+              <Icon name="lucide:search" class="w-4 h-4 text-emerald-500" />
+              {{ $t("collection.filters.search_label") }}
             </label>
-            <div class="relative transition-all duration-300 group-focus-within:ring-4 ring-emerald-500/10 rounded-2xl">
-              <SearchBar 
+            <div
+              class="relative transition-all duration-300 group-focus-within:ring-4 ring-emerald-500/10 rounded-2xl"
+            >
+              <SearchBar
                 v-model="searchQuery"
                 :placeholder="$t('collection.filters.search_placeholder')"
                 class="w-full shadow-sm border-gray-200"
@@ -45,8 +154,14 @@
           </div>
 
           <div class="w-full lg:w-auto shrink-0">
-            <label class="text-sm font-semibold text-gray-600 mb-3 flex items-center gap-2">
-              <span class="text-base">📊</span> {{ $t('collection.filters.status') }}
+            <label
+              class="text-sm font-semibold text-gray-600 mb-3 flex items-center gap-2"
+            >
+              <Icon
+                name="lucide:toggle-left"
+                class="w-4 h-4 text-emerald-500"
+              />
+              {{ $t("collection.filters.status") }}
             </label>
             <div class="flex flex-wrap gap-2">
               <button
@@ -54,23 +169,35 @@
                 :key="filter.value"
                 @click="collectionFilter = filter.value"
                 class="category-tag"
-                :class="[collectionFilter === filter.value ? 'category-tag-active' : 'category-tag-inactive']"
+                :class="[
+                  collectionFilter === filter.value
+                    ? 'category-tag-active'
+                    : 'category-tag-inactive',
+                ]"
               >
-                <span>{{ filter.icon }}</span>
+                <Icon :name="filter.icon" class="w-4 h-4" />
                 <span>{{ filter.label }}</span>
               </button>
             </div>
           </div>
         </div>
 
-        <div class="h-px w-full bg-gradient-to-r from-transparent via-emerald-200/50 to-transparent"></div>
+        <div
+          class="h-px w-full bg-gradient-to-r from-transparent via-emerald-200/50 to-transparent"
+        ></div>
 
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
           <div>
-            <label class="text-sm font-semibold text-gray-600 mb-3 flex items-center gap-2">
-              <span class="text-base">📁</span> {{ $t('collection.filters.category_type') }}
+            <label
+              class="text-sm font-semibold text-gray-600 mb-3 flex items-center gap-2"
+            >
+              <Icon
+                name="lucide:layout-grid"
+                class="w-4 h-4 text-emerald-500"
+              />
+              {{ $t("collection.filters.category_type") }}
             </label>
-            <CategoryNav 
+            <CategoryNav
               :selected="selectedCategoryType"
               @select="selectedCategoryType = $event"
               class="w-full"
@@ -78,10 +205,13 @@
           </div>
 
           <div>
-            <label class="text-sm font-semibold text-gray-600 mb-3 flex items-center gap-2">
-              <span class="text-base">🌱</span> {{ $t('collection.filters.pikmin_type') }}
+            <label
+              class="text-sm font-semibold text-gray-600 mb-3 flex items-center gap-2"
+            >
+              <Icon name="lucide:leaf" class="w-4 h-4 text-emerald-500" />
+              {{ $t("collection.filters.pikmin_type") }}
             </label>
-            <PikminFilter 
+            <PikminFilter
               :selected="selectedPikminType"
               @select="selectedPikminType = $event"
               class="w-full"
@@ -97,56 +227,289 @@
           leave-from-class="opacity-100 translate-y-0 scale-100"
           leave-to-class="opacity-0 -translate-y-4 scale-95"
         >
-          <div 
+          <div
             v-if="hasActiveFilters"
-            class="flex flex-col sm:flex-row sm:items-center justify-between bg-emerald-50/50 border border-emerald-100 rounded-2xl p-4 gap-4 mt-4"
+            class="liquid-glass-soft flex flex-col sm:flex-row sm:items-center justify-between rounded-2xl p-4 gap-4"
           >
             <div class="flex items-center gap-2 flex-wrap">
-              <span class="text-sm text-emerald-800 font-bold mr-2">{{ $t('collection.filters.active_label') }}</span>
-              
-              <span v-if="searchQuery" class="group inline-flex items-center gap-1.5 px-3 py-1.5 bg-white text-emerald-700 border border-emerald-200 rounded-xl text-sm font-medium shadow-sm transition-all hover:border-emerald-300 hover:shadow">
-                <span class="opacity-70">🔍</span> {{ searchQuery }}
-                <button @click="searchQuery = ''" class="w-5 h-5 flex items-center justify-center rounded-full bg-emerald-100 text-emerald-600 hover:bg-emerald-500 hover:text-white transition-colors ml-1">×</button>
-              </span>
-              
-              <span v-if="selectedCategoryType" class="group inline-flex items-center gap-1.5 px-3 py-1.5 bg-white text-emerald-700 border border-emerald-200 rounded-xl text-sm font-medium shadow-sm transition-all hover:border-emerald-300 hover:shadow">
-                <span class="opacity-70">📁</span> {{ getCategoryTypeName(selectedCategoryType) }}
-                <button @click="selectedCategoryType = null" class="w-5 h-5 flex items-center justify-center rounded-full bg-emerald-100 text-emerald-600 hover:bg-emerald-500 hover:text-white transition-colors ml-1">×</button>
-              </span>
-              
-              <span v-if="selectedPikminType" class="group inline-flex items-center gap-1.5 px-3 py-1.5 bg-white text-emerald-700 border border-emerald-200 rounded-xl text-sm font-medium shadow-sm transition-all hover:border-emerald-300 hover:shadow">
-                <span class="opacity-70">🌱</span> {{ PIKMIN_TYPE_NAMES[selectedPikminType] }}
-                <button @click="selectedPikminType = null" class="w-5 h-5 flex items-center justify-center rounded-full bg-emerald-100 text-emerald-600 hover:bg-emerald-500 hover:text-white transition-colors ml-1">×</button>
-              </span>
-              
-              <span v-if="collectionFilter !== 'all'" class="group inline-flex items-center gap-1.5 px-3 py-1.5 bg-white text-emerald-700 border border-emerald-200 rounded-xl text-sm font-medium shadow-sm transition-all hover:border-emerald-300 hover:shadow">
-                <span class="opacity-70">{{ collectionFilters.find(f => f.value === collectionFilter)?.icon }}</span> 
-                {{ collectionFilters.find(f => f.value === collectionFilter)?.label }}
-                <button @click="collectionFilter = 'all'" class="w-5 h-5 flex items-center justify-center rounded-full bg-emerald-100 text-emerald-600 hover:bg-emerald-500 hover:text-white transition-colors ml-1">×</button>
+              <span class="text-sm text-emerald-800 font-bold mr-2">{{
+                $t("collection.filters.active_label")
+              }}</span>
+
+              <span
+                v-if="searchQuery"
+                class="liquid-glass-chip group px-3 py-1.5 text-emerald-800 text-sm"
+              >
+                <Icon name="lucide:search" class="w-3.5 h-3.5 opacity-70" />
+                {{ searchQuery }}
+                <button
+                  @click="searchQuery = ''"
+                  class="w-5 h-5 flex items-center justify-center rounded-full bg-emerald-100 text-emerald-600 hover:bg-emerald-500 hover:text-white transition-colors ml-1"
+                >
+                  ×
+                </button>
               </span>
 
-              <span v-if="isLimitedMode" class="group inline-flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-amber-50 to-orange-50 text-amber-700 border border-amber-200 rounded-xl text-sm font-medium shadow-sm transition-all hover:border-amber-300 hover:shadow">
-                <span class="opacity-70">⚠️</span> {{ $t('collection.filters.limited') }}
-                <button @click="isLimitedMode = false" class="w-5 h-5 flex items-center justify-center rounded-full bg-amber-200 text-amber-700 hover:bg-amber-500 hover:text-white transition-colors ml-1">×</button>
+              <span
+                v-if="selectedCategoryType"
+                class="liquid-glass-chip group px-3 py-1.5 text-emerald-800 text-sm"
+              >
+                <Icon
+                  name="lucide:layout-grid"
+                  class="w-3.5 h-3.5 opacity-70"
+                />
+                {{ getCategoryTypeName(selectedCategoryType) }}
+                <button
+                  @click="selectedCategoryType = null"
+                  class="w-5 h-5 flex items-center justify-center rounded-full bg-emerald-100 text-emerald-600 hover:bg-emerald-500 hover:text-white transition-colors ml-1"
+                >
+                  ×
+                </button>
               </span>
 
-              <span v-if="selectedCategoryId" class="group inline-flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-purple-50 to-fuchsia-50 text-purple-700 border border-purple-200 rounded-xl text-sm font-medium shadow-sm transition-all hover:border-purple-300 hover:shadow">
-                <span class="opacity-70">📁</span> {{ getCategoryName(selectedCategoryId) }}
-                <button @click="selectedCategoryId = null" class="w-5 h-5 flex items-center justify-center rounded-full bg-purple-200 text-purple-700 hover:bg-purple-500 hover:text-white transition-colors ml-1">×</button>
+              <span
+                v-if="selectedPikminType"
+                class="liquid-glass-chip group px-3 py-1.5 text-emerald-800 text-sm"
+              >
+                <Icon name="lucide:leaf" class="w-3.5 h-3.5 opacity-70" />
+                {{ selectedPikminType ? PIKMIN_TYPE_NAMES[selectedPikminType] : "" }}
+                <button
+                  @click="selectedPikminType = null"
+                  class="w-5 h-5 flex items-center justify-center rounded-full bg-emerald-100 text-emerald-600 hover:bg-emerald-500 hover:text-white transition-colors ml-1"
+                >
+                  ×
+                </button>
+              </span>
+
+              <span
+                v-if="collectionFilter !== 'all'"
+                class="liquid-glass-chip group px-3 py-1.5 text-emerald-800 text-sm"
+              >
+                <Icon
+                  :name="selectedCollectionFilter?.icon || 'lucide:list'"
+                  class="w-3.5 h-3.5 opacity-70"
+                />
+                {{ selectedCollectionFilter?.label || "" }}
+                <button
+                  @click="collectionFilter = 'all'"
+                  class="w-5 h-5 flex items-center justify-center rounded-full bg-emerald-100 text-emerald-600 hover:bg-emerald-500 hover:text-white transition-colors ml-1"
+                >
+                  ×
+                </button>
+              </span>
+
+              <span
+                v-if="isLimitedMode"
+                class="liquid-glass-chip group px-3 py-1.5 text-amber-800 text-sm"
+              >
+                <Icon
+                  name="lucide:alert-triangle"
+                  class="w-3.5 h-3.5 opacity-70"
+                />
+                {{ $t("collection.filters.limited") }}
+                <button
+                  @click="isLimitedMode = false"
+                  class="w-5 h-5 flex items-center justify-center rounded-full bg-amber-200 text-amber-700 hover:bg-amber-500 hover:text-white transition-colors ml-1"
+                >
+                  ×
+                </button>
+              </span>
+
+              <span
+                v-if="selectedCategoryId"
+                class="liquid-glass-chip group px-3 py-1.5 text-purple-800 text-sm"
+              >
+                <Icon name="lucide:folder" class="w-3.5 h-3.5 opacity-70" />
+                {{ getCategoryName(selectedCategoryId) }}
+                <button
+                  @click="selectedCategoryId = null"
+                  class="w-5 h-5 flex items-center justify-center rounded-full bg-purple-200 text-purple-700 hover:bg-purple-500 hover:text-white transition-colors ml-1"
+                >
+                  ×
+                </button>
               </span>
             </div>
 
-            <button 
+            <button
               @click="clearAllFilters"
-              class="shrink-0 flex items-center gap-2 px-4 py-2 bg-white text-gray-500 hover:text-red-600 border border-gray-200 hover:border-red-200 rounded-xl text-sm font-bold shadow-sm transition-all hover:bg-red-50 focus:ring-2 focus:ring-red-200 outline-none"
+              class="liquid-glass-soft shrink-0 flex items-center gap-2 px-4 py-2 text-gray-700 hover:text-red-700 rounded-xl text-sm font-bold transition-all focus:ring-2 focus:ring-red-200 outline-none"
             >
-              <span class="text-lg leading-none">🗑️</span>
-              {{ $t('collection.filters.clear') }}
+              <Icon name="lucide:trash-2" class="w-4 h-4" />
+              {{ $t("collection.filters.clear") }}
             </button>
           </div>
         </Transition>
       </div>
     </div>
+
+    <!-- ===== Mobile Navigation Drawer (Bottom Sheet with Three.js) ===== -->
+    <ClientOnly>
+      <Teleport to="body">
+        <Transition
+          enter-active-class="transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)]"
+          enter-from-class="opacity-0 translate-y-full"
+          enter-to-class="opacity-100 translate-y-0"
+          leave-active-class="transition-all duration-300 ease-in-out"
+          leave-from-class="opacity-100 translate-y-0"
+          leave-to-class="opacity-0 translate-y-full"
+        >
+          <div
+            v-if="isFilterExpanded"
+            class="md:hidden fixed inset-0 z-[100] flex flex-col justify-end pointer-events-none"
+          >
+            <!-- Backdrop with Three.js -->
+            <div
+              class="absolute inset-0 bg-gray-900/60 pointer-events-auto transition-opacity"
+              @click="isFilterExpanded = false"
+            >
+              <ThreeSporeBackdrop class="opacity-80" />
+            </div>
+
+            <!-- Bottom Sheet Content -->
+            <div
+              class="liquid-glass-2026 liquid-glass-readable liquid-glass-dynamic relative w-full max-h-[85vh] rounded-t-[2.5rem] pointer-events-auto flex flex-col overflow-hidden"
+            >
+              <!-- Notch -->
+              <div
+                class="w-full flex justify-center pt-4 pb-2"
+                @click="isFilterExpanded = false"
+              >
+                <div class="w-12 h-1.5 bg-gray-300/80 rounded-full"></div>
+              </div>
+
+              <!-- Header -->
+              <div
+                class="flex items-center justify-between px-6 pb-4 border-b border-white/60"
+              >
+                <span
+                  class="text-lg font-bold text-gray-800 flex items-center gap-2"
+                >
+                  <Icon
+                    name="lucide:sliders-horizontal"
+                    class="w-5 h-5 text-emerald-500"
+                  />
+                  {{ $t("collection.filters.title") }}
+                </span>
+                <button
+                  @click="isFilterExpanded = false"
+                  class="liquid-glass-soft p-2 text-gray-500 hover:text-gray-700 rounded-full active:scale-90 transition-transform"
+                >
+                  <Icon name="lucide:x" class="w-5 h-5" />
+                </button>
+              </div>
+
+              <!-- Scrollable Content -->
+              <div
+                class="flex-1 overflow-y-auto px-6 py-6 space-y-8 custom-scrollbar"
+              >
+                <!-- Mobile Search -->
+                <div class="w-full relative group">
+                  <label
+                    class="text-sm font-semibold text-gray-600 mb-3 flex items-center gap-2"
+                  >
+                    <Icon
+                      name="lucide:search"
+                      class="w-4 h-4 text-emerald-500"
+                    />
+                    {{ $t("collection.filters.search_label") }}
+                  </label>
+                  <div
+                    class="relative transition-all duration-300 focus-within:ring-4 ring-emerald-500/10 rounded-2xl"
+                  >
+                    <SearchBar
+                      v-model="searchQuery"
+                      :placeholder="$t('collection.filters.search_placeholder')"
+                      class="w-full shadow-sm border-gray-200"
+                    />
+                  </div>
+                </div>
+
+                <!-- Status -->
+                <div>
+                  <label
+                    class="text-sm font-semibold text-gray-600 mb-3 flex items-center gap-2"
+                  >
+                    <Icon
+                      name="lucide:toggle-left"
+                      class="w-4 h-4 text-emerald-500"
+                    />
+                    {{ $t("collection.filters.status") }}
+                  </label>
+                  <div class="flex flex-wrap gap-2">
+                    <button
+                      v-for="filter in collectionFilters"
+                      :key="filter.value"
+                      @click="collectionFilter = filter.value"
+                      class="category-tag"
+                      :class="[
+                        collectionFilter === filter.value
+                          ? 'category-tag-active'
+                          : 'category-tag-inactive',
+                      ]"
+                    >
+                      <Icon :name="filter.icon" class="w-4 h-4" />
+                      <span>{{ filter.label }}</span>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Category Type -->
+                <div>
+                  <label
+                    class="text-sm font-semibold text-gray-600 mb-3 flex items-center gap-2"
+                  >
+                    <Icon
+                      name="lucide:layout-grid"
+                      class="w-4 h-4 text-emerald-500"
+                    />
+                    {{ $t("collection.filters.category_type") }}
+                  </label>
+                  <CategoryNav
+                    :selected="selectedCategoryType"
+                    @select="selectedCategoryType = $event"
+                    class="w-full"
+                  />
+                </div>
+
+                <!-- Pikmin Type -->
+                <div>
+                  <label
+                    class="text-sm font-semibold text-gray-600 mb-3 flex items-center gap-2"
+                  >
+                    <Icon name="lucide:leaf" class="w-4 h-4 text-emerald-500" />
+                    {{ $t("collection.filters.pikmin_type") }}
+                  </label>
+                  <PikminFilter
+                    :selected="selectedPikminType"
+                    @select="selectedPikminType = $event"
+                    class="w-full"
+                  />
+                </div>
+              </div>
+
+              <!-- Footer (Sticky) -->
+              <div
+                class="p-4 border-t border-white/60 bg-white/20 backdrop-blur-md flex items-center justify-between gap-4"
+              >
+                <button
+                  @click="clearAllFilters"
+                  class="liquid-glass-soft flex-1 py-3.5 text-gray-700 hover:text-red-700 rounded-xl text-sm font-bold transition-all active:scale-95"
+                >
+                  {{ $t("collection.filters.clear") }}
+                </button>
+                <button
+                  @click="isFilterExpanded = false"
+                  class="liquid-glass-button flex-[2] py-3.5 rounded-xl text-sm active:scale-95 flex items-center justify-center gap-2"
+                >
+                  <Icon name="lucide:check" class="w-5 h-5" />
+                  顯示 {{ filteredItems.length }} 個結果
+                </button>
+              </div>
+            </div>
+          </div>
+        </Transition>
+      </Teleport>
+    </ClientOnly>
 
     <!-- Results Section -->
     <div>
@@ -154,199 +517,384 @@
       <template v-if="!hasActiveFilters">
         <!-- Regular Categories Section -->
         <div class="mb-12">
-          <div class="flex items-center gap-3 mb-4 pb-3 border-b-2 border-emerald-200">
-            <span class="text-3xl">📍</span>
+          <div
+            class="collection-section-card flex items-center gap-3 mb-4 px-3 py-3 rounded-3xl"
+          >
+            <span
+              class="collection-section-icon w-12 h-12 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center shadow-md"
+            >
+              <Icon name="lucide:map-pin" class="w-6 h-6 text-white" />
+            </span>
             <div class="flex-1">
-              <h2 class="text-2xl font-bold text-emerald-700">{{ $t('collection.sections.regular.title') }}</h2>
-              <p class="text-sm text-gray-600 mt-1">{{ $t('collection.sections.regular.desc') }}</p>
+              <h2 class="collection-section-title text-2xl font-bold text-emerald-700">
+                {{ $t("collection.sections.regular.title") }}
+              </h2>
+              <p class="collection-section-desc text-sm mt-1">
+                {{ $t("collection.sections.regular.desc") }}
+              </p>
             </div>
-            <div class="text-right">
-              <p class="text-sm font-bold text-emerald-600">{{ regularCategoriesCount }}{{ $t('collection.sections.count_suffix') }}</p>
+            <div class="collection-section-actions flex items-center gap-1.5">
+              <button
+                @click="expandAllCategories"
+                class="collection-section-action"
+                :title="$t('collection.actions.expand_all')"
+              >
+                <Icon name="lucide:chevrons-down" class="w-4 h-4" />
+              </button>
+              <button
+                @click="collapseAllCategories"
+                class="collection-section-action"
+                :title="$t('collection.actions.collapse_all')"
+              >
+                <Icon name="lucide:chevrons-up" class="w-4 h-4" />
+              </button>
+              <p class="collection-count-pill">
+                {{ regularCategoriesCount
+                }}{{ $t("collection.sections.count_suffix") }}
+              </p>
             </div>
           </div>
-          
+
           <!-- Info Box -->
-          <div class="bg-emerald-50 border-l-4 border-emerald-500 p-4 mb-6 rounded-r-lg">
+          <div
+            class="collection-info-card p-4 mb-6 rounded-2xl"
+          >
             <div class="flex items-start gap-3">
-              <span class="text-xl">💡</span>
+              <span
+                class="collection-info-icon w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
+              >
+                <Icon name="lucide:info" class="w-4 h-4 text-emerald-600" />
+              </span>
               <div>
-                <p class="text-sm font-semibold text-emerald-800 mb-1">{{ $t('collection.info.regular.title') }}</p>
-                <p class="text-xs text-emerald-700">{{ $t('collection.info.regular.desc') }}</p>
+                <p class="collection-info-title text-sm font-semibold text-emerald-800 mb-1">
+                  {{ $t("collection.info.regular.title") }}
+                </p>
+                <p class="collection-info-desc text-xs text-emerald-700">
+                  {{ $t("collection.info.regular.desc") }}
+                </p>
               </div>
             </div>
           </div>
-          
-          <div 
-            v-for="def in regularCategories" 
+
+          <div
+            v-for="def in regularCategories"
             :key="def.category.id"
-            class="mb-8"
+            :id="`cat-${def.category.id}`"
+            class="mb-6"
           >
-            <!-- Category Header -->
-            <div class="flex items-center gap-3 mb-4 sticky top-[120px] z-10 bg-gradient-to-r from-emerald-50/95 to-teal-50/95 backdrop-blur-sm -mx-4 px-4 py-3 rounded-xl">
-              <Icon :name="def.category.icon" class="text-2xl" />
-              <div class="flex-1">
-                <h2 class="text-lg font-bold text-gray-800">{{ locale === 'en' ? def.category.nameEn : def.category.name }}</h2>
-                <p class="text-xs text-gray-500">{{ locale === 'en' ? def.category.name : def.category.nameEn }}</p>
+            <!-- Category Header (clickable accordion) -->
+            <div
+              class="liquid-glass-2026 liquid-glass-readable liquid-glass-dynamic flex items-center gap-3 sticky top-[120px] z-10 -mx-4 px-4 py-3 rounded-xl cursor-pointer group"
+              @click="toggleCategory(def.category.id)"
+            >
+              <Icon :name="getCategoryIcon(def.category.icon)" class="text-2xl flex-shrink-0" />
+              <div class="flex-1 min-w-0">
+                <h2 class="text-lg font-bold text-gray-800">
+                  {{
+                    locale === "en" ? def.category.nameEn : def.category.name
+                  }}
+                </h2>
+                <p class="text-xs text-gray-500">
+                  {{
+                    locale === "en" ? def.category.name : def.category.nameEn
+                  }}
+                </p>
               </div>
               <button
-                @click="handleCollectAll(def.category.id, locale === 'en' ? def.category.nameEn : def.category.name)"
-                class="px-3 py-1.5 bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-medium rounded-lg transition-colors flex items-center gap-1 shadow-sm hover:shadow"
+                @click.stop="
+                  handleCollectAll(
+                    def.category.id,
+                    locale === 'en' ? def.category.nameEn : def.category.name,
+                  )
+                "
+                class="liquid-glass-button px-3 py-1.5 text-xs rounded-lg flex items-center gap-1"
                 :title="$t('collection.actions.collect_all_tooltip')"
               >
-                <span>✨</span>
-                <span>{{ $t('collection.actions.collect_all') }}</span>
+                <Icon name="lucide:check-check" class="w-3.5 h-3.5" />
+                <span class="hidden sm:inline">{{
+                  $t("collection.actions.collect_all")
+                }}</span>
               </button>
-              <div class="text-right">
-                <p class="text-sm font-bold text-emerald-600">{{ getCategoryProgress(def.category.id) }}</p>
-                <p class="text-xs text-gray-400">{{ $t('collection.stats.collected') }}</p>
+              <div class="text-right flex-shrink-0 w-20">
+                <p
+                  class="text-sm font-bold"
+                  :class="
+                    getCategoryProgressPercent(def.category.id) === 100
+                      ? 'text-amber-500'
+                      : 'text-emerald-600'
+                  "
+                >
+                  {{ getCategoryProgress(def.category.id) }}
+                </p>
+                <!-- Mini Progress Bar -->
+                <div
+                  class="h-1.5 w-full bg-gray-200 rounded-full mt-1 overflow-hidden"
+                >
+                  <div
+                    class="h-full rounded-full transition-all duration-500"
+                    :class="
+                      getCategoryProgressPercent(def.category.id) === 100
+                        ? 'bg-gradient-to-r from-amber-400 to-yellow-300'
+                        : 'bg-gradient-to-r from-emerald-400 to-teal-400'
+                    "
+                    :style="{
+                      width: getCategoryProgressPercent(def.category.id) + '%',
+                    }"
+                  ></div>
+                </div>
               </div>
+              <Icon
+                name="lucide:chevron-down"
+                class="w-5 h-5 text-gray-400 transition-transform duration-300 flex-shrink-0"
+                :class="isCategoryExpanded(def.category.id) ? 'rotate-180' : ''"
+              />
             </div>
-            
-            <DecorGrid 
-              :items="getItemsForCategory(def.category.id)" 
-              @clear-filters="clearAllFilters"
-            />
+
+            <!-- Collapsible content -->
+            <div v-show="isCategoryExpanded(def.category.id)" class="mt-4">
+              <DecorGrid
+                :items="getItemsForCategory(def.category.id)"
+                @clear-filters="clearAllFilters"
+              />
+            </div>
           </div>
         </div>
 
         <!-- Special Categories Section -->
-        <div v-if="specialCategories.length > 0" id="special-categories-section">
-          <div class="flex items-center gap-3 mb-4 pb-3 border-b-2 border-purple-200">
-            <span class="text-3xl">⭐</span>
+        <div
+          v-if="specialCategories.length > 0"
+          id="special-categories-section"
+        >
+          <div
+            class="collection-section-card collection-section-card-purple flex items-center gap-3 mb-4 px-3 py-3 rounded-3xl"
+          >
+            <span
+              class="collection-section-icon w-12 h-12 rounded-2xl bg-gradient-to-br from-purple-500 to-fuchsia-500 flex items-center justify-center shadow-md"
+            >
+              <Icon name="lucide:star" class="w-6 h-6 text-white" />
+            </span>
             <div class="flex-1">
-              <h2 class="text-2xl font-bold text-purple-700">{{ $t('collection.sections.special.title') }}</h2>
-              <p class="text-sm text-gray-600 mt-1">{{ $t('collection.sections.special.desc') }}</p>
+              <h2 class="collection-section-title text-2xl font-bold text-purple-700">
+                {{ $t("collection.sections.special.title") }}
+              </h2>
+              <p class="collection-section-desc text-sm mt-1">
+                {{ $t("collection.sections.special.desc") }}
+              </p>
             </div>
-            <div class="text-right">
-              <p class="text-sm font-bold text-purple-600">{{ specialCategoriesCount }}{{ $t('collection.sections.count_suffix') }}</p>
-            </div>
+            <p class="collection-count-pill collection-count-pill-purple">
+              {{ specialCategoriesCount
+              }}{{ $t("collection.sections.count_suffix") }}
+            </p>
           </div>
-          
+
           <!-- Info Box -->
-          <div class="bg-purple-50 border-l-4 border-purple-500 p-4 mb-6 rounded-r-lg">
+          <div
+            class="collection-info-card collection-info-card-purple p-4 mb-6 rounded-2xl"
+          >
             <div class="flex items-start gap-3">
-              <span class="text-xl">✨</span>
+              <span
+                class="collection-info-icon w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
+              >
+                <Icon name="lucide:sparkles" class="w-4 h-4 text-purple-600" />
+              </span>
               <div>
-                <p class="text-sm font-semibold text-purple-800 mb-1">{{ $t('collection.info.special.title') }}</p>
-                <p class="text-xs text-purple-700">{{ $t('collection.info.special.desc') }}</p>
+                <p class="collection-info-title text-sm font-semibold text-purple-800 mb-1">
+                  {{ $t("collection.info.special.title") }}
+                </p>
+                <p class="collection-info-desc text-xs text-purple-700">
+                  {{ $t("collection.info.special.desc") }}
+                </p>
               </div>
             </div>
           </div>
-          
-          <div 
-            v-for="def in specialCategories" 
+
+          <div
+            v-for="def in specialCategories"
             :key="def.category.id"
-            class="mb-8"
+            :id="`cat-${def.category.id}`"
+            class="mb-6"
           >
-            <!-- Category Header -->
-            <div class="flex items-center gap-3 mb-4 sticky top-[120px] z-10 bg-gradient-to-r from-purple-50/95 to-pink-50/95 backdrop-blur-sm -mx-4 px-4 py-3 rounded-xl">
-              <Icon :name="def.category.icon" class="text-2xl" />
-              <div class="flex-1">
-                <h2 class="text-lg font-bold text-gray-800">{{ locale === 'en' ? def.category.nameEn : def.category.name }}</h2>
-                <p class="text-xs text-gray-500">{{ locale === 'en' ? def.category.name : def.category.nameEn }}</p>
+            <!-- Category Header (clickable accordion) -->
+            <div
+              class="liquid-glass-2026 liquid-glass-readable liquid-glass-dynamic flex items-center gap-3 sticky top-[120px] z-10 -mx-4 px-4 py-3 rounded-xl cursor-pointer group"
+              @click="toggleCategory(def.category.id)"
+            >
+              <Icon :name="getCategoryIcon(def.category.icon)" class="text-2xl flex-shrink-0" />
+              <div class="flex-1 min-w-0">
+                <h2 class="text-lg font-bold text-gray-800">
+                  {{
+                    locale === "en" ? def.category.nameEn : def.category.name
+                  }}
+                </h2>
+                <p class="text-xs text-gray-500">
+                  {{
+                    locale === "en" ? def.category.name : def.category.nameEn
+                  }}
+                </p>
               </div>
               <button
-                @click="handleCollectAll(def.category.id, locale === 'en' ? def.category.nameEn : def.category.name)"
-                class="px-3 py-1.5 bg-purple-500 hover:bg-purple-600 text-white text-xs font-medium rounded-lg transition-colors flex items-center gap-1 shadow-sm hover:shadow"
+                @click.stop="
+                  handleCollectAll(
+                    def.category.id,
+                    locale === 'en' ? def.category.nameEn : def.category.name,
+                  )
+                "
+                class="liquid-glass-button px-3 py-1.5 text-xs rounded-lg flex items-center gap-1"
                 :title="$t('collection.actions.collect_all_tooltip')"
               >
-                <span>✨</span>
-                <span>{{ $t('collection.actions.collect_all') }}</span>
+                <Icon name="lucide:check-check" class="w-3.5 h-3.5" />
+                <span class="hidden sm:inline">{{
+                  $t("collection.actions.collect_all")
+                }}</span>
               </button>
-              <div class="text-right">
-                <p class="text-sm font-bold text-purple-600">{{ getCategoryProgress(def.category.id) }}</p>
-                <p class="text-xs text-gray-400">{{ $t('collection.stats.collected') }}</p>
+              <div class="text-right flex-shrink-0 w-20">
+                <p
+                  class="text-sm font-bold"
+                  :class="
+                    getCategoryProgressPercent(def.category.id) === 100
+                      ? 'text-amber-500'
+                      : 'text-purple-600'
+                  "
+                >
+                  {{ getCategoryProgress(def.category.id) }}
+                </p>
+                <!-- Mini Progress Bar -->
+                <div
+                  class="h-1.5 w-full bg-gray-200 rounded-full mt-1 overflow-hidden"
+                >
+                  <div
+                    class="h-full rounded-full transition-all duration-500"
+                    :class="
+                      getCategoryProgressPercent(def.category.id) === 100
+                        ? 'bg-gradient-to-r from-amber-400 to-yellow-300'
+                        : 'bg-gradient-to-r from-purple-400 to-fuchsia-400'
+                    "
+                    :style="{
+                      width: getCategoryProgressPercent(def.category.id) + '%',
+                    }"
+                  ></div>
+                </div>
               </div>
+              <Icon
+                name="lucide:chevron-down"
+                class="w-5 h-5 text-gray-400 transition-transform duration-300 flex-shrink-0"
+                :class="isCategoryExpanded(def.category.id) ? 'rotate-180' : ''"
+              />
             </div>
-            
-            <DecorGrid 
-              :items="getItemsForCategory(def.category.id)" 
-              @clear-filters="clearAllFilters"
-            />
+
+            <!-- Collapsible content -->
+            <div v-show="isCategoryExpanded(def.category.id)" class="mt-4">
+              <DecorGrid
+                :items="getItemsForCategory(def.category.id)"
+                @clear-filters="clearAllFilters"
+              />
+            </div>
           </div>
         </div>
       </template>
 
       <!-- Flat Grid View (when filters active) -->
       <template v-else>
-        <DecorGrid 
-          :items="filteredItems" 
-          @clear-filters="clearAllFilters"
-        />
+        <DecorGrid :items="filteredItems" @clear-filters="clearAllFilters" />
       </template>
     </div>
-
 
     <!-- Sync Status Bar -->
     <SyncStatusBar />
 
-    <!-- Floating Navigation Buttons -->
-    <Transition
-      enter-active-class="transition duration-300"
-      enter-from-class="opacity-0 translate-y-4"
-      enter-to-class="opacity-100 translate-y-0"
-      leave-active-class="transition duration-200"
-      leave-from-class="opacity-100 translate-y-0"
-      leave-to-class="opacity-0 translate-y-4"
-    >
-      <div v-if="showScrollTop || !hasActiveFilters" class="fixed bottom-6 right-6 flex flex-col gap-3 z-40">
-        <!-- Jump to Special Categories Button -->
-        <button
-          v-if="!hasActiveFilters && specialCategories.length > 0"
-          @click="scrollToSpecialCategories"
-          class="w-14 h-14 bg-purple-500 hover:bg-purple-600 text-white rounded-full shadow-lg hover:shadow-xl transition-all flex items-center justify-center group relative"
-          :title="$t('collection.scroll.special')"
-        >
-          <span class="text-2xl">⭐</span>
-          <!-- Tooltip -->
-          <div class="absolute right-full mr-3 px-3 py-2 bg-gray-800 text-white text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-            {{ $t('collection.scroll.special') }}
-          </div>
-        </button>
-        
-        <!-- Scroll to Top Button -->
-        <button
-          v-if="showScrollTop"
-          @click="scrollToTop"
-          class="w-14 h-14 bg-emerald-500 hover:bg-emerald-600 text-white rounded-full shadow-lg hover:shadow-xl transition-all flex items-center justify-center text-xl group relative"
-          :title="$t('collection.scroll.top')"
-        >
-          ↑
-          <!-- Tooltip -->
-          <div class="absolute right-full mr-3 px-3 py-2 bg-gray-800 text-white text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-            {{ $t('collection.scroll.top') }}
-          </div>
-        </button>
-      </div>
-    </Transition>
+    <!-- Category Jump Navigation (All screen sizes) -->
+    <CategoryJumpNav
+      :categories="jumpNavCategories"
+      :show-scroll-top="showScrollTop"
+      :has-special="specialCategories.length > 0"
+      :has-active-filters="hasActiveFilters"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
-import { DECOR_CATEGORY_TYPES, PIKMIN_TYPE_NAMES, type PikminType, type DecorCategoryType, type DecorItem } from '~/types/decor';
+import {
+  PIKMIN_TYPE_NAMES,
+  type PikminType,
+  type DecorItem,
+} from "~/types/decor";
+import type { CollectionCategoryFilter } from "~/composables/useCollectionFilters";
 
 const route = useRoute();
 const { t, locale } = useI18n();
-const { isCollected, collectAllInCategory } = useCollection();
-const { hasPendingChanges } = useCollection();
-const { getAllDecorItems, getDecorDefinitions, getItemsByCategoryType, searchItems, getItemsByCategory } = useDecorData();
+const { isCollected, collectAllInCategory, hasPendingChanges } = useCollection();
+const {
+  getAllDecorItems,
+  getDecorDefinitions,
+  getItemsByCategoryType,
+  searchItems,
+  getItemsByCategory,
+} = useDecorData();
 
 // Filter state
-const searchQuery = ref('');
-const selectedCategoryType = ref<DecorCategoryType | 'uncollected-regular' | 'anniversary' | null>(null);
+const searchQuery = ref("");
+const selectedCategoryType = ref<CollectionCategoryFilter | null>(null);
 const selectedPikminType = ref<PikminType | null>(null);
-const collectionFilter = ref<'all' | 'collected' | 'uncollected'>('all');
+const collectionFilter = ref<"all" | "collected" | "uncollected">("all");
 const showScrollTop = ref(false);
 
+// UX: Collapsible filter panel (default collapsed)
+const isFilterExpanded = ref(false);
+
+// UX: Accordion - track collapsed categories (default all expanded)
+const collapsedCategories = ref<Set<string>>(new Set());
+
+const toggleCategory = (categoryId: string) => {
+  const newSet = new Set(collapsedCategories.value);
+  if (newSet.has(categoryId)) {
+    newSet.delete(categoryId);
+  } else {
+    newSet.add(categoryId);
+  }
+  collapsedCategories.value = newSet;
+};
+
+const isCategoryExpanded = (categoryId: string) =>
+  !collapsedCategories.value.has(categoryId);
+
+const expandAllCategories = () => {
+  collapsedCategories.value = new Set();
+};
+
+const collapseAllCategories = () => {
+  const allIds = getDecorDefinitions().map((d) => d.category.id);
+  collapsedCategories.value = new Set(allIds);
+};
+
+// UX: Category progress percentage
+const getCategoryProgressPercent = (categoryId: string): number => {
+  const items = getItemsByCategory(categoryId);
+  if (items.length === 0) return 0;
+  const collected = items.filter((item) => isCollected(item.id)).length;
+  return Math.round((collected / items.length) * 100);
+};
 
 const collectionFilters = computed(() => [
-  { value: 'all' as const, label: t('collection.filters.status_all'), icon: '📋' },
-  { value: 'collected' as const, label: t('collection.filters.status_collected'), icon: '✅' },
-  { value: 'uncollected' as const, label: t('collection.filters.status_uncollected'), icon: '⬜' },
+  {
+    value: "all" as const,
+    label: t("collection.filters.status_all"),
+    icon: "lucide:list",
+  },
+  {
+    value: "collected" as const,
+    label: t("collection.filters.status_collected"),
+    icon: "lucide:check-square",
+  },
+  {
+    value: "uncollected" as const,
+    label: t("collection.filters.status_uncollected"),
+    icon: "lucide:square",
+  },
 ]);
-
-// 取得限定類別 IDs
-const limitedCategoryTypes: DecorCategoryType[] = ['regional', 'special'];
+const selectedCollectionFilter = computed(() =>
+  collectionFilters.value.find((filter) => filter.value === collectionFilter.value),
+);
+const getCategoryIcon = (icon?: string) => icon || "lucide:folder";
 
 // 標記是否為「限定篩選」模式
 const isLimitedMode = ref(false);
@@ -358,27 +906,27 @@ const selectedCategoryId = ref<string | null>(null);
 onMounted(() => {
   // 處理 type 參數（取得方式）
   if (route.query.type) {
-    selectedCategoryType.value = route.query.type as DecorCategoryType;
+    selectedCategoryType.value = route.query.type as CollectionCategoryFilter;
   }
-  
+
   // 處理 search 參數
   if (route.query.search) {
     searchQuery.value = route.query.search as string;
   }
-  
+
   // 處理 status 參數（蒐集狀態）
   if (route.query.status) {
     const status = route.query.status as string;
-    if (status === 'collected' || status === 'uncollected') {
+    if (status === "collected" || status === "uncollected") {
       collectionFilter.value = status;
     }
   }
-  
+
   // 處理 limited 參數（限定飾品模式）
-  if (route.query.limited === 'true') {
+  if (route.query.limited === "true") {
     isLimitedMode.value = true;
   }
-  
+
   // 處理 category 參數（特定類別）
   if (route.query.category) {
     selectedCategoryId.value = route.query.category as string;
@@ -386,24 +934,24 @@ onMounted(() => {
   if (route.query.pikmin) {
     selectedPikminType.value = route.query.pikmin as PikminType;
   }
-  
+
   // Scroll listener
-  window.addEventListener('scroll', handleScroll);
-  
+  window.addEventListener("scroll", handleScroll);
+
   // Warn user if they try to leave with unsaved changes
-  window.addEventListener('beforeunload', handleBeforeUnload);
+  window.addEventListener("beforeunload", handleBeforeUnload);
 });
 
 onUnmounted(() => {
-  window.removeEventListener('scroll', handleScroll);
-  window.removeEventListener('beforeunload', handleBeforeUnload);
+  window.removeEventListener("scroll", handleScroll);
+  window.removeEventListener("beforeunload", handleBeforeUnload);
 });
 
 const handleBeforeUnload = (e: BeforeUnloadEvent) => {
   if (hasPendingChanges.value) {
     e.preventDefault();
     // Modern browsers ignore custom messages, but returnValue is still needed
-    e.returnValue = '';
+    e.returnValue = "";
   }
 };
 
@@ -412,103 +960,71 @@ const handleScroll = () => {
 };
 
 const scrollToTop = () => {
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+  window.scrollTo({ top: 0, behavior: "smooth" });
 };
 
 // Scroll to special categories section
 const scrollToSpecialCategories = () => {
-  const specialSection = document.getElementById('special-categories-section');
+  const specialSection = document.getElementById("special-categories-section");
   if (specialSection) {
     const offset = 100; // 預留 header 高度
     const elementPosition = specialSection.getBoundingClientRect().top;
     const offsetPosition = elementPosition + window.pageYOffset - offset;
-    
+
     window.scrollTo({
       top: offsetPosition,
-      behavior: 'smooth'
+      behavior: "smooth",
     });
   }
 };
 
-// Check if any filters are active
-const hasActiveFilters = computed(() => {
-  return searchQuery.value || selectedCategoryType.value || selectedPikminType.value || collectionFilter.value !== 'all' || isLimitedMode.value || selectedCategoryId.value;
-});
-
 // Separate regular and special categories
 const regularCategories = computed(() => {
-  return getDecorDefinitions().filter(d => d.category.type === 'regular');
+  return getDecorDefinitions().filter((d) => d.category.type === "regular");
 });
 
 const specialCategories = computed(() => {
-  return getDecorDefinitions().filter(d => d.category.type !== 'regular');
+  return getDecorDefinitions().filter((d) => d.category.type !== "regular");
 });
 
 const regularCategoriesCount = computed(() => regularCategories.value.length);
 const specialCategoriesCount = computed(() => specialCategories.value.length);
 
-// Filtered items
-const filteredItems = computed(() => {
-  let items: DecorItem[] = getAllDecorItems();
-
-  // Apply search filter
-  if (searchQuery.value) {
-    items = searchItems(searchQuery.value);
-  }
-
-  // Apply limited mode filter (地區限定 + 活動限定)
-  if (isLimitedMode.value) {
-    const limitedItems = limitedCategoryTypes.flatMap(type => getItemsByCategoryType(type));
-    items = items.filter(item => limitedItems.some(li => li.id === item.id));
-  }
-
-  // Apply category type filter
-  if (selectedCategoryType.value) {
-    // 處理自定義篩選
-    if (selectedCategoryType.value === 'uncollected-regular') {
-      // 篩選一般分類中尚未收集的
-      const regularItems = getItemsByCategoryType('regular');
-      items = items.filter(item => 
-        regularItems.some(ri => ri.id === item.id) && !isCollected(item.id)
-      );
-    } else if (selectedCategoryType.value === 'anniversary') {
-      // 篩選週年紀念分類
-      const anniversaryCategories = [
-        'first-anniversary-snack',
-        '3rd-anniversary-cupcake',
-        '4th-anniversary-flower-box',
-        '4th-anniversary-snack'
-      ];
-      items = items.filter(item => anniversaryCategories.includes(item.categoryId));
-    } else {
-      // 原有的類型篩選
-      const categoryTypeItems = getItemsByCategoryType(selectedCategoryType.value as DecorCategoryType);
-      items = items.filter(item => categoryTypeItems.some(ci => ci.id === item.id));
-    }
-  }
-
-  // Apply specific category filter
-  if (selectedCategoryId.value) {
-    items = items.filter(item => item.categoryId === selectedCategoryId.value);
-  }
-
-  // Apply Pikmin type filter
-  if (selectedPikminType.value) {
-    items = items.filter(item => item.pikminType === selectedPikminType.value);
-  }
-
-  // Apply collection status filter
-  if (collectionFilter.value === 'collected') {
-    items = items.filter(item => isCollected(item.id));
-  } else if (collectionFilter.value === 'uncollected') {
-    items = items.filter(item => !isCollected(item.id));
-  }
-
-  return items;
+// CategoryJumpNav data
+const jumpNavCategories = computed(() => {
+  const allDefs = [...regularCategories.value, ...specialCategories.value];
+  return allDefs.map((def) => {
+    const items = getItemsByCategory(def.category.id);
+    const collected = items.filter((item) => isCollected(item.id)).length;
+    const total = items.length;
+    return {
+      id: def.category.id,
+      name: locale.value === "en" ? def.category.nameEn : def.category.name,
+      icon: getCategoryIcon(def.category.icon),
+      progress: total > 0 ? Math.round((collected / total) * 100) : 0,
+      progressText: `${collected}/${total}`,
+      isSpecial: def.category.type !== "regular",
+    };
+  });
 });
 
-const collectedCount = computed(() => {
-  return filteredItems.value.filter(item => isCollected(item.id)).length;
+const {
+  activeFilterCount,
+  hasActiveFilters,
+  filteredItems,
+  collectedCount,
+  clearAllFilters,
+} = useCollectionFilters({
+  searchQuery,
+  selectedCategoryType,
+  selectedPikminType,
+  collectionFilter,
+  isLimitedMode,
+  selectedCategoryId,
+  isCollected,
+  getAllDecorItems,
+  getItemsByCategoryType,
+  searchItems,
 });
 
 const getItemsForCategory = (categoryId: string): DecorItem[] => {
@@ -517,46 +1033,284 @@ const getItemsForCategory = (categoryId: string): DecorItem[] => {
 
 const getCategoryProgress = (categoryId: string): string => {
   const items = getItemsByCategory(categoryId);
-  const collected = items.filter(item => isCollected(item.id)).length;
+  const collected = items.filter((item) => isCollected(item.id)).length;
   return `${collected}/${items.length}`;
 };
 
 const getCategoryTypeName = (typeId: string): string => {
-  if (typeId === 'uncollected-regular') return t('collection.types.uncollected_regular');
-  if (typeId === 'anniversary') return t('collection.types.anniversary');
+  if (typeId === "uncollected-regular")
+    return t("collection.types.uncollected_regular");
+  if (typeId === "anniversary") return t("collection.types.anniversary");
   return t(`decor_types.${typeId}`);
 };
 
 const getCategoryName = (categoryId: string): string => {
   const definitions = getDecorDefinitions();
-  const found = definitions.find(d => d.category.id === categoryId);
+  const found = definitions.find((d) => d.category.id === categoryId);
   if (!found) return categoryId;
-  return locale.value === 'en' ? found.category.nameEn : found.category.name;
-};
-
-const clearAllFilters = () => {
-  searchQuery.value = '';
-  selectedCategoryType.value = null;
-  selectedPikminType.value = null;
-  collectionFilter.value = 'all';
-  isLimitedMode.value = false;
-  selectedCategoryId.value = null;
+  return locale.value === "en" ? found.category.nameEn : found.category.name;
 };
 
 // Handle collect all button click with confirmation
 const handleCollectAll = (categoryId: string, categoryName: string) => {
   const items = getItemsByCategory(categoryId);
-  const uncollectedCount = items.filter(item => !isCollected(item.id)).length;
-  
+  const uncollectedCount = items.filter((item) => !isCollected(item.id)).length;
+
   if (uncollectedCount === 0) {
-    alert(t('collection.alerts.collected_all', { category: categoryName }));
+    alert(t("collection.alerts.collected_all", { category: categoryName }));
     return;
   }
-  
-  const confirmed = confirm(t('collection.alerts.confirm_collect_all', { category: categoryName, count: items.length, uncollected: uncollectedCount }));
-  
+
+  const confirmed = confirm(
+    t("collection.alerts.confirm_collect_all", {
+      category: categoryName,
+      count: items.length,
+      uncollected: uncollectedCount,
+    }),
+  );
+
   if (confirmed) {
     collectAllInCategory(categoryId);
   }
 };
 </script>
+
+<style scoped>
+.collection-section-card {
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 12% 20%, rgba(0, 185, 47, 0.22), transparent 36%),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.48), rgba(255, 255, 255, 0.2)),
+    rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.82);
+  box-shadow:
+    0 18px 38px rgba(15, 23, 42, 0.14),
+    0 1px 14px rgba(255, 255, 255, 0.88) inset,
+    0 -16px 32px rgba(0, 133, 35, 0.06) inset;
+  backdrop-filter: blur(2px) saturate(1.18);
+  -webkit-backdrop-filter: blur(2px) saturate(1.18);
+}
+
+.collection-section-card::before {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 5px;
+  content: "";
+  background: linear-gradient(180deg, #00b92f, #2bea5d);
+  box-shadow: 0 0 18px rgba(0, 185, 47, 0.46);
+}
+
+.collection-section-card-purple {
+  background:
+    radial-gradient(circle at 12% 20%, rgba(168, 85, 247, 0.2), transparent 36%),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.48), rgba(255, 255, 255, 0.2)),
+    rgba(255, 255, 255, 0.2);
+}
+
+.collection-section-card-purple::before {
+  background: linear-gradient(180deg, #a855f7, #ec4899);
+  box-shadow: 0 0 18px rgba(168, 85, 247, 0.42);
+}
+
+.collection-section-icon {
+  box-shadow:
+    0 12px 24px rgba(0, 133, 35, 0.22),
+    0 1px 8px rgba(255, 255, 255, 0.5) inset;
+}
+
+.collection-section-title {
+  -webkit-text-stroke: 0;
+  paint-order: normal;
+  text-shadow:
+    0 0 1px rgba(255, 255, 255, 0.92),
+    0 0 5px rgba(255, 255, 255, 0.58),
+    0 1px 0 rgba(255, 255, 255, 0.72),
+    0 2px 7px rgba(15, 23, 42, 0.16);
+}
+
+.collection-section-desc,
+.collection-section-count,
+.collection-info-desc {
+  -webkit-text-stroke: 0;
+  paint-order: normal;
+  text-shadow:
+    0 0 1px rgba(255, 255, 255, 0.88),
+    0 0 4px rgba(255, 255, 255, 0.46),
+    0 1px 0 rgba(255, 255, 255, 0.62);
+}
+
+.collection-section-actions {
+  padding: 4px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.72);
+  box-shadow: 0 1px 10px rgba(255, 255, 255, 0.78) inset;
+}
+
+.collection-section-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  color: rgb(6 95 70 / 0.82);
+  border-radius: 12px;
+  transition: all 180ms ease;
+}
+
+.collection-section-action:hover {
+  color: rgb(4 120 87);
+  background: rgba(255, 255, 255, 0.58);
+  transform: translateY(-1px);
+}
+
+.collection-count-pill {
+  min-width: max-content;
+  padding: 7px 10px;
+  color: rgb(6 95 70);
+  font-size: 0.82rem;
+  font-weight: 800;
+  line-height: 1;
+  border-radius: 999px;
+  background: rgba(214, 255, 224, 0.68);
+  border: 1px solid rgba(115, 255, 150, 0.82);
+  box-shadow:
+    0 6px 14px rgba(0, 133, 35, 0.08),
+    0 1px 8px rgba(255, 255, 255, 0.78) inset;
+}
+
+.collection-count-pill-purple {
+  color: rgb(107 33 168);
+  background: rgba(250, 245, 255, 0.7);
+  border-color: rgba(216, 180, 254, 0.78);
+}
+
+.collection-info-card {
+  background:
+    linear-gradient(135deg, rgba(236, 253, 245, 0.5), rgba(255, 255, 255, 0.18)),
+    rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.76);
+  box-shadow:
+    0 12px 28px rgba(15, 23, 42, 0.1),
+    0 1px 12px rgba(255, 255, 255, 0.78) inset;
+  backdrop-filter: blur(2px) saturate(1.16);
+  -webkit-backdrop-filter: blur(2px) saturate(1.16);
+}
+
+.collection-info-card-purple {
+  background:
+    linear-gradient(135deg, rgba(250, 245, 255, 0.52), rgba(255, 255, 255, 0.18)),
+    rgba(255, 255, 255, 0.2);
+}
+
+.collection-info-icon {
+  background: rgba(255, 255, 255, 0.54);
+  border: 1px solid rgba(255, 255, 255, 0.78);
+  box-shadow: 0 1px 10px rgba(255, 255, 255, 0.78) inset;
+}
+
+.collection-info-title {
+  letter-spacing: 0.01em;
+  -webkit-text-stroke: 0;
+  paint-order: normal;
+  text-shadow:
+    0 0 1px rgba(255, 255, 255, 0.88),
+    0 0 4px rgba(255, 255, 255, 0.46),
+    0 1px 0 rgba(255, 255, 255, 0.62);
+}
+
+@media (max-width: 640px) {
+  .collection-section-card {
+    display: grid;
+    grid-template-columns: 48px minmax(0, 1fr);
+    align-items: center;
+    column-gap: 12px;
+    row-gap: 10px;
+    padding: 16px 14px;
+  }
+
+  .collection-section-icon {
+    width: 48px;
+    height: 48px;
+  }
+
+  .collection-section-title {
+    font-size: 1.45rem;
+    line-height: 1.1;
+  }
+
+  .collection-section-actions {
+    position: static;
+    grid-column: 2;
+    justify-self: start;
+    max-width: 100%;
+  }
+
+  .collection-section-desc {
+    max-width: none;
+  }
+}
+
+/* Floating decorative elements */
+.deco-leaf {
+  position: absolute;
+  animation: deco-float 8s ease-in-out infinite;
+}
+
+.deco-leaf-1 {
+  top: 20px;
+  left: 8%;
+  animation-delay: 0s;
+  animation-duration: 7s;
+}
+
+.deco-leaf-2 {
+  top: 60px;
+  right: 15%;
+  animation-delay: 1.5s;
+  animation-duration: 9s;
+}
+
+.deco-leaf-3 {
+  top: 100px;
+  left: 25%;
+  animation-delay: 3s;
+  animation-duration: 6s;
+}
+
+.deco-leaf-4 {
+  top: 40px;
+  right: 30%;
+  animation-delay: 2s;
+  animation-duration: 10s;
+}
+
+.deco-leaf-5 {
+  top: 120px;
+  left: 60%;
+  animation-delay: 4s;
+  animation-duration: 8s;
+}
+
+@keyframes deco-float {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+    opacity: 0.6;
+  }
+  25% {
+    transform: translateY(-12px) rotate(8deg);
+    opacity: 1;
+  }
+  50% {
+    transform: translateY(-6px) rotate(-5deg);
+    opacity: 0.8;
+  }
+  75% {
+    transform: translateY(-15px) rotate(3deg);
+    opacity: 1;
+  }
+}
+</style>
+

@@ -3,6 +3,7 @@ import { type Database } from '~/types/database.types';
 export type ReportStatus = {
     isNotPure: boolean; // True if reported as 'not_pure'
     addedDecors: Set<string>; // Set of decor_ids reported as 'missing_decor'
+    removedDecors: Set<string>; // Set of decor_ids reported as 'extra_decor'
 };
 
 // Global cache registry to track which cells we've already asked Supabase about (in-memory)
@@ -10,7 +11,7 @@ const fetchedCellIds = new Set<string>();
 
 // LocalStorage Cache Key & TTL
 const CACHE_KEY = 'pikmin-cell-reports-cache';
-const CACHE_VERSION = 1;
+const CACHE_VERSION = 2;
 const CACHE_TTL = 12 * 60 * 60 * 1000; // 12 hours in milliseconds
 const FETCH_BATCH_SIZE = 180;
 const MAX_BATCHES_PER_CALL = 2;
@@ -25,7 +26,7 @@ export const useCellReports = () => {
     // Helper to get or create status
     const getReportStatus = (cellId: string): ReportStatus => {
         if (!cellReports.has(cellId)) {
-            cellReports.set(cellId, { isNotPure: false, addedDecors: new Set() });
+            cellReports.set(cellId, { isNotPure: false, addedDecors: new Set(), removedDecors: new Set() });
         }
         return cellReports.get(cellId)!;
     };
@@ -62,7 +63,9 @@ export const useCellReports = () => {
                     // @ts-ignore
                     isNotPure: !!data.np,
                     // @ts-ignore
-                    addedDecors: new Set(data.ad || [])
+                    addedDecors: new Set(data.ad || []),
+                    // @ts-ignore
+                    removedDecors: new Set(data.rd || [])
                 });
                 fetchedCellIds.add(cellId);
                 loadedCount++;
@@ -101,7 +104,8 @@ export const useCellReports = () => {
                 cellsToSave[cellId] = {
                     ts: now,
                     np: status.isNotPure,
-                    ad: Array.from(status.addedDecors)
+                    ad: Array.from(status.addedDecors),
+                    rd: Array.from(status.removedDecors)
                 };
                 count++;
             }
@@ -130,8 +134,16 @@ export const useCellReports = () => {
         return cellReports.get(cellId)?.addedDecors || new Set();
     };
 
+    const getRemovedDecors = (cellId: string): Set<string> => {
+        return cellReports.get(cellId)?.removedDecors || new Set();
+    };
+
     const hasAddedDecor = (cellId: string, decorId: string): boolean => {
         return cellReports.get(cellId)?.addedDecors.has(decorId) || false;
+    };
+
+    const hasRemovedDecor = (cellId: string, decorId: string): boolean => {
+        return cellReports.get(cellId)?.removedDecors.has(decorId) || false;
     };
 
     // Fetch reports for visible cells
@@ -146,35 +158,28 @@ export const useCellReports = () => {
             const limitedCellIds = newCellIds.slice(0, FETCH_BATCH_SIZE * MAX_BATCHES_PER_CALL);
             for (let i = 0; i < limitedCellIds.length; i += FETCH_BATCH_SIZE) {
                 const batchCellIds = limitedCellIds.slice(i, i + FETCH_BATCH_SIZE);
-                let summaryRows: Array<{ s2_cell_id: string; is_not_pure: boolean; added_decors: string[] | null }> | null = null;
-                const { data: rpcData, error: rpcError } = await supabase
-                    // @ts-ignore: RPC is created by SQL migration
-                    .rpc('get_cell_reports_summary', { cell_ids: batchCellIds });
+                const { data, error } = await supabase
+                    .from('cell_reports')
+                    .select('s2_cell_id, report_type, decor_id')
+                    .in('s2_cell_id', batchCellIds);
 
-                if (!rpcError) {
-                    summaryRows = rpcData as Array<{ s2_cell_id: string; is_not_pure: boolean; added_decors: string[] | null }> | null;
-                } else {
-                    const { data, error } = await supabase
-                        .from('cell_reports')
-                        .select('s2_cell_id, report_type, decor_id')
-                        .in('s2_cell_id', batchCellIds);
-
-                    if (error) throw error;
-                    const grouped = new Map<string, { is_not_pure: boolean; added_decors: Set<string> }>();
-                    (data || []).forEach(row => {
-                        if (!grouped.has(row.s2_cell_id)) {
-                            grouped.set(row.s2_cell_id, { is_not_pure: false, added_decors: new Set() });
-                        }
-                        const bucket = grouped.get(row.s2_cell_id)!;
-                        if (row.report_type === 'not_pure') bucket.is_not_pure = true;
-                        if (row.report_type === 'missing_decor' && row.decor_id) bucket.added_decors.add(row.decor_id);
-                    });
-                    summaryRows = Array.from(grouped.entries()).map(([s2_cell_id, value]) => ({
-                        s2_cell_id,
-                        is_not_pure: value.is_not_pure,
-                        added_decors: Array.from(value.added_decors),
-                    }));
-                }
+                if (error) throw error;
+                const grouped = new Map<string, { is_not_pure: boolean; added_decors: Set<string>; removed_decors: Set<string> }>();
+                (data || []).forEach(row => {
+                    if (!grouped.has(row.s2_cell_id)) {
+                        grouped.set(row.s2_cell_id, { is_not_pure: false, added_decors: new Set(), removed_decors: new Set() });
+                    }
+                    const bucket = grouped.get(row.s2_cell_id)!;
+                    if (row.report_type === 'not_pure') bucket.is_not_pure = true;
+                    if (row.report_type === 'missing_decor' && row.decor_id) bucket.added_decors.add(row.decor_id);
+                    if (row.report_type === 'extra_decor' && row.decor_id) bucket.removed_decors.add(row.decor_id);
+                });
+                const summaryRows = Array.from(grouped.entries()).map(([s2_cell_id, value]) => ({
+                    s2_cell_id,
+                    is_not_pure: value.is_not_pure,
+                    added_decors: Array.from(value.added_decors),
+                    removed_decors: Array.from(value.removed_decors),
+                }));
 
                 // 2. Mark batch as fetched regardless of whether it has data
                 batchCellIds.forEach(id => fetchedCellIds.add(id));
@@ -186,6 +191,7 @@ export const useCellReports = () => {
                         status.isNotPure = true;
                     }
                     (row.added_decors || []).forEach(decorId => status.addedDecors.add(decorId));
+                    (row.removed_decors || []).forEach(decorId => status.removedDecors.add(decorId));
                 });
             }
             
@@ -197,7 +203,7 @@ export const useCellReports = () => {
     };
 
     // Submit a report
-    const submitReport = async (cellId: string, reportType: 'not_pure' | 'missing_decor', decorId?: string) => {
+    const submitReport = async (cellId: string, reportType: 'not_pure' | 'missing_decor' | 'extra_decor', decorId?: string) => {
         if (!user.value?.id) throw new Error('必須登入才能回報');
 
         // Optimistic Update
@@ -208,6 +214,9 @@ export const useCellReports = () => {
         } else if (reportType === 'missing_decor' && decorId) {
             if (status.addedDecors.has(decorId)) return; // Already reported
             status.addedDecors.add(decorId);
+        } else if (reportType === 'extra_decor' && decorId) {
+            if (status.removedDecors.has(decorId)) return; // Already reported
+            status.removedDecors.add(decorId);
         }
         
         // Save to cache immediately so optimistic update persists reload
@@ -229,12 +238,14 @@ export const useCellReports = () => {
             if (reportType === 'not_pure') status.isNotPure = false;
             // Only remove from set if not added by others (actually we can't distinguish here easily without full sync, but good enough for optimistic revert)
             if (reportType === 'missing_decor' && decorId) status.addedDecors.delete(decorId);
+            if (reportType === 'extra_decor' && decorId) status.removedDecors.delete(decorId);
              
-            // Ignore duplicate key error for missing_decor as well
+            // Ignore duplicate key error for decor reports as well
             if (error.code === '23505') { 
                 // Re-apply optimistic state just in case
                 if (reportType === 'not_pure') status.isNotPure = true;
                 if (reportType === 'missing_decor' && decorId) status.addedDecors.add(decorId);
+                if (reportType === 'extra_decor' && decorId) status.removedDecors.add(decorId);
                 return;
             }
             throw error;
@@ -249,6 +260,8 @@ export const useCellReports = () => {
         isReported: isReportedNotPure, 
         isReportedNotPure,
         getAddedDecors,
-        hasAddedDecor
+        getRemovedDecors,
+        hasAddedDecor,
+        hasRemovedDecor
     };
 };

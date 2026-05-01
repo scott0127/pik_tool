@@ -1,17 +1,6 @@
 <template>
   <div class="min-h-screen relative">
-    <!-- Background decorations -->
-    <div class="fixed inset-0 pointer-events-none overflow-hidden z-0">
-      <!-- Floating leaves -->
-      <div class="absolute top-20 left-[5%] text-6xl opacity-10 sway">🍃</div>
-      <div class="absolute top-40 right-[8%] text-5xl opacity-10 sway" style="animation-delay: 1s">🌿</div>
-      <div class="absolute bottom-32 left-[12%] text-4xl opacity-10 float">🌱</div>
-      <div class="absolute bottom-20 right-[15%] text-5xl opacity-10 float-delayed">🍀</div>
-      
-      <!-- Gradient orbs -->
-      <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-emerald-300/20 rounded-full blur-3xl"></div>
-      <div class="absolute bottom-1/4 right-1/4 w-80 h-80 bg-teal-300/20 rounded-full blur-3xl"></div>
-    </div>
+    <AppAmbientBackground />
 
     <!-- Loading State -->
     <Transition

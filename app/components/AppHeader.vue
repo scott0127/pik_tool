@@ -3,7 +3,10 @@
     <!-- Decorative top bar -->
     <div class="h-1 bg-gradient-to-r from-emerald-400 via-teal-400 to-emerald-400"></div>
     
-    <div class="glass border-t-0 border-x-0">
+    <div
+      class="glass-frosted-shell border-t-0 border-x-0"
+      :class="{ 'mobile-menu-shell-open': showMobileMenu }"
+    >
       <div class="max-w-8xl mx-auto px-4 py-3">
         <div class="flex items-center justify-between">
           <!-- Logo and Title -->
@@ -52,12 +55,12 @@
               <span class="text-sm font-bold hidden sm:inline">iOS 捷徑</span>
             </button>
 
-            <!-- PWA Install Button (Android/Desktop) -->
+            <!-- PWA Install Button (Android Mobile) -->
             <button 
               v-if="canInstallAndroid"
               @click="triggerAndroidPrompt"
-              class="flex items-center gap-1.5 px-3 sm:px-4 h-10 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-md shadow-emerald-500/20 hover:shadow-lg hover:-translate-y-0.5 transition-all group"
-              title="安裝 App 到主畫面 (Android/PC)"
+              class="md:hidden flex items-center gap-1.5 px-3 sm:px-4 h-10 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-md shadow-emerald-500/20 hover:shadow-lg hover:-translate-y-0.5 transition-all group"
+              title="安裝 App 到主畫面 (Android)"
             >
               <Icon name="lucide:download" class="text-lg group-hover:scale-110 transition-transform" />
               <span class="text-sm font-bold hidden sm:inline">下載 App</span>
@@ -174,7 +177,7 @@
 
             <!-- Mobile Menu Button -->
             <button 
-              @click="showMobileMenu = !showMobileMenu"
+              @click="toggleMobileMenu"
               class="md:hidden w-10 h-10 flex items-center justify-center rounded-xl bg-white/60 hover:bg-white transition-all"
             >
               <Transition
@@ -231,7 +234,11 @@
           leave-from-class="opacity-100 translate-y-0"
           leave-to-class="opacity-0 -translate-y-4"
         >
-          <div v-if="showMobileMenu" class="md:hidden mt-4 space-y-4">
+          <div
+            v-if="showMobileMenu"
+            :key="mobileMenuRenderKey"
+            class="mobile-menu-panel md:hidden mt-4 space-y-4"
+          >
             <!-- Mobile Progress -->
             <div class="flex items-center justify-between bg-white/50 rounded-2xl p-4">
               <div class="flex items-center gap-3">
@@ -266,7 +273,7 @@
             <!-- Buy Me a Coffee Button (Mobile) -->
             <button 
               @click="handleCoffeeClick"
-              class="flex items-center justify-center gap-2 bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 text-white rounded-2xl p-4 transition-all w-full max-w-[200px]"
+              class="mobile-action-button flex items-center justify-center gap-2 bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 text-white rounded-2xl p-4 transition-all w-full max-w-[200px]"
             >
               <span class="text-2xl flex-shrink-0">☕</span>
               <span class="font-semibold">{{ $t('header.coffee_mobile') }}</span>
@@ -277,11 +284,11 @@
               href="https://github.com/scott0127/pik_tool"
               target="_blank"
               rel="noopener noreferrer"
-              class="flex items-center justify-center gap-2 bg-gradient-to-r from-gray-800 to-gray-900 text-white rounded-2xl p-4 hover:from-gray-700 hover:to-gray-800 transition-all w-full max-w-[200px] overflow-hidden"
+              class="mobile-action-button flex items-center justify-center gap-2 bg-gradient-to-r from-gray-800 to-gray-900 text-white rounded-2xl p-4 hover:from-gray-700 hover:to-gray-800 transition-all w-full max-w-[200px] overflow-hidden"
             >
               <span class="text-2xl flex-shrink-0">⭐</span>
               <div class="overflow-hidden">
-                <span class="inline-block whitespace-nowrap animate-marquee font-semibold">
+                <span class="mobile-action-marquee inline-block whitespace-nowrap animate-marquee font-semibold">
                   {{ $t('header.star_mobile') }}&nbsp;&nbsp;&nbsp;&nbsp;{{ $t('header.star_mobile') }}&nbsp;&nbsp;&nbsp;&nbsp;
                 </span>
               </div>
@@ -290,11 +297,11 @@
             <!-- Feedback Button (Mobile) -->
             <button 
               @click="showFeedbackModal = true; showMobileMenu = false"
-              class="flex items-center justify-center gap-2 bg-gradient-to-r from-violet-500 to-purple-600 text-white rounded-2xl p-4 hover:from-violet-600 hover:to-purple-700 transition-all w-full max-w-[200px] overflow-hidden"
+              class="mobile-action-button flex items-center justify-center gap-2 bg-gradient-to-r from-violet-500 to-purple-600 text-white rounded-2xl p-4 hover:from-violet-600 hover:to-purple-700 transition-all w-full max-w-[200px] overflow-hidden"
             >
               <span class="text-2xl flex-shrink-0">💬</span>
               <div class="overflow-hidden">
-                <span class="inline-block whitespace-nowrap animate-marquee font-semibold">
+                <span class="mobile-action-marquee inline-block whitespace-nowrap animate-marquee font-semibold">
                   {{ $t('header.feedback') }}&nbsp;&nbsp;&nbsp;&nbsp;{{ $t('header.feedback') }}&nbsp;&nbsp;&nbsp;&nbsp;
                 </span>
               </div>
@@ -319,19 +326,25 @@
 
             <!-- Mobile Nav -->
             <div class="grid grid-cols-4 gap-2">
-              <NuxtLink 
-                v-for="link in navLinks" 
+              <NuxtLink
+                v-for="(link, index) in navLinks"
                 :key="link.to"
                 :to="link.to"
                 @click="showMobileMenu = false"
-                class="flex flex-col items-center gap-2 p-3 rounded-2xl transition-all"
+                class="mobile-nav-link flex flex-col items-center gap-2 p-3 rounded-2xl transition-all"
+                :style="{ animationDelay: `${40 + index * 55}ms` }"
                 :class="[
                   $route.path === link.to 
-                    ? 'bg-emerald-500 text-white shadow-lg' 
+                    ? 'mobile-nav-link-active bg-emerald-500 text-white shadow-lg' 
                     : 'bg-white/60 text-gray-600 hover:bg-white'
                 ]"
               >
-                <Icon :name="link.icon" class="text-3xl mb-1" />
+                <Icon
+                  :key="`${mobileMenuRenderKey}-${link.to}-icon`"
+                  :name="link.icon"
+                  class="mobile-nav-icon text-3xl mb-1"
+                  :style="{ animationDelay: `${80 + index * 70}ms` }"
+                />
                 <span class="text-xs font-semibold">{{ link.name }}</span>
               </NuxtLink>
             </div>
@@ -582,11 +595,12 @@
 <script setup lang="ts">
 const authStore = useAuthStore();
 const router = useRouter();
-const supabase = useSupabaseClient();
+const supabase = useSupabaseClient<any>();
 const { getStats } = useCollection();
 const { canInstallIos, canInstallAndroid, triggerIosPrompt, triggerAndroidPrompt } = usePwaInstall();
 
 const showMobileMenu = ref(false);
+const mobileMenuRenderKey = ref(0);
 const showSearch = ref(false);
 const searchQuery = ref('');
 const showCoffeeModal = ref(false);
@@ -684,6 +698,13 @@ const navLinks = computed(() => [
 
 const isLoggingOut = ref(false);
 
+const toggleMobileMenu = () => {
+  if (!showMobileMenu.value) {
+    mobileMenuRenderKey.value += 1;
+  }
+  showMobileMenu.value = !showMobileMenu.value;
+};
+
 const handleLogout = async () => {
   if (isLoggingOut.value) return;
   isLoggingOut.value = true;
@@ -717,4 +738,99 @@ watch(() => router.currentRoute.value.path, () => {
   showMobileMenu.value = false;
   showSearch.value = false;
 });
+
+watch(showMobileMenu, (isOpen) => {
+  if (typeof document === 'undefined') return;
+  document.documentElement.classList.toggle('mobile-menu-open', isOpen);
+});
+
+onUnmounted(() => {
+  if (typeof document !== 'undefined') {
+    document.documentElement.classList.remove('mobile-menu-open');
+  }
+});
 </script>
+
+<style scoped>
+@media (max-width: 767px) {
+  .mobile-menu-shell-open {
+    background:
+      radial-gradient(circle at 20% 0%, rgba(255, 255, 255, 0.86), transparent 34%),
+      linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(237, 255, 242, 0.76));
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+
+  .mobile-menu-panel {
+    contain: layout paint;
+    isolation: isolate;
+    will-change: transform, opacity;
+  }
+
+  .mobile-menu-panel .mobile-nav-link {
+    animation: mobile-nav-tile-in 520ms cubic-bezier(0.2, 0.9, 0.22, 1.2) both;
+    transform-origin: 50% 80%;
+  }
+
+  .mobile-menu-panel .mobile-nav-icon {
+    display: inline-block;
+    animation: mobile-nav-icon-pop 680ms cubic-bezier(0.18, 0.95, 0.22, 1.28) both;
+    transform-origin: center;
+    will-change: transform, opacity;
+  }
+}
+
+@keyframes mobile-nav-tile-in {
+  0% {
+    opacity: 0;
+    transform: translateY(14px) scale(0.94);
+  }
+  62% {
+    opacity: 1;
+    transform: translateY(-3px) scale(1.035);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes mobile-nav-icon-pop {
+  0% {
+    opacity: 0;
+    transform: translateY(9px) scale(0.72) rotate(-8deg);
+  }
+  56% {
+    opacity: 1;
+    transform: translateY(-5px) scale(1.18) rotate(5deg);
+  }
+  78% {
+    transform: translateY(1px) scale(0.96) rotate(-2deg);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1) rotate(0);
+  }
+}
+
+.mobile-action-button,
+.mobile-action-button :deep(*) {
+  color: #fff !important;
+  -webkit-text-stroke: 0 !important;
+  paint-order: normal !important;
+  text-shadow: 0 1px 2px rgba(15, 23, 42, 0.28) !important;
+}
+
+.mobile-action-marquee {
+  min-width: max-content;
+  animation: marquee 8s linear infinite;
+}
+
+.mobile-nav-link-active,
+.mobile-nav-link-active :deep(*) {
+  color: #fff !important;
+  -webkit-text-stroke: 0 !important;
+  paint-order: normal !important;
+  text-shadow: 0 1px 2px rgba(15, 23, 42, 0.22) !important;
+}
+</style>

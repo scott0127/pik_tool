@@ -288,7 +288,7 @@ export function useS2Grid() {
     const typeCount = cell.decorTypes.size;
 
     if (typeCount === 0) return '#9CA3AF'; // 灰色 - 路邊/無標籤
-    if (typeCount === 1) return '#10B981'; // 綠色 - 單一類型（最佳）
+    if (typeCount === 1) return '#00B92F'; // 綠色 - 單一類型（最佳）
     if (typeCount <= 3) return '#F59E0B'; // 黃色 - 中等混雜
     return '#EF4444';                      // 紅色 - 高度混雜
   }

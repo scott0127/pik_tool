@@ -297,12 +297,25 @@ const selectedTypes = computed({
 
 const cachedTypesCount = computed(() => props.cachedTypes?.length || 0);
 const isCached = (typeId: string) => props.cachedTypes?.includes(typeId) || false;
+let tutorialTimer: ReturnType<typeof setTimeout> | null = null;
+
+const updateIsMobile = () => {
+  isMobile.value = window.innerWidth < 768;
+};
 
 onMounted(() => {
-  isMobile.value = window.innerWidth < 768;
-  window.addEventListener('resize', () => { isMobile.value = window.innerWidth < 768; });
+  updateIsMobile();
+  window.addEventListener('resize', updateIsMobile, { passive: true });
   if (!localStorage.getItem(TUTORIAL_KEY)) {
-    setTimeout(() => { showTutorial.value = true; }, 500);
+    tutorialTimer = setTimeout(() => { showTutorial.value = true; }, 500);
+  }
+});
+
+onBeforeUnmount(() => {
+  window.removeEventListener('resize', updateIsMobile);
+  if (tutorialTimer) {
+    clearTimeout(tutorialTimer);
+    tutorialTimer = null;
   }
 });
 
@@ -328,12 +341,16 @@ const isPanelDragging = ref(false);
 
 const handleTouchStart = (e: TouchEvent) => {
   if (!isMobile.value) return;
-  touchStartY.value = e.touches[0].clientY;
+  const touch = e.touches[0];
+  if (!touch) return;
+  touchStartY.value = touch.clientY;
   isPanelDragging.value = true;
 };
 const handleTouchMove = (e: TouchEvent) => {
   if (!isPanelDragging.value) return;
-  touchCurrentY.value = e.touches[0].clientY;
+  const touch = e.touches[0];
+  if (!touch) return;
+  touchCurrentY.value = touch.clientY;
 };
 const handleTouchEnd = () => {
   if (!isPanelDragging.value) return;

@@ -1,7 +1,7 @@
 <template>
   <div class="relative">
     <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-      <span class="text-xl">🔍</span>
+      <Icon name="lucide:search" class="w-5 h-5 text-gray-400" />
     </div>
     <input
       type="text"
@@ -23,7 +23,9 @@
         @click="$emit('update:modelValue', '')"
         class="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-emerald-600 transition-colors"
       >
-        <span class="w-6 h-6 bg-gray-100 hover:bg-emerald-100 rounded-full flex items-center justify-center text-sm">✕</span>
+        <span class="w-6 h-6 bg-gray-100 hover:bg-emerald-100 rounded-full flex items-center justify-center">
+          <Icon name="lucide:x" class="w-3.5 h-3.5" />
+        </span>
       </button>
     </Transition>
   </div>

@@ -64,7 +64,7 @@
                     <div class="flex flex-wrap gap-1">
                       <!-- Existing Decors -->
                       <span
-                        v-for="decorId in Array.from(cell.decorTypes)"
+                        v-for="decorId in getVisibleBaseDecorIds(cell)"
                         :key="decorId"
                         class="inline-flex items-center gap-1 px-2 py-1 bg-emerald-50 text-emerald-700 rounded text-xs"
                       >
@@ -84,6 +84,19 @@
                         <span v-else>{{ getDecorInfo(decorId)?.icon }}</span>
                         <span>{{ getDecorInfo(decorId)?.name }}</span>
                         <Icon name="lucide:user" class="w-3 h-3 text-blue-400" />
+                      </span>
+
+                      <!-- Removed Decors -->
+                      <span
+                        v-for="decorId in Array.from(getRemovedDecors(cell.cellId))"
+                        :key="`removed-${decorId}`"
+                        class="inline-flex items-center gap-1 px-2 py-1 bg-red-50 text-red-700 rounded text-xs border border-red-200 line-through decoration-red-500"
+                        :title="$t('map.cell_info.user_reported_extra')"
+                      >
+                        <Icon v-if="getDecorInfo(decorId)?.iconName" :name="getDecorInfo(decorId)!.iconName!" class="w-3.5 h-3.5" />
+                        <span v-else>{{ getDecorInfo(decorId)?.icon }}</span>
+                        <span>{{ getDecorInfo(decorId)?.name }}</span>
+                        <Icon name="lucide:user-x" class="w-3 h-3 text-red-400" />
                       </span>
                     </div>
 
@@ -108,7 +121,7 @@
                            <div v-if="user" class="grid grid-cols-2 gap-1 pt-1">
                                 <!-- Report Pure Error -->
                                <button 
-                                  v-if="!isReported(cell.cellId) && cell.decorTypes.size === 1 && getAddedDecors(cell.cellId).size === 0"
+                                  v-if="!isReported(cell.cellId) && getCellDecorIds(cell).length === 1 && getAddedDecors(cell.cellId).size === 0"
                                   @click="confirmReport(cell.cellId)"
                                   class="col-span-2 bg-gray-50 hover:bg-red-50 text-gray-500 hover:text-red-600 px-2 py-1.5 rounded border border-gray-200 hover:border-red-200 text-xs transition-colors"
                               >
@@ -117,11 +130,20 @@
                               
                               <!-- Report Missing Decor -->
                               <button 
-                                  @click="openDecorSelector(cell.cellId)"
-                                  class="col-span-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-600 hover:text-emerald-700 px-2 py-1.5 rounded border border-emerald-200 hover:border-emerald-300 text-xs font-medium transition-colors flex items-center justify-center gap-1 cursor-pointer"
+                                  @click="openDecorSelector(cell, 'missing')"
+                                  class="bg-emerald-50 hover:bg-emerald-100 text-emerald-600 hover:text-emerald-700 px-2 py-1.5 rounded border border-emerald-200 hover:border-emerald-300 text-xs font-medium transition-colors flex items-center justify-center gap-1 cursor-pointer"
                               >
                                   <Icon name="lucide:plus" class="w-3.5 h-3.5" />
                                   <span>{{ $t('map.report.missing') }}</span>
+                              </button>
+
+                              <!-- Report Extra Decor -->
+                              <button 
+                                  @click="openDecorSelector(cell, 'extra')"
+                                  class="bg-red-50 hover:bg-red-100 text-red-600 hover:text-red-700 px-2 py-1.5 rounded border border-red-200 hover:border-red-300 text-xs font-medium transition-colors flex items-center justify-center gap-1 cursor-pointer"
+                              >
+                                  <Icon name="lucide:minus" class="w-3.5 h-3.5" />
+                                  <span>{{ $t('map.report.extra') }}</span>
                               </button>
                            </div>
                       </div>
@@ -148,9 +170,9 @@
               <LPopup>
                 <div class="min-w-[160px] p-1">
                   <div class="text-xs text-gray-600 flex items-center gap-2 mb-2">
-                    <Icon v-if="getDecorInfo(Array.from(cell.decorTypes)[0])?.iconName" :name="getDecorInfo(Array.from(cell.decorTypes)[0])!.iconName!" class="w-5 h-5" />
-                    <span v-else class="text-lg">{{ getDecorInfo(Array.from(cell.decorTypes)[0])?.icon }}</span>
-                    <span class="font-bold">{{ getDecorInfo(Array.from(cell.decorTypes)[0])?.name }}</span>
+                    <Icon v-if="getFirstDecorInfo(cell)?.iconName" :name="getFirstDecorInfo(cell)!.iconName!" class="w-5 h-5" />
+                    <span v-else class="text-lg">{{ getFirstDecorInfo(cell)?.icon }}</span>
+                    <span class="font-bold">{{ getFirstDecorInfo(cell)?.name }}</span>
                     <span class="text-emerald-600 text-[10px] border border-emerald-200 px-1 rounded bg-emerald-50">{{ $t('map.modes.pure') }}</span>
                   </div>
                   
@@ -179,7 +201,7 @@
             <template v-for="cell in badgeCells" :key="`badge-${cell.cellId}`">
               <!-- 只顯示有裝飾品或 POI 的格子 (或有回報的) -->
               <LMarker
-                v-if="getEffectiveDecors(cell).size > 0 || cell.poiCount > 0"
+                v-if="getEffectiveDecors(cell).size > 0 || getCellPoiCount(cell) > 0"
                 :lat-lng="[cell.center.lat, cell.center.lng]"
               >
                 <LIcon
@@ -191,8 +213,12 @@
                     <MapRadialBadge
                       :items="getRadialItems(cell)"
                       :count="getEffectiveDecors(cell).size"
-                      :size="90"
-                      :max-display="7"
+                      :poi-count="getCellPoiCount(cell)"
+                      :added-count="getAddedDecors(cell.cellId).size"
+                      :is-reported="isReported(cell.cellId)"
+                      :center-title="$t('map.cell_info.decor_types')"
+                      :size="94"
+                      :max-display="3"
                     />
                   </div>
                 </LIcon>
@@ -343,6 +369,8 @@
         v-model="showDecorSelector"
         :cell-id="selectedCellForDecorReport"
         :all-decors="allDecors"
+        :mode="selectedDecorReportMode"
+        :available-decor-ids="selectedDecorReportOptions"
       />
 
       <!-- Panel Toggle Button (for side panel) -->
@@ -638,9 +666,14 @@ const { decorRules, getDecorRule } = useDecorRules();
 const { fetchPOIs, isLoading, error, dataSource, preloadAllRegions } = useLocalFirstPOI();
 const { searchLocation, isSearching, searchError } = useGeocoding();
 // [NEW] Cell Reports Logic
-const { fetchReportsForCells, submitReport, isReported, isReportedNotPure, getAddedDecors, hasAddedDecor } = useCellReports();
+const { fetchReportsForCells, submitReport, isReported, isReportedNotPure, getAddedDecors, getRemovedDecors } = useCellReports();
 const REPORT_FETCH_MIN_ZOOM = 17;
 let reportFetchTimer: ReturnType<typeof setTimeout> | null = null;
+let visibilityFrameId: number | null = null;
+let isMapPageMounted = false;
+const debugMap = (...args: unknown[]) => {
+  if (import.meta.dev) console.debug(...args);
+};
 const user = useSupabaseUser(); // Get user state for UI checks
 const { 
   config: s2Config,
@@ -658,10 +691,29 @@ const {
 } = useS2Grid();
 
 // [NEW] Helper to get effective decor types (Local + Reported)
-const getEffectiveDecors = (cell: any) => {
-    const localDecors = new Set(cell.decorTypes);
+const getCellDecorSet = (cell: S2CellData | SingleTypeCellView | any): Set<string> => {
+    if (cell?.decorTypes instanceof Set) return cell.decorTypes;
+    if (cell?.decorType) return new Set([cell.decorType]);
+    return new Set();
+};
+
+const getCellDecorIds = (cell: S2CellData | SingleTypeCellView | any): string[] => {
+    return Array.from(getCellDecorSet(cell));
+};
+
+const getVisibleBaseDecorIds = (cell: S2CellData | SingleTypeCellView | any): string[] => {
+    const removedDecors = getRemovedDecors(cell.cellId);
+    return getCellDecorIds(cell).filter(decorId => !removedDecors.has(decorId));
+};
+
+const getEffectiveDecors = (cell: S2CellData | SingleTypeCellView | any) => {
+    const localDecors = new Set(getCellDecorSet(cell));
+    const removedDecors = getRemovedDecors(cell.cellId);
+    removedDecors.forEach(d => localDecors.delete(d));
     const addedDecors = getAddedDecors(cell.cellId);
-    addedDecors.forEach(d => localDecors.add(d));
+    addedDecors.forEach(d => {
+        if (!removedDecors.has(d)) localDecors.add(d);
+    });
     return localDecors;
 };
 
@@ -687,14 +739,14 @@ const getCellStyleWithReports = (cell: any) => { // Use 'any' or correct type
     
     // In Grid Mode, we update colors based on count.
     const effectiveDecors = getEffectiveDecors(cell);
-    if (effectiveDecors.size > cell.decorTypes.size) {
-        // We have added decors! Recalculate color based on effective size
+    if (effectiveDecors.size !== getCellDecorSet(cell).size) {
+        // Recalculate color when reports add or remove decor types.
         const size = effectiveDecors.size;
         
         // Logic copied/adapted from getCellStyle in useS2Grid (simplified)
         // 1 = Green, 2-3 = Yellow, 4+ = Red
         let color = '#9CA3AF'; // Default Gray
-        if (size === 1) color = '#10B981'; // Green
+        if (size === 1) color = '#00B92F'; // Green
         else if (size <= 3) color = '#F59E0B'; // Yellow
         else color = '#EF4444'; // Red
         
@@ -711,7 +763,7 @@ const getCellStyleWithReports = (cell: any) => { // Use 'any' or correct type
 };
 
 const handlePolygonClick = (cell: any) => {
-  console.log('[Map] Polygon clicked:', cell.cellId, cell);
+  debugMap('[Map] Polygon clicked:', cell.cellId, cell);
 };
 
 const { t } = useI18n();
@@ -719,36 +771,24 @@ const { t } = useI18n();
 // [NEW] Decor Selector Logic
 const showDecorSelector = ref(false);
 const selectedCellForDecorReport = ref<string | null>(null);
-const decorLoading = ref(false);
+const selectedDecorReportMode = ref<'missing' | 'extra'>('missing');
+const selectedDecorReportOptions = ref<string[]>([]);
 const allDecors = decorRules;
 
-const openDecorSelector = (cellId: string) => {
-    selectedCellForDecorReport.value = cellId;
+const openDecorSelector = (cell: S2CellData | SingleTypeCellView | any, mode: 'missing' | 'extra') => {
+    selectedCellForDecorReport.value = cell.cellId;
+    selectedDecorReportMode.value = mode;
+    const effectiveDecorIds = Array.from(getEffectiveDecors(cell));
+    if (mode === 'extra') {
+        const reportableDecors = new Set([...getCellDecorIds(cell), ...Array.from(getAddedDecors(cell.cellId))]);
+        selectedDecorReportOptions.value = Array.from(reportableDecors);
+    } else {
+        const existingDecors = new Set(effectiveDecorIds);
+        selectedDecorReportOptions.value = decorRules
+            .map(decor => decor.id)
+            .filter(decorId => !existingDecors.has(decorId));
+    }
     showDecorSelector.value = true;
-};
-
-const toggleDecorReport = async (decorId: string) => {
-    if (!selectedCellForDecorReport.value) return;
-    
-    const cellId = selectedCellForDecorReport.value;
-    
-    // Check if already added (optimistic check)
-    // Check if already added (optimistic check)
-    if (hasAddedDecor(cellId, decorId)) {
-        alert(t('map.report.already_reported', '您已經回報過這個飾品了！')); 
-        return; 
-    }
-
-    try {
-        decorLoading.value = true;
-        await submitReport(cellId, 'missing_decor', decorId);
-        // Don't close immediately, allow multiple selections? Or close for feedback?
-        // Let's keep it open for multi-select feel, but maybe show a toast.
-    } catch (e: any) {
-        alert(t('map.report.report_failed', '回報失敗：') + (e.message || t('map.error_unknown', '未知錯誤')));
-    } finally {
-        decorLoading.value = false;
-    }
 };
 
 // 響應式視窗寬度
@@ -768,7 +808,7 @@ const confirmReport = async (cellId: string) => {
     }
     
     try {
-        await submitReport(cellId);
+        await submitReport(cellId, 'not_pure');
         alert(t('map.report.thank_you', '感謝您的回報！地圖已更新。'));
     } catch (e: any) {
         alert(t('map.report.report_failed', '回報失敗：') + (e.message || t('map.error_unknown', '未知錯誤')));
@@ -776,6 +816,7 @@ const confirmReport = async (cellId: string) => {
 };
 
 onMounted(() => {
+  isMapPageMounted = true;
   window.addEventListener('resize', updateWindowWidth);
 });
 
@@ -944,13 +985,17 @@ const isPanelDragging = ref(false);
 
 const handleTouchStart = (e: TouchEvent) => {
   if (!isMobile.value) return;
-  touchStartY.value = e.touches[0].clientY;
+  const touch = e.touches[0];
+  if (!touch) return;
+  touchStartY.value = touch.clientY;
   isPanelDragging.value = true;
 };
 
 const handleTouchMove = (e: TouchEvent) => {
   if (!isPanelDragging.value) return;
-  touchCurrentY.value = e.touches[0].clientY;
+  const touch = e.touches[0];
+  if (!touch) return;
+  touchCurrentY.value = touch.clientY;
 };
 
 const handleTouchEnd = () => {
@@ -975,8 +1020,12 @@ interface SingleTypeCell {
 }
 
 interface SingleTypeCellView extends SingleTypeCell {
-  bounds: { lat: number; lng: number }[];
+  bounds: [{ lat: number; lng: number }, { lat: number; lng: number }, { lat: number; lng: number }, { lat: number; lng: number }];
   center: { lat: number; lng: number };
+  decorTypes: Set<string>;
+  tags: string[];
+  poiCount: number;
+  priority: 'high' | 'medium' | 'low' | 'none';
 }
 
 const singleTypeCells = shallowRef<SingleTypeCell[]>([]);
@@ -1017,7 +1066,7 @@ const clearRenderTimer = (timer: ReturnType<typeof setTimeout> | null) => {
 
 const resetLayers = () => {
   // renderedGridCells and others removed
-  renderedPoints.value = [];
+  singleTypeCellsInView.value = [];
 };
 
 // Helper functions removed (cloneCellsForRender, scheduleGridRender, renderInBatches)
@@ -1050,24 +1099,28 @@ const onMapReady = (map: any) => {
 
 // 組件掛載時執行（修復直接進入頁面時地圖不顯示的問題）
 onMounted(() => {
+  isMapPageMounted = true;
   // 預先載入區域資料（Local-First 策略）
   // preloadAllRegions(); // Disable preloading to save bandwidth (10MB+ taipei.json)
   
   // 等待容器真正可見後再 invalidateSize（修復 app.vue v-show 競爭條件）
   // app.vue 的 isInitializing 會讓容器 display:none，Leaflet 在 0×0 下計算磚座標會全部錯位
   const waitForVisible = () => {
+    if (!isMapPageMounted) return;
+
     const mapEl = document.getElementById('map');
     if (mapEl && mapEl.offsetHeight > 0) {
       // 容器已可見，等一個 rAF 確保 layout 完成
-      requestAnimationFrame(() => {
-        if (leafletMap) {
+      visibilityFrameId = requestAnimationFrame(() => {
+        visibilityFrameId = null;
+        if (isMapPageMounted && leafletMap) {
           leafletMap.invalidateSize();
-          console.log('[Map] Forced map resize after visible');
+          debugMap('[Map] Forced map resize after visible');
         }
       });
     } else {
       // 容器尚未可見，繼續等待
-      requestAnimationFrame(waitForVisible);
+      visibilityFrameId = requestAnimationFrame(waitForVisible);
     }
   };
   nextTick(waitForVisible);
@@ -1192,6 +1245,7 @@ const loadSingleTypeCells = async (types: string[]) => {
     responses.forEach((data, idx) => {
       if (!data) return;
       const decorType = types[idx];
+      if (!decorType) return;
       
       // 跳過日本限定飾品
       if (jpOnlyDecors.has(decorType)) return;
@@ -1209,13 +1263,13 @@ const loadSingleTypeCells = async (types: string[]) => {
     });
     
     singleTypeCells.value = allCells;
-    console.log(`[Map] 載入純種格: ${allCells.length} 格 (${types.length} 種類型)`);
+    debugMap(`[Map] 載入純種格: ${allCells.length} 格 (${types.length} 種類型)`);
     
   } catch (err) {
     console.warn('[Map] 無法載入純種格資料', err);
   } finally {
     isSingleTypeCellsLoading.value = false;
-    showPureModeSelector.value = false;
+    showPureModePanel.value = false;
     updateSingleTypeCellsInView();
   }
 };
@@ -1249,7 +1303,7 @@ const updateSingleTypeCellsInView = () => {
     return;
   }
 
-  const filtered = singleTypeCells.value
+  const filtered: SingleTypeCellView[] = singleTypeCells.value
     .filter(cell => cell.center ? isCellCenterInBounds(cell.center, currentBounds!) : isCellIntersectingBounds(cell.cellId, currentBounds!))
     .slice(0, SINGLE_TYPE_CELL_LIMIT)
     .map(cell => ({
@@ -1257,11 +1311,11 @@ const updateSingleTypeCellsInView = () => {
       bounds: getCellVertices(cell.cellId),
       center: getCellCenter(cell.cellId),
       decorTypes: new Set([cell.decorType]), // Add decorTypes Set for getCellStyle compatibility
+      tags: [],
       poiCount: 1, 
       priority: 'high'
-    })) as S2CellData[]; // Cast to S2CellData to satisfy type requirements
+    }));
 
-  singleTypeCellsInView.value = filtered;
   singleTypeCellsInView.value = filtered;
   
   // renderInBatches logic removed - using direct assignment to singleTypeCellsInView
@@ -1330,6 +1384,7 @@ const loadNewPureTypes = async (types: string[]) => {
       responses.forEach((data, idx) => {
         if (!data) return;
         const decorType = typesToLoad[idx];
+        if (!decorType) return;
         
         // 跳過日本限定飾品
         if (jpOnlyDecors.has(decorType)) return;
@@ -1345,7 +1400,7 @@ const loadNewPureTypes = async (types: string[]) => {
         pureTypeCellsCache.value.set(decorType, cells);
       });
       
-      console.log(`[Map] 新載入純種格: ${typesToLoad.length} 種類型，快取總數: ${pureTypeCellsCache.value.size}`);
+      debugMap(`[Map] 新載入純種格: ${typesToLoad.length} 種類型，快取總數: ${pureTypeCellsCache.value.size}`);
       
     } catch (err) {
       console.warn('[Map] 無法載入純種格資料', err);
@@ -1406,12 +1461,12 @@ const loadingMessage = computed(() => {
 // 手動搜尋
 const handleSearch = async () => {
   if (!currentBounds) {
-    console.log('[Map] No bounds yet');
+    debugMap('[Map] No bounds yet');
     return;
   }
   
   if (!canSearch.value) {
-    console.log(`[Map] Zoom level ${mapZoom.value} is too low, need at least ${MIN_ZOOM_FOR_QUERY}`);
+    debugMap(`[Map] Zoom level ${mapZoom.value} is too low, need at least ${MIN_ZOOM_FOR_QUERY}`);
     return;
   }
   
@@ -1427,7 +1482,7 @@ const handleSearch = async () => {
   currentAttempt.value = 0;
   hasSearched.value = true;
 
-  console.log('[Map] Searching POIs...', { bounds: currentBounds, filters: selectedFilters.value.length });
+  debugMap('[Map] Searching POIs...', { bounds: currentBounds, filters: selectedFilters.value.length });
   
   try {
     const selectedRules = decorRules.filter(r => selectedFilters.value.includes(r.id));
@@ -1438,7 +1493,7 @@ const handleSearch = async () => {
       abortController.signal
     );
     
-    console.log('[Map] Received', points.length, 'points');
+    debugMap('[Map] Received', points.length, 'points');
     
     // 使用 shallowRef，直接賦值整個陣列來觸發更新
     fetchedPoints.value = Object.freeze(points) as POIPoint[];
@@ -1456,7 +1511,7 @@ const handleSearch = async () => {
     }, 3000);
   } catch (err) {
     if (err instanceof Error && err.name === 'AbortError') {
-      console.log('[Map] Search aborted');
+      debugMap('[Map] Search aborted');
     } else {
       console.error('[Map] Search failed:', err);
     }
@@ -1464,7 +1519,7 @@ const handleSearch = async () => {
     abortController = null;
     currentAttempt.value = 0;
     if (isSingleMode.value) {
-      scheduleSingleTypeCellsUpdate();
+      updateSingleTypeCellsInView();
     }
   }
 };
@@ -1573,19 +1628,27 @@ const getIconSizeClass = (): string => {
 
 // 將 cell 的 decor Set 轉換為 RadialBadge 元件格式
 const getRadialItems = (cell: any) => {
-  return Array.from(getEffectiveDecors(cell)).map((decorId: string) => {
+  return Array.from(getEffectiveDecors(cell) as Set<string>).map((decorId) => {
     const info = getDecorInfo(decorId);
     return {
       id: decorId,
+      name: info?.name,
       iconName: info?.iconName,
       icon: info?.icon,
     };
   });
 };
 
+const getCellPoiCount = (cell: any) => cell?.poiCount || 0;
+
 // 獲取飾品資訊
 const getDecorInfo = (decorId: string) => {
   return getDecorRule(decorId);
+};
+
+const getFirstDecorInfo = (cell: S2CellData | SingleTypeCellView | any) => {
+  const decorId = getCellDecorIds(cell)[0];
+  return decorId ? getDecorInfo(decorId) : undefined;
 };
 
 // 定位到使用者當前位置
@@ -1606,7 +1669,7 @@ const goToMyLocation = () => {
       const { latitude, longitude } = position.coords;
       userLocation.value = [latitude, longitude];
       
-      console.log(`[Map] Got user location: ${latitude.toFixed(5)}, ${longitude.toFixed(5)}`);
+      debugMap(`[Map] Got user location: ${latitude.toFixed(5)}, ${longitude.toFixed(5)}`);
       
       if (leafletMap) {
         // 移動地圖到使用者位置，並設定適當的縮放等級
@@ -1721,7 +1784,7 @@ const selectSearchResult = (result: GeocodingResult) => {
   showSearchResults.value = false;
   selectedResultIndex.value = -1;
 
-  console.log(`[Map] Navigated to: ${result.display_name}`);
+  debugMap(`[Map] Navigated to: ${result.display_name}`);
 };
 
 const clearSearch = () => {
@@ -1756,17 +1819,39 @@ if (typeof window !== 'undefined') {
 
 // 清理
 onUnmounted(() => {
+  isMapPageMounted = false;
+
   if (abortController) {
     abortController.abort();
+    abortController = null;
+  }
+  if (visibilityFrameId !== null) {
+    cancelAnimationFrame(visibilityFrameId);
+    visibilityFrameId = null;
   }
   if (searchResultTimer) {
     clearTimeout(searchResultTimer);
+    searchResultTimer = null;
   }
   if (searchDebounceTimer) {
     clearTimeout(searchDebounceTimer);
+    searchDebounceTimer = null;
   }
   if (reportFetchTimer) {
     clearTimeout(reportFetchTimer);
+    reportFetchTimer = null;
+  }
+  if (scannerDebounceTimer) {
+    clearTimeout(scannerDebounceTimer);
+    scannerDebounceTimer = null;
+  }
+  if (gridZoomWarningTimer) {
+    clearTimeout(gridZoomWarningTimer);
+    gridZoomWarningTimer = null;
+  }
+  if (pureModeHintTimer) {
+    clearTimeout(pureModeHintTimer);
+    pureModeHintTimer = null;
   }
   window.removeEventListener('resize', updateWindowWidth);
   leafletMap = null;
@@ -1782,14 +1867,14 @@ onUnmounted(() => {
   height: 52px;
   background: white;
   border-radius: 50%;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3), 0 0 0 3px rgba(16, 185, 129, 0.5);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3), 0 0 0 3px rgba(0, 185, 47, 0.5);
   transition: transform 0.2s, box-shadow 0.2s;
   cursor: pointer;
 }
 
 .poi-marker:hover {
   transform: scale(1.25);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4), 0 0 0 4px rgba(16, 185, 129, 0.7);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4), 0 0 0 4px rgba(0, 185, 47, 0.7);
   z-index: 1000 !important;
 }
 
@@ -1807,7 +1892,7 @@ onUnmounted(() => {
 /* 自訂捲軸樣式 */
 .overflow-y-auto {
   scrollbar-width: thin;
-  scrollbar-color: rgba(16, 185, 129, 0.3) transparent;
+  scrollbar-color: rgba(0, 185, 47, 0.3) transparent;
 }
 
 .overflow-y-auto::-webkit-scrollbar {
@@ -1819,12 +1904,12 @@ onUnmounted(() => {
 }
 
 .overflow-y-auto::-webkit-scrollbar-thumb {
-  background-color: rgba(16, 185, 129, 0.3);
+  background-color: rgba(0, 185, 47, 0.3);
   border-radius: 3px;
 }
 
 .overflow-y-auto::-webkit-scrollbar-thumb:hover {
-  background-color: rgba(16, 185, 129, 0.5);
+  background-color: rgba(0, 185, 47, 0.5);
 }
 
 /* POI 標記樣式（Zoom < 17 時使用）*/
@@ -1836,14 +1921,14 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3), 0 0 0 3px rgba(16, 185, 129, 0.5);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3), 0 0 0 3px rgba(0, 185, 47, 0.5);
   transition: transform 0.2s, box-shadow 0.2s;
   cursor: pointer;
 }
 
 .poi-marker:hover {
   transform: scale(1.25);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4), 0 0 0 4px rgba(16, 185, 129, 0.7);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4), 0 0 0 4px rgba(0, 185, 47, 0.7);
   z-index: 1000 !important;
 }
 
@@ -1867,14 +1952,14 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2), 0 0 0 2px rgba(16, 185, 129, 0.3);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2), 0 0 0 2px rgba(0, 185, 47, 0.3);
   transition: transform 0.2s, box-shadow 0.2s;
   cursor: pointer;
 }
 
 .decor-icon-container:hover {
   transform: scale(1.15);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3), 0 0 0 3px rgba(16, 185, 129, 0.5);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3), 0 0 0 3px rgba(0, 185, 47, 0.5);
   z-index: 1000 !important;
 }
 

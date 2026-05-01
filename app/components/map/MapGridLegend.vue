@@ -37,7 +37,7 @@
           <!-- Grid Mode Legend -->
           <template v-if="isGridMode">
               <div class="flex items-center gap-2 text-xs">
-              <div class="w-4 h-4 rounded-sm flex-shrink-0" style="background-color: #10B981; opacity: 0.5;"></div>
+              <div class="w-4 h-4 rounded-sm flex-shrink-0" style="background-color: #00B92F; opacity: 0.5;"></div>
               <span class="text-gray-700"><span class="font-semibold">綠色</span>：單一飾品類型</span>
               </div>
               <div class="flex items-center gap-2 text-xs">
@@ -60,7 +60,7 @@
           <!-- Single Mode Legend -->
           <template v-if="isSingleMode">
               <div class="flex items-center gap-2 text-xs">
-              <div class="w-4 h-4 rounded-sm flex-shrink-0" style="background-color: #10B981; opacity: 0.5;"></div>
+              <div class="w-4 h-4 rounded-sm flex-shrink-0" style="background-color: #00B92F; opacity: 0.5;"></div>
               <span class="text-gray-700"><span class="font-semibold">綠色</span>：單一飾品類型 (純種)</span>
               </div>
               <div class="flex items-center gap-2 text-xs">

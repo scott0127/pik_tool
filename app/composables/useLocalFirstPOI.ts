@@ -327,9 +327,13 @@ export function useLocalFirstPOI() {
       // 2. 如果查詢範圍完全在某個區域內，直接使用本地資料
       if (fullyContained && intersectingRegions.length > 0) {
         const regionId = intersectingRegions[0];
+        if (!regionId) {
+          dataSource.value = 'api';
+          return await overpassAPI.fetchPOIs(bounds, selectedRules, abortSignal);
+        }
         const regionIndex = regionIndexCache.get(regionId) || await loadRegionIndex(regionId);
         if (regionIndex) {
-          const intersectingTiles = regionIndex.tiles.filter(tile => bboxIntersects(bounds, tile.bbox));
+          const intersectingTiles = regionIndex.tiles.filter(tile => tile.poiCount > 0 && bboxIntersects(bounds, tile.bbox));
           const tileDataList = await Promise.all(
             intersectingTiles.map(tile => loadTile(regionId, tile.file))
           );

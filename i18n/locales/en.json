@@ -96,17 +96,20 @@
             "collected": "Collected"
         },
         "filters": {
-            "search_label": "🔍 Search",
+            "search_label": "Search",
             "search_placeholder": "Search decor name...",
-            "category_type": "🎯 Obtain Method",
-            "pikmin_type": "🌈 Pikmin Type",
-            "status": "✅ Status",
+            "category_type": "Obtain Method",
+            "pikmin_type": "Pikmin Type",
+            "status": "Status",
             "status_all": "All",
             "status_collected": "Collected",
             "status_uncollected": "Missing",
             "active_label": "Active Filters:",
             "limited": "Limited Only",
-            "clear": "Clear All"
+            "clear": "Clear All",
+            "title": "Filters",
+            "expand": "Expand Filters",
+            "collapse": "Collapse"
         },
         "sections": {
             "regular": {
@@ -131,11 +134,15 @@
         },
         "actions": {
             "collect_all": "Collect All",
-            "collect_all_tooltip": "Mark all Pikmin in this category as collected"
+            "collect_all_tooltip": "Mark all Pikmin in this category as collected",
+            "expand_all": "Expand All",
+            "collapse_all": "Collapse All"
         },
         "scroll": {
             "special": "Jump to Special",
-            "top": "Back to Top"
+            "top": "Back to Top",
+            "bottom": "Go to Bottom",
+            "categories": "All Categories"
         },
         "types": {
             "uncollected_regular": "Missing (Regular)",
@@ -239,10 +246,15 @@
         "report": {
             "title": "Report Missing Decor",
             "subtitle": "Select decor types actually present here",
+            "extra_title": "Report Extra Decor",
+            "extra_subtitle": "Select decor types that do not actually appear in this grid",
             "reported": "Reported",
             "footer": "Click icon to submit. Your contribution makes the map more accurate!",
             "error_pure": "Report Error (Not Pure)",
             "missing": "Report Missing",
+            "extra": "Report Extra",
+            "no_missing_options": "There are no missing decor options for this grid.",
+            "no_extra_options": "There are no extra decor options for this grid.",
             "pure_zone": "Pure Zone",
             "impure_warning": "Reported as not pure!"
         },
@@ -258,7 +270,8 @@
             "pure": "Pure",
             "medium": "Mixed",
             "mixed": "Heavily Mixed",
-            "user_reported": "User Reported"
+            "user_reported": "User Reported",
+            "user_reported_extra": "User Reported Extra"
         },
         "search": {
             "placeholder": "Search location",

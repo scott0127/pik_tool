@@ -9,7 +9,7 @@ export default defineNuxtPlugin(() => {
       navigator.serviceWorker.getRegistrations().then((registrations) => {
         for (let registration of registrations) {
           registration.unregister();
-          console.log('[App] Dev mode: Service Worker unregistered.');
+          console.debug('[App] Dev mode: Service Worker unregistered.');
         }
       });
       return;
@@ -30,7 +30,7 @@ export default defineNuxtPlugin(() => {
       navigator.serviceWorker
         .register('/sw.js')
         .then((registration) => {
-          console.log('[App] Service Worker registered:', registration.scope);
+          if (import.meta.dev) console.debug('[App] Service Worker registered:', registration.scope);
 
           // 如果發現有新的 Service Worker 正在等待，發送 skipWaiting 叫它立刻接管
           registration.addEventListener('updatefound', () => {
@@ -39,7 +39,7 @@ export default defineNuxtPlugin(() => {
               newWorker.addEventListener('statechange', () => {
                 // 當新版本安裝好且處於等待階段 (installed)
                 if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                  console.log('[App] New App Version available! Forcing update...');
+                  if (import.meta.dev) console.debug('[App] New App Version available! Forcing update...');
                   // 強制啟動新的 SW
                   newWorker.postMessage('SKIP_WAITING');
                 }
@@ -47,13 +47,12 @@ export default defineNuxtPlugin(() => {
             }
           });
 
-          // 定期檢查 SW 更新（每 60 秒）
-          // 確保即使使用者沒有導航，也能及時收到新版本
+          // 定期檢查 SW 更新。不要過於頻繁，避免背景頁面造成無謂網路請求。
           setInterval(() => {
             registration.update().catch(() => {
               // 忽略更新檢查失敗（離線的情境）
             });
-          }, 60 * 1000);
+          }, 30 * 60 * 1000);
         })
         .catch((error) => {
           console.warn('[App] Service Worker registration failed:', error);
@@ -65,10 +64,10 @@ export default defineNuxtPlugin(() => {
       navigator.serviceWorker.addEventListener('controllerchange', () => {
         if (!refreshing && pageFullyLoaded) {
           refreshing = true;
-          console.log('[App] Refreshing page to load new version...');
+          if (import.meta.dev) console.debug('[App] Refreshing page to load new version...');
           window.location.reload();
         } else if (!pageFullyLoaded) {
-          console.log('[App] SW updated during initial load, skipping reload (page already has latest HTML).');
+          if (import.meta.dev) console.debug('[App] SW updated during initial load, skipping reload (page already has latest HTML).');
         }
       });
     });

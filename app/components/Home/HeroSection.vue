@@ -15,20 +15,23 @@
     </div>
 
     <!-- Left Content: Title & Text (Floats forward slightly) -->
-    <div class="relative z-10 flex-1 text-center md:text-left transition-transform duration-200 ease-out" :style="textStyle">
-      <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/40 backdrop-blur-md border border-white/50 text-emerald-800 text-xs font-bold uppercase tracking-wider mb-6 shadow-sm hover:scale-105 transition-transform cursor-default">
-        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+    <div class="relative z-10 flex-1 text-center md:text-left transition-transform duration-200 ease-out hero-copy-readable" :style="textStyle">
+      <div class="glass-control text-on-glass inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-wider mb-5 hover:scale-105 transition-transform cursor-default">
+        <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
         {{ $t('hero.badge') }}
       </div>
 
-      <h1 class="text-5xl md:text-7xl font-black text-gray-800 leading-[0.9] mb-6 tracking-tighter drop-shadow-sm">
+      <h1 class="text-5xl md:text-7xl font-black text-gray-900 leading-[0.92] mb-5 tracking-tight hero-title-shadow readable-on-art">
         {{ $t('hero.title.prefix') }} <br />
-        <span class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 via-teal-500 to-lime-500 bg-300% animate-gradient">
+        <span
+          class="hero-title-green"
+          :data-text="$t('hero.title.suffix')"
+        >
           {{ $t('hero.title.suffix') }}
         </span>
       </h1>
       
-      <p class="text-gray-600 text-lg md:text-xl max-w-md mx-auto md:mx-0 leading-relaxed font-medium mb-12">
+      <p class="readable-on-art text-base md:text-lg max-w-md mx-auto md:mx-0 leading-[1.75] font-extrabold mb-12 hero-subtitle-shadow">
         {{ $t('hero.subtitle.line1') }}<br />
         {{ $t('hero.subtitle.line2') }}
       </p>
@@ -37,10 +40,15 @@
        <div class="flex flex-col items-stretch w-full sm:w-[100%] md:w-[100%] mx-auto md:mx-0 mt-8 gap-3 md:gap-4 relative z-10">
            
            <!-- Interactive Pikmin Spirits -->
-           <div class="relative bg-white/40 backdrop-blur-sm rounded-3xl md:rounded-[2rem] border border-white/50 shadow-sm p-4 w-full flex flex-col md:flex-row md:items-center md:justify-center gap-4 md:gap-2 hover:scale-105 transition-transform duration-300">
+           <div class="glass-surface-clear relative rounded-3xl md:rounded-[2rem] p-4 w-full flex flex-col md:flex-row md:items-center md:justify-center gap-4 md:gap-2 hover:scale-105 transition-transform duration-300">
                <!-- Admin Settings Button -->
-               <button v-if="isAdmin" @click.stop="showSettingsModal = true" class="absolute -top-3 -right-3 z-50 bg-white shadow-md border border-gray-100 rounded-full p-2 text-gray-400 hover:text-emerald-500 hover:scale-110 transition-all">
-                  <Icon name="lucide:settings" class="w-4 h-4" />
+               <button
+                 v-if="isAdmin"
+                 @click.stop="showSettingsModal = true"
+                 class="glass-control absolute top-3 right-3 z-50 w-9 h-9 rounded-full text-emerald-600 hover:text-emerald-700 hover:scale-110 transition-all"
+                 aria-label="Hero settings"
+               >
+                  <Icon name="lucide:settings" class="w-4.5 h-4.5" />
                </button>
                <!-- Row 1: Reverse Valentine Stickers -->
                <div class="flex items-center justify-center -space-x-2 md:-space-x-4 relative group h-14 cursor-none w-full md:w-auto">
@@ -72,11 +80,11 @@
            </div>
 
            <!-- Missing Tracker Badge -->
-           <button @click="showMissingModal = true" class="group relative w-full inline-flex flex-col md:flex-row items-center md:justify-between gap-2 md:gap-3 px-5 py-4 min-h-[56px] md:py-3.5 text-sm md:text-[15px] font-medium text-emerald-800 bg-[#e7f9ec] backdrop-blur-sm shadow-[0_4px_15px_-4px_rgba(52,211,153,0.3)] rounded-3xl md:rounded-[2rem] hover:bg-[#d5f5de] focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 overflow-hidden border border-emerald-100/60 transition-transform hover:-translate-y-0.5">
+           <button @click="showMissingModal = true" class="glass-surface-readable group relative w-full inline-flex flex-col md:flex-row items-center md:justify-between gap-2 md:gap-3 px-5 py-4 min-h-[56px] md:py-3.5 text-sm md:text-[15px] font-medium rounded-3xl md:rounded-[2rem] focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 transition-transform hover:-translate-y-0.5">
               
               <div class="flex items-center gap-2">
                  <Icon name="lucide:search" class="text-xl text-emerald-600 shrink-0" />
-                 <span class="text-gray-700 font-bold whitespace-nowrap">本月皮克敏還少了:</span>
+                 <span class="text-on-glass font-bold whitespace-nowrap">本月皮克敏還少了:</span>
               </div>
 
               <div v-if="missingValentine.length > 0 || missingPowder.length > 0" class="flex items-center justify-center flex-wrap gap-2 w-full md:w-auto">
@@ -87,7 +95,7 @@
                     粉末 <span class="bg-white rounded-full px-1.5 text-indigo-800 shadow-sm">{{ missingPowder.length }}</span>
                   </span>
               </div>
-              <span v-else class="text-gray-700 tracking-wide font-normal px-2">
+              <span v-else class="text-on-glass tracking-wide font-normal px-2">
                 🎉 太神啦！近期活動收集完畢！
               </span>
 
@@ -99,52 +107,60 @@
     <!-- Right Content: Floating 3D Stats Core -->
     <div class="relative z-20 w-auto perspective-1000">
         <div 
-            class="relative w-72 h-72 md:w-96 md:h-96 transition-transform duration-100 ease-out preserve-3d cursor-pointer"
-            :style="cardStyle"
+            class="relative w-72 h-72 md:w-96 md:h-96"
+            @click="enableDeviceTilt"
         >
-            <!-- 1. Back Glow Layer (Furthest back) -->
-            <div class="absolute inset-10 bg-gradient-to-tr from-emerald-400 to-teal-400 rounded-full blur-[60px] opacity-40 animate-pulse-slow translate-z-[-20px]"></div>
+            <div class="absolute inset-0 preserve-3d transition-transform duration-100 ease-out" :style="cardStyle">
+                <!-- 1. Back Glow Layer (Furthest back) -->
+                <div class="absolute inset-10 bg-gradient-to-tr from-emerald-400 to-teal-400 rounded-full blur-[60px] opacity-40 animate-pulse-slow translate-z-[-20px]"></div>
 
-            <!-- 2. The Glass Sphere/Container -->
-            <div class="absolute inset-0 bg-white/10 backdrop-blur-md rounded-full border border-white/30 shadow-[0_20px_50px_rgba(0,0,0,0.05)] flex items-center justify-center translate-z-[0px] ring-1 ring-white/40">
-                <div class="absolute inset-0 rounded-full bg-gradient-to-b from-white/40 to-transparent pointer-events-none"></div>
-            </div>
-
-            <!-- 3. Progress Ring (Floating) -->
-            <div class="absolute inset-4 translate-z-[20px]">
-                <svg class="w-full h-full -rotate-90 drop-shadow-xl" viewBox="0 0 100 100">
-                    <!-- Track -->
-                    <circle cx="50" cy="50" r="40" stroke="rgba(255,255,255,0.3)" stroke-width="6" fill="none" />
-                    <!-- Progress -->
-                    <circle cx="50" cy="50" r="40" stroke="url(#progressGradient)" stroke-width="6" fill="none"
-                            stroke-linecap="round"
-                            :stroke-dasharray="251.2"
-                            :stroke-dashoffset="251.2 - (stats.percentage / 100) * 251.2"
-                            class="transition-all duration-1000 ease-out"
-                    />
-                    <defs>
-                        <linearGradient id="progressGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                            <stop offset="0%" stop-color="#34d399" />
-                            <stop offset="100%" stop-color="#059669" />
-                        </linearGradient>
-                    </defs>
-                </svg>
-            </div>
-
-            <!-- 4. Central Data Core (Furthest forward) -->
-            <div class="absolute inset-0 flex flex-col items-center justify-center translate-z-[40px]">
-                <div class="w-32 h-32 rounded-full bg-white/80 backdrop-blur-xl shadow-lg flex flex-col items-center justify-center border border-white/60 mb-2">
-                    <Icon name="lucide:sprout" class="text-4xl text-emerald-500 mb-1 animate-bounce-gentle" />
-                    <span class="text-3xl font-black text-gray-800 tracking-tighter leading-none">{{ stats.percentage }}%</span>
+                <!-- 2. The Glass Sphere/Container -->
+                <div class="liquid-glass-2026 liquid-glass-dynamic absolute inset-0 rounded-full flex items-center justify-center translate-z-[0px]">
+                    <div class="absolute inset-0 rounded-full bg-gradient-to-b from-white/40 to-transparent pointer-events-none"></div>
                 </div>
-                <div class="bg-emerald-100/80 backdrop-blur-md text-emerald-800 text-xs font-bold px-4 py-1.5 rounded-full border border-emerald-200/50 shadow-sm mt-4">
+
+                <!-- 3. Progress Ring (Floating) -->
+                <div class="absolute inset-4 translate-z-[20px]">
+                    <svg class="w-full h-full -rotate-90 drop-shadow-xl" viewBox="0 0 100 100">
+                        <!-- Track -->
+                        <circle cx="50" cy="50" r="40" stroke="rgba(255,255,255,0.3)" stroke-width="6" fill="none" />
+                        <!-- Progress -->
+                        <circle cx="50" cy="50" r="40" stroke="url(#progressGradient)" stroke-width="6" fill="none"
+                                stroke-linecap="round"
+                                :stroke-dasharray="251.2"
+                                :stroke-dashoffset="251.2 - (stats.percentage / 100) * 251.2"
+                                class="transition-all duration-1000 ease-out"
+                        />
+                        <defs>
+                            <linearGradient id="progressGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#00b92f" />
+                            <stop offset="100%" stop-color="#008523" />
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                </div>
+
+                <!-- 4. Glass backgrounds only; crisp text is rendered above this transformed layer -->
+                <div class="absolute inset-0 flex flex-col items-center justify-center translate-z-[40px] pointer-events-none">
+                    <div class="liquid-glass-2026 liquid-glass-dynamic w-32 h-32 rounded-full mb-2"></div>
+                    <div class="hero-stat-pill-shell rounded-full mt-4 h-[30px] w-[116px]"></div>
+                </div>
+
+                <!-- 5. Floating Orbs (Decorations) -->
+                <div class="absolute top-0 right-10 w-12 h-12 bg-yellow-300 rounded-full blur-md opacity-60 animate-float translate-z-[30px]"></div>
+                <div class="absolute bottom-10 left-10 w-8 h-8 bg-pink-400 rounded-full blur-md opacity-50 animate-float delay-700 translate-z-[25px]"></div>
+            </div>
+
+            <!-- Screen-space text layer stays crisp while the glass rotates underneath -->
+            <div class="hero-stat-core absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                <div class="w-32 h-32 rounded-full flex flex-col items-center justify-center mb-2">
+                    <Icon name="lucide:sprout" class="text-4xl text-emerald-500 mb-1 animate-bounce-gentle" />
+                    <span class="hero-stat-value text-3xl font-black text-gray-800 leading-none">{{ stats.percentage }}%</span>
+                </div>
+                <div class="hero-stat-pill text-emerald-900 text-xs font-bold px-4 py-1.5 rounded-full mt-4">
                     {{ stats.collected }} {{ $t('hero.collected') }}
                 </div>
             </div>
-
-            <!-- 5. Floating Orbs (Decorations) -->
-            <div class="absolute top-0 right-10 w-12 h-12 bg-yellow-300 rounded-full blur-md opacity-60 animate-float translate-z-[30px]"></div>
-            <div class="absolute bottom-10 left-10 w-8 h-8 bg-pink-400 rounded-full blur-md opacity-50 animate-float delay-700 translate-z-[25px]"></div>
 
         </div>
     </div>
@@ -152,19 +168,19 @@
 
   <!-- Missing Pikmin Modal -->
   <div v-if="showMissingModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-sm animate-fade-in" @click.self="showMissingModal = false">
-    <div class="bg-white rounded-3xl shadow-2xl w-full max-w-lg max-h-[90vh] flex flex-col overflow-hidden animate-pop-in">
-      <div class="p-5 border-b border-gray-100 flex justify-between items-center bg-gradient-to-r from-emerald-50 to-teal-50 shrink-0">
+    <div class="glass-surface-readable rounded-3xl w-full max-w-lg max-h-[90vh] flex flex-col overflow-hidden animate-pop-in">
+      <div class="p-5 border-b border-white/60 flex justify-between items-center shrink-0">
         <h3 class="text-xl font-bold text-emerald-800 flex items-center gap-2">
           <Icon name="lucide:search" class="text-emerald-500" />
           目前缺少的現時活動飾品
         </h3>
-        <button @click="showMissingModal = false" class="text-gray-400 hover:text-gray-600 transition-colors bg-white rounded-full p-1.5 shadow-sm border border-gray-100">
+        <button @click="showMissingModal = false" class="glass-control text-gray-600 hover:text-gray-800 transition-colors rounded-full p-1.5">
           <Icon name="lucide:x" class="w-5 h-5" />
         </button>
       </div>
       
       <div class="p-6 overflow-y-auto flex-1 custom-scrollbar">
-        <p v-if="missingValentine.length > 0 || missingPowder.length > 0" class="text-gray-600 text-sm mb-6 font-medium text-center bg-yellow-50 text-yellow-800 py-2.5 rounded-xl border border-yellow-200">
+        <p v-if="missingValentine.length > 0 || missingPowder.length > 0" class="glass-surface-clear text-on-glass text-sm mb-6 font-bold text-center py-2.5 rounded-xl">
           這是您目前尚未收集到的活動顏色喔！快出門尋找它們吧！
         </p>
         
@@ -172,7 +188,7 @@
         <div v-if="missingValentine.length > 0" class="mb-8">
             <h4 class="text-md font-bold text-gray-700 mb-3 border-l-4 border-pink-400 pl-2">{{ row1CategoryName }} (差 {{ missingValentine.length }} 種)</h4>
             <div class="grid grid-cols-4 sm:grid-cols-4 gap-3">
-              <div v-for="spirit in missingValentine" :key="spirit.id" class="flex flex-col items-center p-2 rounded-xl bg-gray-50 border border-gray-100 hover:bg-pink-50 hover:border-pink-200 transition-colors group">
+              <div v-for="spirit in missingValentine" :key="spirit.id" class="glass-surface-clear flex flex-col items-center p-2 rounded-xl hover:border-pink-200 transition-colors group">
                  <div class="w-12 h-12 flex items-center justify-center mb-1 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3 drop-shadow-md">
                     <img :src="spirit.image" :alt="spirit.name" class="w-full h-full object-contain filter grayscale group-hover:grayscale-0 opacity-70 group-hover:opacity-100 transition-all duration-300" />
                  </div>
@@ -187,7 +203,7 @@
         <div v-if="missingPowder.length > 0" class="mb-2">
             <h4 class="text-md font-bold text-gray-700 mb-3 border-l-4 border-indigo-400 pl-2">{{ row2CategoryName }} (差 {{ missingPowder.length }} 種)</h4>
             <div class="grid grid-cols-4 sm:grid-cols-4 gap-3">
-              <div v-for="spirit in missingPowder" :key="spirit.id" class="flex flex-col items-center p-2 rounded-xl bg-gray-50 border border-gray-100 hover:bg-indigo-50 hover:border-indigo-200 transition-colors group">
+              <div v-for="spirit in missingPowder" :key="spirit.id" class="glass-surface-clear flex flex-col items-center p-2 rounded-xl hover:border-indigo-200 transition-colors group">
                  <div class="w-12 h-12 flex items-center justify-center mb-1 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3 drop-shadow-md">
                     <img :src="spirit.image" :alt="spirit.name" class="w-full h-full object-contain filter grayscale group-hover:grayscale-0 opacity-70 group-hover:opacity-100 transition-all duration-300" />
                  </div>
@@ -206,8 +222,8 @@
         </div>
       </div>
       
-      <div class="p-4 bg-gray-50 border-t border-gray-100 flex flex-wrap justify-end gap-3 shrink-0">
-         <button @click="showMissingModal = false" class="px-5 py-2.5 bg-white border border-gray-200 text-gray-700 rounded-xl font-medium hover:bg-gray-100 transition-colors shadow-sm">
+      <div class="p-4 border-t border-white/60 flex flex-wrap justify-end gap-3 shrink-0">
+         <button @click="showMissingModal = false" class="glass-control px-5 py-2.5 text-gray-800 rounded-xl font-bold transition-colors">
            關閉
          </button>
          <button v-if="missingValentine.length > 0" @click="navigateTo('/collection?category=' + row1CategoryId); showMissingModal = false" class="px-5 py-2.5 bg-pink-500 text-white rounded-xl font-medium hover:bg-pink-600 transition-colors shadow-sm flex items-center gap-2">
@@ -249,9 +265,14 @@ const stats = computed(() => getStats());
 const heroContainer = ref<HTMLElement | null>(null);
 const tiltX = ref(0);
 const tiltY = ref(0);
+const deviceTiltEnabled = ref(false);
+let hasDeviceOrientationListener = false;
 
 onMounted(async () => {
     await fetchHeroConfig();
+    if (typeof window !== 'undefined' && 'DeviceOrientationEvent' in window) {
+        addDeviceOrientationListener();
+    }
 });
 
 // Dynamic Categories
@@ -301,6 +322,7 @@ const missingPowder = computed(() => {
 });
 
 const handleMouseMove = (e: MouseEvent) => {
+    if (deviceTiltEnabled.value) return;
     if (!heroContainer.value) return;
     const rect = heroContainer.value.getBoundingClientRect();
     const x = e.clientX - rect.left;
@@ -315,9 +337,45 @@ const handleMouseMove = (e: MouseEvent) => {
 };
 
 const resetTilt = () => {
+    if (deviceTiltEnabled.value) return;
     tiltX.value = 0;
     tiltY.value = 0;
 };
+
+const clampTilt = (value: number) => Math.max(-10, Math.min(10, value));
+
+const handleDeviceOrientation = (event: DeviceOrientationEvent) => {
+    if (!deviceTiltEnabled.value) return;
+    const beta = event.beta ?? 0;
+    const gamma = event.gamma ?? 0;
+    tiltX.value = clampTilt((beta - 45) / 4);
+    tiltY.value = clampTilt(gamma / 4);
+};
+
+const addDeviceOrientationListener = () => {
+    if (hasDeviceOrientationListener || typeof window === 'undefined') return;
+    window.addEventListener('deviceorientation', handleDeviceOrientation, true);
+    hasDeviceOrientationListener = true;
+};
+
+const enableDeviceTilt = async () => {
+    if (typeof window === 'undefined' || !('DeviceOrientationEvent' in window)) return;
+    const orientationEvent = window.DeviceOrientationEvent as typeof DeviceOrientationEvent & {
+        requestPermission?: () => Promise<'granted' | 'denied'>;
+    };
+    if (typeof orientationEvent.requestPermission === 'function') {
+        const permission = await orientationEvent.requestPermission();
+        if (permission !== 'granted') return;
+    }
+    deviceTiltEnabled.value = true;
+    addDeviceOrientationListener();
+};
+
+onUnmounted(() => {
+    if (hasDeviceOrientationListener && typeof window !== 'undefined') {
+        window.removeEventListener('deviceorientation', handleDeviceOrientation, true);
+    }
+});
 
 const cardStyle = computed(() => ({
     transform: `rotateX(${tiltX.value}deg) rotateY(${tiltY.value}deg)`,
@@ -333,9 +391,77 @@ const textStyle = computed(() => ({
 .perspective-1000 {
     perspective: 1000px;
 }
+
+.hero-title-shadow {
+  -webkit-text-stroke: 0.018em rgba(255, 255, 255, 0.48);
+  paint-order: stroke fill;
+  text-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.9),
+    0 -1px 0 rgba(255, 255, 255, 0.56),
+    1px 0 0 rgba(255, 255, 255, 0.5),
+    -1px 0 0 rgba(255, 255, 255, 0.5),
+    0 5px 12px rgba(15, 23, 42, 0.28),
+    0 18px 38px rgba(0, 133, 35, 0.18);
+}
+
+.hero-subtitle-shadow {
+  color: rgb(15 23 42 / 0.96);
+  -webkit-text-stroke: 0.03em rgba(255, 255, 255, 0.86);
+  paint-order: stroke fill;
+  text-shadow:
+    0 0 1px rgba(255, 255, 255, 0.98),
+    0 0 5px rgba(255, 255, 255, 0.86),
+    0 0 11px rgba(255, 255, 255, 0.7),
+    0 1px 0 rgba(255, 255, 255, 0.9),
+    0 4px 10px rgba(15, 23, 42, 0.22);
+}
+
+@media (min-width: 768px) {
+  .hero-copy-readable::before {
+    position: absolute;
+    inset: -1.5rem -2rem;
+    z-index: -1;
+    content: "";
+    border-radius: 2rem;
+    background: radial-gradient(ellipse at 40% 42%, rgba(255, 255, 255, 0.46), rgba(255, 255, 255, 0.18) 46%, transparent 72%);
+    filter: blur(18px);
+  }
+}
 .preserve-3d {
     transform-style: preserve-3d;
 }
+
+.hero-stat-core {
+  transform: none;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: geometricPrecision;
+}
+
+.hero-stat-value,
+.hero-stat-pill {
+  letter-spacing: 0;
+  transform: none;
+  filter: none;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.68);
+}
+
+.hero-stat-pill,
+.hero-stat-pill-shell {
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.76), rgba(255, 255, 255, 0.34)),
+    rgba(237, 255, 242, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.82);
+  box-shadow:
+    0 10px 22px rgba(0, 133, 35, 0.12),
+    0 1px 0 rgba(255, 255, 255, 0.9) inset;
+}
+
+.hero-stat-value {
+  color: rgb(15 23 42 / 0.96);
+  font-variant-numeric: tabular-nums;
+}
+
 .translate-z-\[-20px\] { transform: translateZ(-20px); }
 .translate-z-\[0px\] { transform: translateZ(0px); }
 .translate-z-\[20px\] { transform: translateZ(20px); }

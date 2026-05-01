@@ -49,8 +49,13 @@ export default defineNuxtConfig({
   },
 
   routeRules: {
-    // Data files: check for updates every time (Network First / ETag)
-    '/data/**': { headers: { 'cache-control': 'public, max-age=0, must-revalidate' } },
+    // Large static data files are content-like assets. Avoid revalidating the
+    // multi-MB map JSON on every map visit.
+    '/data/**': { headers: { 'cache-control': 'public, max-age=86400, stale-while-revalidate=604800' } },
+    '/img/**': { headers: { 'cache-control': 'public, max-age=604800, stale-while-revalidate=2592000' } },
+    '/icon.png': { headers: { 'cache-control': 'public, max-age=604800, stale-while-revalidate=2592000' } },
+    '/favicon.ico': { headers: { 'cache-control': 'public, max-age=604800, stale-while-revalidate=2592000' } },
+    '/manifest.webmanifest': { headers: { 'cache-control': 'public, max-age=86400, stale-while-revalidate=604800' } },
     // Cache images for 1 day
     '/og-image.png': { headers: { 'cache-control': 'public, max-age=86400' } },
     // Cache other static assets

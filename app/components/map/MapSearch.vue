@@ -188,7 +188,6 @@ const selectSearchResult = (result: GeocodingResult) => {
   
   showSearchResults.value = false;
   selectedResultIndex.value = -1;
-  console.log(`[MapSearch] Navigated to: ${result.display_name}`);
 };
 
 const clearSearch = () => {
@@ -216,6 +215,10 @@ if (typeof window !== 'undefined') {
   });
 
   onUnmounted(() => {
+    if (searchDebounceTimer) {
+      clearTimeout(searchDebounceTimer);
+      searchDebounceTimer = null;
+    }
     document.removeEventListener('click', handleClickOutside);
   });
 }

@@ -212,7 +212,8 @@ export const useAuthStore = () => {
       
       // 清除所有 sb- 开头的 cookies
       document.cookie.split(";").forEach((c) => {
-        const cookieName = c.split("=")[0].trim();
+        const cookieName = c.split("=")[0]?.trim();
+        if (!cookieName) return;
         if (cookieName.startsWith('sb-')) {
           document.cookie = `${cookieName}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
           document.cookie = `${cookieName}=; max-age=0; path=/;`;

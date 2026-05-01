@@ -240,12 +240,16 @@ const isPanelDragging = ref(false);
 
 const handleTouchStart = (e: TouchEvent) => {
   if (!props.isMobile) return;
-  touchStartY.value = e.touches[0].clientY;
+  const touch = e.touches[0];
+  if (!touch) return;
+  touchStartY.value = touch.clientY;
   isPanelDragging.value = true;
 };
 const handleTouchMove = (e: TouchEvent) => {
   if (!isPanelDragging.value) return;
-  touchCurrentY.value = e.touches[0].clientY;
+  const touch = e.touches[0];
+  if (!touch) return;
+  touchCurrentY.value = touch.clientY;
 };
 const handleTouchEnd = () => {
   if (!isPanelDragging.value) return;
@@ -261,12 +265,12 @@ const handleTouchEnd = () => {
 <style scoped>
 .overflow-y-auto {
   scrollbar-width: thin;
-  scrollbar-color: rgba(16, 185, 129, 0.2) transparent;
+  scrollbar-color: rgba(0, 185, 47, 0.2) transparent;
 }
 .overflow-y-auto::-webkit-scrollbar { width: 4px; }
 .overflow-y-auto::-webkit-scrollbar-track { background: transparent; }
 .overflow-y-auto::-webkit-scrollbar-thumb {
-  background-color: rgba(16, 185, 129, 0.2);
+  background-color: rgba(0, 185, 47, 0.2);
   border-radius: 4px;
 }
 

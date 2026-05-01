@@ -55,6 +55,12 @@ const getRingColor = (type: PikminType): string => {
 
 <style scoped>
 .pikmin-filter-btn {
-  @apply flex flex-col items-center gap-1.5 p-2.5 rounded-xl bg-white/80 hover:bg-white transition-all duration-200 cursor-pointer min-w-[56px] border-2 border-transparent hover:border-gray-200;
+  @apply flex flex-col items-center gap-1.5 p-2.5 rounded-xl transition-all duration-200 cursor-pointer min-w-[56px] border border-white/70 hover:border-emerald-300/80 text-gray-800;
+  background: rgba(255, 255, 255, 0.54);
+  box-shadow:
+    0 8px 18px rgba(0, 133, 35, 0.08),
+    0 1px 8px rgba(255, 255, 255, 0.68) inset;
+  backdrop-filter: blur(16px) saturate(1.35);
+  -webkit-backdrop-filter: blur(16px) saturate(1.35);
 }
 </style>
