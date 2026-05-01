@@ -8,6 +8,8 @@ export type ReportStatus = {
 
 // Global cache registry to track which cells we've already asked Supabase about (in-memory)
 const fetchedCellIds = new Set<string>();
+const cellReports = reactive<Map<string, ReportStatus>>(new Map());
+let cacheLoaded = false;
 
 // LocalStorage Cache Key & TTL
 const CACHE_KEY = 'pikmin-cell-reports-cache';
@@ -19,9 +21,6 @@ const MAX_BATCHES_PER_CALL = 2;
 export const useCellReports = () => {
     const supabase = useSupabaseClient<Database>();
     const user = useSupabaseUser();
-    
-    // State: Map cellId -> ReportStatus
-    const cellReports = reactive<Map<string, ReportStatus>>(new Map());
 
     // Helper to get or create status
     const getReportStatus = (cellId: string): ReportStatus => {
@@ -120,7 +119,8 @@ export const useCellReports = () => {
     };
     
     // Run loadCache once on initialization
-    if (import.meta.client && cellReports.size === 0) {
+    if (import.meta.client && !cacheLoaded) {
+        cacheLoaded = true;
         loadCache();
     }
     // -----------------------------------------
