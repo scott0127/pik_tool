@@ -202,9 +202,24 @@ export const useCellReports = () => {
         }
     };
 
+    const getCurrentUserId = async () => {
+        if (user.value?.id) return user.value.id;
+
+        const { data, error } = await supabase.auth.getUser();
+        if (error) {
+            throw error;
+        }
+
+        return data.user?.id || null;
+    };
+
     // Submit a report
     const submitReport = async (cellId: string, reportType: 'not_pure' | 'missing_decor' | 'extra_decor', decorId?: string) => {
-        if (!user.value?.id) throw new Error('必須登入才能回報');
+        const userId = await getCurrentUserId();
+        if (!userId) throw new Error('必須登入才能回報');
+        if ((reportType === 'missing_decor' || reportType === 'extra_decor') && !decorId) {
+            throw new Error('請選擇要回報的飾品');
+        }
 
         // Optimistic Update
         const status = getReportStatus(cellId);
@@ -228,7 +243,7 @@ export const useCellReports = () => {
             .from('cell_reports')
             .insert({
                 s2_cell_id: cellId,
-                user_id: user.value.id,
+                user_id: userId,
                 report_type: reportType,
                 decor_id: decorId || null
             });
@@ -239,6 +254,7 @@ export const useCellReports = () => {
             // Only remove from set if not added by others (actually we can't distinguish here easily without full sync, but good enough for optimistic revert)
             if (reportType === 'missing_decor' && decorId) status.addedDecors.delete(decorId);
             if (reportType === 'extra_decor' && decorId) status.removedDecors.delete(decorId);
+            saveCache();
              
             // Ignore duplicate key error for decor reports as well
             if (error.code === '23505') { 
@@ -246,6 +262,7 @@ export const useCellReports = () => {
                 if (reportType === 'not_pure') status.isNotPure = true;
                 if (reportType === 'missing_decor' && decorId) status.addedDecors.add(decorId);
                 if (reportType === 'extra_decor' && decorId) status.removedDecors.add(decorId);
+                saveCache();
                 return;
             }
             throw error;
