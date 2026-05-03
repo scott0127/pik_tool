@@ -3,6 +3,7 @@
   "type": "module",
   "private": true,
   "scripts": {
+    "prebuild": "node scripts/write-version.mjs",
     "build": "nuxt build",
     "dev": "nuxt dev",
     "generate": "nuxt generate",
