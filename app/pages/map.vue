@@ -217,7 +217,7 @@
                       :added-count="getAddedDecors(cell.cellId).size"
                       :is-reported="isReported(cell.cellId)"
                       :center-title="$t('map.cell_info.decor_types')"
-                      :size="94"
+                      :size="cellBadgeSize"
                       :max-display="3"
                     />
                   </div>
@@ -794,6 +794,7 @@ const openDecorSelector = (cell: S2CellData | SingleTypeCellView | any, mode: 'm
 // 響應式視窗寬度
 const windowWidth = ref(typeof window !== 'undefined' ? window.innerWidth : 1024);
 const isMobile = computed(() => windowWidth.value < 768);
+const cellBadgeSize = computed(() => isMobile.value ? 74 : 84);
 
 // 監聯視窗大小變化
 // 監聯視窗大小變化

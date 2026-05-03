@@ -31,3 +31,7 @@ supabase/migration_*.sql
 
 # Ignore agent directory
 .agent/
+.agents/
+
+# Local scratch workspace
+scratch/
