@@ -2,7 +2,11 @@
   <template v-if="!isMapRoute">
     <div
       class="ambient-background fixed inset-0 pointer-events-none overflow-hidden"
-      :class="{ 'is-immersive': isImmersive }"
+      :class="{
+        'is-immersive': isImmersive,
+        'is-gradient-mode': backgroundMode === 'gradient',
+        'is-image-mode': backgroundMode === 'image',
+      }"
       :style="{ '--immersive-progress': immersiveProgress }"
       aria-hidden="true"
     >
@@ -65,6 +69,19 @@
       </div>
     </div>
 
+    <button
+      class="ambient-mode-toggle fixed right-7 top-[9.9rem] z-40"
+      type="button"
+      :aria-label="backgroundMode === 'gradient' ? '切換成背景圖片模式' : '切換成漸層背景模式'"
+      :title="backgroundMode === 'gradient' ? '切換成背景圖片模式' : '切換成漸層背景模式'"
+      @click="toggleBackgroundMode"
+    >
+      <Icon
+        :name="backgroundMode === 'gradient' ? 'lucide:palette' : 'lucide:image'"
+        class="h-4 w-4"
+      />
+    </button>
+
     <div
       ref="sliderRef"
       class="ambient-slider fixed right-7 top-[12.8rem] z-40"
@@ -93,13 +110,17 @@
 </template>
 
 <script setup lang="ts">
+type BackgroundMode = "gradient" | "image";
+
 const route = useRoute();
 const { t } = useI18n();
 
 const STORAGE_KEY = "pikmin-immersive-background";
+const BACKGROUND_MODE_KEY = "pikmin-background-mode";
 const TIP_SHOWN_KEY = "pikmin-bg-tip-shown";
 const isImmersive = ref(false);
 const immersiveProgress = ref(0);
+const backgroundMode = ref<BackgroundMode>("gradient");
 const isDragging = ref(false);
 const sliderRef = ref<HTMLElement | null>(null);
 const isMapRoute = computed(() => route.path === "/map");
@@ -128,6 +149,15 @@ const commitImmersive = (enabled: boolean) => {
   localStorage.setItem(STORAGE_KEY, enabled ? "true" : "false");
 };
 
+const setBackgroundMode = (mode: BackgroundMode) => {
+  backgroundMode.value = mode;
+  localStorage.setItem(BACKGROUND_MODE_KEY, mode);
+};
+
+const toggleBackgroundMode = () => {
+  setBackgroundMode(backgroundMode.value === "gradient" ? "image" : "gradient");
+};
+
 const onSlideMove = (event: PointerEvent) => {
   if (!isDragging.value) return;
   setProgressFromClientY(event.clientY);
@@ -153,12 +183,13 @@ const startSlide = (event: PointerEvent) => {
 
 onMounted(() => {
   const saved = localStorage.getItem(STORAGE_KEY);
-  // Default to non-immersive (false) for first-time visitors
   const enabled = saved === "true";
   isImmersive.value = enabled;
   immersiveProgress.value = enabled ? 1 : 0;
 
-  // Show one-time tip about background toggle
+  const savedBackgroundMode = localStorage.getItem(BACKGROUND_MODE_KEY);
+  backgroundMode.value = savedBackgroundMode === "image" ? "image" : "gradient";
+
   const tipShown = localStorage.getItem(TIP_SHOWN_KEY);
   if (!tipShown) {
     setTimeout(() => {
@@ -204,8 +235,19 @@ onBeforeUnmount(() => {
 .ambient-cute {
   overflow: hidden;
   opacity: calc(1 - var(--immersive-progress));
+  transition: opacity 260ms ease, filter 260ms ease;
+}
+
+.ambient-background.is-gradient-mode .ambient-cute {
   background: transparent;
   filter: none;
+}
+
+.ambient-background.is-image-mode .ambient-cute {
+  background-image: url("/img/ambient-glass-sprouts.png");
+  background-position: center top;
+  background-size: cover;
+  filter: saturate(0.96) contrast(0.98);
 }
 
 .ambient-cute::before,
@@ -222,6 +264,10 @@ onBeforeUnmount(() => {
   display: block;
   border-radius: 999px 999px 0 0;
   filter: blur(0.2px);
+}
+
+.ambient-background.is-image-mode .ambient-hill {
+  display: none;
 }
 
 .ambient-hill-a {
@@ -244,6 +290,10 @@ onBeforeUnmount(() => {
   display: block;
   opacity: 0.76;
   filter: drop-shadow(0 18px 28px rgb(6 78 59 / 0.05));
+}
+
+.ambient-background.is-image-mode .ambient-sprouts {
+  display: none;
 }
 
 .sprout-lines path {
@@ -271,8 +321,20 @@ onBeforeUnmount(() => {
 
   .ambient-cute {
     opacity: calc(0.98 * (1 - var(--immersive-progress)));
-    background: transparent;
+  }
+
+  .ambient-background.is-image-mode .ambient-cute {
+    background-image: none;
     filter: none;
+  }
+
+  .ambient-background.is-image-mode .ambient-cute::before {
+    display: block;
+    background-image: url("/img/pc_background_extended.png");
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    filter: saturate(1.03) brightness(1.03) contrast(0.98);
   }
 
   .ambient-light {
@@ -335,8 +397,16 @@ onBeforeUnmount(() => {
 }
 
 @media (max-width: 640px) {
+  .ambient-mode-toggle,
   .ambient-slider {
     right: 1.25rem;
+  }
+
+  .ambient-mode-toggle {
+    top: 10.3rem;
+  }
+
+  .ambient-slider {
     top: 13.2rem;
   }
 
@@ -349,6 +419,36 @@ onBeforeUnmount(() => {
     right: -48%;
     width: 120%;
   }
+}
+
+.ambient-mode-toggle {
+  display: grid;
+  width: 2.25rem;
+  height: 2.25rem;
+  place-items: center;
+  color: rgb(4 120 87);
+  border-radius: 999px;
+  background:
+    radial-gradient(circle at 30% 18%, rgb(255 255 255 / 0.9), rgb(255 255 255 / 0.36) 56%, rgb(209 250 229 / 0.18)),
+    linear-gradient(135deg, rgb(255 255 255 / 0.3), rgb(255 255 255 / 0.08));
+  box-shadow:
+    0 5px 12px rgb(6 78 59 / 0.06),
+    0 0 16px rgb(52 211 153 / 0.12),
+    0 1px 8px rgb(255 255 255 / 0.54) inset;
+  opacity: 0.58;
+  transition: opacity 180ms ease, transform 180ms ease;
+}
+
+.ambient-mode-toggle:hover,
+.ambient-mode-toggle:focus-visible,
+.ambient-mode-toggle:active {
+  opacity: 1;
+  transform: translateY(-1px);
+}
+
+.ambient-mode-toggle:focus-visible {
+  outline: 3px solid rgb(16 185 129 / 0.28);
+  outline-offset: 3px;
 }
 
 .ambient-slider {
@@ -498,7 +598,9 @@ onBeforeUnmount(() => {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .ambient-spore {
+  .ambient-spore,
+  .ambient-slider-thumb,
+  .ambient-slider::after {
     animation: none;
   }
 }
