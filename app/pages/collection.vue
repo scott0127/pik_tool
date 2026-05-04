@@ -1094,11 +1094,48 @@ const handleCollectAll = (categoryId: string, categoryName: string) => {
 
 .collection-section-card::before {
   position: absolute;
-  inset: 0 auto 0 0;
-  width: 5px;
+  inset: 0;
   content: "";
-  background: linear-gradient(180deg, #00b92f, #2bea5d);
-  box-shadow: 0 0 18px rgba(0, 185, 47, 0.46);
+  border-radius: inherit;
+  pointer-events: none;
+  padding: 1px;
+  background:
+    linear-gradient(
+      120deg,
+      rgba(16, 185, 129, 0.9),
+      rgba(45, 212, 191, 0.62) 32%,
+      rgba(255, 255, 255, 0.76) 64%,
+      rgba(16, 185, 129, 0.38)
+    );
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0.9;
+}
+
+.collection-section-card::after {
+  position: absolute;
+  inset: 0;
+  content: "";
+  border-radius: inherit;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 6% 50%, rgba(16, 185, 129, 0.22), transparent 28%),
+    linear-gradient(
+      90deg,
+      rgba(16, 185, 129, 0.16),
+      transparent 22%,
+      transparent 78%,
+      rgba(20, 184, 166, 0.14)
+    );
+  opacity: 0.8;
+}
+
+.collection-section-card > * {
+  position: relative;
+  z-index: 1;
 }
 
 .collection-section-card-purple {
@@ -1109,8 +1146,26 @@ const handleCollectAll = (categoryId: string, categoryName: string) => {
 }
 
 .collection-section-card-purple::before {
-  background: linear-gradient(180deg, #a855f7, #ec4899);
-  box-shadow: 0 0 18px rgba(168, 85, 247, 0.42);
+  background:
+    linear-gradient(
+      120deg,
+      rgba(168, 85, 247, 0.92),
+      rgba(217, 70, 239, 0.62) 34%,
+      rgba(255, 255, 255, 0.76) 64%,
+      rgba(236, 72, 153, 0.34)
+    );
+}
+
+.collection-section-card-purple::after {
+  background:
+    radial-gradient(circle at 6% 50%, rgba(168, 85, 247, 0.22), transparent 28%),
+    linear-gradient(
+      90deg,
+      rgba(168, 85, 247, 0.16),
+      transparent 22%,
+      transparent 78%,
+      rgba(236, 72, 153, 0.14)
+    );
 }
 
 .collection-section-icon {

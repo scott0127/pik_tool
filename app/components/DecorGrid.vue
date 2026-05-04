@@ -8,22 +8,22 @@
       :data-group-key="group.key"
     >
       <!-- Pikmin Row for this Variant -->
-      <div
-        v-if="isGroupVisible(group.key)"
-        class="flex flex-wrap gap-3"
-      >
-        <DecorCard
-          v-for="(item, index) in group.items"
-          :key="item.id"
+        <div
+          v-if="isGroupVisible(group.key)"
+          class="flex flex-wrap gap-3 px-1 sm:px-2 overflow-visible"
+        >
+          <DecorCard
+            v-for="(item, index) in group.items"
+            :key="item.id"
           :item-id="item.id"
           :category-id="item.categoryId"
           :variant-id="item.variantId"
           :pikmin-type="item.pikminType"
           :animation-delay="Math.min((groupIndex * 8 + index) * 30, 300)"
-          class="w-[calc(12.5%-0.656rem)] min-w-[100px] max-w-[140px]"
-          @toggle="$emit('toggle', $event)"
-        />
-      </div>
+            class="w-[calc(12.5%-0.72rem)] min-w-[100px] max-w-[138px]"
+            @toggle="$emit('toggle', $event)"
+          />
+        </div>
       <div
         v-else
         class="decor-grid-placeholder rounded-2xl"
@@ -181,6 +181,7 @@ onUnmounted(() => {
 .decor-grid-group {
   content-visibility: auto;
   contain-intrinsic-size: auto 198px;
+  overflow: visible;
 }
 
 .decor-grid-placeholder {

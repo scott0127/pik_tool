@@ -49,6 +49,10 @@ export default defineNuxtConfig({
   },
 
   routeRules: {
+    // Version manifest must always be fresh so open tabs can detect deployments.
+    '/version.json': { headers: { 'cache-control': 'no-cache, no-store, must-revalidate' } },
+    // Keep HTML and route responses revalidated to pick up new app shell quickly.
+    '/**': { headers: { 'cache-control': 'no-cache' } },
     '/version.json': {
       headers: {
         'cache-control': 'no-cache, no-store, must-revalidate',

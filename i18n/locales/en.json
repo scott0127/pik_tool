@@ -354,7 +354,8 @@
             "empty_title": "No items found",
             "empty_desc": "Try adjusting filters or search keywords",
             "clear_filters": "Clear All Filters"
-        }
+        },
+        "ambient_tip": "💡 Drag the right slider to toggle immersive background"
     },
     "pikmin_types": {
         "red": "Red Pikmin",

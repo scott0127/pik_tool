@@ -153,10 +153,12 @@ const startSlide = (event: PointerEvent) => {
 
 onMounted(() => {
   const saved = localStorage.getItem(STORAGE_KEY);
+  // Default to non-immersive (false) for first-time visitors
   const enabled = saved === "true";
   isImmersive.value = enabled;
   immersiveProgress.value = enabled ? 1 : 0;
 
+  // Show one-time tip about background toggle
   const tipShown = localStorage.getItem(TIP_SHOWN_KEY);
   if (!tipShown) {
     setTimeout(() => {

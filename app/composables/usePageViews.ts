@@ -2,7 +2,7 @@ export const usePageViews = () => {
   const supabase = useSupabaseClient<any>();
   const pageViews = ref<number | null>(null);
   const PAGE_VIEW_CACHE_KEY = 'pikmin-page-views-cache-v1';
-  const PAGE_VIEW_CACHE_TTL = 10 * 60 * 1000;
+  const PAGE_VIEW_CACHE_TTL =  60 * 60 * 1000; // 1 hour
 
   const readCachedViews = (): number | null => {
     if (!import.meta.client) return null;

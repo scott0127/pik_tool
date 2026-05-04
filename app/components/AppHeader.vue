@@ -105,7 +105,7 @@
             <!-- Buy Me a Coffee Button (Desktop) -->
             <button 
               @click="handleCoffeeClick"
-              class="hidden md:flex items-center gap-2 px-4 h-10 rounded-xl bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 text-white transition-all hover:shadow-lg group"
+              class="hidden md:flex items-center gap-2 px-4 h-10 rounded-xl bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 !text-white transition-all hover:shadow-lg group"
               :title="$t('header.coffee_mobile')"
             >
               <span class="text-lg group-hover:scale-110 transition-transform">☕</span>
@@ -117,7 +117,7 @@
               href="https://github.com/scott0127/pik_tool"
               target="_blank"
               rel="noopener noreferrer"
-              class="hidden md:flex items-center gap-2 px-4 h-10 rounded-xl bg-gradient-to-r from-gray-800 to-gray-900 hover:from-gray-700 hover:to-gray-800 text-white transition-all hover:shadow-lg group"
+              class="hidden md:flex items-center gap-2 px-4 h-10 rounded-xl bg-gradient-to-r from-gray-800 to-gray-900 hover:from-gray-700 hover:to-gray-800 !text-white transition-all hover:shadow-lg group"
               :title="$t('header.star_mobile')"
             >
               <span class="text-lg group-hover:scale-110 transition-transform">⭐</span>
@@ -127,7 +127,7 @@
             <!-- Feedback Button (Desktop) -->
             <button 
               @click="showFeedbackModal = true"
-              class="hidden md:flex items-center gap-2 px-4 h-10 rounded-xl bg-gradient-to-r from-violet-500 to-purple-600 hover:from-violet-600 hover:to-purple-700 text-white transition-all hover:shadow-lg group overflow-hidden"
+              class="hidden md:flex items-center gap-2 px-4 h-10 rounded-xl bg-gradient-to-r from-violet-500 to-purple-600 hover:from-violet-600 hover:to-purple-700 !text-white transition-all hover:shadow-lg group overflow-hidden"
               :title="$t('header.feedback')"
             >
               <div class="hidden lg:block w-24 overflow-hidden">
