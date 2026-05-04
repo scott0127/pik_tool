@@ -69,18 +69,56 @@
       </div>
     </div>
 
-    <button
-      class="ambient-mode-toggle fixed right-7 top-[9.9rem] z-40"
-      type="button"
-      :aria-label="backgroundMode === 'gradient' ? '切換成背景圖片模式' : '切換成漸層背景模式'"
-      :title="backgroundMode === 'gradient' ? '切換成背景圖片模式' : '切換成漸層背景模式'"
-      @click="toggleBackgroundMode"
-    >
-      <Icon
-        :name="backgroundMode === 'gradient' ? 'lucide:palette' : 'lucide:image'"
-        class="h-4 w-4"
-      />
-    </button>
+    <div class="ambient-mode-control fixed right-7 top-[9.9rem] z-40">
+      <Transition
+        enter-active-class="transition duration-300 ease-out"
+        enter-from-class="opacity-0 translate-x-2 scale-95"
+        enter-to-class="opacity-100 translate-x-0 scale-100"
+        leave-active-class="transition duration-200 ease-in"
+        leave-from-class="opacity-100 translate-x-0 scale-100"
+        leave-to-class="opacity-0 translate-x-2 scale-95"
+      >
+        <div
+          v-if="showBackgroundModeTip"
+          class="ambient-mode-tooltip"
+          role="status"
+        >
+          <div class="ambient-mode-tooltip-glow" />
+          <div class="relative z-10 flex items-start gap-3">
+            <span class="ambient-mode-tooltip-icon">
+              <Icon name="lucide:palette" class="h-4 w-4" />
+            </span>
+            <div class="min-w-0 flex-1">
+              <p class="ambient-mode-tooltip-title">背景樣式</p>
+              <p class="ambient-mode-tooltip-text">
+                點這裡可在漸層動畫與背景圖片之間切換。
+              </p>
+            </div>
+            <button
+              class="ambient-mode-tooltip-close"
+              type="button"
+              aria-label="關閉背景樣式提示"
+              @click="dismissBackgroundModeTip"
+            >
+              <Icon name="lucide:x" class="h-3.5 w-3.5" />
+            </button>
+          </div>
+        </div>
+      </Transition>
+
+      <button
+        class="ambient-mode-toggle"
+        type="button"
+        :aria-label="backgroundMode === 'gradient' ? '切換成背景圖片模式' : '切換成漸層背景模式'"
+        :title="backgroundMode === 'gradient' ? '切換成背景圖片模式' : '切換成漸層背景模式'"
+        @click="toggleBackgroundMode"
+      >
+        <Icon
+          :name="backgroundMode === 'gradient' ? 'lucide:palette' : 'lucide:image'"
+          class="h-4 w-4"
+        />
+      </button>
+    </div>
 
     <div
       ref="sliderRef"
@@ -117,10 +155,12 @@ const { t } = useI18n();
 
 const STORAGE_KEY = "pikmin-immersive-background";
 const BACKGROUND_MODE_KEY = "pikmin-background-mode";
+const BACKGROUND_MODE_TIP_DISMISSED_KEY = "pikmin-background-mode-tip-dismissed";
 const TIP_SHOWN_KEY = "pikmin-bg-tip-shown";
 const isImmersive = ref(false);
 const immersiveProgress = ref(0);
 const backgroundMode = ref<BackgroundMode>("gradient");
+const showBackgroundModeTip = ref(false);
 const isDragging = ref(false);
 const sliderRef = ref<HTMLElement | null>(null);
 const isMapRoute = computed(() => route.path === "/map");
@@ -158,6 +198,11 @@ const toggleBackgroundMode = () => {
   setBackgroundMode(backgroundMode.value === "gradient" ? "image" : "gradient");
 };
 
+const dismissBackgroundModeTip = () => {
+  showBackgroundModeTip.value = false;
+  localStorage.setItem(BACKGROUND_MODE_TIP_DISMISSED_KEY, "true");
+};
+
 const onSlideMove = (event: PointerEvent) => {
   if (!isDragging.value) return;
   setProgressFromClientY(event.clientY);
@@ -189,6 +234,7 @@ onMounted(() => {
 
   const savedBackgroundMode = localStorage.getItem(BACKGROUND_MODE_KEY);
   backgroundMode.value = savedBackgroundMode === "image" ? "image" : "gradient";
+  showBackgroundModeTip.value = localStorage.getItem(BACKGROUND_MODE_TIP_DISMISSED_KEY) !== "true";
 
   const tipShown = localStorage.getItem(TIP_SHOWN_KEY);
   if (!tipShown) {
@@ -397,17 +443,31 @@ onBeforeUnmount(() => {
 }
 
 @media (max-width: 640px) {
-  .ambient-mode-toggle,
+  .ambient-mode-control,
   .ambient-slider {
     right: 1.25rem;
   }
 
-  .ambient-mode-toggle {
+  .ambient-mode-control {
     top: 10.3rem;
   }
 
   .ambient-slider {
     top: 13.2rem;
+  }
+
+  .ambient-mode-tooltip {
+    right: 0;
+    top: -0.85rem;
+    width: min(18rem, calc(100vw - 6.5rem));
+    transform: translateY(-100%);
+  }
+
+  .ambient-mode-tooltip::after {
+    right: 0.8rem;
+    top: auto;
+    bottom: -0.42rem;
+    transform: rotate(45deg);
   }
 
   .ambient-hill-a {
@@ -419,6 +479,106 @@ onBeforeUnmount(() => {
     right: -48%;
     width: 120%;
   }
+}
+
+.ambient-mode-control {
+  display: grid;
+  width: 2.25rem;
+  height: 2.25rem;
+  place-items: center;
+}
+
+.ambient-mode-tooltip {
+  position: absolute;
+  right: calc(100% + 0.8rem);
+  top: 50%;
+  width: 18.5rem;
+  color: rgb(6 78 59);
+  border: 1px solid rgb(255 255 255 / 0.62);
+  border-radius: 1.25rem;
+  background:
+    linear-gradient(135deg, rgb(255 255 255 / 0.82), rgb(236 253 245 / 0.72)),
+    radial-gradient(circle at 18% 0%, rgb(255 255 255 / 0.88), transparent 44%);
+  box-shadow:
+    0 18px 42px rgb(6 78 59 / 0.14),
+    0 1px 14px rgb(255 255 255 / 0.58) inset;
+  padding: 0.85rem;
+  transform: translateY(-50%);
+  backdrop-filter: blur(18px) saturate(1.25);
+}
+
+.ambient-mode-tooltip::after {
+  position: absolute;
+  right: -0.38rem;
+  top: 50%;
+  width: 0.75rem;
+  height: 0.75rem;
+  content: "";
+  border-top: 1px solid rgb(255 255 255 / 0.62);
+  border-right: 1px solid rgb(255 255 255 / 0.62);
+  background: rgb(236 253 245 / 0.86);
+  transform: translateY(-50%) rotate(45deg);
+}
+
+.ambient-mode-tooltip-glow {
+  position: absolute;
+  inset: -0.9rem;
+  border-radius: 1.75rem;
+  background: radial-gradient(circle at 80% 50%, rgb(52 211 153 / 0.24), transparent 56%);
+  filter: blur(10px);
+  opacity: 0.82;
+}
+
+.ambient-mode-tooltip-icon {
+  display: grid;
+  width: 2rem;
+  height: 2rem;
+  flex: 0 0 auto;
+  place-items: center;
+  color: rgb(4 120 87);
+  border-radius: 0.9rem;
+  background: linear-gradient(135deg, rgb(209 250 229 / 0.86), rgb(153 246 228 / 0.58));
+  box-shadow: 0 8px 18px rgb(16 185 129 / 0.14);
+}
+
+.ambient-mode-tooltip-title {
+  margin: 0;
+  font-size: 0.86rem;
+  font-weight: 900;
+  letter-spacing: 0.02em;
+  color: rgb(6 95 70);
+}
+
+.ambient-mode-tooltip-text {
+  margin-top: 0.18rem;
+  font-size: 0.76rem;
+  font-weight: 700;
+  line-height: 1.55;
+  color: rgb(15 118 110 / 0.86);
+}
+
+.ambient-mode-tooltip-close {
+  display: grid;
+  width: 1.65rem;
+  height: 1.65rem;
+  flex: 0 0 auto;
+  place-items: center;
+  color: rgb(15 118 110 / 0.72);
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.52);
+  transition: background 160ms ease, color 160ms ease, transform 160ms ease;
+}
+
+.ambient-mode-tooltip-close:hover,
+.ambient-mode-tooltip-close:focus-visible {
+  color: rgb(6 95 70);
+  background: rgb(209 250 229 / 0.82);
+  transform: scale(1.04);
+}
+
+.ambient-mode-tooltip-close:focus-visible {
+  outline: 3px solid rgb(16 185 129 / 0.24);
+  outline-offset: 2px;
 }
 
 .ambient-mode-toggle {
