@@ -2,11 +2,7 @@
   <template v-if="!isMapRoute">
     <div
       class="ambient-background fixed inset-0 pointer-events-none overflow-hidden"
-      :class="{
-        'is-immersive': isImmersive,
-        'is-gradient-mode': backgroundMode === 'gradient',
-        'is-image-mode': backgroundMode === 'image',
-      }"
+      :class="{ 'is-immersive': isImmersive }"
       :style="{ '--immersive-progress': immersiveProgress }"
       aria-hidden="true"
     >
@@ -69,7 +65,7 @@
       </div>
     </div>
 
-    <div class="ambient-mode-control fixed right-7 top-[9.9rem] z-40">
+    <div class="ambient-slider-wrap fixed right-7 top-[12.8rem] z-40">
       <Transition
         enter-active-class="transition duration-300 ease-out"
         enter-from-class="opacity-0 translate-x-2 scale-95"
@@ -79,26 +75,26 @@
         leave-to-class="opacity-0 translate-x-2 scale-95"
       >
         <div
-          v-if="showBackgroundModeTip"
-          class="ambient-mode-tooltip"
+          v-if="showSliderTip"
+          class="ambient-slider-tooltip"
           role="status"
         >
-          <div class="ambient-mode-tooltip-glow" />
+          <div class="ambient-slider-tooltip-glow" />
           <div class="relative z-10 flex items-start gap-3">
-            <span class="ambient-mode-tooltip-icon">
-              <Icon name="lucide:palette" class="h-4 w-4" />
+            <span class="ambient-slider-tooltip-icon">
+              <Icon name="lucide:leaf" class="h-4 w-4" />
             </span>
             <div class="min-w-0 flex-1">
-              <p class="ambient-mode-tooltip-title">背景樣式</p>
-              <p class="ambient-mode-tooltip-text">
-                點這裡可在漸層動畫與背景圖片之間切換。
+              <p class="ambient-slider-tooltip-title">背景切換</p>
+              <p class="ambient-slider-tooltip-text">
+                向下拖曳可切換沉浸式漸層背景；向上則回到背景圖片。
               </p>
             </div>
             <button
-              class="ambient-mode-tooltip-close"
+              class="ambient-slider-tooltip-close"
               type="button"
-              aria-label="關閉背景樣式提示"
-              @click="dismissBackgroundModeTip"
+              aria-label="關閉背景切換提示"
+              @click="dismissSliderTip"
             >
               <Icon name="lucide:x" class="h-3.5 w-3.5" />
             </button>
@@ -106,61 +102,44 @@
         </div>
       </Transition>
 
-      <button
-        class="ambient-mode-toggle"
-        type="button"
-        :aria-label="backgroundMode === 'gradient' ? '切換成背景圖片模式' : '切換成漸層背景模式'"
-        :title="backgroundMode === 'gradient' ? '切換成背景圖片模式' : '切換成漸層背景模式'"
-        @click="toggleBackgroundMode"
+      <div
+        ref="sliderRef"
+        class="ambient-slider"
+        :class="{ 'is-dragging': isDragging, 'is-immersive': isImmersive }"
+        role="switch"
+        tabindex="0"
+        :aria-checked="isImmersive"
+        aria-label="切換沉浸式背景"
+        :style="{ '--slider-progress': immersiveProgress }"
+        @pointerdown="startSlide"
+        @keydown.up.prevent="commitImmersive(false)"
+        @keydown.down.prevent="commitImmersive(true)"
+        @keydown.enter.prevent="commitImmersive(!isImmersive)"
+        @keydown.space.prevent="commitImmersive(!isImmersive)"
       >
-        <Icon
-          :name="backgroundMode === 'gradient' ? 'lucide:palette' : 'lucide:image'"
-          class="h-4 w-4"
-        />
-      </button>
-    </div>
-
-    <div
-      ref="sliderRef"
-      class="ambient-slider fixed right-7 top-[12.8rem] z-40"
-      :class="{ 'is-dragging': isDragging, 'is-immersive': isImmersive }"
-      role="switch"
-      tabindex="0"
-      :aria-checked="isImmersive"
-      aria-label="切換沉浸式背景"
-      :style="{ '--slider-progress': immersiveProgress }"
-      @pointerdown="startSlide"
-      @keydown.up.prevent="commitImmersive(false)"
-      @keydown.down.prevent="commitImmersive(true)"
-      @keydown.enter.prevent="commitImmersive(!isImmersive)"
-      @keydown.space.prevent="commitImmersive(!isImmersive)"
-    >
-      <span class="ambient-slider-fill" />
-      <span class="ambient-slider-secret-glow" />
-      <span class="ambient-slider-thumb">
-        <Icon
-          :name="isImmersive ? 'lucide:sparkles' : 'lucide:leaf'"
-          class="h-4 w-4"
-        />
-      </span>
+        <span class="ambient-slider-fill" />
+        <span class="ambient-slider-secret-glow" />
+        <span class="ambient-slider-thumb">
+          <Icon
+            :name="isImmersive ? 'lucide:sparkles' : 'lucide:leaf'"
+            class="h-4 w-4"
+          />
+        </span>
+      </div>
     </div>
   </template>
 </template>
 
 <script setup lang="ts">
-type BackgroundMode = "gradient" | "image";
-
 const route = useRoute();
 const { t } = useI18n();
 
 const STORAGE_KEY = "pikmin-immersive-background";
-const BACKGROUND_MODE_KEY = "pikmin-background-mode";
-const BACKGROUND_MODE_TIP_DISMISSED_KEY = "pikmin-background-mode-tip-dismissed";
+const SLIDER_TIP_DISMISSED_KEY = "pikmin-ambient-slider-tip-dismissed";
 const TIP_SHOWN_KEY = "pikmin-bg-tip-shown";
 const isImmersive = ref(false);
 const immersiveProgress = ref(0);
-const backgroundMode = ref<BackgroundMode>("gradient");
-const showBackgroundModeTip = ref(false);
+const showSliderTip = ref(false);
 const isDragging = ref(false);
 const sliderRef = ref<HTMLElement | null>(null);
 const isMapRoute = computed(() => route.path === "/map");
@@ -189,18 +168,9 @@ const commitImmersive = (enabled: boolean) => {
   localStorage.setItem(STORAGE_KEY, enabled ? "true" : "false");
 };
 
-const setBackgroundMode = (mode: BackgroundMode) => {
-  backgroundMode.value = mode;
-  localStorage.setItem(BACKGROUND_MODE_KEY, mode);
-};
-
-const toggleBackgroundMode = () => {
-  setBackgroundMode(backgroundMode.value === "gradient" ? "image" : "gradient");
-};
-
-const dismissBackgroundModeTip = () => {
-  showBackgroundModeTip.value = false;
-  localStorage.setItem(BACKGROUND_MODE_TIP_DISMISSED_KEY, "true");
+const dismissSliderTip = () => {
+  showSliderTip.value = false;
+  localStorage.setItem(SLIDER_TIP_DISMISSED_KEY, "true");
 };
 
 const onSlideMove = (event: PointerEvent) => {
@@ -231,10 +201,7 @@ onMounted(() => {
   const enabled = saved === "true";
   isImmersive.value = enabled;
   immersiveProgress.value = enabled ? 1 : 0;
-
-  const savedBackgroundMode = localStorage.getItem(BACKGROUND_MODE_KEY);
-  backgroundMode.value = savedBackgroundMode === "image" ? "image" : "gradient";
-  showBackgroundModeTip.value = localStorage.getItem(BACKGROUND_MODE_TIP_DISMISSED_KEY) !== "true";
+  showSliderTip.value = localStorage.getItem(SLIDER_TIP_DISMISSED_KEY) !== "true";
 
   const tipShown = localStorage.getItem(TIP_SHOWN_KEY);
   if (!tipShown) {
@@ -261,10 +228,9 @@ onBeforeUnmount(() => {
 
 .ambient-base {
   background:
-    radial-gradient(circle at 18% 10%, rgb(255 255 255 / 0.96), transparent 24%),
-    radial-gradient(circle at 82% 18%, rgb(186 230 253 / 0.2), transparent 28%),
-    radial-gradient(circle at 24% 90%, rgb(187 247 208 / 0.32), transparent 32%),
-    linear-gradient(160deg, #fffef7 0%, #f1fbe8 44%, #ecfbf5 100%);
+    radial-gradient(circle at 18% 10%, rgb(255 255 255 / 0.18), transparent 24%),
+    radial-gradient(circle at 82% 18%, rgb(186 230 253 / 0.08), transparent 28%),
+    linear-gradient(160deg, #d6eee4 0%, #bad8cd 44%, #94b5ab 100%);
 }
 
 .ambient-background.is-immersive .ambient-base {
@@ -281,19 +247,15 @@ onBeforeUnmount(() => {
 .ambient-cute {
   overflow: hidden;
   opacity: calc(1 - var(--immersive-progress));
-  transition: opacity 260ms ease, filter 260ms ease;
-}
-
-.ambient-background.is-gradient-mode .ambient-cute {
-  background: transparent;
-  filter: none;
-}
-
-.ambient-background.is-image-mode .ambient-cute {
   background-image: url("/img/ambient-glass-sprouts.png");
   background-position: center top;
   background-size: cover;
   filter: saturate(0.96) contrast(0.98);
+}
+
+.ambient-background.is-immersive .ambient-cute {
+  background-image: none;
+  filter: none;
 }
 
 .ambient-cute::before,
@@ -307,13 +269,13 @@ onBeforeUnmount(() => {
 
 .ambient-hill {
   position: absolute;
-  display: block;
+  display: none;
   border-radius: 999px 999px 0 0;
   filter: blur(0.2px);
 }
 
-.ambient-background.is-image-mode .ambient-hill {
-  display: none;
+.ambient-background.is-immersive .ambient-hill {
+  display: block;
 }
 
 .ambient-hill-a {
@@ -333,13 +295,13 @@ onBeforeUnmount(() => {
 }
 
 .ambient-sprouts {
-  display: block;
+  display: none;
   opacity: 0.76;
   filter: drop-shadow(0 18px 28px rgb(6 78 59 / 0.05));
 }
 
-.ambient-background.is-image-mode .ambient-sprouts {
-  display: none;
+.ambient-background.is-immersive .ambient-sprouts {
+  display: block;
 }
 
 .sprout-lines path {
@@ -348,9 +310,8 @@ onBeforeUnmount(() => {
 
 .ambient-light {
   background:
-    linear-gradient(180deg, rgb(255 255 255 / 0.14), rgb(255 255 255 / 0.03) 46%, rgb(255 255 255 / 0.18)),
-    radial-gradient(ellipse at 50% -10%, rgb(255 255 255 / 0.36), transparent 44%),
-    radial-gradient(ellipse at 50% 112%, rgb(6 95 70 / 0.04), transparent 44%);
+    linear-gradient(180deg, rgb(255 255 255 / 0.1), rgb(255 255 255 / 0.03) 46%, rgb(255 255 255 / 0.12)),
+    radial-gradient(ellipse at 50% -10%, rgb(255 255 255 / 0.18), transparent 44%);
 }
 
 @media (min-width: 768px) {
@@ -360,21 +321,18 @@ onBeforeUnmount(() => {
 
   .ambient-base {
     background:
-      radial-gradient(circle at 18% 14%, rgb(255 255 255 / 0.5), transparent 24%),
-      radial-gradient(circle at 86% 8%, rgb(186 230 253 / 0.24), transparent 30%),
-      linear-gradient(160deg, #e8fbf4 0%, #e7f8f7 48%, #effbf1 100%);
+      radial-gradient(circle at 18% 14%, rgb(255 255 255 / 0.14), transparent 24%),
+      radial-gradient(circle at 86% 8%, rgb(186 230 253 / 0.1), transparent 30%),
+      linear-gradient(160deg, #cfe8dc 0%, #adcbbf 48%, #8eafa4 100%);
   }
 
   .ambient-cute {
     opacity: calc(0.98 * (1 - var(--immersive-progress)));
-  }
-
-  .ambient-background.is-image-mode .ambient-cute {
     background-image: none;
     filter: none;
   }
 
-  .ambient-background.is-image-mode .ambient-cute::before {
+  .ambient-cute::before {
     display: block;
     background-image: url("/img/pc_background_extended.png");
     background-position: center center;
@@ -383,7 +341,16 @@ onBeforeUnmount(() => {
     filter: saturate(1.03) brightness(1.03) contrast(0.98);
   }
 
-  .ambient-light {
+  .ambient-background.is-immersive .ambient-cute::before {
+    display: none;
+  }
+
+  .ambient-background.is-immersive .ambient-cute {
+    background: transparent;
+    filter: none;
+  }
+
+  .ambient-background.is-immersive .ambient-light {
     background: transparent;
     mix-blend-mode: normal;
   }
@@ -443,27 +410,19 @@ onBeforeUnmount(() => {
 }
 
 @media (max-width: 640px) {
-  .ambient-mode-control,
-  .ambient-slider {
+  .ambient-slider-wrap {
     right: 1.25rem;
-  }
-
-  .ambient-mode-control {
-    top: 10.3rem;
-  }
-
-  .ambient-slider {
     top: 13.2rem;
   }
 
-  .ambient-mode-tooltip {
+  .ambient-slider-tooltip {
     right: 0;
     top: -0.85rem;
     width: min(18rem, calc(100vw - 6.5rem));
     transform: translateY(-100%);
   }
 
-  .ambient-mode-tooltip::after {
+  .ambient-slider-tooltip::after {
     right: 0.8rem;
     top: auto;
     bottom: -0.42rem;
@@ -481,14 +440,14 @@ onBeforeUnmount(() => {
   }
 }
 
-.ambient-mode-control {
+.ambient-slider-wrap {
   display: grid;
   width: 2.25rem;
-  height: 2.25rem;
+  height: 6.4rem;
   place-items: center;
 }
 
-.ambient-mode-tooltip {
+.ambient-slider-tooltip {
   position: absolute;
   right: calc(100% + 0.8rem);
   top: 50%;
@@ -507,7 +466,7 @@ onBeforeUnmount(() => {
   backdrop-filter: blur(18px) saturate(1.25);
 }
 
-.ambient-mode-tooltip::after {
+.ambient-slider-tooltip::after {
   position: absolute;
   right: -0.38rem;
   top: 50%;
@@ -520,7 +479,7 @@ onBeforeUnmount(() => {
   transform: translateY(-50%) rotate(45deg);
 }
 
-.ambient-mode-tooltip-glow {
+.ambient-slider-tooltip-glow {
   position: absolute;
   inset: -0.9rem;
   border-radius: 1.75rem;
@@ -529,7 +488,7 @@ onBeforeUnmount(() => {
   opacity: 0.82;
 }
 
-.ambient-mode-tooltip-icon {
+.ambient-slider-tooltip-icon {
   display: grid;
   width: 2rem;
   height: 2rem;
@@ -541,7 +500,7 @@ onBeforeUnmount(() => {
   box-shadow: 0 8px 18px rgb(16 185 129 / 0.14);
 }
 
-.ambient-mode-tooltip-title {
+.ambient-slider-tooltip-title {
   margin: 0;
   font-size: 0.86rem;
   font-weight: 900;
@@ -549,7 +508,7 @@ onBeforeUnmount(() => {
   color: rgb(6 95 70);
 }
 
-.ambient-mode-tooltip-text {
+.ambient-slider-tooltip-text {
   margin-top: 0.18rem;
   font-size: 0.76rem;
   font-weight: 700;
@@ -557,7 +516,7 @@ onBeforeUnmount(() => {
   color: rgb(15 118 110 / 0.86);
 }
 
-.ambient-mode-tooltip-close {
+.ambient-slider-tooltip-close {
   display: grid;
   width: 1.65rem;
   height: 1.65rem;
@@ -569,46 +528,16 @@ onBeforeUnmount(() => {
   transition: background 160ms ease, color 160ms ease, transform 160ms ease;
 }
 
-.ambient-mode-tooltip-close:hover,
-.ambient-mode-tooltip-close:focus-visible {
+.ambient-slider-tooltip-close:hover,
+.ambient-slider-tooltip-close:focus-visible {
   color: rgb(6 95 70);
   background: rgb(209 250 229 / 0.82);
   transform: scale(1.04);
 }
 
-.ambient-mode-tooltip-close:focus-visible {
+.ambient-slider-tooltip-close:focus-visible {
   outline: 3px solid rgb(16 185 129 / 0.24);
   outline-offset: 2px;
-}
-
-.ambient-mode-toggle {
-  display: grid;
-  width: 2.25rem;
-  height: 2.25rem;
-  place-items: center;
-  color: rgb(4 120 87);
-  border-radius: 999px;
-  background:
-    radial-gradient(circle at 30% 18%, rgb(255 255 255 / 0.9), rgb(255 255 255 / 0.36) 56%, rgb(209 250 229 / 0.18)),
-    linear-gradient(135deg, rgb(255 255 255 / 0.3), rgb(255 255 255 / 0.08));
-  box-shadow:
-    0 5px 12px rgb(6 78 59 / 0.06),
-    0 0 16px rgb(52 211 153 / 0.12),
-    0 1px 8px rgb(255 255 255 / 0.54) inset;
-  opacity: 0.58;
-  transition: opacity 180ms ease, transform 180ms ease;
-}
-
-.ambient-mode-toggle:hover,
-.ambient-mode-toggle:focus-visible,
-.ambient-mode-toggle:active {
-  opacity: 1;
-  transform: translateY(-1px);
-}
-
-.ambient-mode-toggle:focus-visible {
-  outline: 3px solid rgb(16 185 129 / 0.28);
-  outline-offset: 3px;
 }
 
 .ambient-slider {
