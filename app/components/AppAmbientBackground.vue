@@ -65,29 +65,68 @@
       </div>
     </div>
 
-    <div
-      ref="sliderRef"
-      class="ambient-slider fixed right-7 top-[12.8rem] z-40"
-      :class="{ 'is-dragging': isDragging, 'is-immersive': isImmersive }"
-      role="switch"
-      tabindex="0"
-      :aria-checked="isImmersive"
-      aria-label="切換沉浸式背景"
-      :style="{ '--slider-progress': immersiveProgress }"
-      @pointerdown="startSlide"
-      @keydown.up.prevent="commitImmersive(false)"
-      @keydown.down.prevent="commitImmersive(true)"
-      @keydown.enter.prevent="commitImmersive(!isImmersive)"
-      @keydown.space.prevent="commitImmersive(!isImmersive)"
-    >
-      <span class="ambient-slider-fill" />
-      <span class="ambient-slider-secret-glow" />
-      <span class="ambient-slider-thumb">
-        <Icon
-          :name="isImmersive ? 'lucide:sparkles' : 'lucide:leaf'"
-          class="h-4 w-4"
-        />
-      </span>
+    <div class="ambient-slider-wrap fixed right-7 top-[12.8rem] z-50">
+      <Transition
+        enter-active-class="transition duration-300 ease-out"
+        enter-from-class="opacity-0 translate-x-3 scale-95"
+        enter-to-class="opacity-100 translate-x-0 scale-100"
+        leave-active-class="transition duration-200 ease-in"
+        leave-from-class="opacity-100 translate-x-0 scale-100"
+        leave-to-class="opacity-0 translate-x-3 scale-95"
+      >
+        <div
+          v-if="showSliderTip"
+          class="ambient-slider-tooltip"
+          role="status"
+        >
+          <div class="ambient-slider-tooltip-glow" />
+          <div class="relative z-10 flex items-start gap-3">
+            <span class="ambient-slider-tooltip-icon">
+              <Icon name="lucide:leaf" class="h-4 w-4" />
+            </span>
+            <div class="min-w-0 flex-1">
+              <p class="ambient-slider-tooltip-title">背景切換</p>
+              <p class="ambient-slider-tooltip-text">
+                向下拖曳切換沉浸式漸層背景；向上回到背景圖片。
+              </p>
+            </div>
+            <button
+              class="ambient-slider-tooltip-close"
+              type="button"
+              aria-label="關閉背景切換提示"
+              @click="dismissSliderTip"
+            >
+              <Icon name="lucide:x" class="h-3.5 w-3.5" />
+            </button>
+          </div>
+        </div>
+      </Transition>
+
+      <div class="ambient-slider-glass" aria-hidden="true" />
+      <div
+        ref="sliderRef"
+        class="ambient-slider"
+        :class="{ 'is-dragging': isDragging, 'is-immersive': isImmersive }"
+        role="switch"
+        tabindex="0"
+        :aria-checked="isImmersive"
+        aria-label="切換沉浸式背景"
+        :style="{ '--slider-progress': immersiveProgress }"
+        @pointerdown="startSlide"
+        @keydown.up.prevent="commitImmersive(false)"
+        @keydown.down.prevent="commitImmersive(true)"
+        @keydown.enter.prevent="commitImmersive(!isImmersive)"
+        @keydown.space.prevent="commitImmersive(!isImmersive)"
+      >
+        <span class="ambient-slider-fill" />
+        <span class="ambient-slider-secret-glow" />
+        <span class="ambient-slider-thumb">
+          <Icon
+            :name="isImmersive ? 'lucide:sparkles' : 'lucide:leaf'"
+            class="h-4 w-4"
+          />
+        </span>
+      </div>
     </div>
   </template>
 </template>
@@ -97,9 +136,11 @@ const route = useRoute();
 const { t } = useI18n();
 
 const STORAGE_KEY = "pikmin-immersive-background";
+const SLIDER_TIP_DISMISSED_KEY = "pikmin-ambient-slider-tip-dismissed";
 const TIP_SHOWN_KEY = "pikmin-bg-tip-shown";
 const isImmersive = ref(false);
 const immersiveProgress = ref(0);
+const showSliderTip = ref(false);
 const isDragging = ref(false);
 const sliderRef = ref<HTMLElement | null>(null);
 const isMapRoute = computed(() => route.path === "/map");
@@ -128,6 +169,11 @@ const commitImmersive = (enabled: boolean) => {
   localStorage.setItem(STORAGE_KEY, enabled ? "true" : "false");
 };
 
+const dismissSliderTip = () => {
+  showSliderTip.value = false;
+  localStorage.setItem(SLIDER_TIP_DISMISSED_KEY, "true");
+};
+
 const onSlideMove = (event: PointerEvent) => {
   if (!isDragging.value) return;
   setProgressFromClientY(event.clientY);
@@ -153,12 +199,11 @@ const startSlide = (event: PointerEvent) => {
 
 onMounted(() => {
   const saved = localStorage.getItem(STORAGE_KEY);
-  // Default to non-immersive (false) for first-time visitors
   const enabled = saved === "true";
   isImmersive.value = enabled;
   immersiveProgress.value = enabled ? 1 : 0;
+  showSliderTip.value = localStorage.getItem(SLIDER_TIP_DISMISSED_KEY) !== "true";
 
-  // Show one-time tip about background toggle
   const tipShown = localStorage.getItem(TIP_SHOWN_KEY);
   if (!tipShown) {
     setTimeout(() => {
@@ -184,10 +229,9 @@ onBeforeUnmount(() => {
 
 .ambient-base {
   background:
-    radial-gradient(circle at 18% 10%, rgb(255 255 255 / 0.96), transparent 24%),
-    radial-gradient(circle at 82% 18%, rgb(186 230 253 / 0.2), transparent 28%),
-    radial-gradient(circle at 24% 90%, rgb(187 247 208 / 0.32), transparent 32%),
-    linear-gradient(160deg, #fffef7 0%, #f1fbe8 44%, #ecfbf5 100%);
+    radial-gradient(circle at 18% 10%, rgb(255 255 255 / 0.18), transparent 24%),
+    radial-gradient(circle at 82% 18%, rgb(186 230 253 / 0.08), transparent 28%),
+    linear-gradient(160deg, #d6eee4 0%, #bad8cd 44%, #94b5ab 100%);
 }
 
 .ambient-background.is-immersive .ambient-base {
@@ -210,16 +254,17 @@ onBeforeUnmount(() => {
   filter: saturate(0.96) contrast(0.98);
 }
 
+.ambient-background.is-immersive .ambient-cute {
+  background-image: none;
+  filter: none;
+}
+
 .ambient-cute::before,
 .ambient-cute::after {
   position: absolute;
   inset: 0;
   content: "";
   pointer-events: none;
-}
-
-.ambient-cute::before,
-.ambient-cute::after {
   display: none;
 }
 
@@ -228,6 +273,10 @@ onBeforeUnmount(() => {
   display: none;
   border-radius: 999px 999px 0 0;
   filter: blur(0.2px);
+}
+
+.ambient-background.is-immersive .ambient-hill {
+  display: block;
 }
 
 .ambient-hill-a {
@@ -248,8 +297,12 @@ onBeforeUnmount(() => {
 
 .ambient-sprouts {
   display: none;
-  opacity: 0;
+  opacity: 0.76;
   filter: drop-shadow(0 18px 28px rgb(6 78 59 / 0.05));
+}
+
+.ambient-background.is-immersive .ambient-sprouts {
+  display: block;
 }
 
 .sprout-lines path {
@@ -258,9 +311,8 @@ onBeforeUnmount(() => {
 
 .ambient-light {
   background:
-    linear-gradient(180deg, rgb(255 255 255 / 0.14), rgb(255 255 255 / 0.03) 46%, rgb(255 255 255 / 0.18)),
-    radial-gradient(ellipse at 50% -10%, rgb(255 255 255 / 0.36), transparent 44%),
-    radial-gradient(ellipse at 50% 112%, rgb(6 95 70 / 0.04), transparent 44%);
+    linear-gradient(180deg, rgb(255 255 255 / 0.1), rgb(255 255 255 / 0.03) 46%, rgb(255 255 255 / 0.12)),
+    radial-gradient(ellipse at 50% -10%, rgb(255 255 255 / 0.18), transparent 44%);
 }
 
 @media (min-width: 768px) {
@@ -270,9 +322,9 @@ onBeforeUnmount(() => {
 
   .ambient-base {
     background:
-      radial-gradient(circle at 18% 14%, rgb(255 255 255 / 0.5), transparent 24%),
-      radial-gradient(circle at 86% 8%, rgb(186 230 253 / 0.24), transparent 30%),
-      linear-gradient(160deg, #e8fbf4 0%, #e7f8f7 48%, #effbf1 100%);
+      radial-gradient(circle at 18% 14%, rgb(255 255 255 / 0.14), transparent 24%),
+      radial-gradient(circle at 86% 8%, rgb(186 230 253 / 0.1), transparent 30%),
+      linear-gradient(160deg, #cfe8dc 0%, #adcbbf 48%, #8eafa4 100%);
   }
 
   .ambient-cute {
@@ -283,20 +335,23 @@ onBeforeUnmount(() => {
 
   .ambient-cute::before {
     display: block;
-    inset: 0;
     background-image: url("/img/pc_background_extended.png");
     background-position: center center;
     background-repeat: no-repeat;
     background-size: cover;
     filter: saturate(1.03) brightness(1.03) contrast(0.98);
-    transform: none;
   }
 
-  .ambient-cute::after {
+  .ambient-background.is-immersive .ambient-cute::before {
     display: none;
   }
 
-  .ambient-light {
+  .ambient-background.is-immersive .ambient-cute {
+    background: transparent;
+    filter: none;
+  }
+
+  .ambient-background.is-immersive .ambient-light {
     background: transparent;
     mix-blend-mode: normal;
   }
@@ -356,9 +411,23 @@ onBeforeUnmount(() => {
 }
 
 @media (max-width: 640px) {
-  .ambient-slider {
+  .ambient-slider-wrap {
     right: 1.25rem;
     top: 13.2rem;
+  }
+
+  .ambient-slider-tooltip {
+    right: 0;
+    top: -1rem;
+    width: min(19rem, calc(100vw - 5.75rem));
+    transform: translateY(-100%);
+  }
+
+  .ambient-slider-tooltip::after {
+    right: 0.9rem;
+    top: auto;
+    bottom: -0.42rem;
+    transform: rotate(45deg);
   }
 
   .ambient-hill-a {
@@ -372,7 +441,122 @@ onBeforeUnmount(() => {
   }
 }
 
+.ambient-slider-wrap {
+  display: grid;
+  width: 3.25rem;
+  height: 7.45rem;
+  place-items: center;
+}
+
+.ambient-slider-glass {
+  position: absolute;
+  inset: -0.38rem;
+  border: 1px solid rgb(255 255 255 / 0.56);
+  border-radius: 999px;
+  background:
+    radial-gradient(circle at 50% 14%, rgb(255 255 255 / 0.72), rgb(255 255 255 / 0.22) 42%, rgb(209 250 229 / 0.16)),
+    linear-gradient(180deg, rgb(255 255 255 / 0.28), rgb(255 255 255 / 0.08));
+  box-shadow:
+    0 16px 34px rgb(6 78 59 / 0.12),
+    0 1px 12px rgb(255 255 255 / 0.58) inset;
+  backdrop-filter: blur(18px) saturate(1.22);
+}
+
+.ambient-slider-tooltip {
+  position: absolute;
+  right: calc(100% + 0.95rem);
+  top: 50%;
+  width: 19.25rem;
+  color: rgb(6 78 59);
+  border: 1px solid rgb(255 255 255 / 0.74);
+  border-radius: 1.35rem;
+  background:
+    linear-gradient(135deg, rgb(255 255 255 / 0.92), rgb(236 253 245 / 0.82)),
+    radial-gradient(circle at 18% 0%, rgb(255 255 255 / 0.96), transparent 44%);
+  box-shadow:
+    0 20px 48px rgb(6 78 59 / 0.18),
+    0 1px 16px rgb(255 255 255 / 0.7) inset;
+  padding: 0.9rem;
+  transform: translateY(-50%);
+  backdrop-filter: blur(20px) saturate(1.32);
+}
+
+.ambient-slider-tooltip::after {
+  position: absolute;
+  right: -0.38rem;
+  top: 50%;
+  width: 0.75rem;
+  height: 0.75rem;
+  content: "";
+  border-top: 1px solid rgb(255 255 255 / 0.74);
+  border-right: 1px solid rgb(255 255 255 / 0.74);
+  background: rgb(236 253 245 / 0.92);
+  transform: translateY(-50%) rotate(45deg);
+}
+
+.ambient-slider-tooltip-glow {
+  position: absolute;
+  inset: -0.9rem;
+  border-radius: 1.9rem;
+  background: radial-gradient(circle at 82% 50%, rgb(52 211 153 / 0.3), transparent 58%);
+  filter: blur(10px);
+  opacity: 0.9;
+}
+
+.ambient-slider-tooltip-icon {
+  display: grid;
+  width: 2rem;
+  height: 2rem;
+  flex: 0 0 auto;
+  place-items: center;
+  color: rgb(4 120 87);
+  border-radius: 0.9rem;
+  background: linear-gradient(135deg, rgb(209 250 229 / 0.92), rgb(153 246 228 / 0.64));
+  box-shadow: 0 8px 18px rgb(16 185 129 / 0.16);
+}
+
+.ambient-slider-tooltip-title {
+  margin: 0;
+  font-size: 0.86rem;
+  font-weight: 900;
+  letter-spacing: 0.02em;
+  color: rgb(6 95 70);
+}
+
+.ambient-slider-tooltip-text {
+  margin-top: 0.18rem;
+  font-size: 0.76rem;
+  font-weight: 700;
+  line-height: 1.55;
+  color: rgb(15 118 110 / 0.9);
+}
+
+.ambient-slider-tooltip-close {
+  display: grid;
+  width: 1.65rem;
+  height: 1.65rem;
+  flex: 0 0 auto;
+  place-items: center;
+  color: rgb(15 118 110 / 0.72);
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.62);
+  transition: background 160ms ease, color 160ms ease, transform 160ms ease;
+}
+
+.ambient-slider-tooltip-close:hover,
+.ambient-slider-tooltip-close:focus-visible {
+  color: rgb(6 95 70);
+  background: rgb(209 250 229 / 0.88);
+  transform: scale(1.04);
+}
+
+.ambient-slider-tooltip-close:focus-visible {
+  outline: 3px solid rgb(16 185 129 / 0.24);
+  outline-offset: 2px;
+}
+
 .ambient-slider {
+  position: relative;
   width: 2.25rem;
   height: 6.4rem;
   cursor: grab;
@@ -380,11 +564,11 @@ onBeforeUnmount(() => {
   user-select: none;
   border-radius: 999px;
   background:
-    radial-gradient(circle at 50% calc(16% + 68% * var(--slider-progress)), rgb(255 255 255 / 0.26), rgb(255 255 255 / 0.04) 34%, transparent 66%);
+    radial-gradient(circle at 50% calc(16% + 68% * var(--slider-progress)), rgb(255 255 255 / 0.36), rgb(255 255 255 / 0.08) 34%, transparent 66%);
   box-shadow:
-    0 10px 24px rgb(6 78 59 / 0.02),
-    0 1px 10px rgb(255 255 255 / 0.08) inset;
-  opacity: 0.48;
+    0 10px 24px rgb(6 78 59 / 0.04),
+    0 1px 10px rgb(255 255 255 / 0.18) inset;
+  opacity: 0.78;
   transition: opacity 180ms ease, transform 180ms ease;
 }
 
@@ -401,7 +585,7 @@ onBeforeUnmount(() => {
 
 .ambient-slider:focus-visible {
   outline: 3px solid rgb(16 185 129 / 0.28);
-  outline-offset: 3px;
+  outline-offset: 5px;
 }
 
 .ambient-slider-fill {
@@ -413,11 +597,11 @@ onBeforeUnmount(() => {
   transform: translateX(-50%);
   border-radius: 999px;
   background:
-    linear-gradient(180deg, rgb(52 211 153 / 0.16), rgb(45 212 191 / 0.32)),
-    radial-gradient(circle at 50% 100%, rgb(255 255 255 / 0.62), transparent 42%);
+    linear-gradient(180deg, rgb(52 211 153 / 0.2), rgb(45 212 191 / 0.38)),
+    radial-gradient(circle at 50% 100%, rgb(255 255 255 / 0.7), transparent 42%);
   box-shadow:
-    0 0 12px rgb(45 212 191 / 0.22),
-    0 1px 7px rgb(255 255 255 / 0.48) inset;
+    0 0 12px rgb(45 212 191 / 0.24),
+    0 1px 7px rgb(255 255 255 / 0.52) inset;
 }
 
 .ambient-slider::before {
@@ -428,7 +612,7 @@ onBeforeUnmount(() => {
   height: calc(100% - 1.36rem);
   content: "";
   border-radius: 999px;
-  background: linear-gradient(180deg, rgb(16 185 129 / 0.04), rgb(4 120 87 / 0.18), rgb(16 185 129 / 0.04));
+  background: linear-gradient(180deg, rgb(16 185 129 / 0.06), rgb(4 120 87 / 0.2), rgb(16 185 129 / 0.06));
   transform: translateX(-50%);
 }
 
@@ -436,8 +620,8 @@ onBeforeUnmount(() => {
   position: absolute;
   inset: -0.55rem;
   border-radius: 999px;
-  background: radial-gradient(circle at 50% calc(22% + 46% * var(--slider-progress)), rgb(255 255 255 / 0.2), transparent 46%);
-  opacity: calc(0.28 + var(--slider-progress) * 0.42);
+  background: radial-gradient(circle at 50% calc(22% + 46% * var(--slider-progress)), rgb(255 255 255 / 0.24), transparent 46%);
+  opacity: calc(0.34 + var(--slider-progress) * 0.44);
   filter: blur(8px);
 }
 
@@ -452,12 +636,12 @@ onBeforeUnmount(() => {
   color: rgb(4 120 87);
   border-radius: 999px;
   background:
-    radial-gradient(circle at 30% 18%, rgb(255 255 255 / 0.9), rgb(255 255 255 / 0.36) 56%, rgb(209 250 229 / 0.18)),
-    linear-gradient(135deg, rgb(255 255 255 / 0.3), rgb(255 255 255 / 0.08));
+    radial-gradient(circle at 30% 18%, rgb(255 255 255 / 0.94), rgb(255 255 255 / 0.42) 56%, rgb(209 250 229 / 0.22)),
+    linear-gradient(135deg, rgb(255 255 255 / 0.36), rgb(255 255 255 / 0.12));
   box-shadow:
-    0 5px 12px rgb(6 78 59 / 0.08),
-    0 0 16px rgb(52 211 153 / 0.14),
-    0 1px 8px rgb(255 255 255 / 0.54) inset;
+    0 5px 12px rgb(6 78 59 / 0.1),
+    0 0 16px rgb(52 211 153 / 0.18),
+    0 1px 8px rgb(255 255 255 / 0.62) inset;
   transform: translateX(-50%) translateY(calc((6.4rem - 2.22rem) * var(--slider-progress)));
   z-index: 2;
   animation: ambient-slider-invite 3.8s ease-in-out infinite;
@@ -471,8 +655,8 @@ onBeforeUnmount(() => {
   height: 0.34rem;
   content: "";
   border-radius: 999px;
-  background: rgb(255 255 255 / 0.76);
-  box-shadow: 0 0 12px rgb(52 211 153 / 0.34);
+  background: rgb(255 255 255 / 0.82);
+  box-shadow: 0 0 12px rgb(52 211 153 / 0.38);
   transform: translateX(-50%);
   animation: ambient-slider-trace 3.8s ease-in-out infinite;
 }
@@ -519,7 +703,9 @@ onBeforeUnmount(() => {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .ambient-spore {
+  .ambient-spore,
+  .ambient-slider-thumb,
+  .ambient-slider::after {
     animation: none;
   }
 }
