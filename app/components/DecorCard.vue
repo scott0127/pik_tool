@@ -4,38 +4,38 @@
     class="relative group cursor-pointer pop-in"
     :style="{ animationDelay: `${animationDelay}ms` }"
   >
-    <!-- Animated golden border for rare variants -->
     <div 
-      v-if="isRareVariant && isCollected" 
-      class="absolute -inset-[3px] rounded-2xl rare-border-glow z-0"
-    ></div>
-    
-    <div 
-      class="liquid-glass-soft liquid-glass-dynamic relative rounded-2xl overflow-hidden transition-all duration-300 z-10"
+      class="liquid-glass-soft liquid-glass-dynamic relative rounded-2xl overflow-hidden transition-all duration-300 z-10 border"
       :class="[
         isRareVariant 
           ? (isCollected 
-              ? 'ring-[3px] ring-yellow-400 shadow-yellow-300/60 rare-golden-glow' 
-              : 'ring-2 ring-yellow-300/50 grayscale-[40%] opacity-70 hover:grayscale-0 hover:opacity-100')
+              ? 'border-yellow-300/90 shadow-[0_14px_34px_rgba(146,64,14,0.28)] rare-golden-glow' 
+              : 'border-slate-300/50 shadow-[0_6px_16px_rgba(15,23,42,0.1)]')
           : (isCollected 
-              ? 'ring-4 ring-emerald-400 ring-offset-2 shadow-emerald-100' 
-              : 'grayscale-[40%] opacity-70 hover:grayscale-0 hover:opacity-100')
+              ? 'border-emerald-300/90 shadow-[0_12px_30px_rgba(5,150,105,0.24)]' 
+              : 'border-slate-300/50 shadow-[0_6px_16px_rgba(15,23,42,0.1)]')
       ]"
     >
       <!-- Image Container -->
       <div 
         class="relative aspect-square p-3 overflow-hidden"
         :class="isRareVariant 
-          ? 'bg-gradient-to-br from-amber-50/70 via-yellow-50/45 to-orange-50/50' 
-          : 'bg-gradient-to-br from-white/58 via-white/34 to-emerald-50/34'"
+          ? (isCollected 
+              ? 'bg-gradient-to-br from-amber-50/92 via-yellow-50/86 to-orange-50/84'
+              : 'bg-gradient-to-br from-slate-100/88 via-gray-50/82 to-slate-50/78')
+          : (isCollected 
+              ? 'bg-gradient-to-br from-white/92 via-emerald-50/84 to-teal-50/80'
+              : 'bg-gradient-to-br from-slate-100/88 via-gray-50/82 to-slate-50/78')"
       >
         <!-- Background pattern -->
-        <div class="absolute inset-0" :class="isRareVariant ? 'opacity-10' : 'opacity-5'">
+        <div class="absolute inset-0" :class="isRareVariant ? (isCollected ? 'opacity-10' : 'opacity-[0.04]') : (isCollected ? 'opacity-5' : 'opacity-[0.03]')">
           <div 
             class="absolute inset-0" 
-            :style="isRareVariant 
-              ? 'background-image: radial-gradient(circle, #fbbf24 1px, transparent 1px); background-size: 16px 16px;'
-              : 'background-image: radial-gradient(circle, #00b92f 1px, transparent 1px); background-size: 20px 20px;'"
+            :style="isCollected
+              ? (isRareVariant 
+                  ? 'background-image: radial-gradient(circle, #fbbf24 1px, transparent 1px); background-size: 16px 16px;'
+                  : 'background-image: radial-gradient(circle, #00b92f 1px, transparent 1px); background-size: 20px 20px;')
+              : 'background-image: radial-gradient(circle, #94a3b8 1px, transparent 1px); background-size: 20px 20px;'"
           ></div>
         </div>
 
@@ -44,7 +44,8 @@
           v-if="imageUrl && !hasError"
           :src="imageUrl"
           :alt="`${locale === 'en' ? variant?.nameEn : variant?.name} ${t('pikmin_types.' + pikminType)}`"
-          class="relative w-full h-full object-contain transform group-hover:scale-110 transition-transform duration-300"
+          class="decor-image relative w-full h-full object-contain transform group-hover:scale-110 transition-all duration-300"
+          :class="isCollected ? 'opacity-100 saturate-[1.02]' : 'opacity-[0.45] grayscale-[70%] saturate-[0.3]'"
           loading="lazy"
           referrerpolicy="no-referrer"
           @error="handleImageError"
@@ -56,10 +57,23 @@
           <Icon :name="category?.icon || 'line-md:question-circle'" class="text-4xl" />
         </div>
 
+        <div
+          v-if="!isCollected"
+          class="absolute inset-0 bg-slate-400/18 backdrop-blur-[1px] pointer-events-none flex items-center justify-center"
+        >
+          <!-- Lock Icon (SVG) -->
+          <div class="w-9 h-9 rounded-full bg-slate-500/28 backdrop-blur-sm flex items-center justify-center ring-1 ring-white/30">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4.5 h-4.5 text-slate-500/70" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect width="18" height="11" x="3" y="11" rx="2" ry="2"/>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+            </svg>
+          </div>
+        </div>
+
         <!-- Pikmin Type Badge -->
         <div 
           class="absolute top-2 right-2 w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold shadow-lg ring-1 ring-white/70 transform group-hover:scale-110 transition-transform"
-          :class="pikminBadgeClass"
+          :class="[pikminBadgeClass, !isCollected && 'opacity-50 saturate-50']"
         >
           {{ pikminTypeShort }}
         </div>
@@ -83,7 +97,7 @@
         >
           <div 
             v-if="isCollected"
-            class="absolute bottom-2 right-2 w-8 h-8 bg-emerald-500/95 rounded-xl flex items-center justify-center shadow-lg ring-1 ring-white/70 backdrop-blur"
+            class="absolute bottom-2 right-2 w-8 h-8 bg-emerald-500 rounded-xl flex items-center justify-center shadow-lg ring-2 ring-white/80"
           >
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" viewBox="0 0 20 20" fill="currentColor">
               <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
@@ -92,15 +106,33 @@
         </Transition>
 
         <!-- Hover overlay -->
-        <div class="absolute inset-0 bg-emerald-500/0 group-hover:bg-emerald-500/10 transition-colors duration-300 rounded-lg pointer-events-none"></div>
+        <div
+          class="absolute inset-0 transition-colors duration-300 rounded-lg pointer-events-none"
+          :class="isCollected ? 'bg-emerald-500/0 group-hover:bg-emerald-500/8' : 'bg-slate-900/0 group-hover:bg-slate-900/6'"
+        ></div>
       </div>
 
       <!-- Info Section -->
-      <div class="p-3 text-center border-t border-white/60 bg-white/24">
-        <p class="text-sm font-extrabold text-gray-900 truncate" :title="locale === 'en' ? variant?.nameEn : variant?.name">
+      <div
+        class="p-3 text-center border-t backdrop-blur-sm"
+        :class="isCollected 
+          ? 'bg-white/93 border-white/70' 
+          : 'bg-slate-50/90 border-slate-200/50'"
+      >
+        <p
+          class="text-sm font-extrabold truncate"
+          :class="isCollected ? 'text-slate-900' : 'text-slate-400'"
+          :style="{ textShadow: '0 1px 2px rgba(255,255,255,0.5)' }"
+          :title="locale === 'en' ? variant?.nameEn : variant?.name"
+        >
           {{ (locale === 'en' ? variant?.nameEn : variant?.name) || 'Unknown' }}
         </p>
-        <p class="text-xs text-gray-600 truncate mt-0.5 font-semibold" :title="locale === 'en' ? variant?.name : variant?.nameEn">
+        <p
+          class="text-xs truncate mt-0.5 font-semibold"
+          :class="isCollected ? 'text-slate-700' : 'text-slate-400'"
+          :style="{ textShadow: '0 1px 2px rgba(255,255,255,0.5)' }"
+          :title="locale === 'en' ? variant?.name : variant?.nameEn"
+        >
           {{ (locale === 'en' ? variant?.name : variant?.nameEn) || '' }}
         </p>
       </div>

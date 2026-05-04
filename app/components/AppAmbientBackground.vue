@@ -94,8 +94,10 @@
 
 <script setup lang="ts">
 const route = useRoute();
+const { t } = useI18n();
 
 const STORAGE_KEY = "pikmin-immersive-background";
+const TIP_SHOWN_KEY = "pikmin-bg-tip-shown";
 const isImmersive = ref(false);
 const immersiveProgress = ref(0);
 const isDragging = ref(false);
@@ -150,9 +152,21 @@ const startSlide = (event: PointerEvent) => {
 };
 
 onMounted(() => {
-  const enabled = localStorage.getItem(STORAGE_KEY) === "true";
+  const saved = localStorage.getItem(STORAGE_KEY);
+  // Default to non-immersive (false) for first-time visitors
+  const enabled = saved === "true";
   isImmersive.value = enabled;
   immersiveProgress.value = enabled ? 1 : 0;
+
+  // Show one-time tip about background toggle
+  const tipShown = localStorage.getItem(TIP_SHOWN_KEY);
+  if (!tipShown) {
+    setTimeout(() => {
+      const toast = useToast();
+      toast.info(t('components.ambient_tip'), 3500);
+      localStorage.setItem(TIP_SHOWN_KEY, "true");
+    }, 1500);
+  }
 });
 
 onBeforeUnmount(() => {

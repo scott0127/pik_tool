@@ -471,7 +471,7 @@
             <div class="hidden md:block absolute right-0 top-full mt-2 w-64 bg-gray-900 text-white text-xs rounded-xl p-3 shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-[2000] pointer-events-none translate-y-2 group-hover:translate-y-0">
               <div class="font-bold mb-2 text-emerald-300">純種區模式</div>
               <p class="leading-relaxed mb-1">該區域僅包含「單一種」飾品（或路邊），不會混雜其他類型。</p>
-              <p class="text-gray-400">適合：精準鎖定特定飾品，排除干擾。</p>
+              <p class="leading-relaxed">適合：精準鎖定特定飾品，排除干擾。</p>
             </div>
 
             <!-- Mobile Ephemeral Tooltip (Auto-hide) -->
