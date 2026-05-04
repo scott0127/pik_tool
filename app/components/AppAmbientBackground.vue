@@ -410,37 +410,6 @@ onBeforeUnmount(() => {
   }
 }
 
-@media (max-width: 640px) {
-  .ambient-slider-wrap {
-    right: 1.25rem;
-    top: 13.2rem;
-  }
-
-  .ambient-slider-tooltip {
-    right: 0;
-    top: -1rem;
-    width: min(19rem, calc(100vw - 5.75rem));
-    transform: translateY(-100%);
-  }
-
-  .ambient-slider-tooltip::after {
-    right: 0.9rem;
-    top: auto;
-    bottom: -0.42rem;
-    transform: rotate(45deg);
-  }
-
-  .ambient-hill-a {
-    left: -42%;
-    width: 110%;
-  }
-
-  .ambient-hill-b {
-    right: -48%;
-    width: 120%;
-  }
-}
-
 .ambient-slider-wrap {
   display: grid;
   width: 3.25rem;
@@ -509,10 +478,10 @@ onBeforeUnmount(() => {
   height: 2rem;
   flex: 0 0 auto;
   place-items: center;
-  color: rgb(4 120 87);
+  color: white;
   border-radius: 0.9rem;
-  background: linear-gradient(135deg, rgb(209 250 229 / 0.92), rgb(153 246 228 / 0.64));
-  box-shadow: 0 8px 18px rgb(16 185 129 / 0.16);
+  background: linear-gradient(135deg, #00c853, #008c3a);
+  box-shadow: 0 8px 18px rgb(0 140 58 / 0.22);
 }
 
 .ambient-slider-tooltip-title {
@@ -564,11 +533,11 @@ onBeforeUnmount(() => {
   user-select: none;
   border-radius: 999px;
   background:
-    radial-gradient(circle at 50% calc(16% + 68% * var(--slider-progress)), rgb(255 255 255 / 0.36), rgb(255 255 255 / 0.08) 34%, transparent 66%);
+    radial-gradient(circle at 50% calc(16% + 68% * var(--slider-progress)), rgb(0 200 83 / 0.28), rgb(0 92 45 / 0.16) 36%, rgb(0 52 32 / 0.1) 68%, transparent 72%);
   box-shadow:
-    0 10px 24px rgb(6 78 59 / 0.04),
-    0 1px 10px rgb(255 255 255 / 0.18) inset;
-  opacity: 0.78;
+    0 12px 28px rgb(0 80 45 / 0.18),
+    0 1px 10px rgb(255 255 255 / 0.14) inset;
+  opacity: 0.96;
   transition: opacity 180ms ease, transform 180ms ease;
 }
 
@@ -584,7 +553,7 @@ onBeforeUnmount(() => {
 }
 
 .ambient-slider:focus-visible {
-  outline: 3px solid rgb(16 185 129 / 0.28);
+  outline: 3px solid rgb(0 200 83 / 0.32);
   outline-offset: 5px;
 }
 
@@ -592,27 +561,27 @@ onBeforeUnmount(() => {
   position: absolute;
   left: 50%;
   top: 0.72rem;
-  width: 0.2rem;
+  width: 0.24rem;
   height: calc((100% - 1.44rem) * var(--slider-progress));
   transform: translateX(-50%);
   border-radius: 999px;
   background:
-    linear-gradient(180deg, rgb(52 211 153 / 0.2), rgb(45 212 191 / 0.38)),
+    linear-gradient(180deg, rgb(0 200 83 / 0.74), rgb(0 150 64 / 0.86)),
     radial-gradient(circle at 50% 100%, rgb(255 255 255 / 0.7), transparent 42%);
   box-shadow:
-    0 0 12px rgb(45 212 191 / 0.24),
-    0 1px 7px rgb(255 255 255 / 0.52) inset;
+    0 0 16px rgb(0 200 83 / 0.36),
+    0 1px 7px rgb(255 255 255 / 0.44) inset;
 }
 
 .ambient-slider::before {
   position: absolute;
   left: 50%;
   top: 0.68rem;
-  width: 0.12rem;
+  width: 0.14rem;
   height: calc(100% - 1.36rem);
   content: "";
   border-radius: 999px;
-  background: linear-gradient(180deg, rgb(16 185 129 / 0.06), rgb(4 120 87 / 0.2), rgb(16 185 129 / 0.06));
+  background: linear-gradient(180deg, rgb(0 200 83 / 0.16), rgb(0 70 42 / 0.4), rgb(0 200 83 / 0.16));
   transform: translateX(-50%);
 }
 
@@ -620,8 +589,8 @@ onBeforeUnmount(() => {
   position: absolute;
   inset: -0.55rem;
   border-radius: 999px;
-  background: radial-gradient(circle at 50% calc(22% + 46% * var(--slider-progress)), rgb(255 255 255 / 0.24), transparent 46%);
-  opacity: calc(0.34 + var(--slider-progress) * 0.44);
+  background: radial-gradient(circle at 50% calc(22% + 46% * var(--slider-progress)), rgb(0 200 83 / 0.3), transparent 46%);
+  opacity: calc(0.42 + var(--slider-progress) * 0.44);
   filter: blur(8px);
 }
 
@@ -629,21 +598,21 @@ onBeforeUnmount(() => {
   position: absolute;
   left: 50%;
   top: 0.22rem;
+  z-index: 2;
   display: grid;
-  width: 1.78rem;
-  height: 1.78rem;
+  width: 1.82rem;
+  height: 1.82rem;
   place-items: center;
-  color: rgb(4 120 87);
+  color: white;
   border-radius: 999px;
   background:
-    radial-gradient(circle at 30% 18%, rgb(255 255 255 / 0.94), rgb(255 255 255 / 0.42) 56%, rgb(209 250 229 / 0.22)),
-    linear-gradient(135deg, rgb(255 255 255 / 0.36), rgb(255 255 255 / 0.12));
+    radial-gradient(circle at 30% 18%, rgb(255 255 255 / 0.34), transparent 34%),
+    linear-gradient(135deg, #00c853 0%, #00a344 48%, #007a35 100%);
   box-shadow:
-    0 5px 12px rgb(6 78 59 / 0.1),
-    0 0 16px rgb(52 211 153 / 0.18),
-    0 1px 8px rgb(255 255 255 / 0.62) inset;
+    0 7px 16px rgb(0 70 42 / 0.28),
+    0 0 20px rgb(0 200 83 / 0.38),
+    0 1px 8px rgb(255 255 255 / 0.36) inset;
   transform: translateX(-50%) translateY(calc((6.4rem - 2.22rem) * var(--slider-progress)));
-  z-index: 2;
   animation: ambient-slider-invite 3.8s ease-in-out infinite;
 }
 
@@ -655,8 +624,8 @@ onBeforeUnmount(() => {
   height: 0.34rem;
   content: "";
   border-radius: 999px;
-  background: rgb(255 255 255 / 0.82);
-  box-shadow: 0 0 12px rgb(52 211 153 / 0.38);
+  background: rgb(34 197 94 / 0.95);
+  box-shadow: 0 0 14px rgb(0 200 83 / 0.52);
   transform: translateX(-50%);
   animation: ambient-slider-trace 3.8s ease-in-out infinite;
 }
@@ -666,6 +635,66 @@ onBeforeUnmount(() => {
 .ambient-slider.is-immersive .ambient-slider-thumb,
 .ambient-slider.is-immersive::after {
   animation: none;
+}
+
+@media (max-width: 640px) {
+  .ambient-slider-wrap {
+    right: 1rem;
+    top: 12.2rem;
+  }
+
+  .ambient-slider-tooltip {
+    right: calc(100% + 0.55rem);
+    top: 0.2rem;
+    width: min(10.75rem, calc(100vw - 6rem));
+    padding: 0.58rem 0.62rem;
+    border-radius: 1rem;
+    transform: none;
+  }
+
+  .ambient-slider-tooltip::after {
+    right: -0.34rem;
+    top: 1.15rem;
+    bottom: auto;
+    width: 0.66rem;
+    height: 0.66rem;
+    transform: rotate(45deg);
+  }
+
+  .ambient-slider-tooltip .relative {
+    gap: 0.45rem;
+  }
+
+  .ambient-slider-tooltip-icon {
+    width: 1.5rem;
+    height: 1.5rem;
+    border-radius: 0.72rem;
+  }
+
+  .ambient-slider-tooltip-title {
+    font-size: 0.74rem;
+  }
+
+  .ambient-slider-tooltip-text {
+    margin-top: 0.08rem;
+    font-size: 0.63rem;
+    line-height: 1.35;
+  }
+
+  .ambient-slider-tooltip-close {
+    width: 1.35rem;
+    height: 1.35rem;
+  }
+
+  .ambient-hill-a {
+    left: -42%;
+    width: 110%;
+  }
+
+  .ambient-hill-b {
+    right: -48%;
+    width: 120%;
+  }
 }
 
 @keyframes ambient-slider-invite {
@@ -693,7 +722,7 @@ onBeforeUnmount(() => {
   }
 
   74% {
-    opacity: 0.7;
+    opacity: 0.85;
   }
 
   92% {
