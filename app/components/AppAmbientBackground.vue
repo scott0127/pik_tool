@@ -204,10 +204,8 @@ onBeforeUnmount(() => {
 .ambient-cute {
   overflow: hidden;
   opacity: calc(1 - var(--immersive-progress));
-  background-image: url("/img/ambient-glass-sprouts.png");
-  background-position: center top;
-  background-size: cover;
-  filter: saturate(0.96) contrast(0.98);
+  background: transparent;
+  filter: none;
 }
 
 .ambient-cute::before,
@@ -216,16 +214,12 @@ onBeforeUnmount(() => {
   inset: 0;
   content: "";
   pointer-events: none;
-}
-
-.ambient-cute::before,
-.ambient-cute::after {
   display: none;
 }
 
 .ambient-hill {
   position: absolute;
-  display: none;
+  display: block;
   border-radius: 999px 999px 0 0;
   filter: blur(0.2px);
 }
@@ -247,8 +241,8 @@ onBeforeUnmount(() => {
 }
 
 .ambient-sprouts {
-  display: none;
-  opacity: 0;
+  display: block;
+  opacity: 0.76;
   filter: drop-shadow(0 18px 28px rgb(6 78 59 / 0.05));
 }
 
@@ -277,23 +271,8 @@ onBeforeUnmount(() => {
 
   .ambient-cute {
     opacity: calc(0.98 * (1 - var(--immersive-progress)));
-    background-image: none;
+    background: transparent;
     filter: none;
-  }
-
-  .ambient-cute::before {
-    display: block;
-    inset: 0;
-    background-image: url("/img/pc_background_extended.png");
-    background-position: center center;
-    background-repeat: no-repeat;
-    background-size: cover;
-    filter: saturate(1.03) brightness(1.03) contrast(0.98);
-    transform: none;
-  }
-
-  .ambient-cute::after {
-    display: none;
   }
 
   .ambient-light {
