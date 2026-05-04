@@ -53,6 +53,27 @@ export default defineNuxtConfig({
     '/version.json': { headers: { 'cache-control': 'no-cache, no-store, must-revalidate' } },
     // Keep HTML and route responses revalidated to pick up new app shell quickly.
     '/**': { headers: { 'cache-control': 'no-cache' } },
+    '/version.json': {
+      headers: {
+        'cache-control': 'no-cache, no-store, must-revalidate',
+      },
+    },
+    // HTML should revalidate frequently so users pick up new hashed bundles.
+    '/': {
+      headers: {
+        'cache-control': 'no-cache',
+      },
+    },
+    '/map': {
+      headers: {
+        'cache-control': 'no-cache',
+      },
+    },
+    '/collection': {
+      headers: {
+        'cache-control': 'no-cache',
+      },
+    },
     // Large static data files are content-like assets. Avoid revalidating the
     // multi-MB map JSON on every map visit.
     '/data/**': { headers: { 'cache-control': 'public, max-age=86400, stale-while-revalidate=604800' } },
@@ -109,4 +130,3 @@ export default defineNuxtConfig({
     },
   },
 })
-
