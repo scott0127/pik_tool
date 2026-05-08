@@ -54,6 +54,11 @@
           <ul class="announcement-copy text-sm leading-relaxed list-disc list-inside space-y-1">
             <li>
               <span class="inline-flex items-center gap-1.5 align-middle">
+                5/8更新任天堂卡匣皮克敏種類
+              </span>
+            </li>
+            <li>
+              <span class="inline-flex items-center gap-1.5 align-middle">
                 4/26 號更新地圖，優化地圖面積邏輯與準確度。
               </span>
             </li>

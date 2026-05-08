@@ -3999,6 +3999,43 @@
     },
     {
       "category": {
+        "id": "任天堂遊戲卡匣",
+        "name": "任天堂遊戲卡匣",
+        "nameEn": "Game Pak",
+        "type": "special",
+        "icon": "noto:bento-box"
+      },
+      "variants": [
+        {
+          "id": "Game Pak",
+          "name": "任天堂遊戲卡匣",
+          "nameEn": "Game Pak",
+          "imageUrl": "https://pikmin.wiki.gallery/images/thumb/a/af/Decor_Red_Game_Pak.png/150px-Decor_Red_Game_Pak.png",
+          "imageUrls": {
+            "red": "https://pikmin.wiki.gallery/images/thumb/a/af/Decor_Red_Game_Pak.png/150px-Decor_Red_Game_Pak.png",
+            "yellow": "https://pikmin.wiki.gallery/images/thumb/e/e6/Decor_Yellow_Game_Pak.png/150px-Decor_Yellow_Game_Pak.png",
+            "blue": "https://pikmin.wiki.gallery/images/thumb/6/68/Decor_Blue_Game_Pak.png/150px-Decor_Blue_Game_Pak.png",
+            "white": "https://pikmin.wiki.gallery/images/thumb/3/32/Decor_White_Game_Pak.png/150px-Decor_White_Game_Pak.png",
+            "purple": "https://pikmin.wiki.gallery/images/thumb/8/82/Decor_Purple_Game_Pak.png/150px-Decor_Purple_Game_Pak.png",
+            "rock": "https://pikmin.wiki.gallery/images/thumb/4/40/Decor_Rock_Game_Pak.png/150px-Decor_Rock_Game_Pak.png",
+            "winged": "https://pikmin.wiki.gallery/images/thumb/8/87/Decor_Winged_Game_Pak.png/150px-Decor_Winged_Game_Pak.png",
+            "ice": "https://pikmin.wiki.gallery/images/thumb/2/22/Decor_Ice_Game_Pak.png/150px-Decor_Ice_Game_Pak.png"
+          }
+        }
+      ],
+      "availablePikminTypes": [
+        "red",
+        "yellow",
+        "blue",
+        "white",
+        "purple",
+        "rock",
+        "winged",
+        "ice"
+      ]
+    },
+    {
+      "category": {
         "id": "golden-airplane",
         "name": "金色飛機玩具",
         "nameEn": "Golden Toy Airplane",

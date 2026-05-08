@@ -18,6 +18,14 @@ export const usePageViews = () => {
     }
   };
 
+  /**
+   * The function `writeCachedViews` stores the count of views in local storage along with a timestamp
+   * if the environment is a client-side browser.
+   * @param {number} count - The `count` parameter in the `writeCachedViews` function represents the
+   * number of views to be cached.
+   * @returns If the `import.meta.client` condition is not met, the function will return nothing as
+   * there is no explicit return statement in that case.
+   */
   const writeCachedViews = (count: number) => {
     if (!import.meta.client) return;
     try {
