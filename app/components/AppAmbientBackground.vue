@@ -411,9 +411,13 @@ onBeforeUnmount(() => {
 }
 
 .ambient-slider-wrap {
+  --ambient-slider-height: 5.45rem;
+  --ambient-slider-thumb-travel: 3.5rem;
+  --ambient-slider-trace-travel: 3.05rem;
+
   display: grid;
-  width: 3.25rem;
-  height: 7.45rem;
+  width: 2.75rem;
+  height: 6.35rem;
   place-items: center;
 }
 
@@ -526,8 +530,8 @@ onBeforeUnmount(() => {
 
 .ambient-slider {
   position: relative;
-  width: 2.25rem;
-  height: 6.4rem;
+  width: 1.92rem;
+  height: var(--ambient-slider-height);
   cursor: grab;
   touch-action: none;
   user-select: none;
@@ -560,9 +564,9 @@ onBeforeUnmount(() => {
 .ambient-slider-fill {
   position: absolute;
   left: 50%;
-  top: 0.72rem;
-  width: 0.24rem;
-  height: calc((100% - 1.44rem) * var(--slider-progress));
+  top: 0.62rem;
+  width: 0.2rem;
+  height: calc((100% - 1.24rem) * var(--slider-progress));
   transform: translateX(-50%);
   border-radius: 999px;
   background:
@@ -576,9 +580,9 @@ onBeforeUnmount(() => {
 .ambient-slider::before {
   position: absolute;
   left: 50%;
-  top: 0.68rem;
-  width: 0.14rem;
-  height: calc(100% - 1.36rem);
+  top: 0.58rem;
+  width: 0.12rem;
+  height: calc(100% - 1.16rem);
   content: "";
   border-radius: 999px;
   background: linear-gradient(180deg, rgb(0 200 83 / 0.16), rgb(0 70 42 / 0.4), rgb(0 200 83 / 0.16));
@@ -597,11 +601,11 @@ onBeforeUnmount(() => {
 .ambient-slider-thumb {
   position: absolute;
   left: 50%;
-  top: 0.22rem;
+  top: 0.2rem;
   z-index: 2;
   display: grid;
-  width: 1.82rem;
-  height: 1.82rem;
+  width: 1.55rem;
+  height: 1.55rem;
   place-items: center;
   color: white;
   border-radius: 999px;
@@ -612,16 +616,16 @@ onBeforeUnmount(() => {
     0 7px 16px rgb(0 70 42 / 0.28),
     0 0 20px rgb(0 200 83 / 0.38),
     0 1px 8px rgb(255 255 255 / 0.36) inset;
-  transform: translateX(-50%) translateY(calc((6.4rem - 2.22rem) * var(--slider-progress)));
+  transform: translateX(-50%) translateY(calc(var(--ambient-slider-thumb-travel) * var(--slider-progress)));
   animation: ambient-slider-invite 3.8s ease-in-out infinite;
 }
 
 .ambient-slider::after {
   position: absolute;
   left: 50%;
-  top: 0.66rem;
-  width: 0.34rem;
-  height: 0.34rem;
+  top: 0.56rem;
+  width: 0.29rem;
+  height: 0.29rem;
   content: "";
   border-radius: 999px;
   background: rgb(34 197 94 / 0.95);
@@ -701,15 +705,15 @@ onBeforeUnmount(() => {
   0%,
   68%,
   100% {
-    transform: translateX(-50%) translateY(calc((6.4rem - 2.22rem) * var(--slider-progress))) scale(1);
+    transform: translateX(-50%) translateY(calc(var(--ambient-slider-thumb-travel) * var(--slider-progress))) scale(1);
   }
 
   78% {
-    transform: translateX(-50%) translateY(calc((6.4rem - 2.22rem) * var(--slider-progress) + 0.5rem)) scale(1.04);
+    transform: translateX(-50%) translateY(calc(var(--ambient-slider-thumb-travel) * var(--slider-progress) + 0.42rem)) scale(1.04);
   }
 
   88% {
-    transform: translateX(-50%) translateY(calc((6.4rem - 2.22rem) * var(--slider-progress))) scale(1);
+    transform: translateX(-50%) translateY(calc(var(--ambient-slider-thumb-travel) * var(--slider-progress))) scale(1);
   }
 }
 
@@ -727,7 +731,7 @@ onBeforeUnmount(() => {
 
   92% {
     opacity: 0;
-    transform: translateX(-50%) translateY(3.6rem) scale(1.05);
+    transform: translateX(-50%) translateY(var(--ambient-slider-trace-travel)) scale(1.05);
   }
 }
 

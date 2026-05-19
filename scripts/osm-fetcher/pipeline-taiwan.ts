@@ -1,12 +1,14 @@
 /**
  * 台灣本島 OSM 資料一鍵抓取管線
  *
- * 自動執行五步驟：
+ * 自動執行七步驟：
  *   1. 清除舊資料 (chunks + progress)
  *   2. 抓取全台灣 OSM POI 資料 (fetch-taiwan.ts)
  *   3. 合併至前端目錄 (merge-taiwan.ts)
  *   4. 重建 S2 單一飾品格索引 (build-s2-singletons.ts)
- *   5. 驗證高雄巨蛋 POI (verify-kaohsiung-arena.ts)
+ *   5. 拆分 S2 單一飾品格索引為前端實際使用的小檔
+ *   6. 對拆分檔做差量編碼，並移除 public 內的大型中繼檔
+ *   7. 驗證高雄巨蛋 POI (verify-kaohsiung-arena.ts)
  *
  * 使用方式：
  *   npx tsx scripts/osm-fetcher/pipeline-taiwan.ts
@@ -37,7 +39,7 @@ function hasFlag(args: string[], key: string): boolean {
 function runStep(stepNum: number, name: string, command: string): Promise<void> {
   return new Promise((resolve, reject) => {
     console.log(`\n${'='.repeat(60)}`);
-    console.log(`📌 步驟 ${stepNum}/5: ${name}`);
+    console.log(`📌 步驟 ${stepNum}/7: ${name}`);
     console.log(`${'='.repeat(60)}\n`);
     console.log(`> ${command}\n`);
 
@@ -137,9 +139,21 @@ async function main() {
   // ============ 步驟 4：重建 S2 索引 ============
   await runStep(4, '重建 S2 單一飾品格索引', 'npx tsx scripts/osm-fetcher/build-s2-singletons.ts');
 
-  // ============ 步驟 5：驗證 ============
+  // ============ 步驟 5：拆分 S2 索引 ============
+  await runStep(5, '拆分 S2 單一飾品格索引', 'node scripts/split-single-cells.cjs');
+
+  // ============ 步驟 6：差量編碼並移除大型中繼檔 ============
+  await runStep(6, '壓縮 S2 單一飾品格小檔', 'node scripts/encode-s2-cells.cjs');
+
+  const singleIndexFile = join(__dirname, '../../public/data/regions/taiwan_main_island/s2_l17_single.json');
+  if (existsSync(singleIndexFile)) {
+    unlinkSync(singleIndexFile);
+    console.log(`🧹 已移除 public 中不給前端直接讀取的大型中繼檔: ${singleIndexFile}`);
+  }
+
+  // ============ 步驟 7：驗證 ============
   try {
-    await runStep(5, '驗證高雄巨蛋 POI', 'npx tsx scripts/osm-fetcher/verify-kaohsiung-arena.ts');
+    await runStep(7, '驗證高雄巨蛋 POI', 'npx tsx scripts/osm-fetcher/verify-kaohsiung-arena.ts');
   } catch {
     console.log(`⚠️  驗證未通過，但管線已完成。請手動檢查資料。`);
   }
@@ -151,7 +165,7 @@ async function main() {
   console.log(`${'='.repeat(60)}`);
   console.log(`⏱️  總耗時: ${elapsed} 分鐘`);
   console.log(`📁 前端 Tiles: public/data/regions/taiwan_main_island/tiles/`);
-  console.log(`📁 S2 索引:    public/data/regions/taiwan_main_island/s2_l17_single.json`);
+  console.log(`📁 S2 小檔:    public/data/regions/taiwan_main_island/single/`);
   console.log(`\n下一步：執行 npm run dev 確認地圖顯示正確`);
 }
 

@@ -388,7 +388,8 @@
 
           <!-- Content -->
           <div class="p-6 space-y-4">
-            <p class="text-gray-700 text-center" v-html="$t('coffee.redirect')">
+            <p class="text-gray-700 text-center">
+              {{ $t('coffee.redirect') }}
             </p>
 
             <!-- Important Notice -->
@@ -721,7 +722,7 @@ const handleCoffeeClick = () => {
 
 const confirmCoffee = () => {
   showCoffeeModal.value = false;
-  window.open('https://buymeacoffee.com/scott5497', '_blank');
+  window.open('https://buymeacoffee.com/scott5497', '_blank', 'noopener,noreferrer');
 };
 
 const handleSearch = () => {

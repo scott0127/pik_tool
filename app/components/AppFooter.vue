@@ -86,8 +86,8 @@
                   <div>
                     <h4 class="font-semibold text-emerald-700 mb-2">文字內容授權</h4>
                     <p class="text-gray-700 leading-relaxed">
-                      本網站部分文字內容翻譯或引用自 <a href="https://www.pikminwiki.com/" target="_blank" class="text-emerald-600 hover:text-emerald-700 underline">Pikipedia</a>。根據該網站之規範，相關文字內容採用 
-                      <a href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh-hant" target="_blank" class="text-emerald-600 hover:text-emerald-700 underline font-medium">創用 CC 姓名標示-相同方式分享 4.0 國際授權條款 (CC BY-SA 4.0)</a> 
+                      本網站部分文字內容翻譯或引用自 <a href="https://www.pikminwiki.com/" target="_blank" rel="noopener noreferrer" class="text-emerald-600 hover:text-emerald-700 underline">Pikipedia</a>。根據該網站之規範，相關文字內容採用 
+                      <a href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh-hant" target="_blank" rel="noopener noreferrer" class="text-emerald-600 hover:text-emerald-700 underline font-medium">創用 CC 姓名標示-相同方式分享 4.0 國際授權條款 (CC BY-SA 4.0)</a> 
                       釋出。若您重製或引用本站基於 Wiki 修改之內容，亦須採用相同授權條款。
                     </p>
                   </div>
@@ -129,8 +129,8 @@
                   <div>
                     <h4 class="font-semibold text-emerald-700 mb-2">Text Content License</h4>
                     <p class="text-gray-700 leading-relaxed">
-                      Portions of the text content on this website are derived or translated from <a href="https://www.pikminwiki.com/" target="_blank" class="text-emerald-600 hover:text-emerald-700 underline">Pikipedia</a>. In accordance with their terms, this text is made available under the 
-                      <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" class="text-emerald-600 hover:text-emerald-700 underline font-medium">Creative Commons Attribution-ShareAlike 4.0 International License (CC BY-SA 4.0)</a>. 
+                      Portions of the text content on this website are derived or translated from <a href="https://www.pikminwiki.com/" target="_blank" rel="noopener noreferrer" class="text-emerald-600 hover:text-emerald-700 underline">Pikipedia</a>. In accordance with their terms, this text is made available under the 
+                      <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener noreferrer" class="text-emerald-600 hover:text-emerald-700 underline font-medium">Creative Commons Attribution-ShareAlike 4.0 International License (CC BY-SA 4.0)</a>. 
                       Any redistribution or derivative works based on this content must also be released under the same license.
                     </p>
                   </div>

@@ -11,26 +11,47 @@
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
-    "@nuxtjs/i18n": "^10.2.1",
-    "@nuxtjs/supabase": "^2.0.3",
+    "@nuxtjs/i18n": "^10.3.0",
+    "@nuxtjs/supabase": "^2.0.8",
     "@vue-leaflet/vue-leaflet": "^0.10.1",
     "leaflet": "^1.9.4",
-    "nuxt": "^4.2.2",
+    "nuxt": "^4.4.6",
     "s2-geometry": "^1.2.10",
     "three": "^0.184.0",
-    "vue": "^3.5.26",
-    "vue-router": "^4.6.4"
+    "vue": "^3.5.34",
+    "vue-router": "^5.0.7"
   },
   "packageManager": "pnpm@10.11.0+sha512.6540583f41cc5f628eb3d9773ecee802f4f9ef9923cc45b69890fb47991d4b092964694ec3a4f738a420c918a333062c8b925d312f42e4f0c263eb603551f977",
+  "pnpm": {
+    "overrides": {
+      "brace-expansion@1": "^1.1.14",
+      "brace-expansion@2": "^2.1.0",
+      "defu": "^6.1.7",
+      "devalue": "^5.8.1",
+      "flatted": "^3.4.2",
+      "h3@1": "^1.15.11",
+      "koa@2": "^2.16.4",
+      "minimatch@3": "^3.1.5",
+      "minimatch@9": "^9.0.9",
+      "picomatch@2": "^2.3.2",
+      "picomatch@4": "^4.0.4",
+      "postcss": "^8.5.14",
+      "ws": "^8.20.1",
+      "yaml": "^2.9.0"
+    }
+  },
   "devDependencies": {
-    "@nuxt/icon": "^2.2.0",
+    "@nuxt/icon": "^2.2.2",
     "@nuxtjs/tailwindcss": "^6.14.0",
-    "@supabase/supabase-js": "^2.98.0",
-    "@types/three": "^0.184.0",
-    "dotenv": "^17.3.1",
-    "happy-dom": "^20.1.0",
+    "@supabase/supabase-js": "^2.106.0",
+    "@types/three": "^0.184.1",
+    "@vue/compiler-sfc": "^3.5.34",
+    "dotenv": "^17.4.2",
+    "eslint": "^9.39.4",
+    "happy-dom": "^20.9.0",
     "htmlparser2": "^12.0.0",
-    "tsx": "^4.21.0",
-    "vitest": "^4.0.17"
+    "tsx": "^4.22.2",
+    "vitest": "^4.1.6",
+    "vue-tsc": "^3.3.0"
   }
 }
