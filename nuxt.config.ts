@@ -1,7 +1,37 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
+const securityHeaders = {
+  'x-content-type-options': 'nosniff',
+  'x-frame-options': 'DENY',
+  'referrer-policy': 'strict-origin-when-cross-origin',
+  'permissions-policy': 'camera=(), microphone=(), geolocation=()',
+  'content-security-policy': [
+    "default-src 'self'",
+    "base-uri 'self'",
+    "object-src 'none'",
+    "frame-ancestors 'none'",
+    "form-action 'self'",
+    "script-src 'self' 'unsafe-inline'",
+    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+    "font-src 'self' data: https://fonts.gstatic.com",
+    "img-src 'self' data: blob: https://pikmin.wiki.gallery https://*.tile.openstreetmap.org",
+    "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.iconify.design https://api.simplesvg.com https://api.unisvg.com https://nominatim.openstreetmap.org https://overpass-api.de https://overpass.kumi.systems https://maps.mail.ru",
+    "worker-src 'self' blob:",
+    "manifest-src 'self'",
+    'upgrade-insecure-requests',
+  ].join('; '),
+};
+
+const withSecurityHeaders = (headers: Record<string, string>) => ({
+  headers: {
+    ...securityHeaders,
+    ...headers,
+  },
+});
+
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
+  sourcemap: false,
   
   modules: ['@nuxtjs/tailwindcss', '@nuxtjs/supabase', '@nuxt/icon', '@nuxtjs/i18n'],
   
@@ -15,8 +45,24 @@ export default defineNuxtConfig({
     configPath: 'tailwind.config.js',
   },
 
+  vite: {
+    build: {
+      modulePreload: {
+        polyfill: false,
+      },
+      // Nuxt/Vue plus the map/auth runtime sits a little above Vite's generic
+      // 500 kB browser-app default. Keep this explicit so real growth still
+      // shows up without forcing circular manual chunks.
+      chunkSizeWarningLimit: 1400,
+    },
+  },
+
   supabase: {
     redirect: false, // Auth is managed by AuthStore
+    // This app handles auth in the browser. Keeping SSR cookies enabled makes
+    // Render refresh Supabase sessions during SSR and can race the browser,
+    // causing repeated `refresh_token_already_used` AuthApiError logs.
+    useSsrCookies: false,
     redirectOptions: {
       login: '/auth',
       callback: '/auth/callback',
@@ -50,41 +96,24 @@ export default defineNuxtConfig({
 
   routeRules: {
     // Version manifest must always be fresh so open tabs can detect deployments.
-    '/version.json': { headers: { 'cache-control': 'no-cache, no-store, must-revalidate' } },
+    '/version.json': withSecurityHeaders({ 'cache-control': 'no-cache, no-store, must-revalidate' }),
     // Keep HTML and route responses revalidated to pick up new app shell quickly.
-    '/**': { headers: { 'cache-control': 'no-cache' } },
-    '/version.json': {
-      headers: {
-        'cache-control': 'no-cache, no-store, must-revalidate',
-      },
-    },
+    '/**': withSecurityHeaders({ 'cache-control': 'no-cache' }),
     // HTML should revalidate frequently so users pick up new hashed bundles.
-    '/': {
-      headers: {
-        'cache-control': 'no-cache',
-      },
-    },
-    '/map': {
-      headers: {
-        'cache-control': 'no-cache',
-      },
-    },
-    '/collection': {
-      headers: {
-        'cache-control': 'no-cache',
-      },
-    },
+    '/': withSecurityHeaders({ 'cache-control': 'no-cache' }),
+    '/map': withSecurityHeaders({ 'cache-control': 'no-cache' }),
+    '/collection': withSecurityHeaders({ 'cache-control': 'no-cache' }),
     // Large static data files are content-like assets. Avoid revalidating the
     // multi-MB map JSON on every map visit.
-    '/data/**': { headers: { 'cache-control': 'public, max-age=86400, stale-while-revalidate=604800' } },
-    '/img/**': { headers: { 'cache-control': 'public, max-age=604800, stale-while-revalidate=2592000' } },
-    '/icon.png': { headers: { 'cache-control': 'public, max-age=604800, stale-while-revalidate=2592000' } },
-    '/favicon.ico': { headers: { 'cache-control': 'public, max-age=604800, stale-while-revalidate=2592000' } },
-    '/manifest.webmanifest': { headers: { 'cache-control': 'public, max-age=86400, stale-while-revalidate=604800' } },
+    '/data/**': withSecurityHeaders({ 'cache-control': 'public, max-age=86400, stale-while-revalidate=604800' }),
+    '/img/**': withSecurityHeaders({ 'cache-control': 'public, max-age=604800, stale-while-revalidate=2592000' }),
+    '/icon.png': withSecurityHeaders({ 'cache-control': 'public, max-age=604800, stale-while-revalidate=2592000' }),
+    '/favicon.ico': withSecurityHeaders({ 'cache-control': 'public, max-age=604800, stale-while-revalidate=2592000' }),
+    '/manifest.webmanifest': withSecurityHeaders({ 'cache-control': 'public, max-age=86400, stale-while-revalidate=604800' }),
     // Cache images for 1 day
-    '/og-image.png': { headers: { 'cache-control': 'public, max-age=86400' } },
+    '/og-image.png': withSecurityHeaders({ 'cache-control': 'public, max-age=86400' }),
     // Cache other static assets
-    '/_nuxt/**': { headers: { 'cache-control': 'public, max-age=31536000, immutable' } },
+    '/_nuxt/**': withSecurityHeaders({ 'cache-control': 'public, max-age=31536000, immutable' }),
   },
   
   app: {
@@ -121,12 +150,10 @@ export default defineNuxtConfig({
     },
   },
 
-  // Nitro 配置：啟用靜態資源壓縮 (Gzip + Brotli)
-  // Build 時會自動產生 .gz 和 .br 壓縮版本，節省 60-80% 帶寬
+  // Nitro 配置
   nitro: {
-    compressPublicAssets: {
-      gzip: true,
-      brotli: true,
-    },
+    // public/data is hundreds of MB; build-time Brotli/Gzip compression stalls
+    // deployment builds and duplicates large JSON assets.
+    compressPublicAssets: false,
   },
 })

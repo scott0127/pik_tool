@@ -7,7 +7,7 @@
  * 重點：
  * - 避免將所有 POI (數百萬筆) 同時載入記憶體
  * - 即時將讀取的 POI 分配進前端所需的 S2 Level 16(或自訂Grid) Bucket
- * - 同步產出單格 s2_l17_single.json 來供應遊戲判斷雷達
+ * - 同步產出單格 s2_l17_single.json 作為中繼檔，管線後續會拆成前端使用的小檔
  */
 
 import { readdirSync, readFileSync, writeFileSync, mkdirSync, existsSync } from 'fs';
@@ -173,7 +173,7 @@ async function main() {
   writeFileSync(join(OUTPUT_DIR, 'index.json'), JSON.stringify(index), 'utf-8');
   console.log(`✅ 寫入主索引: ${join(OUTPUT_DIR, 'index.json')}`);
 
-  // 4. 輸出單一雷達飾品格 (同 build-s2-singletons 格式)
+  // 4. 輸出單一雷達飾品格中繼檔 (同 build-s2-singletons 格式)
   console.log(`\n💾 正在寫入 S2 單一飾品格資料...`);
   const cells = Array.from(cellTypes.entries())
     .filter(([, decorType]) => decorType)

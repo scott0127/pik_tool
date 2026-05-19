@@ -23,10 +23,10 @@ const __dirname = path.dirname(__filename);
 dotenv.config({ path: path.resolve(__dirname, '..', '.env') });
 
 const SUPABASE_URL = process.env.SUPABASE_URL!;
-const SUPABASE_KEY = process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_KEY!;
+const SUPABASE_KEY = process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_KEY!;
 
 if (!SUPABASE_URL || !SUPABASE_KEY) {
-  console.error('❌ 缺少 SUPABASE_URL 或 SUPABASE_SERVICE_KEY，請確認 .env 檔案');
+  console.error('❌ 缺少 SUPABASE_URL 或 SUPABASE_SECRET_KEY，請確認 .env 檔案');
   process.exit(1);
 }
 

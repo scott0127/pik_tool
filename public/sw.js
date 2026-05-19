@@ -2,9 +2,9 @@
 // 離線快取大型靜態資源，減少重複下載
 // ⚠️ 不預快取 HTML 導航路由，避免部署後舊 HTML 引用不存在的 chunk 檔
 
-const CACHE_NAME = 'pikmin-decor-v6';
-const STATIC_CACHE_NAME = 'pikmin-static-v6';
-const DATA_CACHE_NAME = 'pikmin-data-v6';
+const CACHE_NAME = 'pikmin-decor-v7';
+const STATIC_CACHE_NAME = 'pikmin-static-v7';
+const DATA_CACHE_NAME = 'pikmin-data-v7';
 
 // 需要快取的數據 URL 模式
 const DATA_URL_PATTERNS = [
@@ -75,24 +75,24 @@ self.addEventListener('fetch', (event) => {
     const isDataRequest = DATA_URL_PATTERNS.some(pattern => pattern.test(url.pathname));
 
     if (isDataRequest) {
-        // 數據文件: Network First 策略 (確保取得最新版)
-        // 優先嘗試網路請求，成功後更新快取；失敗則使用快取
+        // 數據文件: Cache First 策略
+        // 地圖 JSON 體積很大且檔名穩定，線上也先吃本機快取，避免每次開圖都打 Render。
+        // 若資料格式或內容更新，請同步 bump DATA_CACHE_NAME 版本。
         event.respondWith(
-            fetch(event.request)
-                .then((networkResponse) => {
-                    // 如果網路請求成功，更新快取
-                    if (networkResponse.ok) {
-                        const responseClone = networkResponse.clone();
-                        caches.open(DATA_CACHE_NAME).then((cache) => {
-                            cache.put(event.request, responseClone);
-                        });
+            caches.open(DATA_CACHE_NAME).then((cache) => {
+                return cache.match(event.request).then((cachedResponse) => {
+                    if (cachedResponse) {
+                        return cachedResponse;
                     }
-                    return networkResponse;
+
+                    return fetch(event.request).then((networkResponse) => {
+                        if (networkResponse.ok) {
+                            cache.put(event.request, networkResponse.clone());
+                        }
+                        return networkResponse;
+                    });
                 })
-                .catch(() => {
-                    console.log('[SW] Network failed, serving from cache:', url.pathname);
-                    return caches.match(event.request);
-                })
+            })
         );
     } else if (url.pathname.startsWith('/_nuxt/')) {
         // Nuxt 靜態資源: Cache First

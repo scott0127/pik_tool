@@ -147,8 +147,8 @@ beforeEach(() => {
 // 1. 基礎功能測試
 // =========================================================================
 describe('1. 基礎功能', () => {
-  it('decor.json 應有 95 個分類', () => {
-    expect(decorData.definitions.length).toBe(95);
+  it('decor.json 應有 97 個分類', () => {
+    expect(decorData.definitions.length).toBe(97);
   });
 
   it('getAllDecorItems() 應生成正確數量的 DecorItem', () => {
@@ -893,4 +893,3 @@ describe('11. saveCollection 行為層 — debounce vs 立即存', () => {
     expect(cloudSaves[1].itemCount).toBe(restaurantCount + cafeCount);
   });
 });
-
