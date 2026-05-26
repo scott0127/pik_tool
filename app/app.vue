@@ -1,6 +1,6 @@
 <template>
   <div class="min-h-screen relative">
-    <AppAmbientBackground />
+    <AppAmbientBackground v-if="!isStandalonePage" />
 
     <!-- Loading State -->
     <Transition
@@ -11,7 +11,7 @@
       leave-from-class="opacity-100"
       leave-to-class="opacity-0"
     >
-      <div v-if="isInitializing" class="fixed inset-0 flex items-center justify-center bg-gradient-to-br from-emerald-50 to-teal-50 z-50">
+      <div v-if="isInitializing && !isStandalonePage" class="fixed inset-0 flex items-center justify-center bg-gradient-to-br from-emerald-50 to-teal-50 z-50">
         <div class="text-center">
           <div class="relative inline-block mb-6">
             <div class="w-20 h-20 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-3xl flex items-center justify-center shadow-xl float glow-emerald">
@@ -30,19 +30,19 @@
     </Transition>
     
     <!-- Main Content -->
-    <div v-show="!isInitializing" class="relative z-10">
-      <AppHeader />
+    <div v-show="!isInitializing || isStandalonePage" class="relative z-10">
+      <AppHeader v-if="!isStandalonePage" />
       
-      <main :class="$route.path === '/map' ? 'w-full px-0 py-0' : 'max-w-7xl mx-auto px-4 py-6'">
+      <main :class="mainClass">
         <NuxtPage />
       </main>
       
-      <AppFooter />
+      <AppFooter v-if="!isStandalonePage" />
     </div>
 
     <!-- Global Components -->
-    <GlobalAnnouncement />
-    <PwaInstallPrompt />
+    <GlobalAnnouncement v-if="!isStandalonePage" />
+    <PwaInstallPrompt v-if="!isStandalonePage" />
     <Toast 
       v-if="currentToast && isShowingToast"
       :message="currentToast.message"
@@ -60,6 +60,13 @@
 const authStore = useAuthStore();
 const { loadCollection, loadFromCloud } = useCollection();
 const isInitializing = ref(true);
+const route = useRoute();
+const isStandalonePage = computed(() => route.meta.standalone === true);
+let appInitStarted = false;
+const mainClass = computed(() => {
+  if (isStandalonePage.value) return 'w-full px-0 py-0';
+  return route.path === '/map' ? 'w-full px-0 py-0' : 'max-w-7xl mx-auto px-4 py-6';
+});
 
 const { t, locale } = useI18n();
 
@@ -69,6 +76,7 @@ const { currentToast, isShowing: isShowingToast } = useToast();
 // 動態 SEO 設定 (支援多語系)
 useHead(() => ({
   titleTemplate: (titleChunk) => {
+    if (isStandalonePage.value) return titleChunk || 'Forza Music Overlay';
     return titleChunk ? `${titleChunk} - ${t('app.title')}` : t('app.title');
   },
   htmlAttrs: {
@@ -89,7 +97,10 @@ useSeoMeta({
   ogSiteName: () => t('app.title'),
 });
 
-onMounted(async () => {
+const initializeAppShell = async () => {
+  if (appInitStarted) return;
+  appInitStarted = true;
+  isInitializing.value = true;
   console.log('[App] Starting initialization...');
   
   try {
@@ -116,6 +127,23 @@ onMounted(async () => {
     setTimeout(() => {
       isInitializing.value = false;
     }, 300);
+  }
+};
+
+onMounted(async () => {
+  if (isStandalonePage.value) {
+    isInitializing.value = false;
+    return;
+  }
+
+  await initializeAppShell();
+});
+
+watch(isStandalonePage, async (standalone) => {
+  if (!standalone) {
+    await initializeAppShell();
+  } else {
+    isInitializing.value = false;
   }
 });
 
