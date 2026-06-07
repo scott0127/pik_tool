@@ -4036,6 +4036,43 @@
     },
     {
       "category": {
+        "id": "花冠",
+        "name": "花冠",
+        "nameEn": "Flower Crown",
+        "type": "special",
+        "icon": "noto:bento-box"
+      },
+      "variants": [
+        {
+          "id": "Flower Crown",
+          "name": "花冠",
+          "nameEn": "Flower Crown",
+          "imageUrl": "https://pikmin.wiki.gallery/images/thumb/d/d0/Decor_Red_Flower_Crown.png/200px-Decor_Red_Flower_Crown.png",
+          "imageUrls": {
+            "red": "https://pikmin.wiki.gallery/images/thumb/d/d0/Decor_Red_Flower_Crown.png/200px-Decor_Red_Flower_Crown.png",
+            "yellow": "https://pikmin.wiki.gallery/images/thumb/3/31/Decor_Yellow_Flower_Crown.png/200px-Decor_Yellow_Flower_Crown.png",
+            "blue": "https://pikmin.wiki.gallery/images/thumb/a/a4/Decor_Blue_Flower_Crown.png/200px-Decor_Blue_Flower_Crown.png",
+            "white": "https://pikmin.wiki.gallery/images/c/c5/Decor_White_Flower_Crown.png",
+            "purple": "https://pikmin.wiki.gallery/images/thumb/1/1a/Decor_Purple_Flower_Crown.png/200px-Decor_Purple_Flower_Crown.png",
+            "rock": "https://pikmin.wiki.gallery/images/thumb/f/f1/Decor_Rock_Flower_Crown.png/200px-Decor_Rock_Flower_Crown.png",
+            "winged": "https://pikmin.wiki.gallery/images/thumb/d/d5/Decor_Winged_Flower_Crown.png/200px-Decor_Winged_Flower_Crown.png",
+            "ice": "https://pikmin.wiki.gallery/images/thumb/e/e2/Decor_Ice_Flower_Crown.png/200px-Decor_Ice_Flower_Crown.png"
+          }
+        }
+      ],
+      "availablePikminTypes": [
+        "red",
+        "yellow",
+        "blue",
+        "white",
+        "purple",
+        "rock",
+        "winged",
+        "ice"
+      ]
+    },
+    {
+      "category": {
         "id": "golden-airplane",
         "name": "金色飛機玩具",
         "nameEn": "Golden Toy Airplane",
