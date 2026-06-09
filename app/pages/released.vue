@@ -9,9 +9,10 @@
     <div class="max-w-4xl mx-auto px-4 sm:px-6 relative z-10">
       <!-- Header -->
       <div class="mb-8 flex flex-col sm:flex-row items-center gap-6 sm:gap-8 text-center sm:text-left gsap-stagger">
-        <div class="w-40 h-40 shrink-0 rounded-[2rem] overflow-hidden shadow-lg shadow-emerald-900/10 border-4 border-white relative bg-white">
-          <img src="/images/released_hero.png" alt="Pikmin leaving" class="w-full h-full object-cover transform hover:scale-105 transition-transform duration-700" />
-          <div class="absolute inset-0 ring-1 ring-inset ring-black/5 rounded-[2rem] pointer-events-none"></div>
+        <div class="w-48 h-48 sm:w-56 sm:h-56 shrink-0 relative flex items-center justify-center">
+          <div class="absolute inset-0 w-full h-full" style="mask-image: radial-gradient(circle closest-side, black 50%, transparent 100%); -webkit-mask-image: radial-gradient(circle closest-side, black 50%, transparent 100%);">
+            <img src="/images/single_pikmin_leaving.png" alt="Pikmin leaving" class="w-full h-full object-cover transform hover:scale-105 transition-transform duration-1000 opacity-90 mix-blend-multiply" />
+          </div>
         </div>
         <div>
           <h1 class="text-4xl sm:text-5xl font-extrabold text-emerald-900 mb-3 drop-shadow-sm">
