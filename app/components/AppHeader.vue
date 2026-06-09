@@ -325,7 +325,7 @@
             </div>
 
             <!-- Mobile Nav -->
-            <div class="grid grid-cols-4 gap-2">
+            <div class="grid grid-cols-5 gap-1.5">
               <NuxtLink
                 v-for="(link, index) in navLinks"
                 :key="link.to"
@@ -695,6 +695,7 @@ const navLinks = computed(() => [
   { to: '/collection', name: t('nav.collection'), icon: 'line-md:text-box' },
   { to: '/map', name: t('nav.map'), icon: 'line-md:map-marker' },
   { to: '/friends', name: t('nav.friends'), icon: 'line-md:account' },
+  { to: '/released', name: t('nav.released'), icon: 'line-md:cloud-off-outline-loop' },
 ]);
 
 const isLoggingOut = ref(false);
