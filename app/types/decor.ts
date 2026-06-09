@@ -95,3 +95,21 @@ export interface CollectionStats {
   byPikminType: Record<PikminType, { total: number; collected: number }>;
   byCategoryType: Record<DecorCategoryType, { total: number; collected: number }>;
 }
+
+// Released Pikmin record
+export interface ReleasedPikmin {
+  id: string;              // UUID (crypto.randomUUID)
+  decorItemId: string;     // DecorItem.id, e.g. "restaurant_chef_hat_red"
+  nickname?: string;       // Pikmin's in-game nickname
+  location?: string;       // Where the Pikmin was obtained
+  releasedAt: string;      // ISO date string (date only, e.g. "2026-06-09")
+  note?: string;           // Free-form note
+  createdAt: string;       // ISO datetime when this record was created
+}
+
+// Released state stored in localStorage
+export interface ReleasedState {
+  records: ReleasedPikmin[];
+  lastUpdated: string;     // ISO date string
+  version: number;         // For migration purposes
+}
