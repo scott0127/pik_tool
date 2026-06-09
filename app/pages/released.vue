@@ -11,7 +11,7 @@
       <div class="mb-8 flex flex-col sm:flex-row items-center gap-6 sm:gap-8 text-center sm:text-left gsap-stagger">
         <div class="w-48 h-48 sm:w-56 sm:h-56 shrink-0 relative flex items-center justify-center">
           <div class="absolute inset-0 w-full h-full" style="mask-image: radial-gradient(circle closest-side, black 50%, transparent 100%); -webkit-mask-image: radial-gradient(circle closest-side, black 50%, transparent 100%);">
-            <img src="/images/single_pikmin_leaving.png" alt="Pikmin leaving" class="w-full h-full object-cover transform hover:scale-105 transition-transform duration-1000 opacity-90 mix-blend-multiply" />
+            <img src="/images/red_pikmin_leaving.png" alt="Red Pikmin leaving" class="w-full h-full object-cover transform hover:scale-105 transition-transform duration-1000 opacity-90 mix-blend-multiply" />
           </div>
         </div>
         <div>
