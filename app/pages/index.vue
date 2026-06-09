@@ -302,4 +302,3 @@ const goToCategory = (categoryId: string) => {
   router.push({ path: '/collection', query: { category: categoryId } });
 };
 </script>
-```
