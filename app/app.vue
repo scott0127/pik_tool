@@ -2,6 +2,35 @@
   <div class="min-h-screen relative">
     <AppAmbientBackground v-if="!isStandalonePage" />
 
+    <!-- Updating Version State -->
+    <Transition
+      enter-active-class="transition duration-300"
+      enter-from-class="opacity-0 scale-95"
+      enter-to-class="opacity-100 scale-100"
+      leave-active-class="transition duration-300"
+      leave-from-class="opacity-100 scale-100"
+      leave-to-class="opacity-0 scale-95"
+    >
+      <div v-if="isUpdatingVersion" class="fixed inset-0 flex items-center justify-center bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl z-[9999]">
+        <div class="text-center bg-white dark:bg-gray-800 p-8 rounded-[2rem] shadow-2xl border border-gray-100 dark:border-gray-700 max-w-sm mx-4">
+          <div class="relative inline-block mb-6">
+            <div class="w-20 h-20 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-2xl flex items-center justify-center shadow-lg shadow-emerald-500/30 animate-pulse">
+              <Icon name="line-md:cloud-download-outline-loop" class="w-10 h-10 text-white" />
+            </div>
+            <span class="absolute -top-2 -right-2 text-2xl animate-bounce">✨</span>
+          </div>
+          <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">更新載入中</h2>
+          <p class="text-gray-500 dark:text-gray-400 font-medium mb-6">發現了新的遊戲資料，正在為您同步...</p>
+          
+          <div class="flex items-center justify-center gap-2">
+            <div class="w-2.5 h-2.5 bg-emerald-500 rounded-full animate-bounce" style="animation-delay: 0ms"></div>
+            <div class="w-2.5 h-2.5 bg-emerald-500 rounded-full animate-bounce" style="animation-delay: 150ms"></div>
+            <div class="w-2.5 h-2.5 bg-emerald-500 rounded-full animate-bounce" style="animation-delay: 300ms"></div>
+          </div>
+        </div>
+      </div>
+    </Transition>
+
     <!-- Loading State -->
     <Transition
       enter-active-class="transition duration-300"
@@ -60,6 +89,7 @@
 const authStore = useAuthStore();
 const { loadCollection, loadFromCloud } = useCollection();
 const isInitializing = ref(true);
+const isUpdatingVersion = useState('isUpdatingVersion', () => false);
 const route = useRoute();
 const isStandalonePage = computed(() => route.meta.standalone === true);
 let appInitStarted = false;

@@ -63,7 +63,12 @@ export default defineNuxtPlugin(() => {
       latestVersion,
     });
 
-    window.location.reload();
+    const isUpdatingVersion = useState('isUpdatingVersion', () => false);
+    isUpdatingVersion.value = true;
+
+    setTimeout(() => {
+      window.location.reload();
+    }, 2500);
   };
 
   checkVersion();
