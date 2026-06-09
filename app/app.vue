@@ -40,7 +40,7 @@
       leave-from-class="opacity-100"
       leave-to-class="opacity-0"
     >
-      <div v-if="isInitializing && !isStandalonePage" class="fixed inset-0 flex items-center justify-center bg-gradient-to-br from-emerald-50 to-teal-50 z-50">
+      <div v-if="!isAppReady && !isStandalonePage && !isUpdatingVersion" class="fixed inset-0 flex items-center justify-center bg-gradient-to-br from-emerald-50 to-teal-50 z-50">
         <div class="text-center">
           <div class="relative inline-block mb-6">
             <div class="w-20 h-20 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-3xl flex items-center justify-center shadow-xl float glow-emerald">
@@ -59,7 +59,7 @@
     </Transition>
     
     <!-- Main Content -->
-    <div v-show="!isInitializing || isStandalonePage" class="relative z-10">
+    <div v-show="isAppReady || isStandalonePage" class="relative z-10">
       <AppHeader v-if="!isStandalonePage" />
       
       <main :class="mainClass">
@@ -90,6 +90,8 @@ const authStore = useAuthStore();
 const { loadCollection, loadFromCloud } = useCollection();
 const isInitializing = ref(true);
 const isUpdatingVersion = useState('isUpdatingVersion', () => false);
+const isCheckingVersion = useState('isCheckingVersion', () => true);
+const isAppReady = computed(() => !isInitializing.value && !isCheckingVersion.value);
 const route = useRoute();
 const isStandalonePage = computed(() => route.meta.standalone === true);
 let appInitStarted = false;
