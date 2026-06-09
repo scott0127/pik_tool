@@ -40,38 +40,52 @@ export default defineNuxtPlugin(() => {
     }
   };
 
-  const checkVersion = async () => {
-    const latestVersion = await fetchLatestVersion();
-    if (!latestVersion) return;
-
-    const currentVersion = localStorage.getItem(VERSION_STORAGE_KEY);
-
-    if (!currentVersion) {
-      localStorage.setItem(VERSION_STORAGE_KEY, latestVersion);
-      return;
-    }
-
-    if (currentVersion === latestVersion) return;
-
-    if (shouldAvoidReloadLoop()) return;
-
-    localStorage.setItem(VERSION_STORAGE_KEY, latestVersion);
-    setReloadLock();
-
-    console.info('[VersionCheck] New version detected. Reloading...', {
-      currentVersion,
-      latestVersion,
-    });
-
     const isUpdatingVersion = useState('isUpdatingVersion', () => false);
-    isUpdatingVersion.value = true;
+    const isCheckingVersion = useState('isCheckingVersion', () => true);
 
-    setTimeout(() => {
-      window.location.reload();
-    }, 2500);
-  };
+    const checkVersion = async () => {
+      const latestVersion = await fetchLatestVersion();
+      if (!latestVersion) {
+        isCheckingVersion.value = false;
+        return;
+      }
 
-  checkVersion();
+      const currentVersion = localStorage.getItem(VERSION_STORAGE_KEY);
+
+      if (!currentVersion) {
+        localStorage.setItem(VERSION_STORAGE_KEY, latestVersion);
+        isCheckingVersion.value = false;
+        return;
+      }
+
+      if (currentVersion === latestVersion) {
+        isCheckingVersion.value = false;
+        return;
+      }
+
+      if (shouldAvoidReloadLoop()) {
+        isCheckingVersion.value = false;
+        return;
+      }
+
+      localStorage.setItem(VERSION_STORAGE_KEY, latestVersion);
+      setReloadLock();
+
+      console.info('[VersionCheck] New version detected. Reloading...', {
+        currentVersion,
+        latestVersion,
+      });
+
+      // Show update overlay, and do not set isCheckingVersion to false 
+      // so the app stays blocked until reload.
+      isUpdatingVersion.value = true;
+
+      setTimeout(() => {
+        window.location.reload();
+      }, 2500);
+    };
+
+    checkVersion();
 
   window.addEventListener('focus', checkVersion);
 
