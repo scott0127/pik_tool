@@ -51,10 +51,17 @@
 
       <!-- Records List -->
       <div v-if="filteredRecords.length > 0" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 mt-12">
-        <div 
+        <LiquidGlassCard 
           v-for="record in filteredRecords" 
           :key="record.id"
-          class="gsap-card glass-capsule flex flex-col items-center pt-8 pb-6 px-4 group transition-transform duration-500 hover:-translate-y-2 hover:shadow-2xl hover:shadow-emerald-500/20 h-[300px] sm:h-[320px]"
+          :blur-value="12"
+          :glass-opacity="0.3"
+          :bg-x="bgXSpring"
+          :bg-y="bgYSpring"
+          :is-draggable="false"
+          :magnification="1"
+          bg-image=""
+          class="gsap-card glass-capsule flex flex-col items-center pt-8 pb-6 px-4 group h-[300px] sm:h-[320px] transition-all"
         >
           <!-- Floor Glow -->
           <div class="capsule-floor"></div>
@@ -65,7 +72,7 @@
           <div class="capsule-sparkle bottom-1/3 left-[20%]" style="animation-delay: 2.5s"></div>
 
           <!-- Image -->
-          <div class="relative w-24 h-24 sm:w-28 sm:h-28 shrink-0 z-10 mb-4 transition-transform duration-700 group-hover:scale-110">
+          <div class="relative w-24 h-24 sm:w-28 sm:h-28 shrink-0 z-10 mb-4 transition-transform duration-700 group-hover:scale-110 pointer-events-none">
             <img 
               :src="getRecordImageUrl(record.decorItemId) || ''" 
               alt="Decor"
@@ -81,41 +88,41 @@
           </div>
 
           <!-- Info -->
-          <div class="z-10 flex-1 flex flex-col items-center text-center w-full mt-auto">
-            <h3 class="font-extrabold text-gray-900 text-base sm:text-lg line-clamp-1 mb-1">
+          <div class="z-10 flex-1 flex flex-col items-center text-center w-full mt-auto pointer-events-none">
+            <h3 class="font-extrabold text-gray-900 text-base sm:text-lg line-clamp-1 mb-1 drop-shadow-sm">
               {{ record.nickname || getDecorName(record.decorItemId) }}
             </h3>
-            <p class="text-[10px] sm:text-xs text-emerald-700 font-bold bg-white/70 backdrop-blur-md px-2 py-0.5 rounded-full mb-3 shadow-sm border border-white/50">
+            <p class="text-[10px] sm:text-xs text-emerald-800 font-bold bg-white/60 backdrop-blur-md px-2 py-0.5 rounded-full mb-3 shadow-sm border border-white/50">
               {{ getDecorCategoryName(record.decorItemId) }}
             </p>
             
             <div class="flex flex-col gap-1.5 w-full items-center">
-              <span v-if="record.location" class="inline-flex items-center gap-1 text-[10px] font-bold bg-white/80 text-gray-700 px-2 py-0.5 rounded-full shadow-sm">
-                <Icon name="lucide:map-pin" class="w-3 h-3 text-emerald-600" />
+              <span v-if="record.location" class="inline-flex items-center gap-1 text-[10px] font-bold bg-white/70 text-gray-800 px-2 py-0.5 rounded-full shadow-sm">
+                <Icon name="lucide:map-pin" class="w-3 h-3 text-emerald-700" />
                 {{ record.location }}
               </span>
-              <span class="inline-flex items-center gap-1 text-[10px] font-bold bg-emerald-100/90 text-emerald-800 px-2 py-0.5 rounded-full shadow-sm border border-emerald-200/50">
-                <Icon name="lucide:calendar" class="w-3 h-3 text-emerald-600" />
+              <span class="inline-flex items-center gap-1 text-[10px] font-bold bg-emerald-100/80 text-emerald-900 px-2 py-0.5 rounded-full shadow-sm border border-emerald-200/50">
+                <Icon name="lucide:calendar" class="w-3 h-3 text-emerald-700" />
                 {{ record.releasedAt }}
               </span>
             </div>
             
             <!-- Note -->
-            <div v-if="record.note" class="mt-3 text-[10px] sm:text-xs text-gray-600 bg-white/50 backdrop-blur-md px-2 py-1.5 rounded-lg font-medium w-full line-clamp-2 border border-white/40 shadow-sm leading-tight">
+            <div v-if="record.note" class="mt-3 text-[10px] sm:text-xs text-gray-800 bg-white/50 backdrop-blur-md px-2 py-1.5 rounded-lg font-bold w-full line-clamp-2 border border-white/40 shadow-sm leading-tight">
               "{{ record.note }}"
             </div>
           </div>
 
           <!-- Hover Actions -->
-          <div class="absolute inset-0 z-20 bg-white/30 backdrop-blur-[4px] opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-3 sm:gap-4" style="border-radius: inherit;">
-            <button @click.stop="editRecord(record)" class="w-10 h-10 sm:w-12 sm:h-12 bg-white rounded-full flex items-center justify-center text-emerald-600 hover:bg-emerald-50 shadow-xl transform hover:scale-110 transition-all border border-emerald-100">
+          <div class="absolute inset-0 z-20 bg-white/10 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-3 sm:gap-4" style="border-radius: inherit;">
+            <button @click.stop="editRecord(record)" class="w-10 h-10 sm:w-12 sm:h-12 bg-white rounded-full flex items-center justify-center text-emerald-600 hover:bg-emerald-50 shadow-xl transform hover:scale-110 transition-all border border-emerald-100 cursor-pointer">
               <Icon name="lucide:edit-2" class="w-4 h-4 sm:w-5 sm:h-5" />
             </button>
-            <button @click.stop="confirmDelete(record)" class="w-10 h-10 sm:w-12 sm:h-12 bg-white rounded-full flex items-center justify-center text-red-500 hover:bg-red-50 shadow-xl transform hover:scale-110 transition-all border border-red-100">
+            <button @click.stop="confirmDelete(record)" class="w-10 h-10 sm:w-12 sm:h-12 bg-white rounded-full flex items-center justify-center text-red-500 hover:bg-red-50 shadow-xl transform hover:scale-110 transition-all border border-red-100 cursor-pointer">
               <Icon name="lucide:trash-2" class="w-4 h-4 sm:w-5 sm:h-5" />
             </button>
           </div>
-        </div>
+        </LiquidGlassCard>
       </div>
 
       <!-- Empty State -->
@@ -314,11 +321,27 @@ useHead({
 });
 
 // Initialization
+const bgX = ref(0);
+const bgY = ref(0);
+// Add useSpring composable state for LiquidGlassCard global parallax
+const bgXSpring = useSpring(bgX, { stiffness: 100, damping: 50 });
+const bgYSpring = useSpring(bgY, { stiffness: 100, damping: 50 });
+
+const handleGlobalMouseMove = (e: MouseEvent) => {
+  const xPct = (e.clientX / window.innerWidth) - 0.5;
+  const yPct = (e.clientY / window.innerHeight) - 0.5;
+  bgX.value = xPct * -30;
+  bgY.value = yPct * -30;
+};
+
 onMounted(async () => {
   loadFromLocal();
   if (authStore.isAuthenticated.value) {
     await loadFromCloud();
   }
+
+  // Bind global mouse move for liquid glass cards
+  window.addEventListener('mousemove', handleGlobalMouseMove);
 
   // GSAP Initial Stagger Animation
   nextTick(() => {
@@ -332,6 +355,12 @@ onMounted(async () => {
       { y: 0, opacity: 1, scale: 1, duration: 0.6, stagger: 0.05, ease: 'power2.out', delay: 0.3 }
     );
   });
+});
+
+import { onUnmounted } from 'vue';
+
+onUnmounted(() => {
+  window.removeEventListener('mousemove', handleGlobalMouseMove);
 });
 
 // Modal GSAP Transition Hooks
