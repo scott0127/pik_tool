@@ -6,7 +6,10 @@
       :style="{ '--immersive-progress': immersiveProgress }"
       aria-hidden="true"
     >
-      <div class="ambient-base absolute inset-0" />
+      <div 
+        class="ambient-base absolute inset-[-100px]" 
+        :style="{ transform: `translate3d(${bgXSpring}px, ${bgYSpring}px, 0)` }"
+      />
       <ClientOnly>
         <ThreeSporeBackdrop
           v-if="shouldRenderThree"
@@ -14,7 +17,10 @@
         />
       </ClientOnly>
 
-      <div class="ambient-cute absolute inset-0">
+      <div 
+        class="ambient-cute absolute inset-[-100px]"
+        :style="{ transform: `translate3d(${bgXSpring}px, ${bgYSpring}px, 0)` }"
+      >
         <div class="ambient-hill ambient-hill-a" />
         <div class="ambient-hill ambient-hill-b" />
         <svg
@@ -134,6 +140,8 @@
 <script setup lang="ts">
 const route = useRoute();
 const { t } = useI18n();
+
+const { bgXSpring, bgYSpring } = useParallax();
 
 const STORAGE_KEY = "pikmin-immersive-background";
 const SLIDER_TIP_DISMISSED_KEY = "pikmin-ambient-slider-tip-dismissed";

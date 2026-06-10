@@ -35,7 +35,7 @@
   >
     <!-- 1. 液態透鏡放大層 (True Liquid Lens Magnification Layer) -->
     <!-- 透過與全域視窗對齊的背景位移，再配合 scale 放大，創造出物理透鏡折射效果 -->
-    <div class="absolute inset-0 rounded-[inherit] pointer-events-none -z-10 overflow-hidden bg-white/5">
+    <div v-if="bgImage" class="absolute inset-0 rounded-[inherit] pointer-events-none -z-10 overflow-hidden bg-white/5">
       <div 
         class="absolute"
         :style="magnifierStyle"
@@ -89,6 +89,7 @@ interface Props {
   magnification?: number     // 內部放大率
   isDraggable?: boolean      // 是否允許滑鼠拖動
   isTiltable?: boolean       // 是否啟用 3D 懸停傾斜
+  bgInset?: number           // 全域背景的 inset 邊界 (px，預設為 0 以對齊滿版背景)
   containerEl?: HTMLElement  // 拖動限制的容器元件（若不傳則預設限制在 parentElement 內）
 }
 
@@ -97,10 +98,11 @@ const props = withDefaults(defineProps<Props>(), {
   glassOpacity: 0.1,
   bgX: 0,
   bgY: 0,
-  bgImage: '/bg.png',
+  bgImage: '',
   magnification: 1.15,
   isDraggable: true,
-  isTiltable: true
+  isTiltable: true,
+  bgInset: 0
 })
 
 // 元件 DOM 參照
@@ -251,15 +253,15 @@ const handleMouseLeave = () => {
 }
 
 // --- 卡片絕對坐標更新 (Lens Alignment Calculation) ---
-// 卡片相對於視窗背景（帶有 inset-[-100px] 的滿版背景）的左上角坐標。
+// 卡片相對於視窗背景的左上角坐標。
 // 為了與全域背景無縫對齊，放大層的 left / top 位置必須動態抵消卡片自身的拖動與頁面捲動位移。
 const updateRect = () => {
   if (cardRef.value) {
     const rect = cardRef.value.getBoundingClientRect()
-    // +100px 是因為全域背景具有 inset-[-100px] 的視差餘裕，其原點在 (-100, -100)
+    // +props.bgInset 是因為全域背景可能有視差邊界餘裕，例如 inset-[-100px]
     rectOffset.value = {
-      x: rect.left - dragX.value + 100,
-      y: rect.top - dragY.value + 100,
+      x: rect.left - dragX.value + props.bgInset,
+      y: rect.top - dragY.value + props.bgInset,
       w: rect.width,
       h: rect.height
     }
@@ -308,8 +310,8 @@ const magnifierStyle = computed(() => {
   const originY = dragY.value + rectOffset.value.y + rectOffset.value.h / 2
 
   return {
-    width: 'calc(100vw + 200px)',
-    height: 'calc(100vh + 200px)',
+    width: `calc(100vw + ${props.bgInset * 2}px)`,
+    height: `calc(100vh + ${props.bgInset * 2}px)`,
     left: `${leftVal}px`,
     top: `${topVal}px`,
     // 同步全域背景視差偏移 bgX / bgY，並乘以 magnification 倍率

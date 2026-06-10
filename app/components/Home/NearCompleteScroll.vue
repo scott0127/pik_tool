@@ -83,16 +83,11 @@ interface NearCompleteCategory {
 
 interface Props {
   categories: NearCompleteCategory[];
-  bgX?: number;
-  bgY?: number;
-  bgImage?: string;
 }
 
-const props = withDefaults(defineProps<Props>(), {
-  bgX: 0,
-  bgY: 0,
-  bgImage: '/images/bg.png'
-});
+const props = defineProps<Props>();
+
+const { bgXSpring: bgX, bgYSpring: bgY, bgImage } = useParallax();
 
 defineEmits(['select-category']);
 
