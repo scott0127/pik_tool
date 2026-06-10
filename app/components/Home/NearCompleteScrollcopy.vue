@@ -1,49 +1,40 @@
 <template>
-  <LiquidGlassCard
-    :blur-value="16"
-    :glass-opacity="0.15"
-    :bg-x="bgX"
-    :bg-y="bgY"
-    :bg-image="bgImage"
-    :magnification="1.05"
-    :is-draggable="false"
-    class="h-full w-full rounded-[2.5rem] p-6 flex flex-col relative overflow-hidden"
-  >
+  <div class="h-full flex flex-col pt-2 pb-2 px-1">
     <!-- Header: Simple & Clean (Pikmin Bloom Style) -->
-    <div class="flex items-center justify-between mb-4 px-2 relative z-10">
+    <div class="flex items-center justify-between mb-4 px-2">
       <div class="flex items-center gap-2">
          <Icon name="lucide:footprints" class="text-emerald-500 transform -rotate-45" />
-         <h2 class="text-gray-900 text-lg font-black tracking-tight drop-shadow-sm">{{ $t('home.near_complete.title') }}</h2>
+         <h2 class="text-on-glass text-white-halo text-lg font-black tracking-tight">{{ $t('home.near_complete.title') }}</h2>
       </div>
-      <button v-if="categories.length > 3" class="bg-white/30 border border-white/50 text-xs font-bold text-emerald-700 px-3 py-1.5 rounded-full hover:bg-white/50 transition-all shadow-sm">
+      <button v-if="categories.length > 3" class="glass-control text-xs font-bold text-emerald-700 px-3 py-1.5 rounded-full transition-all">
         {{ $t('home.near_complete.view_all') }}
       </button>
     </div>
 
     <!-- Empty State -->
-    <div v-if="categories.length === 0" class="flex-1 flex flex-col items-center justify-center text-center opacity-60 relative z-10">
+    <div v-if="categories.length === 0" class="flex-1 flex flex-col items-center justify-center text-center opacity-60">
         <Icon name="lucide:flower-2" class="text-4xl text-emerald-300 mb-2 animate-pulse" />
-        <p class="text-sm font-bold text-gray-700">{{ $t('home.near_complete.empty') }}</p>
+        <p class="text-sm font-bold text-gray-600">{{ $t('home.near_complete.empty') }}</p>
     </div>
 
     <!-- List: Expedition Style -->
-    <div v-else class="flex-1 flex flex-col gap-3 overflow-y-auto pr-2 custom-scrollbar relative z-10">
+    <div v-else class="flex-1 flex flex-col gap-3 overflow-y-auto pr-2 custom-scrollbar">
       <div 
         v-for="(cat, index) in categories.slice(0, 4)" 
         :key="cat.id"
         @click="$emit('select-category', cat.id)"
-        class="bg-white/20 border border-white/40 group relative w-full rounded-2xl p-3 transition-all duration-300 cursor-pointer flex items-center gap-3 hover:-translate-y-0.5 hover:bg-white/35 hover:shadow-lg"
+        class="glass-surface-readable group relative w-full rounded-2xl p-3 transition-all duration-300 cursor-pointer flex items-center gap-3 hover:-translate-y-0.5"
       >
         <!-- 1. Icon (Rounded Square like game) -->
-        <div class="bg-white/30 border border-white/50 w-12 h-12 rounded-xl flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform overflow-hidden shadow-sm">
+        <div class="glass-control w-12 h-12 rounded-xl flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform overflow-hidden">
             <img v-if="cat.icon.startsWith('http')" :src="cat.icon" class="w-10 h-10 object-contain" alt="icon" />
-            <Icon v-else :name="cat.icon" class="text-2xl text-gray-800" />
+            <Icon v-else :name="cat.icon" class="text-2xl text-gray-700" />
         </div>
 
         <!-- 2. Progress Info -->
         <div class="flex-1 min-w-0">
             <div class="flex justify-between items-end mb-1">
-                <span class="text-gray-900 font-black text-sm truncate pr-2 drop-shadow-sm">{{ cat.name }}</span>
+                <span class="text-on-glass font-black text-sm truncate pr-2">{{ cat.name }}</span>
                 <span class="near-badge text-[10px] font-black px-1.5 py-0.5 rounded-md">
                     {{ $t('home.near_complete.remaining', { n: cat.remaining }) }}
                 </span>
@@ -61,12 +52,12 @@
         </div>
 
         <!-- 3. Goal (Gift) -->
-        <div class="bg-white/30 border border-white/50 w-8 h-8 rounded-full flex items-center justify-center shrink-0 group-hover:rotate-12 transition-transform shadow-sm">
+        <div class="glass-control w-8 h-8 rounded-full flex items-center justify-center shrink-0 group-hover:rotate-12 transition-transform">
              <Icon name="lucide:gift" class="w-4 h-4 text-orange-500" />
         </div>
       </div>
     </div>
-  </LiquidGlassCard>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -81,18 +72,9 @@ interface NearCompleteCategory {
   percentage: number;
 }
 
-interface Props {
-  categories: NearCompleteCategory[];
-  bgX?: number;
-  bgY?: number;
-  bgImage?: string;
-}
-
-const props = withDefaults(defineProps<Props>(), {
-  bgX: 0,
-  bgY: 0,
-  bgImage: '/images/bg.png'
-});
+defineProps<{
+  categories: NearCompleteCategory[]
+}>();
 
 defineEmits(['select-category']);
 
