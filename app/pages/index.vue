@@ -16,13 +16,16 @@
       <HomeBentoGrid>
           <!-- 1. Hero -->
           <template #hero>
-              <HomeHeroSection />
+              <HomeHeroSection :bg-x="bgXSpring" :bg-y="bgYSpring" bg-image="/images/bg.png" />
           </template>
 
           <!-- 2. Near Complete -->
           <template #near-complete>
              <HomeNearCompleteScroll 
                 :categories="nearCompleteCategories" 
+                :bg-x="bgXSpring"
+                :bg-y="bgYSpring"
+                bg-image="/images/bg.png"
                 @select-category="goToCategory"
             />
           </template>

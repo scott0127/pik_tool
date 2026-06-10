@@ -39,86 +39,68 @@
        <!-- Interactive & Tracker Unified Container -->
        <div class="flex flex-col items-stretch w-full sm:w-[100%] md:w-[100%] mx-auto md:mx-0 mt-8 gap-3 md:gap-4 relative z-10">
            
-            <!-- Interactive Pikmin Spirits -->
-            <LiquidGlassCard 
-              :blur-value="14"
-              :glass-opacity="0.15"
-              :bg-x="bgX"
-              :bg-y="bgY"
-              :bg-image="bgImage"
-              :magnification="1.05"
-              :is-draggable="false"
-              class="relative rounded-3xl md:rounded-[2rem] p-4 w-full flex flex-col md:flex-row md:items-center md:justify-center gap-4 md:gap-2 hover:scale-[1.02] transition-transform duration-300"
-            >
-                <!-- Admin Settings Button -->
-                <button
-                  v-if="isAdmin"
-                  @click.stop="showSettingsModal = true"
-                  class="glass-control absolute top-3 right-3 z-50 w-9 h-9 rounded-full text-emerald-600 hover:text-emerald-700 hover:scale-110 transition-all"
-                  aria-label="Hero settings"
-                >
-                   <Icon name="lucide:settings" class="w-4.5 h-4.5" />
-                </button>
-                <!-- Row 1: Reverse Valentine Stickers -->
-                <div class="flex items-center justify-center -space-x-2 md:-space-x-4 relative group h-14 cursor-none w-full md:w-auto">
-                   <div v-for="(pikmin, index) in valentineSpirits" :key="pikmin.id" 
-                        class="w-10 h-14 transform transition-all duration-300 hover:scale-125 hover:-translate-y-4 hover:z-20 relative filter drop-shadow-md"
-                        :style="{ zIndex: index }">
-                        <img :src="pikmin.image" :alt="pikmin.name" class="w-full h-full object-contain" />
-                   </div>
-                   
-                  <!-- Tooltip (appears on hover of container) -->
-                  <div class="absolute bottom-full mb-3 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-all duration-300 text-[11px] font-bold text-pink-700 bg-white/95 shadow-md border border-pink-100/50 px-3.5 py-1.5 rounded-full pointer-events-none whitespace-nowrap z-40 transform group-hover:-translate-y-1">
-                      {{ row1CategoryName }}
+           <!-- Interactive Pikmin Spirits -->
+           <div class="glass-surface-clear relative rounded-3xl md:rounded-[2rem] p-4 w-full flex flex-col md:flex-row md:items-center md:justify-center gap-4 md:gap-2 hover:scale-105 transition-transform duration-300">
+               <!-- Admin Settings Button -->
+               <button
+                 v-if="isAdmin"
+                 @click.stop="showSettingsModal = true"
+                 class="glass-control absolute top-3 right-3 z-50 w-9 h-9 rounded-full text-emerald-600 hover:text-emerald-700 hover:scale-110 transition-all"
+                 aria-label="Hero settings"
+               >
+                  <Icon name="lucide:settings" class="w-4.5 h-4.5" />
+               </button>
+               <!-- Row 1: Reverse Valentine Stickers -->
+               <div class="flex items-center justify-center -space-x-2 md:-space-x-4 relative group h-14 cursor-none w-full md:w-auto">
+                  <div v-for="(pikmin, index) in valentineSpirits" :key="pikmin.id" 
+                       class="w-10 h-14 transform transition-all duration-300 hover:scale-125 hover:-translate-y-4 hover:z-20 relative filter drop-shadow-md"
+                       :style="{ zIndex: index }">
+                       <img :src="pikmin.image" :alt="pikmin.name" class="w-full h-full object-contain" />
                   </div>
-               </div>
-
-               <!-- Row 2: Colored Powder -->
-                <div class="flex items-center justify-center -space-x-2 md:-space-x-4 relative group h-14 cursor-none w-full md:w-auto">
-                   <div v-for="(pikmin, index) in powderSpirits" :key="pikmin.id" 
-                        class="w-10 h-14 transform transition-all duration-300 hover:scale-125 hover:-translate-y-4 hover:z-20 relative filter drop-shadow-md"
-                        :style="{ zIndex: index }">
-                        <img :src="pikmin.image" :alt="pikmin.name" class="w-full h-full object-contain" />
-                   </div>
                   
-                  <!-- Tooltip (appears on hover of container) -->
-                  <div class="absolute bottom-full mb-3 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-all duration-300 text-[11px] font-bold text-indigo-700 bg-white/95 shadow-md border border-indigo-100/50 px-3.5 py-1.5 rounded-full pointer-events-none whitespace-nowrap z-40 transform group-hover:-translate-y-1">
-                      {{ row2CategoryName }}
+                 <!-- Tooltip (appears on hover of container) -->
+                 <div class="absolute bottom-full mb-3 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-all duration-300 text-[11px] font-bold text-pink-700 bg-white/95 shadow-md border border-pink-100/50 px-3.5 py-1.5 rounded-full pointer-events-none whitespace-nowrap z-40 transform group-hover:-translate-y-1">
+                     {{ row1CategoryName }}
+                 </div>
+              </div>
+
+              <!-- Row 2: Colored Powder -->
+               <div class="flex items-center justify-center -space-x-2 md:-space-x-4 relative group h-14 cursor-none w-full md:w-auto">
+                  <div v-for="(pikmin, index) in powderSpirits" :key="pikmin.id" 
+                       class="w-10 h-14 transform transition-all duration-300 hover:scale-125 hover:-translate-y-4 hover:z-20 relative filter drop-shadow-md"
+                       :style="{ zIndex: index }">
+                       <img :src="pikmin.image" :alt="pikmin.name" class="w-full h-full object-contain" />
                   </div>
-               </div>
-            </LiquidGlassCard>
+                 
+                 <!-- Tooltip (appears on hover of container) -->
+                 <div class="absolute bottom-full mb-3 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-all duration-300 text-[11px] font-bold text-indigo-700 bg-white/95 shadow-md border border-indigo-100/50 px-3.5 py-1.5 rounded-full pointer-events-none whitespace-nowrap z-40 transform group-hover:-translate-y-1">
+                     {{ row2CategoryName }}
+                 </div>
+              </div>
+           </div>
 
-            <!-- Missing Tracker Badge -->
-            <LiquidGlassCard 
-              @click="showMissingModal = true"
-              :blur-value="14"
-              :glass-opacity="0.15"
-              :bg-x="bgX"
-              :bg-y="bgY"
-              :bg-image="bgImage"
-              :magnification="1.05"
-              :is-draggable="false"
-              class="group relative w-full inline-flex flex-col md:flex-row items-center md:justify-between gap-2 md:gap-3 px-5 py-4 min-h-[56px] md:py-3.5 text-sm md:text-[15px] font-medium rounded-3xl md:rounded-[2rem] focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 transition-transform hover:-translate-y-0.5 cursor-pointer"
-            >
-               <div class="flex items-center gap-2">
-                  <Icon name="lucide:search" class="text-xl text-emerald-600 shrink-0" />
-                  <span class="text-on-glass font-bold whitespace-nowrap">本月皮克敏還少了:</span>
-               </div>
+           <!-- Missing Tracker Badge -->
+           <button @click="showMissingModal = true" class="glass-surface-readable group relative w-full inline-flex flex-col md:flex-row items-center md:justify-between gap-2 md:gap-3 px-5 py-4 min-h-[56px] md:py-3.5 text-sm md:text-[15px] font-medium rounded-3xl md:rounded-[2rem] focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 transition-transform hover:-translate-y-0.5">
+              
+              <div class="flex items-center gap-2">
+                 <Icon name="lucide:search" class="text-xl text-emerald-600 shrink-0" />
+                 <span class="text-on-glass font-bold whitespace-nowrap">本月皮克敏還少了:</span>
+              </div>
 
-               <div v-if="missingValentine.length > 0 || missingPowder.length > 0" class="flex items-center justify-center flex-wrap gap-2 w-full md:w-auto">
-                   <span v-if="missingValentine.length > 0" class="inline-flex items-center gap-1.5 bg-pink-100/80 text-pink-700 px-3 py-1 rounded-full text-xs md:text-sm font-bold border border-pink-200/60 transition-transform hover:scale-105">
-                     貼紙 <span class="bg-white rounded-full px-1.5 text-pink-800 shadow-sm">{{ missingValentine.length }}</span>
-                   </span>
-                   <span v-if="missingPowder.length > 0" class="inline-flex items-center gap-1.5 bg-indigo-100/80 text-indigo-700 px-3 py-1 rounded-full text-xs md:text-sm font-bold border border-indigo-200/60 transition-transform hover:scale-105">
-                     粉末 <span class="bg-white rounded-full px-1.5 text-indigo-800 shadow-sm">{{ missingPowder.length }}</span>
-                   </span>
-               </div>
-               <span v-else class="text-on-glass tracking-wide font-normal px-2">
-                 🎉 太神啦！近期活動收集完畢！
-               </span>
+              <div v-if="missingValentine.length > 0 || missingPowder.length > 0" class="flex items-center justify-center flex-wrap gap-2 w-full md:w-auto">
+                  <span v-if="missingValentine.length > 0" class="inline-flex items-center gap-1.5 bg-pink-100/80 text-pink-700 px-3 py-1 rounded-full text-xs md:text-sm font-bold border border-pink-200/60 transition-transform hover:scale-105">
+                    貼紙 <span class="bg-white rounded-full px-1.5 text-pink-800 shadow-sm">{{ missingValentine.length }}</span>
+                  </span>
+                  <span v-if="missingPowder.length > 0" class="inline-flex items-center gap-1.5 bg-indigo-100/80 text-indigo-700 px-3 py-1 rounded-full text-xs md:text-sm font-bold border border-indigo-200/60 transition-transform hover:scale-105">
+                    粉末 <span class="bg-white rounded-full px-1.5 text-indigo-800 shadow-sm">{{ missingPowder.length }}</span>
+                  </span>
+              </div>
+              <span v-else class="text-on-glass tracking-wide font-normal px-2">
+                🎉 太神啦！近期活動收集完畢！
+              </span>
 
-               <span v-if="missingValentine.length > 0 || missingPowder.length > 0" class="text-emerald-600/90 border-b border-emerald-400 group-hover:text-emerald-700 group-hover:border-emerald-600 transition-colors whitespace-nowrap text-[13px] md:text-sm font-semibold pb-0.5 mt-1 md:mt-0 md:ml-1 self-center">點擊查看缺誰</span>
-            </LiquidGlassCard>
+              <span v-if="missingValentine.length > 0 || missingPowder.length > 0" class="text-emerald-600/90 border-b border-emerald-400 group-hover:text-emerald-700 group-hover:border-emerald-600 transition-colors whitespace-nowrap text-[13px] md:text-sm font-semibold pb-0.5 mt-1 md:mt-0 md:ml-1 self-center">點擊查看缺誰</span>
+           </button>
        </div>
     </div>
 
@@ -133,19 +115,9 @@
                 <div class="absolute inset-10 bg-gradient-to-tr from-emerald-400 to-teal-400 rounded-full blur-[60px] opacity-40 animate-pulse-slow translate-z-[-20px]"></div>
 
                 <!-- 2. The Glass Sphere/Container -->
-                <LiquidGlassCard
-                  :blur-value="24"
-                  :glass-opacity="0.2"
-                  :bg-x="bgX"
-                  :bg-y="bgY"
-                  :bg-image="bgImage"
-                  :magnification="1.15"
-                  :is-draggable="false"
-                  :is-tiltable="false"
-                  class="absolute inset-0 rounded-full flex items-center justify-center translate-z-[0px]"
-                >
+                <div class="liquid-glass-2026 liquid-glass-dynamic absolute inset-0 rounded-full flex items-center justify-center translate-z-[0px]">
                     <div class="absolute inset-0 rounded-full bg-gradient-to-b from-white/40 to-transparent pointer-events-none"></div>
-                </LiquidGlassCard>
+                </div>
 
                 <!-- 3. Progress Ring (Floating) -->
                 <div class="absolute inset-4 translate-z-[20px]">
@@ -170,28 +142,8 @@
 
                 <!-- 4. Glass backgrounds only; crisp text is rendered above this transformed layer -->
                 <div class="absolute inset-0 flex flex-col items-center justify-center translate-z-[40px] pointer-events-none">
-                    <LiquidGlassCard
-                      :blur-value="16"
-                      :glass-opacity="0.3"
-                      :bg-x="bgX"
-                      :bg-y="bgY"
-                      :bg-image="bgImage"
-                      :magnification="1.1"
-                      :is-draggable="false"
-                      :is-tiltable="false"
-                      class="w-32 h-32 rounded-full mb-2"
-                    />
-                    <LiquidGlassCard
-                      :blur-value="10"
-                      :glass-opacity="0.4"
-                      :bg-x="bgX"
-                      :bg-y="bgY"
-                      :bg-image="bgImage"
-                      :magnification="1.05"
-                      :is-draggable="false"
-                      :is-tiltable="false"
-                      class="rounded-full mt-4 h-[30px] w-[116px]"
-                    />
+                    <div class="liquid-glass-2026 liquid-glass-dynamic w-32 h-32 rounded-full mb-2"></div>
+                    <div class="hero-stat-pill-shell rounded-full mt-4 h-[30px] w-[116px]"></div>
                 </div>
 
                 <!-- 5. Floating Orbs (Decorations) -->
@@ -216,29 +168,19 @@
 
   <!-- Missing Pikmin Modal -->
   <div v-if="showMissingModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-sm animate-fade-in" @click.self="showMissingModal = false">
-    <LiquidGlassCard 
-      v-if="showMissingModal"
-      :blur-value="24"
-      :glass-opacity="0.25"
-      :bg-x="bgX"
-      :bg-y="bgY"
-      :bg-image="bgImage"
-      :magnification="1.05"
-      :is-draggable="false"
-      class="rounded-3xl w-full max-w-lg max-h-[90vh] flex flex-col overflow-hidden animate-pop-in"
-    >
-      <div class="p-5 border-b border-white/60 flex justify-between items-center shrink-0 relative z-10">
-        <h3 class="text-xl font-bold text-emerald-800 flex items-center gap-2 drop-shadow-sm">
+    <div class="glass-surface-readable rounded-3xl w-full max-w-lg max-h-[90vh] flex flex-col overflow-hidden animate-pop-in">
+      <div class="p-5 border-b border-white/60 flex justify-between items-center shrink-0">
+        <h3 class="text-xl font-bold text-emerald-800 flex items-center gap-2">
           <Icon name="lucide:search" class="text-emerald-500" />
           目前缺少的現時活動飾品
         </h3>
-        <button @click="showMissingModal = false" class="bg-white/30 border border-white/50 w-8 h-8 rounded-full flex items-center justify-center hover:bg-white/50 transition-colors shadow-sm">
-          <Icon name="lucide:x" class="w-4 h-4 text-gray-800" />
+        <button @click="showMissingModal = false" class="glass-control text-gray-600 hover:text-gray-800 transition-colors rounded-full p-1.5">
+          <Icon name="lucide:x" class="w-5 h-5" />
         </button>
       </div>
       
-      <div class="p-6 overflow-y-auto flex-1 custom-scrollbar relative z-10">
-        <p v-if="missingValentine.length > 0 || missingPowder.length > 0" class="bg-white/20 border border-white/40 text-gray-800 text-sm mb-6 font-bold text-center py-2.5 rounded-xl drop-shadow-sm">
+      <div class="p-6 overflow-y-auto flex-1 custom-scrollbar">
+        <p v-if="missingValentine.length > 0 || missingPowder.length > 0" class="glass-surface-clear text-on-glass text-sm mb-6 font-bold text-center py-2.5 rounded-xl">
           這是您目前尚未收集到的活動顏色喔！快出門尋找它們吧！
         </p>
         
@@ -246,7 +188,7 @@
         <div v-if="missingValentine.length > 0" class="mb-8">
             <h4 class="text-md font-bold text-gray-700 mb-3 border-l-4 border-pink-400 pl-2">{{ row1CategoryName }} (差 {{ missingValentine.length }} 種)</h4>
             <div class="grid grid-cols-4 sm:grid-cols-4 gap-3">
-              <div v-for="spirit in missingValentine" :key="spirit.id" class="bg-white/20 border border-white/40 flex flex-col items-center p-2 rounded-xl hover:border-pink-200 transition-colors group">
+              <div v-for="spirit in missingValentine" :key="spirit.id" class="glass-surface-clear flex flex-col items-center p-2 rounded-xl hover:border-pink-200 transition-colors group">
                  <div class="w-12 h-12 flex items-center justify-center mb-1 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3 drop-shadow-md">
                     <img :src="spirit.image" :alt="spirit.name" class="w-full h-full object-contain filter grayscale group-hover:grayscale-0 opacity-70 group-hover:opacity-100 transition-all duration-300" />
                  </div>
@@ -261,7 +203,7 @@
         <div v-if="missingPowder.length > 0" class="mb-2">
             <h4 class="text-md font-bold text-gray-700 mb-3 border-l-4 border-indigo-400 pl-2">{{ row2CategoryName }} (差 {{ missingPowder.length }} 種)</h4>
             <div class="grid grid-cols-4 sm:grid-cols-4 gap-3">
-              <div v-for="spirit in missingPowder" :key="spirit.id" class="bg-white/20 border border-white/40 flex flex-col items-center p-2 rounded-xl hover:border-indigo-200 transition-colors group">
+              <div v-for="spirit in missingPowder" :key="spirit.id" class="glass-surface-clear flex flex-col items-center p-2 rounded-xl hover:border-indigo-200 transition-colors group">
                  <div class="w-12 h-12 flex items-center justify-center mb-1 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3 drop-shadow-md">
                     <img :src="spirit.image" :alt="spirit.name" class="w-full h-full object-contain filter grayscale group-hover:grayscale-0 opacity-70 group-hover:opacity-100 transition-all duration-300" />
                  </div>
@@ -280,8 +222,8 @@
         </div>
       </div>
       
-      <div class="p-4 border-t border-white/60 flex flex-wrap justify-end gap-3 shrink-0 relative z-10">
-         <button @click="showMissingModal = false" class="bg-white/30 border border-white/50 px-5 py-2.5 text-gray-800 rounded-xl font-bold transition-colors shadow-sm hover:bg-white/50">
+      <div class="p-4 border-t border-white/60 flex flex-wrap justify-end gap-3 shrink-0">
+         <button @click="showMissingModal = false" class="glass-control px-5 py-2.5 text-gray-800 rounded-xl font-bold transition-colors">
            關閉
          </button>
          <button v-if="missingValentine.length > 0" @click="navigateTo('/collection?category=' + row1CategoryId); showMissingModal = false" class="px-5 py-2.5 bg-pink-500 text-white rounded-xl font-medium hover:bg-pink-600 transition-colors shadow-sm flex items-center gap-2">
@@ -297,7 +239,7 @@
            <Icon name="lucide:arrow-right" class="w-4 h-4" />
          </button>
       </div>
-    </LiquidGlassCard>
+    </div>
   </div>
 
   <AdminHeroSettingsModal :is-open="showSettingsModal" @close="showSettingsModal = false" />
@@ -309,18 +251,6 @@ import { useAuthStore } from '~/composables/useAuthStore';
 import { useSiteConfig } from '~/composables/useSiteConfig';
 import { useDecorData } from '~/composables/useDecorData';
 import AdminHeroSettingsModal from '~/components/Admin/HeroSettingsModal.vue';
-
-interface Props {
-  bgX?: number;
-  bgY?: number;
-  bgImage?: string;
-}
-
-const props = withDefaults(defineProps<Props>(), {
-  bgX: 0,
-  bgY: 0,
-  bgImage: '/images/bg.png'
-});
 
 const { getStats, isCollected } = useCollection();
 const { isAdmin } = useAuthStore();
