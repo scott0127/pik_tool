@@ -310,17 +310,8 @@ import { useSiteConfig } from '~/composables/useSiteConfig';
 import { useDecorData } from '~/composables/useDecorData';
 import AdminHeroSettingsModal from '~/components/Admin/HeroSettingsModal.vue';
 
-interface Props {
-  bgX?: number;
-  bgY?: number;
-  bgImage?: string;
-}
-
-const props = withDefaults(defineProps<Props>(), {
-  bgX: 0,
-  bgY: 0,
-  bgImage: '/images/bg.png'
-});
+// 使用全域共享背景視差與底圖偵測
+const { bgXSpring: bgX, bgYSpring: bgY, bgImage } = useParallax();
 
 const { getStats, isCollected } = useCollection();
 const { isAdmin } = useAuthStore();

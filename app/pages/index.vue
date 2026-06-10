@@ -1,22 +1,10 @@
 <template>
   <div class="min-h-screen relative pb-20 overflow-hidden">
-    <!-- Global Parallax Background -->
-    <div 
-      class="fixed inset-[-50px] pointer-events-none -z-20 transition-transform duration-700 ease-out"
-      :style="{
-        backgroundImage: `url('/images/bg.png')`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        transform: `translate3d(${bgXSpring}px, ${bgYSpring}px, 0)`
-      }"
-    />
-    <div class="fixed inset-0 bg-white/20 pointer-events-none -z-10 backdrop-blur-[2px]" />
-
     <div class="relative z-10 pt-4 md:pt-8">
       <HomeBentoGrid>
           <!-- 1. Hero -->
           <template #hero>
-              <HomeHeroSection :bg-x="bgXSpring" :bg-y="bgYSpring" bg-image="/images/bg.png" />
+              <HomeHeroSection :bg-x="bgXSpring" :bg-y="bgYSpring" :bg-image="bgImage" />
           </template>
 
           <!-- 2. Near Complete -->
@@ -25,7 +13,7 @@
                 :categories="nearCompleteCategories" 
                 :bg-x="bgXSpring"
                 :bg-y="bgYSpring"
-                bg-image="/images/bg.png"
+                :bg-image="bgImage"
                 @select-category="goToCategory"
             />
           </template>
@@ -38,7 +26,7 @@
                 :glass-opacity="0.2"
                 :bg-x="bgXSpring"
                 :bg-y="bgYSpring"
-                bg-image="/images/bg.png"
+                :bg-image="bgImage"
                 :magnification="1.05"
                 :is-draggable="false"
                 class="group h-full w-full min-h-[220px] p-6 flex flex-col items-start justify-between relative overflow-hidden rounded-[2.5rem] cursor-pointer"
@@ -74,7 +62,7 @@
                 :glass-opacity="0.2"
                 :bg-x="bgXSpring"
                 :bg-y="bgYSpring"
-                bg-image="/images/bg.png"
+                :bg-image="bgImage"
                 :magnification="1.05"
                 :is-draggable="false"
                 class="group h-full w-full min-h-[220px] p-6 flex flex-col items-start justify-between relative overflow-hidden rounded-[2.5rem] cursor-pointer"
@@ -110,7 +98,7 @@
                 :glass-opacity="0.2"
                 :bg-x="bgXSpring"
                 :bg-y="bgYSpring"
-                bg-image="/images/bg.png"
+                :bg-image="bgImage"
                 :magnification="1.05"
                 :is-draggable="false"
                 class="group h-full w-full min-h-[220px] p-6 flex flex-col justify-between relative overflow-hidden rounded-[2.5rem] cursor-pointer"
@@ -141,7 +129,7 @@
             :glass-opacity="0.25"
             :bg-x="bgXSpring"
             :bg-y="bgYSpring"
-            bg-image="/images/bg.png"
+            :bg-image="bgImage"
             :magnification="1.02"
             :is-draggable="false"
             class="w-full flex items-center justify-center gap-3 px-6 py-4 rounded-[1.5rem] cursor-pointer hover:scale-[1.02] transition-transform duration-300 group"
@@ -155,7 +143,7 @@
             :glass-opacity="0.25"
             :bg-x="bgXSpring"
             :bg-y="bgYSpring"
-            bg-image="/images/bg.png"
+            :bg-image="bgImage"
             :magnification="1.02"
             :is-draggable="false"
             class="w-full flex items-center justify-center gap-3 px-6 py-4 rounded-[1.5rem] cursor-pointer hover:scale-[1.02] transition-transform duration-300 group"
@@ -170,7 +158,7 @@
           :glass-opacity="0.2"
           :bg-x="bgXSpring"
           :bg-y="bgYSpring"
-          bg-image="/images/bg.png"
+          :bg-image="bgImage"
           :magnification="1.05"
           :is-draggable="false"
           class="rounded-3xl p-6 relative overflow-hidden"
@@ -233,7 +221,7 @@
               :glass-opacity="0.3"
               :bg-x="bgXSpring"
               :bg-y="bgYSpring"
-              bg-image="/images/bg.png"
+              :bg-image="bgImage"
               :magnification="1.1"
               :is-draggable="false"
               class="rounded-[2rem] p-6 max-w-md w-full relative overflow-hidden"
@@ -279,7 +267,6 @@
 
 <script setup lang="ts">
 import { PIKMIN_TYPES, PIKMIN_TYPE_NAMES, PIKMIN_TYPE_COLORS, type PikminType } from '~/types/decor';
-import { useSpring } from '~/composables/useSpring';
 
 const { t, locale } = useI18n();
 
@@ -287,26 +274,8 @@ const router = useRouter();
 const { getStats } = useCollection();
 const { getDecorDefinitions } = useDecorData();
 
-// Liquid Glass Global Parallax State
-const bgX = ref(0);
-const bgY = ref(0);
-const bgXSpring = useSpring(bgX, { stiffness: 100, damping: 50 });
-const bgYSpring = useSpring(bgY, { stiffness: 100, damping: 50 });
-
-const handleGlobalMouseMove = (e: MouseEvent) => {
-  const xPct = (e.clientX / window.innerWidth) - 0.5;
-  const yPct = (e.clientY / window.innerHeight) - 0.5;
-  bgX.value = xPct * -40;
-  bgY.value = yPct * -40;
-};
-
-onMounted(() => {
-  window.addEventListener('mousemove', handleGlobalMouseMove);
-});
-
-onUnmounted(() => {
-  window.removeEventListener('mousemove', handleGlobalMouseMove);
-});
+// 使用全域共享背景視察與底圖偵測
+const { bgXSpring, bgYSpring, bgImage } = useParallax();
 
 // Stats
 const stats = computed(() => getStats());

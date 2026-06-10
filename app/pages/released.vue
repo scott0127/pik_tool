@@ -60,7 +60,7 @@
           :bg-y="bgYSpring"
           :is-draggable="false"
           :magnification="1"
-          bg-image=""
+          :bg-image="bgImage"
           class="gsap-card glass-capsule flex flex-col items-center pt-8 pb-6 px-4 group h-[300px] sm:h-[320px] transition-all"
         >
           <!-- Floor Glow -->
@@ -320,28 +320,14 @@ useHead({
   title: () => t('released.title') + ' | ' + t('app.title'),
 });
 
-// Initialization
-const bgX = ref(0);
-const bgY = ref(0);
-// Add useSpring composable state for LiquidGlassCard global parallax
-const bgXSpring = useSpring(bgX, { stiffness: 100, damping: 50 });
-const bgYSpring = useSpring(bgY, { stiffness: 100, damping: 50 });
-
-const handleGlobalMouseMove = (e: MouseEvent) => {
-  const xPct = (e.clientX / window.innerWidth) - 0.5;
-  const yPct = (e.clientY / window.innerHeight) - 0.5;
-  bgX.value = xPct * -30;
-  bgY.value = yPct * -30;
-};
+// 使用全域共享背景視差與底圖偵測
+const { bgXSpring, bgYSpring, bgImage } = useParallax();
 
 onMounted(async () => {
   loadFromLocal();
   if (authStore.isAuthenticated.value) {
     await loadFromCloud();
   }
-
-  // Bind global mouse move for liquid glass cards
-  window.addEventListener('mousemove', handleGlobalMouseMove);
 
   // GSAP Initial Stagger Animation
   nextTick(() => {
@@ -355,12 +341,6 @@ onMounted(async () => {
       { y: 0, opacity: 1, scale: 1, duration: 0.6, stagger: 0.05, ease: 'power2.out', delay: 0.3 }
     );
   });
-});
-
-import { onUnmounted } from 'vue';
-
-onUnmounted(() => {
-  window.removeEventListener('mousemove', handleGlobalMouseMove);
 });
 
 // Modal GSAP Transition Hooks
