@@ -6,7 +6,7 @@ const bgX = ref(0)
 const bgY = ref(0)
 const bgMouseX = ref(0)
 const bgMouseY = ref(0)
-const MOBILE_BG_IMAGE = '/img/ambient-glass-sprouts.png'
+const MOBILE_BG_IMAGE = '/img/ambient-glass-sprouts.png?v=bg-20260611'
 const DESKTOP_BG_IMAGE = '/img/pc_background_extended.png'
 const bgImage = ref(DESKTOP_BG_IMAGE)
 const isImmersive = ref(false)
@@ -27,7 +27,7 @@ const updateBgImage = () => {
     isMobile.value = window.innerWidth < 768
     bgImage.value = isMobile.value ? MOBILE_BG_IMAGE : DESKTOP_BG_IMAGE
     if (isMobile.value) {
-      scrollBgScale.value = 1.25
+      scrollBgScale.value = 1
       scrollBgY.value = 0
     } else {
       scrollBgScale.value = 1.16
