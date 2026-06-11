@@ -1,12 +1,14 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 import { useSpring } from '~/composables/useSpring'
 
+const MOBILE_AMBIENT_BG = '/img/ambient-glass-sprouts.png?v=bg-20260611'
+
 // 全域共享狀態 (Client-only)
 const bgX = ref(0)
 const bgY = ref(0)
 const bgMouseX = ref(0)
 const bgMouseY = ref(0)
-const bgImage = ref('/img/ambient-glass-sprouts.png')
+const bgImage = ref(MOBILE_AMBIENT_BG)
 const isImmersive = ref(false)
 const immersiveProgress = ref(0)
 const isMobile = ref(false)
@@ -35,7 +37,7 @@ const updateBgImage = () => {
   if (typeof window !== 'undefined') {
     const wasMobile = isMobile.value
     isMobile.value = window.innerWidth < 768
-    bgImage.value = '/img/ambient-glass-sprouts.png'
+    bgImage.value = MOBILE_AMBIENT_BG
     if (isMobile.value) {
       scrollBgScale.value = 1.25
       scrollBgY.value = 0
