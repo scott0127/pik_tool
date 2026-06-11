@@ -43,9 +43,28 @@ export default defineNuxtConfig({
   tailwindcss: {
     cssPath: '~/assets/css/main.css',
     configPath: 'tailwind.config.js',
+    viewer: false, // 關閉 Tailwind UI 預覽以加速啟動
   },
 
   vite: {
+    // 預先編譯大型重型套件，避免 Vite 在首頁載入時動態預編譯觸發多次重載 (Page Reload)
+    optimizeDeps: {
+      include: [
+        'gsap',
+        'three',
+        'leaflet',
+        '@vue-leaflet/vue-leaflet',
+        'vue',
+        'vue-router'
+      ]
+    },
+    // 優化 Windows 下的檔案監聽，排除產出目錄以降低檔案系統 I/O 與 CPU 負擔
+    server: {
+      watch: {
+        usePolling: false,
+        ignored: ['**/.nuxt/**', '**/.output/**', '**/node_modules/**']
+      }
+    },
     build: {
       modulePreload: {
         polyfill: false,
