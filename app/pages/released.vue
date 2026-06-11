@@ -44,18 +44,7 @@
           :key="record.id"
           class="released-record-row gsap-card group"
         >
-          <LiquidGlassCard
-            :blur-value="12"
-            :glass-opacity="0.2"
-            :bg-x="bgXSpring"
-            :bg-y="bgYSpring"
-            :bg-image="bgImage"
-            :magnification="1.05"
-            :is-draggable="false"
-            :is-tiltable="false"
-            class="released-record-image"
-          >
-            <div class="released-record-image-glow" />
+          <div class="released-record-image glass-frosted-shell">
             <img
               :src="getRecordImageUrl(record.decorItemId) || ''"
               alt="Decor"
@@ -63,7 +52,7 @@
               class="relative z-10 h-full w-full object-contain drop-shadow-xl transition-transform duration-500 group-hover:scale-110"
               @error="(e) => { (e.target as HTMLImageElement).style.display = 'none'; }"
             >
-          </LiquidGlassCard>
+          </div>
 
           <div class="released-record-content">
             <div class="released-record-header">
@@ -391,9 +380,6 @@ const { searchItems, getCategory, getVariant, getImageUrl, getAllDecorItems } = 
 useHead({
   title: () => t('released.title') + ' | ' + t('app.title'),
 });
-
-// 使用全域共享背景視差與底圖偵測
-const { bgXSpring, bgYSpring, bgImage } = useParallax();
 
 onMounted(async () => {
   loadFromLocal();
@@ -766,19 +752,6 @@ function getDecorCategoryName(decorItemId: string) {
   -webkit-backdrop-filter: blur(4px) saturate(1.12);
 }
 
-.released-record-row::before {
-  position: absolute;
-  inset: 0 auto 0 0;
-  width: 9.25rem;
-  z-index: -1;
-  content: "";
-  border-radius: inherit;
-  background:
-    linear-gradient(90deg, rgba(255, 255, 255, 0.32), rgba(255, 255, 255, 0.08) 62%, transparent),
-    radial-gradient(circle at 28% 50%, rgba(236, 253, 245, 0.28), transparent 54%);
-  pointer-events: none;
-}
-
 .released-record-row::after {
   position: absolute;
   inset: 0;
@@ -802,29 +775,6 @@ function getDecorCategoryName(decorItemId: string) {
   overflow: hidden;
   padding: 0.72rem;
   border-radius: 1.75rem;
-  border-color: rgba(255, 255, 255, 0.6) !important;
-  box-shadow:
-    0 10px 20px rgba(6, 78, 59, 0.08),
-    0 1px 10px rgba(255, 255, 255, 0.68) inset,
-    0 -10px 22px rgba(6, 78, 59, 0.05) inset !important;
-  transform: none !important;
-  transition: box-shadow 180ms ease !important;
-}
-
-.released-record-row:hover .released-record-image {
-  box-shadow:
-    0 12px 24px rgba(6, 78, 59, 0.1),
-    0 1px 12px rgba(255, 255, 255, 0.74) inset,
-    0 -10px 22px rgba(6, 78, 59, 0.06) inset !important;
-}
-
-.released-record-image-glow {
-  position: absolute;
-  inset: auto 16% 0.35rem;
-  height: 1.5rem;
-  border-radius: 999px;
-  background: radial-gradient(ellipse at center, rgba(16, 185, 129, 0.24), transparent 70%);
-  filter: blur(4px);
 }
 
 .released-record-content {
@@ -1011,10 +961,6 @@ function getDecorCategoryName(decorItemId: string) {
     border-radius: 1.55rem;
   }
 
-  .released-record-row::before {
-    width: 7rem;
-  }
-
   .released-record-image {
     width: 5.7rem;
     min-width: 5.7rem;
@@ -1083,10 +1029,6 @@ function getDecorCategoryName(decorItemId: string) {
     box-shadow:
       0 22px 54px rgba(6, 78, 59, 0.16),
       0 1px 18px rgba(255, 255, 255, 0.86) inset;
-  }
-
-  .released-record-row::before {
-    width: 16rem;
   }
 
   .released-record-image {

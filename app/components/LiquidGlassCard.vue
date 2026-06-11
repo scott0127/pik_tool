@@ -19,6 +19,7 @@
      - magnification: 透鏡放大倍率 (預設為 1.15)
      - isDraggable: 是否啟用拖曳功能 (預設為 true)
      - isTiltable: 是否啟用滑鼠懸停 3D 傾斜與折射光澤 (預設為 true)
+     - contentClass: 內容容器的額外 class，用於需要覆寫內部 slot layout 時使用
 -->
 
 <template>
@@ -65,7 +66,7 @@
     <!-- 5. 內容主容器 (微移視差效果) -->
     <!-- 內容會朝著滑鼠位置產生輕微的正向視差偏移，讓玻璃厚度感更逼真 -->
     <div 
-      class="relative z-10 w-full h-full text-white"
+      :class="['relative z-10 w-full h-full text-white liquid-glass-card-content', contentClass]"
       :style="contentStyle"
     >
       <slot />
@@ -90,6 +91,7 @@ interface Props {
   isTiltable?: boolean       // 是否啟用 3D 懸停傾斜
   bgInset?: number           // 全域背景的 inset 邊界 (px，預設為 0 以對齊滿版背景)
   containerEl?: HTMLElement  // 拖動限制的容器元件（若不傳則預設限制在 parentElement 內）
+  contentClass?: string      // 內容容器額外 class
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -101,7 +103,8 @@ const props = withDefaults(defineProps<Props>(), {
   magnification: 1.15,
   isDraggable: true,
   isTiltable: true,
-  bgInset: 100
+  bgInset: 100,
+  contentClass: ''
 })
 
 // 元件 DOM 參照
@@ -489,6 +492,36 @@ const contentStyle = computed(() => {
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
   will-change: transform;
+}
+
+.liquid-glass-card-content {
+  box-sizing: border-box;
+  min-width: 0;
+  min-height: 0;
+
+  /*
+    LiquidGlassCard has a required content wrapper for z-index and parallax.
+    Mirror common layout properties from the root so classes passed to the
+    component, such as flex/grid/items-center/justify-between/gap, affect slot
+    content instead of stopping at the glass shell.
+  */
+  display: inherit;
+  flex-direction: inherit;
+  flex-wrap: inherit;
+  align-items: inherit;
+  align-content: inherit;
+  justify-content: inherit;
+  justify-items: inherit;
+  place-items: inherit;
+  place-content: inherit;
+  gap: inherit;
+  row-gap: inherit;
+  column-gap: inherit;
+  grid-template-columns: inherit;
+  grid-template-rows: inherit;
+  grid-auto-flow: inherit;
+  grid-auto-columns: inherit;
+  grid-auto-rows: inherit;
 }
 
 /* =========================================================

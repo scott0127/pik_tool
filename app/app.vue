@@ -81,6 +81,16 @@
 
     <!-- Toast notifications area (legacy) -->
     <div id="toast-container" class="fixed bottom-4 left-1/2 -translate-x-1/2 z-50"></div>
+
+    <div class="portrait-only-guard" role="alert" aria-live="assertive">
+      <div class="portrait-only-panel">
+        <div class="portrait-only-icon">
+          <Icon name="lucide:rotate-ccw" class="h-7 w-7" />
+        </div>
+        <h2>請旋轉為直向使用</h2>
+        <p>手機版介面目前以直向操作設計，轉回直向後就可以繼續使用。</p>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -192,3 +202,68 @@ watch(() => authStore.isAuthenticated.value, async (isAuth, wasAuth) => {
   }
 });
 </script>
+
+<style scoped>
+.portrait-only-guard {
+  display: none;
+}
+
+@media (max-width: 767px) and (orientation: landscape) {
+  .portrait-only-guard {
+    position: fixed;
+    inset: 0;
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: max(1rem, env(safe-area-inset-top)) max(1rem, env(safe-area-inset-right)) max(1rem, env(safe-area-inset-bottom)) max(1rem, env(safe-area-inset-left));
+    background:
+      radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.9), transparent 42%),
+      linear-gradient(160deg, rgba(209, 250, 229, 0.96), rgba(240, 253, 244, 0.98));
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+  }
+
+  .portrait-only-panel {
+    width: min(26rem, 92vw);
+    padding: 1.35rem;
+    text-align: center;
+    color: rgb(15, 23, 42);
+    border: 1px solid rgba(255, 255, 255, 0.86);
+    border-radius: 1.6rem;
+    background: rgba(255, 255, 255, 0.72);
+    box-shadow:
+      0 20px 48px rgba(6, 78, 59, 0.18),
+      0 1px 12px rgba(255, 255, 255, 0.82) inset;
+  }
+
+  .portrait-only-icon {
+    display: inline-flex;
+    width: 3.25rem;
+    height: 3.25rem;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 0.75rem;
+    color: white;
+    border-radius: 1.2rem;
+    background: linear-gradient(135deg, #00b92f, #008523);
+    box-shadow: 0 12px 24px rgba(0, 133, 35, 0.2);
+  }
+
+  .portrait-only-panel h2 {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 900;
+    line-height: 1.25;
+  }
+
+  .portrait-only-panel p {
+    margin: 0.55rem auto 0;
+    max-width: 20rem;
+    color: rgb(71, 85, 105);
+    font-size: 0.9rem;
+    font-weight: 800;
+    line-height: 1.65;
+  }
+}
+</style>
