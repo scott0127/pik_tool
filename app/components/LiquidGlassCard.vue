@@ -26,6 +26,7 @@
     ref="cardRef"
     :class="[
       'relative overflow-hidden group select-none morph-card liquid-glass-card',
+      isMobile ? 'mobile-liquid-glass' : '',
       isDraggable ? 'cursor-grab active:cursor-grabbing' : ''
     ]"
     :style="cardStyle"
@@ -34,48 +35,32 @@
     @mouseleave="handleMouseLeave"
     @pointerdown="handlePointerDown"
   >
-    <!-- 1. 液態透鏡放大層 (True Liquid Lens Magnification Layer) -->
-    <!-- 透過與全域視窗對齊的背景位移，再配合 scale 放大，創造出物理透鏡折射效果 -->
-    <div class="absolute inset-0 rounded-[inherit] pointer-events-none -z-10 overflow-hidden bg-white/5">
-      <!-- (A) Base Gradient Layer (corresponds to .ambient-base) -->
-      <div 
-        class="absolute"
-        :style="baseGradientStyle"
-      />
-      <!-- (B) Ambient Cute Image Layer (corresponds to .ambient-cute) -->
-      <div 
-        v-if="effectiveBgImage"
-        class="absolute"
-        :style="imageStyle"
-      />
-      <!-- (C) Ambient Light Overlay Layer (corresponds to .ambient-light) -->
-      <div 
-        class="absolute"
-        :style="lightOverlayStyle"
-      />
-      <!-- 邊緣變形陰影：模擬透鏡在最邊緣因弧度產生的光線微弱衰減 -->
-      <div 
-        class="absolute inset-0 pointer-events-none"
-        :style="distortionStyle"
-      />
-    </div>
+    <!-- 桌機版：保留原本高成本 lens 效果 -->
+    <template v-if="!isMobile">
+      <!-- 1. 液態透鏡放大層 (True Liquid Lens Magnification Layer) -->
+      <div class="absolute inset-0 rounded-[inherit] pointer-events-none -z-10 overflow-hidden bg-white/5">
+        <div class="absolute" :style="baseGradientStyle" />
+        <div v-if="effectiveBgImage" class="absolute" :style="imageStyle" />
+        <div class="absolute" :style="lightOverlayStyle" />
+        <div class="absolute inset-0 pointer-events-none" :style="distortionStyle" />
+      </div>
 
-    <!-- 2. 精緻折射邊框 (Subtle Refractive Edge) -->
-    <!-- 陰影位置會隨著滑鼠懸停傾斜而產生相反的微移，模擬光線折射在玻璃邊緣的立體亮邊 -->
-    <div
-      class="pointer-events-none absolute inset-0 rounded-[inherit]"
-      :style="refractiveEdgeStyle"
-    />
-    
-    <!-- 3. 邊緣色差虹彩 (Chromatic Iridescence) -->
-    <!-- 使用彩色漸層並設定為 color-dodge 混合模式，滑鼠移動時漸層位置同步偏移，模擬光譜散射 -->
-    <div
-      class="pointer-events-none absolute inset-0 rounded-[inherit] transition-opacity duration-500 opacity-40 group-hover:opacity-100"
-      :style="iridescenceStyle"
-    />
+      <!-- 2. 精緻折射邊框 -->
+      <div class="pointer-events-none absolute inset-0 rounded-[inherit]" :style="refractiveEdgeStyle" />
+      
+      <!-- 3. 邊緣色差虹彩 -->
+      <div class="pointer-events-none absolute inset-0 rounded-[inherit] transition-opacity duration-500 opacity-40 group-hover:opacity-100" :style="iridescenceStyle" />
 
-    <!-- 4. 靜態玻璃基礎漸層 (Static Glass Overlay) -->
-    <div class="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/5 to-white/10 pointer-events-none z-0 mix-blend-overlay rounded-[inherit]" />
+      <!-- 4. 靜態玻璃基礎漸層 -->
+      <div class="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/5 to-white/10 pointer-events-none z-0 mix-blend-overlay rounded-[inherit]" />
+    </template>
+
+    <!-- 手機版：使用 backdrop-filter 低成本玻璃 -->
+    <template v-else>
+      <div class="mobile-glass-refraction" />
+      <div class="mobile-glass-edge" />
+      <div class="mobile-glass-noise" />
+    </template>
     
     <!-- 5. 內容主容器 (微移視差效果) -->
     <!-- 內容會朝著滑鼠位置產生輕微的正向視差偏移，讓玻璃厚度感更逼真 -->
@@ -321,15 +306,19 @@ const updateRect = () => {
 // 監聽視窗縮放與滾動以即時重新計算對齊坐標
 onMounted(() => {
   updateRect()
-  // 延遲一下確保版面渲染完畢後再讀取一次正確坐標
   setTimeout(updateRect, 100)
   window.addEventListener('resize', updateRect)
-  window.addEventListener('scroll', updateRect, { passive: true })
+  // 手機版不要每張卡各自監聽 scroll，改用全域 CSS variable
+  if (!isMobile.value) {
+    window.addEventListener('scroll', updateRect, { passive: true })
+  }
 })
 
 onUnmounted(() => {
   window.removeEventListener('resize', updateRect)
-  window.removeEventListener('scroll', updateRect)
+  if (!isMobile.value) {
+    window.removeEventListener('scroll', updateRect)
+  }
 })
 
 // --- 樣式計算屬性 (Style Computeds) ---
@@ -339,17 +328,23 @@ const cardStyle = computed(() => {
   const scale = isDragging.value ? 0.98 : (isHovered.value ? 1.02 : 1)
   const zIdx = isDragging.value ? 30 : (isHovered.value ? 20 : 10)
   
-  return {
+  const baseStyles: any = {
     transform: `translate3d(${dragX.value}px, ${dragY.value}px, 0) rotateX(${rotateX.value}deg) rotateY(${rotateY.value}deg) scale(${scale})`,
-    transformPerspective: '1000px',
-    transformStyle: 'preserve-3d' as const,
-    background: `rgba(255, 255, 255, ${effectiveGlassOpacity.value * 0.4})`,
-    border: '1.5px solid rgba(255, 255, 255, 0.42)',
-    boxShadow: 'inset 0 1.5px 3px rgba(255, 255, 255, 0.45), inset 0 -1px 2px rgba(255, 255, 255, 0.1), 0 25px 50px -12px rgba(0, 0, 0, 0.45)',
     zIndex: zIdx,
-    // 拖動時關閉 transform 過渡以防滑鼠延遲，平時懸停與歸零則開啟平滑過渡
     transition: isDragging.value ? 'none' : 'transform 0.2s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.2s'
   }
+
+  // 桌機版：套用 3D perspective 與玻璃外觀
+  // 手機版：由 .mobile-liquid-glass CSS 類別處理，不能用 preserve-3d 否則 backdrop-filter 會失效
+  if (!isMobile.value) {
+    baseStyles.transformPerspective = '1000px'
+    baseStyles.transformStyle = 'preserve-3d'
+    baseStyles.background = `rgba(255, 255, 255, ${effectiveGlassOpacity.value * 0.4})`
+    baseStyles.border = '1.5px solid rgba(255, 255, 255, 0.42)'
+    baseStyles.boxShadow = 'inset 0 1.5px 3px rgba(255, 255, 255, 0.45), inset 0 -1px 2px rgba(255, 255, 255, 0.1), 0 25px 50px -12px rgba(0, 0, 0, 0.45)'
+  }
+
+  return baseStyles
 })
 
 // 2. 共享透鏡樣式（定位、變形與濾鏡基礎）
@@ -494,5 +489,98 @@ const contentStyle = computed(() => {
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
   will-change: transform;
+}
+
+/* =========================================================
+   Mobile Fallback: High Performance Liquid Glass
+   用 backdrop-filter 取代全螢幕 lens texture
+   ========================================================= */
+
+.mobile-liquid-glass {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  contain: paint;
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.18),
+      rgba(255, 255, 255, 0.06) 38%,
+      rgba(255, 255, 255, 0.02)
+    );
+
+  border: 1px solid rgba(255, 255, 255, 0.3);
+
+  backdrop-filter: blur(10px) saturate(130%);
+  -webkit-backdrop-filter: blur(10px) saturate(130%);
+
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.4),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.08),
+    0 12px 28px rgba(0, 0, 0, 0.12);
+
+  transform: translateZ(0);
+}
+
+/* 折射高光層：用靜態漸層模擬厚玻璃光線彎折 */
+.mobile-glass-refraction {
+  position: absolute;
+  inset: -20%;
+  z-index: 1;
+  pointer-events: none;
+
+  background:
+    radial-gradient(
+      circle at 22% 18%,
+      rgba(255, 255, 255, 0.35),
+      rgba(255, 255, 255, 0.08) 18%,
+      transparent 42%
+    ),
+    radial-gradient(
+      circle at 86% 72%,
+      rgba(255, 255, 255, 0.18),
+      transparent 36%
+    ),
+    linear-gradient(
+      120deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.18) 42%,
+      transparent 62%
+    );
+
+  opacity: 0.35;
+  mix-blend-mode: screen;
+  /* 綁定全域 CSS variable，滑動時光斑會上下流動 */
+  transform: translate3d(0, var(--glass-flow-y, 0px), 0) rotate(-4deg);
+}
+
+/* 邊緣厚玻璃感 */
+.mobile-glass-edge {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  border-radius: inherit;
+
+  box-shadow:
+    inset 1px 1px 0 rgba(255, 255, 255, 0.5),
+    inset -1px -1px 0 rgba(255, 255, 255, 0.12),
+    inset 0 0 18px rgba(255, 255, 255, 0.1);
+}
+
+/* 微材質雜訊層 */
+.mobile-glass-noise {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  opacity: 0.08;
+
+  background-image:
+    radial-gradient(rgba(255, 255, 255, 0.35) 0.5px, transparent 0.5px);
+  background-size: 5px 5px;
+
+  mix-blend-mode: overlay;
 }
 </style>
