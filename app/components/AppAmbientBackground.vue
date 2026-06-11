@@ -266,25 +266,25 @@ onMounted(() => {
       }
     });
 
-    // 2. Interactive 3D glass bokeh particles fly past camera
+    // 2. Interactive 3D glass bokeh particles fly past camera (no dynamic blur on mobile)
     tl.fromTo(".bokeh-1", 
-      { y: 150, scale: 0.8, opacity: 0.6, filter: "blur(6px)" },
-      { y: -450, scale: 2.5, opacity: 0, filter: "blur(24px)", ease: "power1.out" },
+      { y: 150, scale: 0.8, opacity: 0.6 },
+      { y: -450, scale: 2.5, opacity: 0, ease: "power1.out" },
       0
     );
     tl.fromTo(".bokeh-2", 
-      { y: 200, scale: 0.6, opacity: 0.5, filter: "blur(4px)" },
-      { y: -550, scale: 2.8, opacity: 0, filter: "blur(30px)", ease: "power1.out" },
+      { y: 200, scale: 0.6, opacity: 0.5 },
+      { y: -550, scale: 2.8, opacity: 0, ease: "power1.out" },
       0
     );
     tl.fromTo(".bokeh-3", 
-      { y: 250, scale: 0.9, opacity: 0.7, filter: "blur(8px)" },
-      { y: -350, scale: 2.2, opacity: 0, filter: "blur(20px)", ease: "power1.out" },
+      { y: 250, scale: 0.9, opacity: 0.7 },
+      { y: -350, scale: 2.2, opacity: 0, ease: "power1.out" },
       0
     );
     tl.fromTo(".bokeh-4", 
-      { y: 120, scale: 0.7, opacity: 0.4, filter: "blur(5px)" },
-      { y: -650, scale: 3.0, opacity: 0, filter: "blur(32px)", ease: "power1.out" },
+      { y: 120, scale: 0.7, opacity: 0.4 },
+      { y: -650, scale: 3.0, opacity: 0, ease: "power1.out" },
       0
     );
 
