@@ -42,14 +42,14 @@
 
                    <!-- Text Content -->
                    <div class="relative z-10 space-y-1 mb-auto pointer-events-none">
-                       <h3 class="text-gray-900 text-2xl font-black tracking-tight group-hover:text-orange-700 transition-colors drop-shadow-sm">{{ $t('home.missing.title') }}</h3>
-                       <p class="text-gray-800 text-sm font-bold">{{ $t('home.missing.desc') }}</p>
+                       <h3 class="readable-outline text-gray-900 text-2xl font-black tracking-tight group-hover:text-orange-700 transition-colors drop-shadow-sm">{{ $t('home.missing.title') }}</h3>
+                       <p class="readable-outline text-gray-800 text-sm font-bold">{{ $t('home.missing.desc') }}</p>
                    </div>
                    
                    <!-- Count -->
                    <div class="relative z-10 mt-4 flex items-baseline gap-1.5 pointer-events-none">
                        <span class="text-4xl font-black text-orange-600 leading-none drop-shadow-md">{{ uncollectedCount }}</span>
-                       <span class="text-gray-800 text-sm font-extrabold">{{ $t('home.missing.count_suffix') }}</span>
+                       <span class="readable-outline text-gray-800 text-sm font-extrabold">{{ $t('home.missing.count_suffix') }}</span>
                    </div>
               </LiquidGlassCard>
           </template>
@@ -78,14 +78,14 @@
 
                    <!-- Text Content -->
                    <div class="relative z-10 space-y-1 mb-auto pointer-events-none">
-                       <h3 class="text-gray-900 text-2xl font-black tracking-tight group-hover:text-purple-700 transition-colors drop-shadow-sm">{{ $t('home.limited.title') }}</h3>
-                       <p class="text-gray-800 text-sm font-bold">{{ $t('home.limited.desc') }}</p>
+                       <h3 class="readable-outline text-gray-900 text-2xl font-black tracking-tight group-hover:text-purple-700 transition-colors drop-shadow-sm">{{ $t('home.limited.title') }}</h3>
+                       <p class="readable-outline text-gray-800 text-sm font-bold">{{ $t('home.limited.desc') }}</p>
                    </div>
 
                    <!-- Count -->
                    <div class="relative z-10 mt-4 flex items-baseline gap-1.5 pointer-events-none">
                        <span class="text-4xl font-black text-purple-600 leading-none drop-shadow-md">{{ limitedCount }}</span>
-                       <span class="text-gray-800 text-sm font-extrabold">{{ $t('home.limited.count_suffix') }}</span>
+                       <span class="readable-outline text-gray-800 text-sm font-extrabold">{{ $t('home.limited.count_suffix') }}</span>
                    </div>
               </LiquidGlassCard>
           </template>
@@ -114,8 +114,8 @@
                   </div>
 
                   <div class="mt-4 relative z-10 group-hover:translate-x-1 transition-transform duration-300 pointer-events-none">
-                       <h3 class="text-gray-900 text-2xl font-black tracking-tight drop-shadow-sm">{{ $t('home.map.title') }}</h3>
-                       <p class="text-gray-800 text-sm font-bold opacity-90 group-hover:text-emerald-800 transition-colors">{{ $t('home.map.desc') }}</p>
+                       <h3 class="readable-outline text-gray-900 text-2xl font-black tracking-tight drop-shadow-sm">{{ $t('home.map.title') }}</h3>
+                       <p class="readable-outline text-gray-800 text-sm font-bold opacity-90 group-hover:text-emerald-800 transition-colors">{{ $t('home.map.desc') }}</p>
                   </div>
               </LiquidGlassCard>
           </template>
@@ -135,7 +135,7 @@
             class="w-full flex items-center justify-center gap-3 px-6 py-4 rounded-[1.5rem] cursor-pointer hover:scale-[1.02] transition-transform duration-300 group"
           >
             <span class="text-2xl group-hover:scale-110 transition-transform">📖</span>
-            <span class="text-gray-900 font-extrabold tracking-wide drop-shadow-sm">{{ $t('home.actions.browse_collection') }}</span>
+            <span class="readable-outline text-gray-900 font-extrabold tracking-wide drop-shadow-sm">{{ $t('home.actions.browse_collection') }}</span>
           </LiquidGlassCard>
           <LiquidGlassCard
             @click="router.push('/map')"
@@ -149,7 +149,7 @@
             class="w-full flex items-center justify-center gap-3 px-6 py-4 rounded-[1.5rem] cursor-pointer hover:scale-[1.02] transition-transform duration-300 group"
           >
             <span class="text-2xl group-hover:scale-110 transition-transform">🗺️</span>
-            <span class="text-gray-900 font-extrabold tracking-wide drop-shadow-sm">{{ $t('home.actions.open_map') }}</span>
+            <span class="readable-outline text-gray-900 font-extrabold tracking-wide drop-shadow-sm">{{ $t('home.actions.open_map') }}</span>
           </LiquidGlassCard>
         </div>
 
@@ -166,22 +166,22 @@
           <div class="flex items-center gap-3 mb-4 relative z-10 pointer-events-none">
             <div class="bg-white/40 border border-white/60 shadow-inner w-12 h-12 rounded-2xl flex items-center justify-center text-2xl backdrop-blur-md">💡</div>
             <div>
-              <h3 class="text-gray-900 text-lg font-extrabold drop-shadow-sm">{{ $t('home.tips.title') }}</h3>
-              <p class="text-gray-700 text-xs font-bold">{{ $t('home.tips.subtitle') }}</p>
+              <h3 class="readable-outline text-gray-900 text-lg font-extrabold drop-shadow-sm">{{ $t('home.tips.title') }}</h3>
+              <p class="readable-outline text-gray-700 text-xs font-bold">{{ $t('home.tips.subtitle') }}</p>
             </div>
           </div>
           <ul class="space-y-3 text-sm text-gray-800 font-bold relative z-10 pointer-events-none">
             <li class="flex items-start gap-2">
               <span class="text-emerald-600 font-black mt-0.5">✓</span>
-              <span class="drop-shadow-sm">{{ $t('home.tips.tip1') }}</span>
+              <span class="readable-outline drop-shadow-sm">{{ $t('home.tips.tip1') }}</span>
             </li>
             <li class="flex items-start gap-2">
               <span class="text-emerald-600 font-black mt-0.5">✓</span>
-              <span class="drop-shadow-sm">{{ $t('home.tips.tip2') }}</span>
+              <span class="readable-outline drop-shadow-sm">{{ $t('home.tips.tip2') }}</span>
             </li>
             <li class="flex items-start gap-2">
               <span class="text-emerald-600 font-black mt-0.5">✓</span>
-              <span class="drop-shadow-sm">{{ $t('home.tips.tip3') }}</span>
+              <span class="readable-outline drop-shadow-sm">{{ $t('home.tips.tip3') }}</span>
             </li>
           </ul>
         </LiquidGlassCard>

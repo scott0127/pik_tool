@@ -15,6 +15,13 @@ let lastCloudLoadUserId: string | null = null;
 
 type SyncStatus = 'idle' | 'pending' | 'syncing' | 'success' | 'error';
 
+interface ReleasedSyncConflict {
+  localRecords: ReleasedPikmin[];
+  cloudRecords: ReleasedPikmin[];
+  localCount: number;
+  cloudCount: number;
+}
+
 export function useReleased() {
   const supabase = useSupabaseClient();
   const authStore = useAuthStore();
@@ -32,6 +39,7 @@ export function useReleased() {
   const hasPendingChanges = useState<boolean>('released-has-pending', () => false);
   const syncRetryAttempt = useState<number>('released-sync-retry', () => 0);
   const lastSyncedSignature = useState<string | null>('released-last-synced-signature', () => null);
+  const syncConflict = useState<ReleasedSyncConflict | null>('released-sync-conflict', () => null);
 
   // ---- localStorage ----
 
@@ -148,11 +156,42 @@ export function useReleased() {
   };
 
   const computeSignature = (records: ReleasedPikmin[]): string => {
-    // Simple signature based on record IDs + last update times
     return records
-      .map(r => `${r.id}:${r.decorItemId}`)
+      .map(r => JSON.stringify({
+        id: r.id,
+        decorItemId: r.decorItemId,
+        nickname: r.nickname || '',
+        location: r.location || '',
+        releasedAt: r.releasedAt || '',
+        note: r.note || '',
+        createdAt: r.createdAt || '',
+      }))
       .sort()
       .join('|');
+  };
+
+  const cloneRecords = (records: ReleasedPikmin[]): ReleasedPikmin[] => {
+    return records.map(record => ({ ...record }));
+  };
+
+  const applyCloudRecords = (records: ReleasedPikmin[]) => {
+    releasedState.value.records = cloneRecords(records);
+    saveToLocal();
+    lastSyncedSignature.value = computeSignature(records);
+  };
+
+  const mergeRecordsCloudFirst = (localRecords: ReleasedPikmin[], cloudRecords: ReleasedPikmin[]): ReleasedPikmin[] => {
+    const mergedById = new Map<string, ReleasedPikmin>();
+    cloudRecords.forEach(record => mergedById.set(record.id, { ...record }));
+    localRecords.forEach(record => {
+      if (!mergedById.has(record.id)) {
+        mergedById.set(record.id, { ...record });
+      }
+    });
+
+    return Array.from(mergedById.values()).sort((a, b) => {
+      return new Date(b.createdAt || b.releasedAt).getTime() - new Date(a.createdAt || a.releasedAt).getTime();
+    });
   };
 
   const attemptSaveToCloud = async (userId: string, records: ReleasedPikmin[]): Promise<void> => {
@@ -287,16 +326,27 @@ export function useReleased() {
 
       if (error && error.code !== 'PGRST116') throw error;
 
-      if (data?.released_data && Array.isArray(data.released_data)) {
-        const cloudRecords = data.released_data as ReleasedPikmin[];
-        const localCount = releasedState.value.records.length;
+      const cloudRecords = data?.released_data && Array.isArray(data.released_data)
+        ? data.released_data as ReleasedPikmin[]
+        : [];
+      const localRecords = releasedState.value.records;
+      const localCount = localRecords.length;
+      const localSignature = computeSignature(localRecords);
+      const cloudSignature = computeSignature(cloudRecords);
 
-        // Cloud-first strategy: use cloud data directly
-        releasedState.value.records = cloudRecords;
-        saveToLocal();
-
-        lastSyncedSignature.value = computeSignature(cloudRecords);
+      if (localCount === 0 || localSignature === cloudSignature) {
+        applyCloudRecords(cloudRecords);
+        syncConflict.value = null;
         console.log(`[Released] ☁️ Loaded ${cloudRecords.length} records from cloud (local had ${localCount})`);
+      } else {
+        syncConflict.value = {
+          localRecords: cloneRecords(localRecords),
+          cloudRecords: cloneRecords(cloudRecords),
+          localCount,
+          cloudCount: cloudRecords.length,
+        };
+        syncStatus.value = 'idle';
+        console.log(`[Released] Sync conflict detected (local: ${localCount}, cloud: ${cloudRecords.length})`);
       }
 
       lastCloudLoadTime = Date.now();
@@ -306,6 +356,30 @@ export function useReleased() {
     }
   };
 
+  const mergeCloudConflict = async (): Promise<boolean> => {
+    if (!syncConflict.value) return false;
+
+    const mergedRecords = mergeRecordsCloudFirst(
+      syncConflict.value.localRecords,
+      syncConflict.value.cloudRecords,
+    );
+    releasedState.value.records = mergedRecords;
+    saveToLocal();
+    syncConflict.value = null;
+    syncStatus.value = 'syncing';
+    return await saveToCloud(true);
+  };
+
+  const discardLocalConflict = async (): Promise<boolean> => {
+    if (!syncConflict.value) return false;
+
+    const cloudRecords = cloneRecords(syncConflict.value.cloudRecords);
+    applyCloudRecords(cloudRecords);
+    syncConflict.value = null;
+    syncStatus.value = 'syncing';
+    return await saveToCloud(true);
+  };
+
   return {
     // State
     releasedState: readonly(releasedState),
@@ -313,6 +387,7 @@ export function useReleased() {
     syncCountdown: readonly(syncCountdown),
     hasPendingChanges: readonly(hasPendingChanges),
     syncRetryAttempt: readonly(syncRetryAttempt),
+    syncConflict: readonly(syncConflict),
 
     // CRUD
     addRecord,
@@ -327,5 +402,7 @@ export function useReleased() {
     saveToCloud,
     forceSyncNow,
     scheduleDebouncedSync,
+    mergeCloudConflict,
+    discardLocalConflict,
   };
 }

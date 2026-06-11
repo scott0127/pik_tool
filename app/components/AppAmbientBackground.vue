@@ -8,7 +8,7 @@
     >
       <div 
         class="ambient-base absolute inset-[-100px]" 
-        :style="{ transform: `translate3d(${bgXSpring}px, ${bgYSpring}px, 0)` }"
+        :style="{ transform: baseTransform }"
       />
       <ClientOnly>
         <ThreeSporeBackdrop
@@ -19,7 +19,7 @@
 
       <div 
         class="ambient-cute absolute inset-[-100px]"
-        :style="{ transform: `translate3d(${bgXSpring}px, ${bgYSpring}px, 0)` }"
+        :style="{ transform: imageTransform, filter: imageFilter }"
       >
         <div class="ambient-hill ambient-hill-a" />
         <div class="ambient-hill ambient-hill-b" />
@@ -53,6 +53,14 @@
             <path d="M914 542 C832 496 840 422 940 446 C1014 466 1000 538 914 542Z" fill="url(#sprout-leaf)" />
           </g>
         </svg>
+      </div>
+
+      <!-- Foreground Bokeh Layer -->
+      <div class="ambient-bokeh-layer absolute inset-0 overflow-hidden pointer-events-none">
+        <div class="ambient-bokeh bokeh-1"></div>
+        <div class="ambient-bokeh bokeh-2"></div>
+        <div class="ambient-bokeh bokeh-3"></div>
+        <div class="ambient-bokeh bokeh-4"></div>
       </div>
 
       <div class="ambient-light absolute inset-0" />
@@ -138,21 +146,124 @@
 </template>
 
 <script setup lang="ts">
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+
 const route = useRoute();
 const { t } = useI18n();
 
-const { bgXSpring, bgYSpring } = useParallax();
+const { bgXSpring, bgYSpring, isImmersive, immersiveProgress, scrollBgScale, scrollBgY, isMobile } = useParallax();
 
 const STORAGE_KEY = "pikmin-immersive-background";
 const SLIDER_TIP_DISMISSED_KEY = "pikmin-ambient-slider-tip-dismissed";
 const TIP_SHOWN_KEY = "pikmin-bg-tip-shown";
-const isImmersive = ref(false);
-const immersiveProgress = ref(0);
 const showSliderTip = ref(false);
 const isDragging = ref(false);
 const sliderRef = ref<HTMLElement | null>(null);
+
 const isMapRoute = computed(() => route.path === "/map");
 const shouldRenderThree = computed(() => isImmersive.value || immersiveProgress.value > 0.04);
+const baseTransform = computed(() => {
+  return `translate3d(${bgXSpring.value}px, ${bgYSpring.value}px, 0)`;
+});
+const imageTransform = computed(() => {
+  const tx = isMobile.value ? 0 : bgXSpring.value;
+  const ty = isMobile.value ? 0 : (bgYSpring.value + scrollBgY.value);
+  return `translate3d(${tx}px, ${ty}px, 0) scale(${scrollBgScale.value})`;
+});
+
+const scrollMotion = { y: -10, scale: 1.16 };
+let mm: any = null;
+let observer: MutationObserver | null = null;
+let refreshTimeout: any = null;
+
+// Background Image Blur reactive reference for depth-of-field focal shifting
+const imageBlur = ref(0);
+const imageFilter = computed(() => {
+  return `saturate(0.96) contrast(0.98) blur(${imageBlur.value}px)`;
+});
+
+const blurScale = ref(1.0);
+let lastScrollBlurTarget = 0;
+let scrollTimeout: any = null;
+let blurScaleTween: any = null;
+let lastScrollY = -1;
+
+let ticking = false;
+const updateScrollParallax = () => {
+  if (typeof window === "undefined") return;
+  const scrollY = window.scrollY;
+  
+  // 只有當 scrollY 真正改變時，才視為使用者正在滾動，避免 MutationObserver 重繪干擾
+  const isScrollingActive = scrollY !== lastScrollY;
+  lastScrollY = scrollY;
+  
+  let targetBlur = 0;
+  if (isMobile.value) {
+    const targetScroll = 350;
+    const progress = Math.min(1, Math.max(0, scrollY / targetScroll));
+    const easedProgress = 1 - Math.pow(1 - progress, 2);
+    
+    scrollBgScale.value = Math.max(1.0, 1.25 - easedProgress * 0.25);
+    targetBlur = Math.min(4, Math.max(0, easedProgress * 4));
+    scrollBgY.value = 0;
+  } else {
+    const targetScroll = 700;
+    const progress = Math.min(1, Math.max(0, scrollY / targetScroll));
+    const easedProgress = 1 - Math.pow(1 - progress, 2);
+    
+    scrollBgScale.value = Math.max(1.0, 1.16 - easedProgress * 0.16);
+    targetBlur = Math.min(4, Math.max(0, easedProgress * 4));
+    scrollBgY.value = -10 + easedProgress * 10;
+  }
+  
+  lastScrollBlurTarget = targetBlur;
+
+  if (isScrollingActive) {
+    // 只有在真正滾動時，才恢復模糊度與重設 3 秒定時器
+    if (blurScale.value < 1.0 && (!blurScaleTween || !blurScaleTween.isActive() || blurScaleTween.vars.value !== 1.0)) {
+      if (blurScaleTween) blurScaleTween.kill();
+      blurScaleTween = gsap.to(blurScale, {
+        value: 1.0,
+        duration: 0.4, // 0.4 秒內平滑恢復
+        ease: "power1.out",
+        onUpdate: () => {
+          imageBlur.value = lastScrollBlurTarget * blurScale.value;
+        }
+      });
+    } else if (!blurScaleTween || !blurScaleTween.isActive()) {
+      imageBlur.value = targetBlur * blurScale.value;
+    }
+
+    clearTimeout(scrollTimeout);
+    scrollTimeout = setTimeout(() => {
+      if (blurScaleTween) blurScaleTween.kill();
+      blurScaleTween = gsap.to(blurScale, {
+        value: 0.0,
+        duration: 1.5, // 1.5 秒內平滑解除模糊
+        ease: "power1.inOut",
+        onUpdate: () => {
+          imageBlur.value = lastScrollBlurTarget * blurScale.value;
+        }
+      });
+    }, 1500);
+  } else {
+    // 若僅是 Layout 重新整理而非實際滾動，不干涉已在進行的 fade-out 定時器與動畫
+    if (!blurScaleTween || !blurScaleTween.isActive()) {
+      imageBlur.value = targetBlur * blurScale.value;
+    }
+  }
+};
+
+const handleScroll = () => {
+  if (!ticking) {
+    window.requestAnimationFrame(() => {
+      updateScrollParallax();
+      ticking = false;
+    });
+    ticking = true;
+  }
+};
 
 const spores = [
   { id: 1, left: "9%", top: "18%", delay: "0s", duration: "13s" },
@@ -220,12 +331,130 @@ onMounted(() => {
       localStorage.setItem(TIP_SHOWN_KEY, "true");
     }, 1500);
   }
+
+  gsap.registerPlugin(ScrollTrigger);
+
+  mm = gsap.matchMedia();
+
+  // Mobile layout (< 768px)
+  mm.add("(max-width: 767px)", () => {
+    const tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: "body",
+        start: "top top",
+        end: () => {
+          const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+          return `+=${maxScroll * 0.5}`;
+        },
+        scrub: true,
+        invalidateOnRefresh: true,
+      }
+    });
+
+    // 2. Interactive 3D glass bokeh particles fly past camera
+    tl.fromTo(".bokeh-1", 
+      { y: 150, scale: 0.8, opacity: 0.6, filter: "blur(6px)" },
+      { y: -450, scale: 2.5, opacity: 0, filter: "blur(24px)", ease: "power1.out" },
+      0
+    );
+    tl.fromTo(".bokeh-2", 
+      { y: 200, scale: 0.6, opacity: 0.5, filter: "blur(4px)" },
+      { y: -550, scale: 2.8, opacity: 0, filter: "blur(30px)", ease: "power1.out" },
+      0
+    );
+    tl.fromTo(".bokeh-3", 
+      { y: 250, scale: 0.9, opacity: 0.7, filter: "blur(8px)" },
+      { y: -350, scale: 2.2, opacity: 0, filter: "blur(20px)", ease: "power1.out" },
+      0
+    );
+    tl.fromTo(".bokeh-4", 
+      { y: 120, scale: 0.7, opacity: 0.4, filter: "blur(5px)" },
+      { y: -650, scale: 3.0, opacity: 0, filter: "blur(32px)", ease: "power1.out" },
+      0
+    );
+
+    return () => {
+      tl.kill();
+    };
+  });
+
+  // Desktop layout (>= 768px)
+  mm.add("(min-width: 768px)", () => {
+    const tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: "body",
+        start: "top top",
+        end: "bottom bottom",
+        scrub: true,
+        invalidateOnRefresh: true,
+      }
+    });
+
+    // 2. Interactive 3D glass bokeh particles fly past camera on desktop
+    tl.fromTo(".bokeh-1", 
+      { y: 200, scale: 0.8, opacity: 0.6, filter: "blur(6px)" },
+      { y: -600, scale: 2.6, opacity: 0, filter: "blur(26px)", ease: "power1.out" },
+      0
+    );
+    tl.fromTo(".bokeh-2", 
+      { y: 250, scale: 0.6, opacity: 0.5, filter: "blur(5px)" },
+      { y: -700, scale: 3.0, opacity: 0, filter: "blur(32px)", ease: "power1.out" },
+      0
+    );
+    tl.fromTo(".bokeh-3", 
+      { y: 300, scale: 0.9, opacity: 0.7, filter: "blur(8px)" },
+      { y: -500, scale: 2.3, opacity: 0, filter: "blur(22px)", ease: "power1.out" },
+      0
+    );
+    tl.fromTo(".bokeh-4", 
+      { y: 150, scale: 0.7, opacity: 0.4, filter: "blur(6px)" },
+      { y: -800, scale: 3.2, opacity: 0, filter: "blur(35px)", ease: "power1.out" },
+      0
+    );
+
+    return () => {
+      tl.kill();
+    };
+  });
+
+  // Setup MutationObserver to refresh ScrollTriggers when dynamic content loads
+  observer = new MutationObserver(() => {
+    clearTimeout(refreshTimeout);
+    refreshTimeout = setTimeout(() => {
+      ScrollTrigger.refresh();
+      handleScroll();
+    }, 150);
+  });
+  observer.observe(document.body, {
+    childList: true,
+    subtree: true,
+  });
+
+  window.addEventListener("scroll", handleScroll, { passive: true });
+  window.addEventListener("resize", handleScroll);
+  handleScroll();
 });
 
 onBeforeUnmount(() => {
   window.removeEventListener("pointermove", onSlideMove);
   window.removeEventListener("pointerup", finishSlide);
   window.removeEventListener("pointercancel", finishSlide);
+  window.removeEventListener("scroll", handleScroll);
+  window.removeEventListener("resize", handleScroll);
+  clearTimeout(scrollTimeout);
+  if (blurScaleTween) {
+    blurScaleTween.kill();
+    blurScaleTween = null;
+  }
+  if (mm) {
+    mm.revert();
+    mm = null;
+  }
+  if (observer) {
+    observer.disconnect();
+    observer = null;
+  }
+  clearTimeout(refreshTimeout);
 });
 </script>
 
@@ -257,9 +486,67 @@ onBeforeUnmount(() => {
   overflow: hidden;
   opacity: calc(1 - var(--immersive-progress));
   background-image: url("/img/ambient-glass-sprouts.png");
-  background-position: center top;
+  background-position: center center;
+  background-repeat: no-repeat;
   background-size: cover;
+  transform-origin: 50% 50%;
   filter: saturate(0.96) contrast(0.98);
+  will-change: transform;
+}
+
+@media (max-width: 767px) {
+  .ambient-cute {
+    inset: 0 !important;
+  }
+}
+
+/* Foreground Bokeh Layer & Particles */
+.ambient-bokeh-layer {
+  z-index: 1;
+  opacity: calc(1 - var(--immersive-progress));
+  transition: opacity 0.3s ease;
+  transform-style: preserve-3d;
+  perspective: 1000px;
+}
+
+.ambient-bokeh {
+  position: absolute;
+  border-radius: 999px;
+  mix-blend-mode: screen;
+  pointer-events: none;
+  will-change: transform, opacity, filter;
+}
+
+.bokeh-1 {
+  width: 14rem;
+  height: 14rem;
+  left: 5%;
+  bottom: -15rem;
+  background: radial-gradient(circle, rgba(16, 185, 129, 0.4) 0%, rgba(16, 185, 129, 0.05) 70%, transparent 100%);
+}
+
+.bokeh-2 {
+  width: 11rem;
+  height: 11rem;
+  right: 8%;
+  bottom: -20rem;
+  background: radial-gradient(circle, rgba(34, 211, 238, 0.35) 0%, rgba(34, 211, 238, 0.05) 70%, transparent 100%);
+}
+
+.bokeh-3 {
+  width: 18rem;
+  height: 18rem;
+  left: 35%;
+  bottom: -25rem;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0.02) 75%, transparent 100%);
+}
+
+.bokeh-4 {
+  width: 9rem;
+  height: 9rem;
+  left: 20%;
+  bottom: -12rem;
+  background: radial-gradient(circle, rgba(0, 185, 47, 0.45) 0%, rgba(0, 185, 47, 0.05) 70%, transparent 100%);
 }
 
 .ambient-background.is-immersive .ambient-cute {
