@@ -1,6 +1,8 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 import { useSpring } from '~/composables/useSpring'
 
+const MOBILE_AMBIENT_BG = '/img/ambient-glass-sprouts.png?v=bg-20260611'
+
 // 全域共享狀態 (Client-only)
 const bgX = ref(0)
 const bgY = ref(0)
