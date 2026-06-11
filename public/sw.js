@@ -2,9 +2,9 @@
 // 離線快取大型靜態資源，減少重複下載
 // ⚠️ 不預快取 HTML 導航路由，避免部署後舊 HTML 引用不存在的 chunk 檔
 
-const CACHE_NAME = 'pikmin-decor-v7';
-const STATIC_CACHE_NAME = 'pikmin-static-v7';
-const DATA_CACHE_NAME = 'pikmin-data-v7';
+const CACHE_NAME = 'pikmin-decor-v8';
+const STATIC_CACHE_NAME = 'pikmin-static-v8';
+const DATA_CACHE_NAME = 'pikmin-data-v8';
 
 // 需要快取的數據 URL 模式
 const DATA_URL_PATTERNS = [
