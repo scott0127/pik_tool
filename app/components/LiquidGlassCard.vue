@@ -39,7 +39,7 @@
     <!-- 桌機版：保留原本高成本 lens 效果 -->
     <template v-if="!isMobile">
       <!-- 1. 液態透鏡放大層 (True Liquid Lens Magnification Layer) -->
-      <div class="absolute inset-0 rounded-[inherit] pointer-events-none -z-10 overflow-hidden bg-white/5">
+      <div class="desktop-liquid-layer absolute inset-0 rounded-[inherit] pointer-events-none -z-10 overflow-hidden bg-white/5">
         <div class="absolute" :style="baseGradientStyle" />
         <div v-if="effectiveBgImage" class="absolute" :style="imageStyle" />
         <div class="absolute" :style="lightOverlayStyle" />
@@ -47,13 +47,13 @@
       </div>
 
       <!-- 2. 精緻折射邊框 -->
-      <div class="pointer-events-none absolute inset-0 rounded-[inherit]" :style="refractiveEdgeStyle" />
+      <div class="desktop-liquid-layer pointer-events-none absolute inset-0 rounded-[inherit]" :style="refractiveEdgeStyle" />
       
       <!-- 3. 邊緣色差虹彩 -->
-      <div class="pointer-events-none absolute inset-0 rounded-[inherit] transition-opacity duration-500 opacity-40 group-hover:opacity-100" :style="iridescenceStyle" />
+      <div class="desktop-liquid-layer pointer-events-none absolute inset-0 rounded-[inherit] transition-opacity duration-500 opacity-40 group-hover:opacity-100" :style="iridescenceStyle" />
 
       <!-- 4. 靜態玻璃基礎漸層 -->
-      <div class="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/5 to-white/10 pointer-events-none z-0 mix-blend-overlay rounded-[inherit]" />
+      <div class="desktop-liquid-layer absolute inset-0 bg-gradient-to-tr from-white/0 via-white/5 to-white/10 pointer-events-none z-0 mix-blend-overlay rounded-[inherit]" />
     </template>
 
     <!-- 手機版：使用 backdrop-filter 低成本玻璃 -->
@@ -182,6 +182,7 @@ let initialDragX = 0
 let initialDragY = 0
 
 const handlePointerDown = (e: PointerEvent) => {
+  if (isMobile.value) return
   if (!props.isDraggable) return
   
   // 如果點擊到按鈕、輸入框等互動控制項，則不觸發拖曳
@@ -260,6 +261,7 @@ const handlePointerUp = (e: PointerEvent) => {
 
 // --- 滑鼠懸停傾斜處理 (Hover Tilt Handlers) ---
 const handleMouseMove = (e: MouseEvent) => {
+  if (isMobile.value) return
   if (!props.isTiltable || !cardRef.value) return
   isHovered.value = true
   
@@ -279,11 +281,13 @@ const handleMouseMove = (e: MouseEvent) => {
 }
 
 const handleMouseEnter = () => {
+  if (isMobile.value) return
   isHovered.value = true
   updateRect()
 }
 
 const handleMouseLeave = () => {
+  if (isMobile.value) return
   isHovered.value = false
   // 滑鼠移開時歸零，卡片平滑彈回水平狀態
   mouseX.value = 0
@@ -294,6 +298,7 @@ const handleMouseLeave = () => {
 // 卡片相對於視窗背景的左上角坐標。
 // 為了與全域背景無縫對齊，放大層的 left / top 位置必須動態抵消卡片自身的拖動與頁面捲動位移。
 const updateRect = () => {
+  if (isMobile.value) return
   if (cardRef.value) {
     const rect = cardRef.value.getBoundingClientRect()
     // +effectiveBgInset.value 是因為全域背景可能有視差邊界餘裕，例如 inset-[-100px]
@@ -308,18 +313,17 @@ const updateRect = () => {
 
 // 監聽視窗縮放與滾動以即時重新計算對齊坐標
 onMounted(() => {
-  updateRect()
-  setTimeout(updateRect, 100)
-  window.addEventListener('resize', updateRect)
-  // 手機版不要每張卡各自監聽 scroll，改用全域 CSS variable
   if (!isMobile.value) {
+    updateRect()
+    setTimeout(updateRect, 100)
+    window.addEventListener('resize', updateRect)
     window.addEventListener('scroll', updateRect, { passive: true })
   }
 })
 
 onUnmounted(() => {
-  window.removeEventListener('resize', updateRect)
   if (!isMobile.value) {
+    window.removeEventListener('resize', updateRect)
     window.removeEventListener('scroll', updateRect)
   }
 })
@@ -328,6 +332,13 @@ onUnmounted(() => {
 
 // 1. 卡片主體樣式：結合拖曳平移、3D 旋轉與懸停縮放
 const cardStyle = computed(() => {
+  if (isMobile.value) {
+    return {
+      zIndex: 10,
+      transition: 'none'
+    }
+  }
+
   const scale = isDragging.value ? 0.98 : (isHovered.value ? 1.02 : 1)
   const zIdx = isDragging.value ? 30 : (isHovered.value ? 20 : 10)
   
@@ -478,6 +489,12 @@ const distortionStyle = computed(() => {
 
 // 6. 內容文字視差微移
 const contentStyle = computed(() => {
+  if (isMobile.value) {
+    return {
+      transform: 'none',
+    }
+  }
+
   const xOffset = mouseXSpring.value * 20 // -10px 到 10px
   const yOffset = mouseYSpring.value * 20 // -10px 到 10px
   return {
@@ -491,7 +508,6 @@ const contentStyle = computed(() => {
 .liquid-glass-card {
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
-  will-change: transform;
 }
 
 .liquid-glass-card-content {
@@ -545,15 +561,15 @@ const contentStyle = computed(() => {
 
   border: 1px solid rgba(255, 255, 255, 0.3);
 
-  backdrop-filter: blur(10px) saturate(130%);
-  -webkit-backdrop-filter: blur(10px) saturate(130%);
+  backdrop-filter: blur(6px) saturate(112%);
+  -webkit-backdrop-filter: blur(6px) saturate(112%);
 
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.4),
     inset 0 -1px 0 rgba(255, 255, 255, 0.08),
     0 12px 28px rgba(0, 0, 0, 0.12);
 
-  transform: translateZ(0);
+  transform: none !important;
 }
 
 /* 折射高光層：用靜態漸層模擬厚玻璃光線彎折 */
@@ -582,10 +598,9 @@ const contentStyle = computed(() => {
       transparent 62%
     );
 
-  opacity: 0.35;
-  mix-blend-mode: screen;
-  /* 綁定全域 CSS variable，滑動時光斑會上下流動 */
-  transform: translate3d(0, var(--glass-flow-y, 0px), 0) rotate(-4deg);
+  opacity: 0.18;
+  mix-blend-mode: normal;
+  transform: rotate(-4deg);
 }
 
 /* 邊緣厚玻璃感 */
@@ -608,12 +623,39 @@ const contentStyle = computed(() => {
   inset: 0;
   z-index: 3;
   pointer-events: none;
-  opacity: 0.08;
+  opacity: 0.04;
 
   background-image:
     radial-gradient(rgba(255, 255, 255, 0.35) 0.5px, transparent 0.5px);
   background-size: 5px 5px;
 
-  mix-blend-mode: overlay;
+  mix-blend-mode: normal;
+}
+
+@media (max-width: 767px) {
+  .liquid-glass-card {
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    background:
+      linear-gradient(
+        135deg,
+        rgba(255, 255, 255, 0.18),
+        rgba(255, 255, 255, 0.06) 38%,
+        rgba(255, 255, 255, 0.02)
+      );
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.4),
+      inset 0 -1px 0 rgba(255, 255, 255, 0.08),
+      0 12px 28px rgba(0, 0, 0, 0.12);
+    transform: none !important;
+    will-change: auto;
+  }
+
+  .desktop-liquid-layer {
+    display: none !important;
+  }
+
+  .liquid-glass-card-content {
+    transform: none !important;
+  }
 }
 </style>

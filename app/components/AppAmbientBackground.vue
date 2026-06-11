@@ -251,46 +251,9 @@ onMounted(() => {
 
   mm = gsap.matchMedia();
 
-  // Mobile layout (< 768px)
+  // Mobile layout (< 768px): keep ambient background static for scroll performance.
   mm.add("(max-width: 767px)", () => {
-    const tl = gsap.timeline({
-      scrollTrigger: {
-        trigger: "body",
-        start: "top top",
-        end: () => {
-          const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
-          return `+=${maxScroll * 0.5}`;
-        },
-        scrub: true,
-        invalidateOnRefresh: true,
-      }
-    });
-
-    // 2. Interactive 3D glass bokeh particles fly past camera (no dynamic blur on mobile)
-    tl.fromTo(".bokeh-1", 
-      { y: 150, scale: 0.8, opacity: 0.6 },
-      { y: -450, scale: 2.5, opacity: 0, ease: "power1.out" },
-      0
-    );
-    tl.fromTo(".bokeh-2", 
-      { y: 200, scale: 0.6, opacity: 0.5 },
-      { y: -550, scale: 2.8, opacity: 0, ease: "power1.out" },
-      0
-    );
-    tl.fromTo(".bokeh-3", 
-      { y: 250, scale: 0.9, opacity: 0.7 },
-      { y: -350, scale: 2.2, opacity: 0, ease: "power1.out" },
-      0
-    );
-    tl.fromTo(".bokeh-4", 
-      { y: 120, scale: 0.7, opacity: 0.4 },
-      { y: -650, scale: 3.0, opacity: 0, ease: "power1.out" },
-      0
-    );
-
-    return () => {
-      tl.kill();
-    };
+    gsap.set(".ambient-bokeh", { clearProps: "transform,opacity,filter" });
   });
 
   // Desktop layout (>= 768px)
@@ -332,17 +295,19 @@ onMounted(() => {
     };
   });
 
-  // Setup MutationObserver to refresh ScrollTriggers when dynamic content loads
-  observer = new MutationObserver(() => {
-    clearTimeout(refreshTimeout);
-    refreshTimeout = setTimeout(() => {
-      ScrollTrigger.refresh();
-    }, 150);
-  });
-  observer.observe(document.body, {
-    childList: true,
-    subtree: true,
-  });
+  // Desktop only: refresh ScrollTriggers when dynamic content changes.
+  if (window.matchMedia("(min-width: 768px)").matches) {
+    observer = new MutationObserver(() => {
+      clearTimeout(refreshTimeout);
+      refreshTimeout = setTimeout(() => {
+        ScrollTrigger.refresh();
+      }, 150);
+    });
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true,
+    });
+  }
 });
 
 onBeforeUnmount(() => {
@@ -388,7 +353,7 @@ onBeforeUnmount(() => {
 .ambient-cute {
   overflow: hidden;
   opacity: calc(1 - var(--immersive-progress));
-  background-image: url("/img/ambient-glass-sprouts.png");
+  background-image: url("/img/ambient-glass-sprouts.png?v=bg-20260611");
   background-position: center center;
   background-repeat: no-repeat;
   background-size: cover;
