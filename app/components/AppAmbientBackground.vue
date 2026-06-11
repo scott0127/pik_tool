@@ -167,6 +167,8 @@ const baseTransform = computed(() => {
   return `translate3d(${bgXSpring.value}px, ${bgYSpring.value}px, 0)`;
 });
 const imageTransform = computed(() => {
+  if (isMobile.value) return "none";
+
   const tx = isMobile.value ? 0 : bgXSpring.value;
   const ty = isMobile.value ? 0 : (bgYSpring.value + scrollBgY.value);
   return `translate3d(${tx}px, ${ty}px, 0) scale(${scrollBgScale.value})`;
@@ -363,8 +365,33 @@ onBeforeUnmount(() => {
 }
 
 @media (max-width: 767px) {
+  .ambient-background {
+    inset: 0 !important;
+    height: 100lvh;
+    min-height: 100lvh;
+    overflow: hidden;
+  }
+
+  .ambient-base {
+    inset: 0 !important;
+    height: 100lvh;
+    min-height: 100lvh;
+    transform: none !important;
+  }
+
   .ambient-cute {
     inset: 0 !important;
+    height: 100lvh;
+    min-height: 100lvh;
+    background-position: center center;
+    background-size: cover;
+    transform: none !important;
+    will-change: auto;
+  }
+
+  .ambient-bokeh-layer,
+  .ambient-spores {
+    display: none;
   }
 }
 
