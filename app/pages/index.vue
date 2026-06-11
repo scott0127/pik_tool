@@ -4,7 +4,7 @@
       <HomeBentoGrid>
           <!-- 1. Hero -->
           <template #hero>
-              <HomeHeroSection :bg-x="bgXSpring" :bg-y="bgYSpring" :bg-image="bgImage" />
+              <HomeHeroSection />
           </template>
 
           <!-- 2. Near Complete -->
@@ -29,27 +29,27 @@
                 :bg-image="bgImage"
                 :magnification="1.05"
                 :is-draggable="false"
-                class="group h-full w-full min-h-[220px] p-6 flex flex-col items-start justify-between relative overflow-hidden rounded-[2.5rem] cursor-pointer"
+                class="home-action-card group h-full w-full min-h-[220px] p-6 grid relative overflow-hidden rounded-[2.5rem] cursor-pointer"
               >
                    <!-- Soft Aurora Background -->
                    <div class="absolute top-[-20%] right-[-20%] w-64 h-64 bg-orange-200/40 rounded-full blur-2xl pointer-events-none group-hover:bg-orange-300/50 transition-colors duration-700"></div>
                    <div class="absolute bottom-[-20%] left-[-20%] w-64 h-64 bg-red-100/30 rounded-full blur-2xl pointer-events-none group-hover:bg-red-200/40 transition-colors duration-700"></div>
 
                    <!-- Icon -->
-                   <div class="bg-white/40 border border-white/60 shadow-inner w-14 h-14 rounded-2xl flex items-center justify-center text-3xl group-hover:scale-110 transition-transform duration-300 relative z-10 mb-4 backdrop-blur-md">
+                   <div class="home-action-icon bg-white/40 border border-white/60 shadow-inner w-14 h-14 rounded-2xl flex items-center justify-center text-3xl group-hover:scale-110 transition-transform duration-300 relative z-10 backdrop-blur-md">
                        <Icon name="lucide:help-circle" class="text-emerald-700" />
                    </div>
 
                    <!-- Text Content -->
-                   <div class="relative z-10 space-y-1 mb-auto pointer-events-none">
-                       <h3 class="readable-outline text-gray-900 text-2xl font-black tracking-tight group-hover:text-orange-700 transition-colors drop-shadow-sm">{{ $t('home.missing.title') }}</h3>
-                       <p class="readable-outline text-gray-800 text-sm font-bold">{{ $t('home.missing.desc') }}</p>
+                   <div class="home-action-copy relative z-10 space-y-1 pointer-events-none">
+                       <h3 class="glass-text-plain text-gray-900 text-2xl font-black tracking-tight group-hover:text-orange-700 transition-colors drop-shadow-sm">{{ $t('home.missing.title') }}</h3>
+                       <p class="glass-text-plain text-gray-800 text-sm font-bold">{{ $t('home.missing.desc') }}</p>
                    </div>
                    
                    <!-- Count -->
-                   <div class="relative z-10 mt-4 flex items-baseline gap-1.5 pointer-events-none">
+                   <div class="home-action-count relative z-10 flex items-baseline gap-1.5 pointer-events-none">
                        <span class="text-4xl font-black text-orange-600 leading-none drop-shadow-md">{{ uncollectedCount }}</span>
-                       <span class="readable-outline text-gray-800 text-sm font-extrabold">{{ $t('home.missing.count_suffix') }}</span>
+                       <span class="glass-text-plain text-gray-800 text-sm font-extrabold">{{ $t('home.missing.count_suffix') }}</span>
                    </div>
               </LiquidGlassCard>
           </template>
@@ -65,27 +65,27 @@
                 :bg-image="bgImage"
                 :magnification="1.05"
                 :is-draggable="false"
-                class="group h-full w-full min-h-[220px] p-6 flex flex-col items-start justify-between relative overflow-hidden rounded-[2.5rem] cursor-pointer"
+                class="home-action-card group h-full w-full min-h-[220px] p-6 grid relative overflow-hidden rounded-[2.5rem] cursor-pointer"
               >
                   <!-- Soft Aurora Background -->
                   <div class="absolute top-[-20%] right-[-20%] w-64 h-64 bg-purple-200/40 rounded-full blur-2xl pointer-events-none group-hover:bg-purple-300/50 transition-colors duration-700"></div>
                   <div class="absolute bottom-[-20%] left-[-20%] w-64 h-64 bg-pink-100/30 rounded-full blur-2xl pointer-events-none group-hover:bg-pink-200/40 transition-colors duration-700"></div>
                   
                   <!-- Icon -->
-                   <div class="bg-white/40 border border-white/60 shadow-inner w-14 h-14 rounded-2xl flex items-center justify-center text-3xl group-hover:scale-110 transition-transform duration-300 relative z-10 mb-4 backdrop-blur-md">
+                   <div class="home-action-icon bg-white/40 border border-white/60 shadow-inner w-14 h-14 rounded-2xl flex items-center justify-center text-3xl group-hover:scale-110 transition-transform duration-300 relative z-10 backdrop-blur-md">
                        <Icon name="lucide:alert-circle" class="text-emerald-700" />
                    </div>
 
                    <!-- Text Content -->
-                   <div class="relative z-10 space-y-1 mb-auto pointer-events-none">
-                       <h3 class="readable-outline text-gray-900 text-2xl font-black tracking-tight group-hover:text-purple-700 transition-colors drop-shadow-sm">{{ $t('home.limited.title') }}</h3>
-                       <p class="readable-outline text-gray-800 text-sm font-bold">{{ $t('home.limited.desc') }}</p>
+                   <div class="home-action-copy relative z-10 space-y-1 pointer-events-none">
+                       <h3 class="glass-text-plain text-gray-900 text-2xl font-black tracking-tight group-hover:text-purple-700 transition-colors drop-shadow-sm">{{ $t('home.limited.title') }}</h3>
+                       <p class="glass-text-plain text-gray-800 text-sm font-bold">{{ $t('home.limited.desc') }}</p>
                    </div>
 
                    <!-- Count -->
-                   <div class="relative z-10 mt-4 flex items-baseline gap-1.5 pointer-events-none">
+                   <div class="home-action-count relative z-10 flex items-baseline gap-1.5 pointer-events-none">
                        <span class="text-4xl font-black text-purple-600 leading-none drop-shadow-md">{{ limitedCount }}</span>
-                       <span class="readable-outline text-gray-800 text-sm font-extrabold">{{ $t('home.limited.count_suffix') }}</span>
+                       <span class="glass-text-plain text-gray-800 text-sm font-extrabold">{{ $t('home.limited.count_suffix') }}</span>
                    </div>
               </LiquidGlassCard>
           </template>
@@ -101,21 +101,21 @@
                 :bg-image="bgImage"
                 :magnification="1.05"
                 :is-draggable="false"
-                class="group h-full w-full min-h-[220px] p-6 flex flex-col justify-between relative overflow-hidden rounded-[2.5rem] cursor-pointer"
+                class="home-action-card group h-full w-full min-h-[220px] p-6 grid relative overflow-hidden rounded-[2.5rem] cursor-pointer"
               >
                    <!-- Soft Aurora Background -->
                    <div class="absolute top-[-20%] right-[-20%] w-64 h-64 bg-emerald-200/40 rounded-full blur-2xl pointer-events-none group-hover:bg-emerald-300/50 transition-colors duration-700"></div>
                    <div class="absolute bottom-[-20%] left-[-20%] w-64 h-64 bg-teal-100/30 rounded-full blur-2xl pointer-events-none group-hover:bg-teal-200/40 transition-colors duration-700"></div>
                    
-                  <div class="flex items-start justify-between relative z-10 pointer-events-none">
+                  <div class="home-action-icon-row flex items-start justify-between relative z-10 pointer-events-none">
                        <div class="bg-white/40 border border-white/60 shadow-inner backdrop-blur-md w-14 h-14 rounded-2xl flex items-center justify-center text-3xl group-hover:scale-110 transition-transform duration-300">
                            <Icon name="lucide:map-pin" class="text-emerald-700 drop-shadow-sm" />
                        </div>
                   </div>
 
-                  <div class="mt-4 relative z-10 group-hover:translate-x-1 transition-transform duration-300 pointer-events-none">
-                       <h3 class="readable-outline text-gray-900 text-2xl font-black tracking-tight drop-shadow-sm">{{ $t('home.map.title') }}</h3>
-                       <p class="readable-outline text-gray-800 text-sm font-bold opacity-90 group-hover:text-emerald-800 transition-colors">{{ $t('home.map.desc') }}</p>
+                  <div class="home-action-copy home-action-copy-bottom relative z-10 group-hover:translate-x-1 transition-transform duration-300 pointer-events-none">
+                       <h3 class="glass-text-plain text-gray-900 text-2xl font-black tracking-tight drop-shadow-sm">{{ $t('home.map.title') }}</h3>
+                       <p class="glass-text-plain text-gray-800 text-sm font-bold opacity-90 group-hover:text-emerald-800 transition-colors">{{ $t('home.map.desc') }}</p>
                   </div>
               </LiquidGlassCard>
           </template>
@@ -371,3 +371,46 @@ const goToCategory = (categoryId: string) => {
   router.push({ path: '/collection', query: { category: categoryId } });
 };
 </script>
+
+<style scoped>
+.home-action-card {
+  grid-template-rows: auto 1fr auto;
+  align-items: start;
+  gap: 1rem;
+}
+
+.home-action-icon,
+.home-action-icon-row {
+  align-self: start;
+}
+
+.home-action-copy {
+  align-self: center;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.home-action-copy-bottom {
+  align-self: end;
+}
+
+.home-action-count {
+  align-self: end;
+  min-width: 0;
+}
+
+.home-action-copy :where(h3, p),
+.home-action-count :where(span) {
+  -webkit-text-fill-color: currentColor;
+  -webkit-text-stroke: 0;
+  filter: none;
+  paint-order: normal;
+  text-shadow: 0 1px 2px rgb(255 255 255 / 0.72), 0 8px 18px rgb(15 23 42 / 0.16);
+}
+
+@media (max-width: 767px) {
+  .home-action-card {
+    min-height: 220px;
+  }
+}
+</style>

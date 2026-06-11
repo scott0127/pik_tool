@@ -51,34 +51,45 @@
 
         <!-- 更新內容 -->
         <div v-show="currentTab === 'update'" class="flex-1">
-          <ul class="announcement-copy text-sm leading-relaxed list-disc list-inside space-y-1">
-            <li>
-              <span class="inline-flex items-center gap-1.5 align-middle">
-                5/8更新任天堂卡匣皮克敏種類
+          <ul class="announcement-copy announcement-list text-sm leading-relaxed">
+            <li class="announcement-update-item announcement-update-item-feature">
+              <span class="announcement-update-date">6/11</span>
+              <span class="announcement-update-icon announcement-update-icon-emerald">
+                <Icon name="lucide:sprout" class="h-3.5 w-3.5" />
+              </span>
+              <span class="announcement-update-copy">
+                <span class="announcement-update-kicker">全新功能</span>
+                <span class="announcement-update-highlight">放生皮克敏的回憶</span>
               </span>
             </li>
-            <li>
-              <span class="inline-flex items-center gap-1.5 align-middle">
-                4/26 號更新地圖，優化地圖面積邏輯與準確度。
+            <li class="announcement-update-item">
+              <span class="announcement-update-date">iOS</span>
+              <span class="announcement-update-icon announcement-update-icon-dark">
+                <svg
+                  class="h-3.5 w-3.5"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                  aria-hidden="true"
+                >
+                  <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83ZM13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11Z" />
+                </svg>
+              </span>
+              <span class="announcement-update-copy">
+                <span class="announcement-update-kicker">新增捷徑</span>
+                <span>專屬「加到主畫面」按鈕</span>
               </span>
             </li>
-            <li>3/14 主頁現在會顯示<span class="text-green-600 font-medium">當月全新與復刻的裝飾品</span>皮克敏了!新增<span class="bg-gradient-to-r from-yellow-400 via-red-500 to-purple-600 bg-clip-text text-transparent font-bold">彩色粉末皮克敏系列</span></li>
-            <li class="flex items-center gap-1 flex-wrap">新增 <span class="ios-badge inline-flex items-center gap-0.5 bg-gray-900 text-white px-1.5 py-[1.5px] rounded-[5px] text-[11px] font-semibold tracking-wide shadow-sm" style="font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif;"><Icon name="lucide:apple" class="w-3 h-3 mb-[0.5px]"/> iOS</span> 專屬「加到主畫面」捷徑按鈕</li>
-            <li>
-              <div class="flex items-start gap-3"> <!-- items-start 讓文字對齊網格頂部 -->
-                
-                <!-- 國旗網格容器 -->
-                <div class="grid grid-cols-2 gap-1 w-fit">
-                  <Icon name="circle-flags:tw" class="text-xl" />
-                  <Icon name="circle-flags:us" class="text-xl" />
-                  <!-- col-span-2 讓第三個國旗佔滿兩格並置中 -->
-                  <Icon name="circle-flags:jp" class="text-xl col-span-2 justify-self-center" />
-                </div>
-                
-                <span class="flex-1">
-                  好友功能可以為自己設定出沒區域了！想拿外國/漂亮明信片嗎！快去設定你的區域吧
-                </span>
-              </div>
+            <li class="announcement-update-item">
+              <span class="announcement-update-date">好友</span>
+              <span class="announcement-update-icon announcement-update-flags">
+                <Icon name="circle-flags:tw" class="h-3.5 w-3.5" />
+                <Icon name="circle-flags:us" class="h-3.5 w-3.5" />
+                <Icon name="circle-flags:jp" class="h-3.5 w-3.5" />
+              </span>
+              <span class="announcement-update-copy">
+                <span class="announcement-update-kicker">區域設定</span>
+                <span>設定出沒區域，尋找外國/漂亮明信片</span>
+              </span>
             </li>
           </ul>
         </div>
@@ -209,6 +220,136 @@ onBeforeUnmount(() => {
 .announcement-copy {
   color: rgb(15 23 42 / 0.9);
   text-shadow: none;
+}
+
+.announcement-list {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.announcement-update-item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+  padding: 0.42rem 0.55rem;
+  overflow: hidden;
+  list-style: none;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  border-radius: 0.9rem;
+  background:
+    radial-gradient(circle at 16% 0%, rgba(255, 255, 255, 0.92), transparent 42%),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.66), rgba(241, 245, 249, 0.42));
+  box-shadow:
+    0 8px 18px rgba(15, 23, 42, 0.05),
+    0 1px 8px rgba(255, 255, 255, 0.72) inset;
+}
+
+.announcement-update-item-feature {
+  border-color: rgba(16, 185, 129, 0.24);
+  background:
+    radial-gradient(circle at 16% 0%, rgba(255, 255, 255, 0.96), transparent 42%),
+    linear-gradient(135deg, rgba(236, 253, 245, 0.92), rgba(255, 255, 255, 0.62));
+}
+
+.announcement-update-item-feature::after {
+  position: absolute;
+  inset: 0;
+  content: "";
+  background: linear-gradient(110deg, transparent 0%, rgba(255, 255, 255, 0.78) 44%, transparent 58%);
+  opacity: 0.42;
+  transform: translateX(-115%);
+  animation: announcement-feature-sheen 3.6s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.announcement-update-date {
+  position: relative;
+  z-index: 1;
+  flex: 0 0 auto;
+  min-width: 2.35rem;
+  padding: 0.18rem 0.42rem;
+  color: white;
+  font-size: 0.68rem;
+  font-weight: 900;
+  line-height: 1;
+  text-align: center;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #00b92f, #008523);
+  box-shadow: 0 6px 14px rgba(0, 133, 35, 0.2);
+}
+
+.announcement-update-icon {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  width: 1.65rem;
+  height: 1.65rem;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  color: rgb(5, 150, 105);
+  border: 1px solid rgba(255, 255, 255, 0.72);
+  border-radius: 0.65rem;
+  background: rgba(255, 255, 255, 0.58);
+  box-shadow: 0 1px 6px rgba(255, 255, 255, 0.68) inset;
+}
+
+.announcement-update-icon-emerald {
+  color: rgb(5, 150, 105);
+  background: rgba(209, 250, 229, 0.64);
+}
+
+.announcement-update-icon-dark {
+  color: white;
+  background: rgb(17, 24, 39);
+}
+
+.announcement-update-flags {
+  width: auto;
+  min-width: 2.55rem;
+  gap: 0.08rem;
+  padding-inline: 0.2rem;
+}
+
+.announcement-update-copy {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  flex-wrap: wrap;
+  min-width: 0;
+  align-items: center;
+  gap: 0.24rem 0.38rem;
+  color: rgb(15, 23, 42);
+  font-size: 0.78rem;
+  font-weight: 850;
+  line-height: 1.35;
+}
+
+.announcement-update-kicker {
+  color: rgb(4, 120, 87);
+  font-weight: 950;
+}
+
+.announcement-update-highlight {
+  overflow: hidden;
+  color: transparent;
+  font-weight: 950;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  background: linear-gradient(90deg, #047857, #00b92f, #0ea5e9);
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+
+@keyframes announcement-feature-sheen {
+  0%, 42% {
+    transform: translateX(-115%);
+  }
+  72%, 100% {
+    transform: translateX(115%);
+  }
 }
 
 .announcement-close-button {

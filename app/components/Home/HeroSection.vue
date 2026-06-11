@@ -48,7 +48,7 @@
               :bg-image="bgImage"
               :magnification="1.05"
               :is-draggable="false"
-              class="relative rounded-3xl md:rounded-[2rem] p-4 w-full flex flex-col md:flex-row md:items-center md:justify-center gap-4 md:gap-2 hover:scale-[1.02] transition-transform duration-300"
+              class="hero-spirit-showcase relative rounded-3xl md:rounded-[2rem] p-4 w-full flex flex-col md:flex-row md:items-center md:justify-center gap-3 md:gap-2 transition-transform duration-300"
             >
                 <!-- Admin Settings Button -->
                 <button
@@ -59,33 +59,35 @@
                 >
                    <Icon name="lucide:settings" class="w-4.5 h-4.5" />
                 </button>
-                <!-- Row 1: Reverse Valentine Stickers -->
-                <div class="flex items-center justify-center -space-x-2 md:-space-x-4 relative group h-14 cursor-none w-full md:w-auto">
-                   <div v-for="(pikmin, index) in valentineSpirits" :key="pikmin.id" 
-                        class="w-10 h-14 transform transition-all duration-300 hover:scale-125 hover:-translate-y-4 hover:z-20 relative filter drop-shadow-md"
-                        :style="{ zIndex: index }">
-                        <img :src="pikmin.image" :alt="pikmin.name" class="w-full h-full object-contain" />
-                   </div>
-                   
-                  <!-- Tooltip (appears on hover of container) -->
-                  <div class="absolute bottom-full mb-3 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-all duration-300 text-[11px] font-bold text-pink-700 bg-white/95 shadow-md border border-pink-100/50 px-3.5 py-1.5 rounded-full pointer-events-none whitespace-nowrap z-40 transform group-hover:-translate-y-1">
-                      {{ row1CategoryName }}
-                  </div>
-               </div>
+                <div class="hero-spirit-content">
+                  <!-- Row 1: Reverse Valentine Stickers -->
+                  <div class="hero-spirit-row group">
+                     <div v-for="(pikmin, index) in valentineSpirits" :key="pikmin.id" 
+                          class="hero-spirit-item"
+                          :style="{ zIndex: index }">
+                          <img :src="pikmin.image" :alt="pikmin.name" class="w-full h-full object-contain" />
+                     </div>
+                     
+                    <!-- Tooltip (appears on hover of container) -->
+                    <div class="hero-spirit-tooltip text-pink-700 border-pink-100/50">
+                        {{ row1CategoryName }}
+                    </div>
+                 </div>
 
-               <!-- Row 2: Colored Powder -->
-                <div class="flex items-center justify-center -space-x-2 md:-space-x-4 relative group h-14 cursor-none w-full md:w-auto">
-                   <div v-for="(pikmin, index) in powderSpirits" :key="pikmin.id" 
-                        class="w-10 h-14 transform transition-all duration-300 hover:scale-125 hover:-translate-y-4 hover:z-20 relative filter drop-shadow-md"
-                        :style="{ zIndex: index }">
-                        <img :src="pikmin.image" :alt="pikmin.name" class="w-full h-full object-contain" />
-                   </div>
-                  
-                  <!-- Tooltip (appears on hover of container) -->
-                  <div class="absolute bottom-full mb-3 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-all duration-300 text-[11px] font-bold text-indigo-700 bg-white/95 shadow-md border border-indigo-100/50 px-3.5 py-1.5 rounded-full pointer-events-none whitespace-nowrap z-40 transform group-hover:-translate-y-1">
-                      {{ row2CategoryName }}
+                 <!-- Row 2: Colored Powder -->
+                  <div class="hero-spirit-row group">
+                     <div v-for="(pikmin, index) in powderSpirits" :key="pikmin.id" 
+                          class="hero-spirit-item"
+                          :style="{ zIndex: index }">
+                          <img :src="pikmin.image" :alt="pikmin.name" class="w-full h-full object-contain" />
+                     </div>
+                    
+                    <!-- Tooltip (appears on hover of container) -->
+                    <div class="hero-spirit-tooltip text-indigo-700 border-indigo-100/50">
+                        {{ row2CategoryName }}
+                    </div>
                   </div>
-               </div>
+                </div>
             </LiquidGlassCard>
 
             <!-- Missing Tracker Badge -->
@@ -568,6 +570,137 @@ const textStyle = computed(() => ({
     filter: blur(18px);
   }
 }
+
+.hero-spirit-showcase {
+  min-height: 10.6rem;
+  max-height: 10.6rem;
+  overflow: hidden;
+}
+
+.hero-spirit-content {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+}
+
+.hero-spirit-row {
+  position: relative;
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  height: 3.9rem;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  cursor: default;
+}
+
+.hero-spirit-item {
+  position: relative;
+  width: 2.35rem;
+  height: 3.35rem;
+  flex: 0 1 2.35rem;
+  margin-inline: -0.25rem;
+  filter: drop-shadow(0 5px 8px rgba(15, 23, 42, 0.18));
+  transform: translateZ(0);
+  transition:
+    transform 220ms ease,
+    filter 220ms ease;
+}
+
+.hero-spirit-item:hover {
+  filter: drop-shadow(0 7px 12px rgba(15, 23, 42, 0.22));
+  transform: translateY(-0.18rem) scale(1.08);
+}
+
+.hero-spirit-tooltip {
+  position: absolute;
+  top: 0.18rem;
+  left: 50%;
+  z-index: 40;
+  max-width: calc(100% - 1.5rem);
+  overflow: hidden;
+  padding: 0.34rem 0.8rem;
+  font-size: 0.68rem;
+  font-weight: 900;
+  line-height: 1.1;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  border-width: 1px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.12);
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, -0.25rem);
+  transition:
+    opacity 180ms ease,
+    transform 180ms ease;
+}
+
+.hero-spirit-row:hover .hero-spirit-tooltip {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+@media (min-width: 768px) {
+  .hero-spirit-showcase {
+    width: min(100%, 32rem) !important;
+    min-height: 6.4rem;
+    max-height: 6.4rem;
+    overflow: hidden;
+    padding: 0.72rem 1rem;
+  }
+
+  .hero-spirit-content {
+    flex-direction: row;
+    justify-content: center;
+    gap: 1.1rem;
+  }
+
+  .hero-spirit-row {
+    width: min(100%, 14.4rem);
+    max-width: 14.4rem;
+    height: 4.8rem;
+    flex: 1 1 0;
+  }
+
+  .hero-spirit-item {
+    width: 2.75rem;
+    height: 4rem;
+    flex-basis: 2.75rem;
+    margin-inline: -0.5rem;
+  }
+
+  .hero-spirit-tooltip {
+    top: 0.36rem;
+  }
+}
+
+@media (max-width: 420px) {
+  .hero-spirit-showcase {
+    min-height: 9.8rem;
+    max-height: 9.8rem;
+    padding-inline: 0.75rem;
+  }
+
+  .hero-spirit-row {
+    height: 3.55rem;
+  }
+
+  .hero-spirit-item {
+    width: 2.05rem;
+    height: 3.05rem;
+    flex-basis: 2.05rem;
+    margin-inline: -0.3rem;
+  }
+}
+
 .preserve-3d {
     transform-style: preserve-3d;
 }
