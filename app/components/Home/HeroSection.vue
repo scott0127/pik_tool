@@ -135,34 +135,125 @@
                 <!-- 2. The Glass Sphere/Container -->
                 <LiquidGlassCard
                   :blur-value="24"
-                  :glass-opacity="0.2"
+                  :glass-opacity="0.15"
                   :bg-x="bgX"
                   :bg-y="bgY"
                   :bg-image="bgImage"
                   :magnification="1.15"
                   :is-draggable="false"
                   :is-tiltable="false"
-                  class="absolute inset-0 rounded-full flex items-center justify-center translate-z-[0px]"
-                >
-                    <div class="absolute inset-0 rounded-full bg-gradient-to-b from-white/40 to-transparent pointer-events-none"></div>
-                </LiquidGlassCard>
+                  class="absolute inset-0 rounded-full flex items-center justify-center translate-z-[10px]"
+                />
 
-                <!-- 3. Progress Ring (Floating) -->
+                <!-- 3. Progress Ring (Floating 3D Crystal Green Ring) -->
                 <div class="absolute inset-4 translate-z-[20px]">
                     <svg class="w-full h-full -rotate-90 drop-shadow-xl" viewBox="0 0 100 100">
-                        <!-- Track -->
-                        <circle cx="50" cy="50" r="40" stroke="rgba(255,255,255,0.3)" stroke-width="6" fill="none" />
-                        <!-- Progress -->
-                        <circle cx="50" cy="50" r="40" stroke="url(#progressGradient)" stroke-width="6" fill="none"
-                                stroke-linecap="round"
+                        <!-- ================= TRACK (Full 360-degree Transparent Glass/Crystal Ring) ================= -->
+                        <!-- 1. Track Body (Frosted/Clear Glass Base) -->
+                        <circle cx="50" cy="50" r="40" stroke="rgba(255, 255, 255, 0.08)" stroke-width="6.5" fill="none" />
+                        
+                        <!-- 2. Track Glass Gloss (360-degree light reflection with sweep shimmer) -->
+                        <circle cx="50" cy="50" r="40" stroke="url(#trackGlossGradient)" stroke-width="6.5" fill="none" class="mix-blend-overlay" />
+                        
+                        <!-- 3. Track Outer Sharp Edge -->
+                        <circle cx="50" cy="50" r="42.2" stroke="rgba(255, 255, 255, 0.35)" stroke-width="0.6" fill="none" class="mix-blend-overlay" />
+                        
+                        <!-- 4. Track Inner Sharp Edge -->
+                        <circle cx="50" cy="50" r="37.8" stroke="rgba(255, 255, 255, 0.2)" stroke-width="0.5" fill="none" class="mix-blend-overlay" />
+
+
+                        <!-- ================= PROGRESS (Glowing Green Crystal Filling) ================= -->
+                        <!-- 4.5 Progress: 3D Cast Shadow (Casts a shadow onto the glass track underneath) -->
+                        <circle cx="50" cy="50" r="40" stroke="rgba(0, 35, 10, 0.26)" stroke-width="6.5" fill="none" stroke-linecap="round"
+                                :stroke-dasharray="251.2"
+                                :stroke-dashoffset="251.2 - (stats.percentage / 100) * 251.2"
+                                filter="url(#shadowBlur)"
+                                transform="translate(0.5, 0.8)"
+                                class="transition-all duration-1000 ease-out"
+                        />
+                        
+                        <!-- 5. Progress Green Body (Semi-transparent brand-green with shadow glow filter) -->
+                        <circle cx="50" cy="50" r="40" stroke="url(#crystalBrandGreenGradient)" stroke-width="6.5" fill="none" stroke-linecap="round"
+                                :stroke-dasharray="251.2"
+                                :stroke-dashoffset="251.2 - (stats.percentage / 100) * 251.2"
+                                filter="url(#brandGreenGlow)"
+                                class="transition-all duration-1000 ease-out"
+                        />
+                        <!-- 6. Progress Glowing Inner Core (Neon-green theme) -->
+                        <circle cx="50" cy="50" r="40" stroke="url(#crystalBrandCoreGradient)" stroke-width="3" fill="none" stroke-linecap="round"
                                 :stroke-dasharray="251.2"
                                 :stroke-dashoffset="251.2 - (stats.percentage / 100) * 251.2"
                                 class="transition-all duration-1000 ease-out"
                         />
+                        <!-- 7. Progress Glossy Highlight Reflection (Sweeping Top Light Source overlay) -->
+                        <circle cx="50" cy="50" r="40" stroke="url(#progressGlossGradient)" stroke-width="6.5" fill="none" stroke-linecap="round"
+                                :stroke-dasharray="251.2"
+                                :stroke-dashoffset="251.2 - (stats.percentage / 100) * 251.2"
+                                class="transition-all duration-1000 ease-out mix-blend-overlay"
+                        />
+                        
+                        <!-- 8. Progress Outer Edge Highlight Reflection -->
+                        <circle cx="50" cy="50" r="42.2" stroke="rgba(255, 255, 255, 0.7)" stroke-width="0.8" fill="none" stroke-linecap="round"
+                                :stroke-dasharray="251.2"
+                                :stroke-dashoffset="251.2 - (stats.percentage / 100) * 251.2"
+                                class="transition-all duration-1000 ease-out mix-blend-overlay"
+                        />
+                        <!-- 9. Progress Inner Edge Highlight Reflection -->
+                        <circle cx="50" cy="50" r="37.8" stroke="rgba(255, 255, 255, 0.35)" stroke-width="0.5" fill="none" stroke-linecap="round"
+                                :stroke-dasharray="251.2"
+                                :stroke-dashoffset="251.2 - (stats.percentage / 100) * 251.2"
+                                class="transition-all duration-1000 ease-out mix-blend-overlay"
+                        />
+
                         <defs>
-                            <linearGradient id="progressGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                            <stop offset="0%" stop-color="#00b92f" />
-                            <stop offset="100%" stop-color="#008523" />
+                            <!-- Shadow blur for 3D cast shadow -->
+                            <filter id="shadowBlur" x="-10%" y="-10%" width="120%" height="120%">
+                                <feGaussianBlur stdDeviation="0.8" />
+                            </filter>
+
+                            <!-- Ambient Glow Filter to make brand green crystal luminous -->
+                            <filter id="brandGreenGlow" x="-20%" y="-20%" width="140%" height="140%">
+                                <feGaussianBlur stdDeviation="1.2" result="blur" />
+                                <feMerge>
+                                    <feMergeNode in="blur" />
+                                    <feMergeNode in="SourceGraphic" />
+                                </feMerge>
+                            </filter>
+
+                            <!-- Track Glass Gloss (With active ambient light sweep animation) -->
+                            <linearGradient id="trackGlossGradient" x1="100%" y1="0%" x2="0%" y2="100%">
+                                <stop offset="0%" stop-color="rgba(255, 255, 255, 0.45)" />
+                                <stop offset="30%" stop-color="rgba(255, 255, 255, 0.15)" />
+                                <stop offset="70%" stop-color="rgba(255, 255, 255, 0)" />
+                                <stop offset="100%" stop-color="rgba(255, 255, 255, 0)" />
+                                <animate attributeName="x1" values="100%; 0%; 100%" dur="12s" repeatCount="indefinite" />
+                                <animate attributeName="y1" values="0%; 100%; 0%" dur="12s" repeatCount="indefinite" />
+                            </linearGradient>
+
+                            <!-- Crystal Brand Green Theme Gradient (Semi-transparent) -->
+                            <linearGradient id="crystalBrandGreenGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" stop-color="rgba(214, 255, 224, 0.72)" />  <!-- brand-green-soft 72% -->
+                                <stop offset="45%" stop-color="rgba(0, 185, 47, 0.58)" />     <!-- brand-green 58% -->
+                                <stop offset="85%" stop-color="rgba(0, 133, 35, 0.68)" />     <!-- brand-green-dark 68% -->
+                                <stop offset="100%" stop-color="rgba(0, 60, 15, 0.78)" />     <!-- deep forest brand green 78% -->
+                            </linearGradient>
+                            
+                            <!-- Glowing Inner Core Gradient (Vibrant neon brand green core) -->
+                            <linearGradient id="crystalBrandCoreGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" stop-color="rgba(255, 255, 255, 0.95)" />   <!-- specular highlight -->
+                                <stop offset="35%" stop-color="rgba(42, 255, 183, 0.88)" />   <!-- neon brand light core -->
+                                <stop offset="80%" stop-color="rgba(0, 185, 47, 0.92)" />     <!-- brand-green core -->
+                                <stop offset="100%" stop-color="rgba(0, 133, 35, 0.98)" />    <!-- brand-green-dark core -->
+                            </linearGradient>
+                            
+                            <!-- Progress Glass Gloss (With active reflection shimmer sweep) -->
+                            <linearGradient id="progressGlossGradient" x1="100%" y1="0%" x2="0%" y2="100%">
+                                <stop offset="0%" stop-color="rgba(255, 255, 255, 0.98)" />
+                                <stop offset="30%" stop-color="rgba(255, 255, 255, 0.45)" />
+                                <stop offset="70%" stop-color="rgba(255, 255, 255, 0)" />
+                                <stop offset="100%" stop-color="rgba(255, 255, 255, 0)" />
+                                <animate attributeName="x1" values="100%; 0%; 100%" dur="8s" repeatCount="indefinite" />
+                                <animate attributeName="y1" values="0%; 100%; 0%" dur="8s" repeatCount="indefinite" />
                             </linearGradient>
                         </defs>
                     </svg>
@@ -180,17 +271,6 @@
                       :is-draggable="false"
                       :is-tiltable="false"
                       class="w-32 h-32 rounded-full mb-2"
-                    />
-                    <LiquidGlassCard
-                      :blur-value="10"
-                      :glass-opacity="0.4"
-                      :bg-x="bgX"
-                      :bg-y="bgY"
-                      :bg-image="bgImage"
-                      :magnification="1.05"
-                      :is-draggable="false"
-                      :is-tiltable="false"
-                      class="rounded-full mt-4 h-[30px] w-[116px]"
                     />
                 </div>
 
@@ -525,6 +605,7 @@ const textStyle = computed(() => ({
 
 .translate-z-\[-20px\] { transform: translateZ(-20px); }
 .translate-z-\[0px\] { transform: translateZ(0px); }
+.translate-z-\[10px\] { transform: translateZ(10px); }
 .translate-z-\[20px\] { transform: translateZ(20px); }
 .translate-z-\[25px\] { transform: translateZ(25px); }
 .translate-z-\[30px\] { transform: translateZ(30px); }

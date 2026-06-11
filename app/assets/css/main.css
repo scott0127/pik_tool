@@ -269,48 +269,64 @@
       0 2px 6px rgba(15, 23, 42, 0.22);
   }
 
-  .liquid-glass-2026 :where(h1, h2, h3, h4, p, li, span, label):not(.text-white):not([class*="text-emerald"]):not([class*="text-orange"]):not([class*="text-purple"]):not([class*="text-pink"]):not([class*="text-blue"]):not([class*="text-red"]),
-  .liquid-glass-soft :where(h1, h2, h3, h4, p, li, span, label):not(.text-white):not([class*="text-emerald"]):not([class*="text-orange"]):not([class*="text-purple"]):not([class*="text-pink"]):not([class*="text-blue"]):not([class*="text-red"]) {
-    color: rgb(17 24 39 / 0.94);
-    -webkit-text-stroke: 0;
-    paint-order: normal;
-    text-shadow: 0 1px 2px rgba(255, 255, 255, 0.24);
-  }
-
-  .readable-on-art {
-    color: rgb(15 23 42 / 0.96);
-    -webkit-text-stroke: 0.02em rgba(255, 255, 255, 0.5);
-    paint-order: stroke fill;
+  .readable-outline,
+  .readable-on-art,
+  .text-on-glass,
+  .liquid-glass-card :where(h1, h2, h3, h4, p, li, span, label):not(.glass-text-plain):not(.glass-text-plain *):not(.glass-text-light):not(.glass-text-light *):not(.text-white):not([class*="text-white"]):not([class*="bg-"]):not([class*="text-emerald"]):not([class*="text-orange"]):not([class*="text-purple"]):not([class*="text-pink"]):not([class*="text-blue"]):not([class*="text-red"]),
+  .liquid-glass-2026 :where(h1, h2, h3, h4, p, li, span, label):not(.glass-text-plain):not(.glass-text-plain *):not(.glass-text-light):not(.glass-text-light *):not(.text-white):not([class*="text-white"]):not([class*="bg-"]):not([class*="text-emerald"]):not([class*="text-orange"]):not([class*="text-purple"]):not([class*="text-pink"]):not([class*="text-blue"]):not([class*="text-red"]),
+  .liquid-glass-soft :where(h1, h2, h3, h4, p, li, span, label):not(.glass-text-plain):not(.glass-text-plain *):not(.glass-text-light):not(.glass-text-light *):not(.text-white):not([class*="text-white"]):not([class*="bg-"]):not([class*="text-emerald"]):not([class*="text-orange"]):not([class*="text-purple"]):not([class*="text-pink"]):not([class*="text-blue"]):not([class*="text-red"]),
+  .glass-surface-readable :where(h1, h2, h3, h4, p, li, span, label):not(.glass-text-plain):not(.glass-text-plain *):not(.glass-text-light):not(.glass-text-light *):not(.text-white):not([class*="text-white"]):not([class*="bg-"]):not([class*="text-emerald"]):not([class*="text-orange"]):not([class*="text-purple"]):not([class*="text-pink"]):not([class*="text-blue"]):not([class*="text-red"]),
+  .glass-surface-clear :where(h1, h2, h3, h4, p, li, span, label):not(.glass-text-plain):not(.glass-text-plain *):not(.glass-text-light):not(.glass-text-light *):not(.text-white):not([class*="text-white"]):not([class*="bg-"]):not([class*="text-emerald"]):not([class*="text-orange"]):not([class*="text-purple"]):not([class*="text-pink"]):not([class*="text-blue"]):not([class*="text-red"]),
+  .glass-frosted-shell :where(h1, h2, h3, h4, p, li, span, label):not(.glass-text-plain):not(.glass-text-plain *):not(.glass-text-light):not(.glass-text-light *):not(.text-white):not([class*="text-white"]):not([class*="bg-"]):not([class*="text-emerald"]):not([class*="text-orange"]):not([class*="text-purple"]):not([class*="text-pink"]):not([class*="text-blue"]):not([class*="text-red"]) {
+    color: rgb(21 30 45 / 0.96) !important;
+    -webkit-text-stroke: 0.035em rgba(255, 255, 255, 0.95) !important;
+    paint-order: stroke fill !important;
     text-shadow:
-      0 1px 0 rgba(255, 255, 255, 0.92),
-      0 -1px 0 rgba(255, 255, 255, 0.58),
-      1px 0 0 rgba(255, 255, 255, 0.5),
-      -1px 0 0 rgba(255, 255, 255, 0.5),
-      0 3px 8px rgba(15, 23, 42, 0.28);
+      0 1px 0 rgba(255, 255, 255, 0.95),
+      0 -1px 0 rgba(255, 255, 255, 0.65),
+      1px 0 0 rgba(255, 255, 255, 0.55),
+      -1px 0 0 rgba(255, 255, 255, 0.55),
+      0 2.5px 5px rgba(21, 30, 45, 0.28) !important;
   }
 
-  .text-on-glass {
-    color: rgb(15 23 42 / 0.96);
-    -webkit-text-stroke: 0;
-    paint-order: normal;
-    text-shadow: 0 1px 2px rgba(255, 255, 255, 0.28);
+  .glass-text-plain,
+  .glass-frosted-shell.glass-text-plain,
+  .liquid-glass-2026.glass-text-plain,
+  .liquid-glass-soft.glass-text-plain,
+  .glass-frosted-shell .glass-text-plain,
+  .liquid-glass-2026 .glass-text-plain,
+  .liquid-glass-soft .glass-text-plain,
+  .glass-frosted-shell.glass-text-plain :where(h1, h2, h3, h4, p, li, span, label, a, button, div),
+  .liquid-glass-2026.glass-text-plain :where(h1, h2, h3, h4, p, li, span, label, a, button, div),
+  .liquid-glass-soft.glass-text-plain :where(h1, h2, h3, h4, p, li, span, label, a, button, div),
+  .glass-text-plain :where(h1, h2, h3, h4, p, li, span, label, a, button, div) {
+    -webkit-text-fill-color: currentColor !important;
+    -webkit-text-stroke: 0 !important;
+    filter: none !important;
+    paint-order: normal !important;
+    text-shadow: none !important;
   }
 
-  .glass-surface-readable :where(h1, h2, h3, h4, p, li, span, label):not(.text-white):not([class*="text-emerald"]):not([class*="text-orange"]):not([class*="text-purple"]):not([class*="text-pink"]):not([class*="text-blue"]):not([class*="text-red"]),
-  .glass-surface-clear :where(h1, h2, h3, h4, p, li, span, label):not(.text-white):not([class*="text-emerald"]):not([class*="text-orange"]):not([class*="text-purple"]):not([class*="text-pink"]):not([class*="text-blue"]):not([class*="text-red"]),
-  .glass-frosted-shell :where(h1, h2, h3, h4, p, li, span, label):not(.text-white):not([class*="text-emerald"]):not([class*="text-orange"]):not([class*="text-purple"]):not([class*="text-pink"]):not([class*="text-blue"]):not([class*="text-red"]) {
-    color: rgb(15 23 42 / 0.94);
-    -webkit-text-stroke: 0;
-    paint-order: normal;
-    text-shadow: 0 1px 2px rgba(255, 255, 255, 0.24);
-  }
-
-  .glass-frosted-shell .text-white :where(h1, h2, h3, h4, p, li, span, label, svg),
-  .glass-frosted-shell [class*="text-white"] :where(h1, h2, h3, h4, p, li, span, label, svg) {
-    color: inherit;
-    -webkit-text-stroke: 0;
-    paint-order: normal;
-    text-shadow: none;
+  .glass-text-light,
+  .glass-frosted-shell.glass-text-plain .glass-text-light,
+  .liquid-glass-2026.glass-text-plain .glass-text-light,
+  .liquid-glass-soft.glass-text-plain .glass-text-light,
+  .glass-frosted-shell .glass-text-light,
+  .liquid-glass-2026 .glass-text-light,
+  .liquid-glass-soft .glass-text-light,
+  .glass-frosted-shell.glass-text-plain .glass-text-light :where(*),
+  .liquid-glass-2026.glass-text-plain .glass-text-light :where(*),
+  .liquid-glass-soft.glass-text-plain .glass-text-light :where(*),
+  .glass-frosted-shell .glass-text-light :where(*),
+  .liquid-glass-2026 .glass-text-light :where(*),
+  .liquid-glass-soft .glass-text-light :where(*),
+  .glass-text-light :where(*) {
+    color: #fff !important;
+    -webkit-text-fill-color: #fff !important;
+    -webkit-text-stroke: 0 !important;
+    filter: none !important;
+    paint-order: normal !important;
+    text-shadow: none !important;
   }
 
   html.mobile-menu-open .ambient-three {

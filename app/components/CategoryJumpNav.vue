@@ -25,7 +25,6 @@
         
         <!-- Generated Artistic Background -->
         <div class="absolute inset-0 -z-10 bg-gradient-to-br from-emerald-50/80 to-teal-50/80"></div>
-        <img src="/img/nav-bg.png" class="absolute inset-0 w-full h-full object-cover opacity-30 mix-blend-multiply pointer-events-none" />
         
         <!-- Drawer Header -->
         <div class="flex items-center justify-between px-6 py-5 border-b border-white/40 bg-white/40 backdrop-blur-md shrink-0 shadow-sm relative z-20">

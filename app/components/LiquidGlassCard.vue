@@ -30,15 +30,28 @@
     ]"
     :style="cardStyle"
     @mousemove="handleMouseMove"
+    @mouseenter="handleMouseEnter"
     @mouseleave="handleMouseLeave"
     @pointerdown="handlePointerDown"
   >
     <!-- 1. 液態透鏡放大層 (True Liquid Lens Magnification Layer) -->
     <!-- 透過與全域視窗對齊的背景位移，再配合 scale 放大，創造出物理透鏡折射效果 -->
-    <div v-if="bgImage" class="absolute inset-0 rounded-[inherit] pointer-events-none -z-10 overflow-hidden bg-white/5">
+    <div class="absolute inset-0 rounded-[inherit] pointer-events-none -z-10 overflow-hidden bg-white/5">
+      <!-- (A) Base Gradient Layer (corresponds to .ambient-base) -->
       <div 
         class="absolute"
-        :style="magnifierStyle"
+        :style="baseGradientStyle"
+      />
+      <!-- (B) Ambient Cute Image Layer (corresponds to .ambient-cute) -->
+      <div 
+        v-if="effectiveBgImage"
+        class="absolute"
+        :style="imageStyle"
+      />
+      <!-- (C) Ambient Light Overlay Layer (corresponds to .ambient-light) -->
+      <div 
+        class="absolute"
+        :style="lightOverlayStyle"
       />
       <!-- 邊緣變形陰影：模擬透鏡在最邊緣因弧度產生的光線微弱衰減 -->
       <div 
@@ -78,11 +91,12 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useSpring } from '~/composables/useSpring'
+import { useParallax } from '~/composables/useParallax'
 
 // 定義元件的屬性
 interface Props {
   blurValue?: number         // 玻璃模糊半徑 (px)
-  glassOpacity?: number      // 玻璃底色透明度 (0 ~ 1)
+  glassOpacity?: number | null // 玻璃底色透明度 (0 ~ 1)
   bgX?: number               // 全域背景 X 軸視差偏移 (px)
   bgY?: number               // 全域背景 Y 軸視差偏移 (px)
   bgImage?: string           // 全域背景圖片 URL
@@ -95,14 +109,14 @@ interface Props {
 
 const props = withDefaults(defineProps<Props>(), {
   blurValue: 28,
-  glassOpacity: 0.1,
+  glassOpacity: null,
   bgX: 0,
   bgY: 0,
   bgImage: '',
   magnification: 1.15,
   isDraggable: true,
   isTiltable: true,
-  bgInset: 0
+  bgInset: 100
 })
 
 // 元件 DOM 參照
@@ -122,6 +136,37 @@ const mouseY = ref(0)
 
 // 卡片相對於背景原點的偏移與尺寸資訊，用於液態透鏡精準對齊
 const rectOffset = ref({ x: 0, y: 0, w: 0, h: 0 })
+
+// 取得全域視差背景狀態與沉浸式切換變數
+const { bgXSpring, bgYSpring, bgImage: globalBgImage, isImmersive, immersiveProgress, isMobile, globalGlassOpacity, scrollBgScale, scrollBgY } = useParallax()
+
+const effectiveBgInset = computed(() => {
+  return isMobile.value ? 0 : props.bgInset
+})
+
+// 計算實際使用的背景偏移與圖檔，無痛向下相容與覆寫
+const effectiveBgX = computed(() => {
+  if (isMobile.value) return 0
+  return props.bgX !== undefined && props.bgX !== 0 ? props.bgX : (bgXSpring?.value ?? 0)
+})
+
+const effectiveBgY = computed(() => {
+  if (isMobile.value) return 0
+  return props.bgY !== undefined && props.bgY !== 0 ? props.bgY : (bgYSpring?.value ?? 0)
+})
+
+const effectiveBgImage = computed(() => {
+  return props.bgImage || globalBgImage.value
+})
+
+const effectiveGlassOpacity = computed(() => {
+  const base = globalGlassOpacity.value // 預設 0.2，範圍可調整為 0 ~ 0.8
+  if (props.glassOpacity !== null && props.glassOpacity !== undefined) {
+    // 依據傳入的 props 與預設的 0.2 比例進行等比縮放，讓全域滑桿可同比例控制所有卡片
+    return props.glassOpacity * (base / 0.2)
+  }
+  return base
+})
 
 // --- 彈簧物理學設定 (Spring Physics) ---
 // 使用 VueUse 的 useSpring 創造平滑流暢的物理動畫過渡
@@ -245,6 +290,11 @@ const handleMouseMove = (e: MouseEvent) => {
   mouseY.value = yPct
 }
 
+const handleMouseEnter = () => {
+  isHovered.value = true
+  updateRect()
+}
+
 const handleMouseLeave = () => {
   isHovered.value = false
   // 滑鼠移開時歸零，卡片平滑彈回水平狀態
@@ -258,26 +308,28 @@ const handleMouseLeave = () => {
 const updateRect = () => {
   if (cardRef.value) {
     const rect = cardRef.value.getBoundingClientRect()
-    // +props.bgInset 是因為全域背景可能有視差邊界餘裕，例如 inset-[-100px]
+    // +effectiveBgInset.value 是因為全域背景可能有視差邊界餘裕，例如 inset-[-100px]
     rectOffset.value = {
-      x: rect.left - dragX.value + props.bgInset,
-      y: rect.top - dragY.value + props.bgInset,
+      x: rect.left - dragX.value + effectiveBgInset.value,
+      y: rect.top - dragY.value + effectiveBgInset.value,
       w: rect.width,
       h: rect.height
     }
   }
 }
 
-// 監聽視窗縮放以即時重新計算對齊坐標
+// 監聽視窗縮放與滾動以即時重新計算對齊坐標
 onMounted(() => {
   updateRect()
   // 延遲一下確保版面渲染完畢後再讀取一次正確坐標
   setTimeout(updateRect, 100)
   window.addEventListener('resize', updateRect)
+  window.addEventListener('scroll', updateRect, { passive: true })
 })
 
 onUnmounted(() => {
   window.removeEventListener('resize', updateRect)
+  window.removeEventListener('scroll', updateRect)
 })
 
 // --- 樣式計算屬性 (Style Computeds) ---
@@ -291,36 +343,96 @@ const cardStyle = computed(() => {
     transform: `translate3d(${dragX.value}px, ${dragY.value}px, 0) rotateX(${rotateX.value}deg) rotateY(${rotateY.value}deg) scale(${scale})`,
     transformPerspective: '1000px',
     transformStyle: 'preserve-3d' as const,
-    background: `rgba(255, 255, 255, ${props.glassOpacity * 0.4})`,
-    border: '1px solid rgba(255, 255, 255, 0.2)',
-    boxShadow: 'inset 0 1px 2px rgba(255,255,255,0.3), inset 0 -1px 2px rgba(255,255,255,0.05), 0 25px 50px -12px rgba(0,0,0,0.5)',
+    background: `rgba(255, 255, 255, ${effectiveGlassOpacity.value * 0.4})`,
+    border: '1.5px solid rgba(255, 255, 255, 0.42)',
+    boxShadow: 'inset 0 1.5px 3px rgba(255, 255, 255, 0.45), inset 0 -1px 2px rgba(255, 255, 255, 0.1), 0 25px 50px -12px rgba(0, 0, 0, 0.45)',
     zIndex: zIdx,
     // 拖動時關閉 transform 過渡以防滑鼠延遲，平時懸停與歸零則開啟平滑過渡
     transition: isDragging.value ? 'none' : 'transform 0.2s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.2s'
   }
 })
 
-// 2. 放大鏡樣式：精確計算偏移量與縮放中心
-const magnifierStyle = computed(() => {
+// 2. 共享透鏡樣式（定位、變形與濾鏡基礎）
+const sharedLensStyle = computed(() => {
   const leftVal = -rectOffset.value.x - dragX.value
   const topVal = -rectOffset.value.y - dragY.value
   
-  // 以卡片的中心為變形原點 (Transform Origin) 進行縮放，這能確保拖動時放大效果最為平滑
   const originX = dragX.value + rectOffset.value.x + rectOffset.value.w / 2
   const originY = dragY.value + rectOffset.value.y + rectOffset.value.h / 2
 
+  const tx = effectiveBgX.value
+  const ty = effectiveBgY.value + scrollBgY.value
+
   return {
-    width: `calc(100vw + ${props.bgInset * 2}px)`,
-    height: `calc(100vh + ${props.bgInset * 2}px)`,
+    width: `calc(100vw + ${effectiveBgInset.value * 2}px)`,
+    height: `calc(100vh + ${effectiveBgInset.value * 2}px)`,
     left: `${leftVal}px`,
     top: `${topVal}px`,
-    // 同步全域背景視差偏移 bgX / bgY，並乘以 magnification 倍率
-    transform: `translate3d(${props.bgX}px, ${props.bgY}px, 0) scale(${props.magnification})`,
-    backgroundImage: `url('${props.bgImage}')`,
-    backgroundSize: 'cover',
-    backgroundPosition: 'center',
+    transform: `translate3d(${tx}px, ${ty}px, 0) scale(${scrollBgScale.value * props.magnification})`,
     transformOrigin: `${originX}px ${originY}px`,
-    filter: `blur(${props.blurValue * 0.4}px) saturate(160%) brightness(1.1) contrast(1.05)`,
+    filter: `saturate(160%) brightness(1.1) contrast(1.05)`,
+  }
+})
+
+// (A) 漸層底層樣式 (對應全域底色漸層 .ambient-base)
+const baseGradientStyle = computed(() => {
+  let gradientStr = ''
+  if (isImmersive.value) {
+    gradientStr = 'radial-gradient(circle at 50% 0%, rgb(255 255 255 / 0.42), transparent 30%), linear-gradient(160deg, #082f25 0%, #0f513c 46%, #082f49 100%)'
+  } else {
+    if (isMobile.value) {
+      gradientStr = 'radial-gradient(circle at 18% 10%, rgb(255 255 255 / 0.18), transparent 24%), radial-gradient(circle at 82% 18%, rgb(186 230 253 / 0.08), transparent 28%), linear-gradient(160deg, #d6eee4 0%, #bad8cd 44%, #94b5ab 100%)'
+    } else {
+      gradientStr = 'radial-gradient(circle at 18% 14%, rgb(255 255 255 / 0.14), transparent 24%), radial-gradient(circle at 86% 8%, rgb(186 230 253 / 0.1), transparent 30%), linear-gradient(160deg, #cfe8dc 0%, #adcbbf 48%, #8eafa4 100%)'
+    }
+  }
+
+  return {
+    ...sharedLensStyle.value,
+    backgroundImage: gradientStr,
+  }
+})
+
+// (B) 圖片層樣式 (對應全域底圖 .ambient-cute，可隨進度淡入淡出並精確對齊 position)
+const imageStyle = computed(() => {
+  return {
+    ...sharedLensStyle.value,
+    backgroundImage: `url('${effectiveBgImage.value}')`,
+    backgroundSize: 'cover',
+    backgroundPosition: 'center center',
+    backgroundRepeat: 'no-repeat',
+    opacity: 1 - immersiveProgress.value,
+  }
+})
+
+// (C) 頂層光暈樣式 (對應全域光暈層 .ambient-light)
+const lightOverlayStyle = computed(() => {
+  const rawX = rectOffset.value.x - effectiveBgInset.value
+  const rawY = rectOffset.value.y - effectiveBgInset.value
+  
+  const leftVal = -rawX - dragX.value
+  const topVal = -rawY - dragY.value
+  
+  const originX = dragX.value + rawX + rectOffset.value.w / 2
+  const originY = dragY.value + rawY + rectOffset.value.h / 2
+
+  let gradientStr = ''
+  if (isImmersive.value) {
+    gradientStr = 'linear-gradient(180deg, rgb(255 255 255 / 0.2), rgb(240 253 244 / 0.52) 36%, rgb(240 253 244 / 0.76)), radial-gradient(circle at 50% 0%, rgb(255 255 255 / 0.48), transparent 26%)'
+  } else {
+    gradientStr = 'linear-gradient(180deg, rgb(255 255 255 / 0.1), rgb(255 255 255 / 0.03) 46%, rgb(255 255 255 / 0.12)), radial-gradient(ellipse at 50% -10%, rgb(255 255 255 / 0.18), transparent 44%)'
+  }
+
+  return {
+    width: '100vw',
+    height: '100vh',
+    left: `${leftVal}px`,
+    top: `${topVal}px`,
+    transform: `scale(${props.magnification})`,
+    transformOrigin: `${originX}px ${originY}px`,
+    backgroundImage: gradientStr,
+    filter: 'saturate(160%) brightness(1.1) contrast(1.05)',
+    opacity: isImmersive.value ? 1 : (1 - immersiveProgress.value * 0.32),
   }
 })
 
@@ -333,7 +445,7 @@ const refractiveEdgeStyle = computed(() => {
   const y2 = mouseYSpring.value * 8
   
   return {
-    boxShadow: `inset ${x1}px ${y1}px 12px rgba(255, 255, 255, 0.2), inset ${x2}px ${y2}px 8px rgba(255, 255, 255, 0.05)`,
+    boxShadow: `inset ${x1}px ${y1}px 12px rgba(255, 255, 255, 0.35), inset ${x2}px ${y2}px 8px rgba(255, 255, 255, 0.12)`,
     zIndex: 1,
   }
 })
@@ -359,8 +471,8 @@ const iridescenceStyle = computed(() => {
 const distortionStyle = computed(() => {
   return {
     boxShadow: 'inset 0 0 40px rgba(0,0,0,0.1)',
-    backdropFilter: `blur(${props.blurValue * 0.1}px)`,
-    WebkitBackdropFilter: `blur(${props.blurValue * 0.1}px)`,
+    backdropFilter: 'none',
+    WebkitBackdropFilter: 'none',
     maskImage: 'radial-gradient(ellipse at center, transparent 70%, black 100%)',
     WebkitMaskImage: 'radial-gradient(ellipse at center, transparent 70%, black 100%)',
   }
