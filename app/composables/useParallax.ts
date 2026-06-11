@@ -1,8 +1,6 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 import { useSpring } from '~/composables/useSpring'
 
-const MOBILE_AMBIENT_BG = '/img/ambient-glass-sprouts.png?v=bg-20260611'
-
 // 全域共享狀態 (Client-only)
 const bgX = ref(0)
 const bgY = ref(0)
@@ -23,35 +21,17 @@ let bgYSpring: any = null
 
 let isTracking = false
 let listenersCount = 0
-let mobileRaf = 0
-
-const updateMobileGlassMotion = () => {
-  if (mobileRaf) return
-  mobileRaf = requestAnimationFrame(() => {
-    const y = window.scrollY
-    document.documentElement.style.setProperty('--glass-flow-y', `${y * -0.15}px`)
-    mobileRaf = 0
-  })
-}
-
 
 const updateBgImage = () => {
   if (typeof window !== 'undefined') {
-    const wasMobile = isMobile.value
     isMobile.value = window.innerWidth < 768
     bgImage.value = isMobile.value ? MOBILE_BG_IMAGE : DESKTOP_BG_IMAGE
     if (isMobile.value) {
       scrollBgScale.value = 1.25
       scrollBgY.value = 0
-      if (!wasMobile && isTracking) {
-        window.addEventListener('scroll', updateMobileGlassMotion, { passive: true })
-      }
     } else {
       scrollBgScale.value = 1.16
       scrollBgY.value = -10
-      if (wasMobile && isTracking) {
-        window.removeEventListener('scroll', updateMobileGlassMotion)
-      }
     }
   }
 }
@@ -62,6 +42,8 @@ const syncBgOffset = () => {
 }
 
 const handleMouseMove = (e: MouseEvent) => {
+  if (isMobile.value) return
+
   const xPct = (e.clientX / window.innerWidth) - 0.5
   const yPct = (e.clientY / window.innerHeight) - 0.5
   bgMouseX.value = xPct * -24
@@ -95,9 +77,6 @@ export function useParallax() {
       if (!isTracking) {
         window.addEventListener('resize', updateBgImage)
         window.addEventListener('mousemove', handleMouseMove)
-        if (isMobile.value) {
-          window.addEventListener('scroll', updateMobileGlassMotion, { passive: true })
-        }
         isTracking = true
       }
     }
@@ -108,7 +87,6 @@ export function useParallax() {
     if (listenersCount <= 0 && isTracking && typeof window !== 'undefined') {
       window.removeEventListener('resize', updateBgImage)
       window.removeEventListener('mousemove', handleMouseMove)
-      window.removeEventListener('scroll', updateMobileGlassMotion)
       isTracking = false
     }
   })
