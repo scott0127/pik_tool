@@ -172,98 +172,13 @@ const imageTransform = computed(() => {
   return `translate3d(${tx}px, ${ty}px, 0) scale(${scrollBgScale.value})`;
 });
 
-const scrollMotion = { y: -10, scale: 1.16 };
 let mm: any = null;
 let observer: MutationObserver | null = null;
 let refreshTimeout: any = null;
 
-// Background Image Blur reactive reference for depth-of-field focal shifting
-const imageBlur = ref(0);
 const imageFilter = computed(() => {
-  return `saturate(0.96) contrast(0.98) blur(${imageBlur.value}px)`;
+  return "saturate(0.96) contrast(0.98)";
 });
-
-const blurScale = ref(1.0);
-let lastScrollBlurTarget = 0;
-let scrollTimeout: any = null;
-let blurScaleTween: any = null;
-let lastScrollY = -1;
-
-let ticking = false;
-const updateScrollParallax = () => {
-  if (typeof window === "undefined") return;
-  const scrollY = window.scrollY;
-  
-  // 只有當 scrollY 真正改變時，才視為使用者正在滾動，避免 MutationObserver 重繪干擾
-  const isScrollingActive = scrollY !== lastScrollY;
-  lastScrollY = scrollY;
-  
-  let targetBlur = 0;
-  if (isMobile.value) {
-    const targetScroll = 350;
-    const progress = Math.min(1, Math.max(0, scrollY / targetScroll));
-    const easedProgress = 1 - Math.pow(1 - progress, 2);
-    
-    scrollBgScale.value = Math.max(1.0, 1.25 - easedProgress * 0.25);
-    targetBlur = Math.min(4, Math.max(0, easedProgress * 4));
-    scrollBgY.value = 0;
-  } else {
-    const targetScroll = 700;
-    const progress = Math.min(1, Math.max(0, scrollY / targetScroll));
-    const easedProgress = 1 - Math.pow(1 - progress, 2);
-    
-    scrollBgScale.value = Math.max(1.0, 1.16 - easedProgress * 0.16);
-    targetBlur = Math.min(4, Math.max(0, easedProgress * 4));
-    scrollBgY.value = -10 + easedProgress * 10;
-  }
-  
-  lastScrollBlurTarget = targetBlur;
-
-  if (isScrollingActive) {
-    // 只有在真正滾動時，才恢復模糊度與重設 3 秒定時器
-    if (blurScale.value < 1.0 && (!blurScaleTween || !blurScaleTween.isActive() || blurScaleTween.vars.value !== 1.0)) {
-      if (blurScaleTween) blurScaleTween.kill();
-      blurScaleTween = gsap.to(blurScale, {
-        value: 1.0,
-        duration: 0.4, // 0.4 秒內平滑恢復
-        ease: "power1.out",
-        onUpdate: () => {
-          imageBlur.value = lastScrollBlurTarget * blurScale.value;
-        }
-      });
-    } else if (!blurScaleTween || !blurScaleTween.isActive()) {
-      imageBlur.value = targetBlur * blurScale.value;
-    }
-
-    clearTimeout(scrollTimeout);
-    scrollTimeout = setTimeout(() => {
-      if (blurScaleTween) blurScaleTween.kill();
-      blurScaleTween = gsap.to(blurScale, {
-        value: 0.0,
-        duration: 1.5, // 1.5 秒內平滑解除模糊
-        ease: "power1.inOut",
-        onUpdate: () => {
-          imageBlur.value = lastScrollBlurTarget * blurScale.value;
-        }
-      });
-    }, 1500);
-  } else {
-    // 若僅是 Layout 重新整理而非實際滾動，不干涉已在進行的 fade-out 定時器與動畫
-    if (!blurScaleTween || !blurScaleTween.isActive()) {
-      imageBlur.value = targetBlur * blurScale.value;
-    }
-  }
-};
-
-const handleScroll = () => {
-  if (!ticking) {
-    window.requestAnimationFrame(() => {
-      updateScrollParallax();
-      ticking = false;
-    });
-    ticking = true;
-  }
-};
 
 const spores = [
   { id: 1, left: "9%", top: "18%", delay: "0s", duration: "13s" },
@@ -422,30 +337,18 @@ onMounted(() => {
     clearTimeout(refreshTimeout);
     refreshTimeout = setTimeout(() => {
       ScrollTrigger.refresh();
-      handleScroll();
     }, 150);
   });
   observer.observe(document.body, {
     childList: true,
     subtree: true,
   });
-
-  window.addEventListener("scroll", handleScroll, { passive: true });
-  window.addEventListener("resize", handleScroll);
-  handleScroll();
 });
 
 onBeforeUnmount(() => {
   window.removeEventListener("pointermove", onSlideMove);
   window.removeEventListener("pointerup", finishSlide);
   window.removeEventListener("pointercancel", finishSlide);
-  window.removeEventListener("scroll", handleScroll);
-  window.removeEventListener("resize", handleScroll);
-  clearTimeout(scrollTimeout);
-  if (blurScaleTween) {
-    blurScaleTween.kill();
-    blurScaleTween = null;
-  }
   if (mm) {
     mm.revert();
     mm = null;
