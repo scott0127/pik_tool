@@ -829,6 +829,8 @@ function getReleasedDateParts(dateText: string) {
 .released-record-list {
   display: grid;
   gap: 1.25rem;
+  width: 100%;
+  max-width: 100%;
 }
 
 .released-record-row {
@@ -838,8 +840,11 @@ function getReleasedDateParts(dateText: string) {
   grid-template-columns: 7.2rem minmax(0, 1fr);
   align-items: center;
   gap: 1.2rem;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
   overflow: visible;
-  min-height: 9rem;
+  min-height: 9.25rem;
   padding: 0.95rem;
   border: 1px solid rgba(255, 255, 255, 0.78);
   border-radius: 2rem;
@@ -914,6 +919,15 @@ function getReleasedDateParts(dateText: string) {
   transform-origin: center;
   will-change: transform, box-shadow, background-position;
   transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.released-record-image :deep(img) {
+  width: auto !important;
+  height: auto !important;
+  max-width: 86%;
+  max-height: 84%;
+  object-fit: contain;
+  object-position: center;
 }
 
 .released-record-row:hover .released-record-image {
@@ -1045,7 +1059,7 @@ function getReleasedDateParts(dateText: string) {
 /* 4. Typewriter label meta info with staples */
 .released-record-meta {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   gap: 0.45rem;
   min-width: 0;
   width: 100%;
@@ -1056,6 +1070,7 @@ function getReleasedDateParts(dateText: string) {
   display: inline-flex;
   align-items: center;
   min-width: 0;
+  max-width: 100%;
   gap: 0.25rem;
   padding: 0.25rem 0.55rem;
   color: #1f2937;
@@ -1093,6 +1108,8 @@ function getReleasedDateParts(dateText: string) {
   align-items: flex-start;
   gap: 0.35rem;
   align-self: start;
+  width: 100%;
+  min-width: 0;
   margin-top: 0.25rem;
   padding: 0.5rem 0.7rem;
   color: #334155;
@@ -1114,7 +1131,9 @@ function getReleasedDateParts(dateText: string) {
 
 .released-record-note p {
   min-width: 0;
-  overflow-wrap: anywhere;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .released-record-note-mark {
@@ -1125,10 +1144,11 @@ function getReleasedDateParts(dateText: string) {
   line-height: 1;
 }
 
-@media (max-width: 480px) {
+@media (max-width: 639px) {
   .released-record-row {
-    grid-template-columns: 5.7rem minmax(0, 1fr);
+    grid-template-columns: 5.95rem minmax(0, 1fr);
     gap: 0.9rem;
+    min-height: 10.15rem;
     padding: 0.75rem;
     border-radius: 1.7rem;
   }
@@ -1144,16 +1164,50 @@ function getReleasedDateParts(dateText: string) {
   }
 
   .released-record-image {
-    width: 5.7rem;
-    min-width: 5.7rem;
+    width: 5.95rem;
+    min-width: 5.95rem;
+    height: 7.8rem;
     min-height: 6.1rem;
     padding: 0.45rem;
     border-radius: 1.35rem;
   }
 
   .released-record-content {
+    min-height: 7.8rem;
+    justify-content: center;
+    gap: 0.42rem;
     padding-left: 0.8rem;
     margin-left: -0.4rem;
+  }
+
+  .released-record-header {
+    gap: 0.45rem;
+  }
+
+  .released-record-title {
+    font-size: 1.08rem;
+  }
+
+  .released-record-category-row {
+    margin-top: 0.18rem;
+  }
+
+  .released-record-meta {
+    gap: 0.38rem;
+  }
+
+  .released-record-chip {
+    flex: 1 1 0;
+    padding: 0.24rem 0.48rem;
+  }
+
+  .released-record-chip:first-child {
+    flex: 0 0 auto;
+  }
+
+  .released-record-note {
+    margin-top: 0;
+    padding: 0.42rem 0.6rem;
   }
 }
 

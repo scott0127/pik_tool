@@ -40,7 +40,7 @@
            <div class="relative bg-white/46 backdrop-blur-sm rounded-3xl md:rounded-[2rem] border border-white/60 shadow-sm p-4 w-full flex flex-col md:flex-row md:items-center md:justify-center gap-4 md:gap-2 hover:scale-105 transition-transform duration-300">
                <!-- Admin Settings Button -->
                <button v-if="isAdmin" @click.stop="showSettingsModal = true" class="absolute top-3 right-3 z-50 bg-white/60 backdrop-blur-sm shadow-md border border-gray-100/50 rounded-full p-2 text-gray-400 hover:text-emerald-500 hover:scale-110 transition-all">
-                  <Icon name="lucide:settings" class="w-4.5 h-4.5" />
+                  <Icon name="lucide:settings" class="w-4 h-4" />
                </button>
                <!-- Row 1: Reverse Valentine Stickers -->
                <div class="flex items-center justify-center -space-x-2 md:-space-x-4 relative group h-14 cursor-none w-full md:w-auto">
@@ -382,6 +382,27 @@ const textStyle = computed(() => ({
 .translate-z-\[25px\] { transform: translateZ(25px); }
 .translate-z-\[30px\] { transform: translateZ(30px); }
 .translate-z-\[40px\] { transform: translateZ(40px); }
+
+@media (max-width: 520px) {
+    .home-hero-section {
+        min-height: calc(100vh - 8.75rem);
+        justify-content: flex-start;
+        padding-top: 3.75rem;
+        padding-bottom: 2.5rem;
+    }
+
+    .home-hero-title {
+        font-size: clamp(3rem, 15vw, 4.7rem);
+        letter-spacing: -0.035em;
+    }
+
+    .home-hero-subtitle {
+        margin-bottom: 4.2rem;
+        font-size: 1.15rem;
+        line-height: 1.72;
+        font-weight: 700;
+    }
+}
 
 /* Custom Keyframes */
 @keyframes float {

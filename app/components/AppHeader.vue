@@ -1,28 +1,28 @@
 <template>
   <header class="sticky top-0 z-50">
     <!-- Decorative top bar -->
-    <div class="h-1 bg-gradient-to-r from-emerald-400 via-teal-400 to-emerald-400"></div>
+    <div class="app-top-bar h-1 bg-gradient-to-r from-emerald-400 via-teal-400 to-emerald-400"></div>
     
     <div
       class="glass border-t-0 border-x-0"
       :class="{ 'mobile-menu-shell-open': showMobileMenu }"
     >
-      <div class="max-w-8xl mx-auto px-4 py-3">
+      <div class="app-header-inner max-w-8xl mx-auto px-4 py-3">
         <div class="flex items-center justify-between">
           <!-- Logo and Title -->
           <NuxtLink to="/" class="flex items-center gap-3 group">
             <div class="relative">
-              <div class="w-12 h-12 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-2xl flex items-center justify-center shadow-lg group-hover:shadow-xl group-hover:scale-110 transition-all duration-300">
-                <span class="text-2xl">🌱</span>
+              <div class="app-header-logo w-12 h-12 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-2xl flex items-center justify-center shadow-lg group-hover:shadow-xl group-hover:scale-110 transition-all duration-300">
+                <span class="app-header-logo-mark text-2xl">🌱</span>
               </div>
               <!-- Floating leaf decoration -->
               <span class="absolute -top-1 -right-1 text-sm sway">🍃</span>
             </div>
             <div>
-              <h1 class="text-xl font-extrabold text-gradient group-hover:opacity-80 transition-opacity">
+              <h1 class="app-header-title text-xl font-extrabold text-gradient group-hover:opacity-80 transition-opacity">
                 {{ $t('app.title') }}
               </h1>
-              <p class="text-xs text-gray-500 font-medium">{{ $t('app.subtitle') }}</p>
+              <p class="app-header-subtitle text-xs text-gray-500 font-medium">{{ $t('app.subtitle') }}</p>
             </div>
           </NuxtLink>
 
@@ -178,7 +178,7 @@
             <!-- Mobile Menu Button -->
             <button 
               @click="toggleMobileMenu"
-              class="md:hidden w-10 h-10 flex items-center justify-center rounded-xl bg-white/60 hover:bg-white transition-all"
+              class="app-mobile-menu-button md:hidden w-10 h-10 flex items-center justify-center rounded-xl bg-white/60 hover:bg-white transition-all"
             >
               <Transition
                 enter-active-class="transition duration-200"
@@ -755,6 +755,43 @@ onUnmounted(() => {
 
 <style scoped>
 @media (max-width: 767px) {
+  .app-top-bar {
+    height: 5px;
+  }
+
+  .app-header-inner {
+    padding: 1rem 1.55rem;
+  }
+
+  .app-header-logo {
+    width: 4rem;
+    height: 4rem;
+    border-radius: 1.35rem;
+  }
+
+  .app-header-logo-mark {
+    font-size: 2rem;
+    line-height: 1;
+  }
+
+  .app-header-title {
+    font-size: clamp(1.55rem, 5.9vw, 2rem);
+    line-height: 1.08;
+  }
+
+  .app-header-subtitle {
+    margin-top: 0.28rem;
+    font-size: 0.95rem;
+    font-weight: 700;
+  }
+
+  .app-mobile-menu-button {
+    width: 3.75rem;
+    height: 3.75rem;
+    border-radius: 1.35rem;
+    font-size: 1.55rem;
+  }
+
   .mobile-menu-shell-open {
     background:
       radial-gradient(circle at 20% 0%, rgba(255, 255, 255, 0.86), transparent 34%),
