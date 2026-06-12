@@ -1,5 +1,5 @@
 <template>
-  <footer class="glass-frosted-shell border-b-0 mt-auto">
+  <footer class="glass border-b-0 mt-auto">
     <div class="max-w-7xl mx-auto px-4 py-6">
       <div class="text-center space-y-5">
         <!-- Page Views Counter -->

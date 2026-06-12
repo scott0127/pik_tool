@@ -1,5 +1,5 @@
 <template>
-  <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6 p-4 md:p-6 max-w-7xl mx-auto">
+  <div class="home-bento-grid grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6 p-4 md:p-6 max-w-7xl mx-auto">
     
     <!-- 1. Hero / Welcome (Span 2x2 on Desktop) -->
     <div class="md:col-span-2 lg:col-span-3 row-span-auto md:row-span-1 relative group transition-all duration-500 z-10">
@@ -44,6 +44,19 @@ div:nth-child(2) { animation-delay: 0.2s; }
 div:nth-child(3) { animation-delay: 0.3s; }
 div:nth-child(4) { animation-delay: 0.4s; }
 div:nth-child(5) { animation-delay: 0.5s; }
+
+@media (max-width: 767px) {
+    .home-bento-grid {
+        width: min(100%, 43rem);
+        padding-inline: 1.35rem;
+        gap: 1.45rem;
+    }
+
+    .home-bento-grid > div {
+        width: min(100%, 34rem);
+        margin-inline: auto;
+    }
+}
 
 @keyframes fade-in-up {
     from { opacity: 0; transform: translateY(20px); }

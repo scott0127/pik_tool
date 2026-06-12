@@ -8,36 +8,28 @@
     <div class="absolute left-1/2 top-1/2 h-7 w-px -translate-x-1/2 -translate-y-[103%] bg-gradient-to-t from-emerald-400/45 to-transparent" />
 
     <div
-      class="liquid-glass-shell absolute left-1/2 top-1/2 flex w-[124px] -translate-x-1/2 -translate-y-[82%] items-center gap-1.5 overflow-hidden rounded-[20px] border p-1.5"
+      class="decor-badge-shell absolute left-1/2 top-1/2 flex w-[124px] -translate-x-1/2 -translate-y-[82%] items-center gap-1.5 overflow-hidden rounded-[20px] border p-1.5"
       :class="markerClass"
     >
-      <div class="pointer-events-none absolute inset-0 rounded-[20px] bg-[radial-gradient(circle_at_18%_18%,rgba(255,255,255,0.92)_0,rgba(255,255,255,0.32)_24%,transparent_46%),radial-gradient(circle_at_86%_82%,rgba(45,212,191,0.34)_0,transparent_48%),linear-gradient(135deg,rgba(255,255,255,0.18),rgba(255,255,255,0.04)_48%,rgba(20,184,166,0.16))]" />
-      <div class="pointer-events-none absolute inset-x-3 top-1 h-px bg-white/95 shadow-[0_0_10px_rgba(255,255,255,0.9)]" />
-      <div class="pointer-events-none absolute -left-8 -top-10 h-24 w-12 rotate-[30deg] bg-white/34 blur-[1px]" />
-      <div class="pointer-events-none absolute -right-5 bottom-0 h-12 w-16 rounded-full bg-cyan-200/26 blur-md" />
-
       <div
-        class="liquid-glass-count relative flex h-10 w-10 shrink-0 items-center justify-center rounded-[15px] border-2"
+        class="decor-badge-count relative flex h-10 w-10 shrink-0 items-center justify-center rounded-[15px] border-2"
         :class="countClass"
       >
-        <div class="pointer-events-none absolute inset-0 rounded-[15px] bg-[radial-gradient(circle_at_20%_12%,rgba(255,255,255,0.96)_0,rgba(255,255,255,0.48)_30%,transparent_58%),linear-gradient(145deg,rgba(255,255,255,0.22),rgba(20,184,166,0.14))]" />
-        <div class="pointer-events-none absolute inset-x-1.5 top-1 h-px bg-white/95 shadow-[0_0_8px_rgba(255,255,255,0.9)]" />
         <div class="absolute -top-1 -right-0.5 h-3 w-4 rotate-[-18deg] rounded-[100%_0] bg-emerald-300/90 shadow-sm" />
-        <div class="absolute left-2 top-1.5 h-2 w-5 rounded-full bg-white/72 blur-[1px]" />
         <span class="relative text-[24px] font-black leading-none text-emerald-950 drop-shadow-[0_1px_0_rgba(255,255,255,0.9)]">{{ count }}</span>
       </div>
 
       <div class="relative min-w-0 flex-1">
         <div class="mb-1 flex items-center gap-1">
           <span
-            class="liquid-glass-pill inline-flex min-w-[30px] shrink-0 items-center justify-center whitespace-nowrap rounded-full border px-1.5 py-[2px] text-[10px] font-black leading-none tracking-normal"
+            class="decor-badge-pill inline-flex min-w-[30px] shrink-0 items-center justify-center whitespace-nowrap rounded-full border px-1.5 py-[2px] text-[10px] font-black leading-none tracking-normal"
             :class="statusClass"
           >
             {{ statusLabel }}
           </span>
           <span
             v-if="overflowCount > 0"
-            class="liquid-glass-pill inline-flex shrink-0 items-center justify-center whitespace-nowrap rounded-full border border-white/80 px-1.5 py-[2px] text-[10px] font-black leading-none text-emerald-950"
+            class="decor-badge-pill inline-flex shrink-0 items-center justify-center whitespace-nowrap rounded-full border border-white/80 px-1.5 py-[2px] text-[10px] font-black leading-none text-emerald-950"
           >
             +{{ overflowCount }}
           </span>
@@ -47,7 +39,7 @@
           <div
             v-for="item in iconItems"
             :key="item.id"
-            class="liquid-glass-icon flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-white/80"
+            class="decor-badge-icon flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-white/80"
             :title="item.name || item.id"
           >
             <Icon
@@ -60,7 +52,7 @@
         </div>
 
         <div
-          class="relative mt-1 h-3 max-w-[66px] overflow-hidden whitespace-nowrap text-[10px] font-black leading-none tracking-normal text-emerald-950 [text-shadow:0_1px_0_rgba(255,255,255,0.95),0_0_7px_rgba(255,255,255,0.85)]"
+          class="relative mt-1 h-3 max-w-[66px] overflow-hidden whitespace-nowrap text-[10px] font-black leading-none tracking-normal text-emerald-950"
           :title="carouselTitle"
         >
           <span v-if="carouselLabels.length <= 1" class="block truncate">
@@ -192,69 +184,52 @@ const titleText = computed(() => {
 </script>
 
 <style scoped>
-.liquid-glass-shell {
-  background:
-    linear-gradient(135deg, rgb(255 255 255 / 0.42), rgb(255 255 255 / 0.16) 42%, rgb(255 255 255 / 0.28)),
-    color-mix(in srgb, white 26%, transparent);
+.decor-badge-shell {
+  background: rgba(255, 255, 255, 0.84);
   border-color: rgb(255 255 255 / 0.78);
   box-shadow:
-    0 14px 24px rgb(6 78 59 / 0.18),
-    0 2px 10px rgb(255 255 255 / 0.62) inset,
-    0 -14px 22px rgb(15 118 110 / 0.12) inset,
-    0 0 0 1px rgb(255 255 255 / 0.28) inset;
-  backdrop-filter: blur(10px) saturate(1.9) contrast(1.08);
-  -webkit-backdrop-filter: blur(10px) saturate(1.9) contrast(1.08);
+    0 10px 20px rgb(6 78 59 / 0.14),
+    0 1px 8px rgb(255 255 255 / 0.72) inset;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
 
-.liquid-glass-shell::after {
+.decor-badge-shell::after {
   position: absolute;
   inset: 1px;
   pointer-events: none;
   content: "";
   border-radius: 19px;
-  border: 1px solid rgb(255 255 255 / 0.36);
-  box-shadow:
-    5px 0 14px rgb(45 212 191 / 0.16) inset,
-    -5px 0 14px rgb(59 130 246 / 0.1) inset;
+  border: 1px solid rgb(255 255 255 / 0.42);
 }
 
-.liquid-glass-count,
-.liquid-glass-pill,
-.liquid-glass-icon {
-  background:
-    radial-gradient(circle at 25% 18%, rgb(255 255 255 / 0.92), rgb(255 255 255 / 0.44) 34%, transparent 72%),
-    linear-gradient(135deg, rgb(255 255 255 / 0.64), rgb(255 255 255 / 0.3));
+.decor-badge-count,
+.decor-badge-pill,
+.decor-badge-icon {
+  background: rgba(255, 255, 255, 0.86);
   box-shadow:
-    0 1px 8px rgb(255 255 255 / 0.72) inset,
-    0 -5px 10px rgb(20 184 166 / 0.08) inset,
-    0 3px 8px rgb(6 78 59 / 0.14);
-  backdrop-filter: blur(8px) saturate(1.75);
-  -webkit-backdrop-filter: blur(8px) saturate(1.75);
+    0 1px 7px rgb(255 255 255 / 0.7) inset,
+    0 3px 8px rgb(6 78 59 / 0.1);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 }
 
-.liquid-glass-count {
-  background:
-    radial-gradient(circle at 22% 12%, rgb(255 255 255 / 0.72), rgb(255 255 255 / 0.22) 38%, transparent 64%),
-    linear-gradient(135deg, rgb(255 255 255 / 0.36), rgb(255 255 255 / 0.12) 46%, rgb(20 184 166 / 0.18));
+.decor-badge-count {
+  background: rgba(236, 253, 245, 0.92);
   box-shadow:
-    0 8px 16px rgb(6 78 59 / 0.16),
-    0 1px 12px rgb(255 255 255 / 0.84) inset,
-    0 -10px 14px rgb(14 165 233 / 0.1) inset,
-    0 0 0 1px rgb(255 255 255 / 0.34) inset;
-  backdrop-filter: blur(9px) saturate(1.95) contrast(1.08);
-  -webkit-backdrop-filter: blur(9px) saturate(1.95) contrast(1.08);
+    0 7px 14px rgb(6 78 59 / 0.14),
+    0 1px 10px rgb(255 255 255 / 0.84) inset;
+  backdrop-filter: blur(9px);
+  -webkit-backdrop-filter: blur(9px);
 }
 
-.liquid-glass-count::after {
+.decor-badge-count::after {
   position: absolute;
   inset: 1px;
   pointer-events: none;
   content: "";
   border-radius: 14px;
   border: 1px solid rgb(255 255 255 / 0.42);
-  box-shadow:
-    3px 0 9px rgb(45 212 191 / 0.16) inset,
-    -3px 0 9px rgb(59 130 246 / 0.1) inset;
 }
 
 .decor-name-track {

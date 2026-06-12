@@ -1,7 +1,7 @@
 <template>
   <div class="min-h-screen pt-20 pb-24 lg:pt-24 lg:pb-8 relative">
     <!-- Background Decor (Matches app style) -->
-    <div class="fixed inset-0 pointer-events-none -z-10 overflow-hidden">
+    <div class="fixed inset-0 pointer-events-none -z-10 hidden overflow-hidden md:block">
       <div class="absolute top-[-10%] right-[-5%] w-[500px] h-[500px] bg-emerald-400/20 rounded-full blur-3xl opacity-50 mix-blend-multiply"></div>
       <div class="absolute bottom-[-10%] left-[-10%] w-[600px] h-[600px] bg-teal-300/20 rounded-full blur-3xl opacity-50 mix-blend-multiply"></div>
     </div>
@@ -44,7 +44,7 @@
           :key="record.id"
           class="released-record-row gsap-card group"
         >
-          <div class="released-record-image glass-frosted-shell">
+          <div class="released-record-image">
             <img
               :src="getRecordImageUrl(record.decorItemId) || ''"
               alt="Decor"
@@ -767,22 +767,14 @@ function getReleasedDateParts(dateText: string) {
 
 .released-hero-title {
   color: #065f46;
-  -webkit-text-stroke: 0.018em rgba(240, 253, 244, 0.94);
   paint-order: stroke fill;
-  text-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.95),
-    0 0 10px rgba(255, 255, 255, 0.72),
-    0 8px 20px rgba(6, 78, 59, 0.28);
+  text-shadow: none;
 }
 
 .released-hero-subtitle {
   color: rgba(30, 41, 59, 0.94);
-  -webkit-text-stroke: 0.018em rgba(255, 255, 255, 0.82);
   paint-order: stroke fill;
-  text-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.88),
-    0 0 8px rgba(255, 255, 255, 0.68),
-    0 4px 12px rgba(15, 23, 42, 0.18);
+  text-shadow: none;
 }
 
 .released-details-section {
@@ -823,21 +815,15 @@ function getReleasedDateParts(dateText: string) {
 
 .released-empty-state h3 {
   color: rgb(15, 23, 42);
-  -webkit-text-stroke: 0.018em rgba(255, 255, 255, 0.92);
   paint-order: stroke fill;
-  text-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.9),
-    0 4px 12px rgba(15, 23, 42, 0.22);
+  text-shadow: none;
 }
 
 .released-empty-state p {
   color: rgba(51, 65, 85, 0.96);
   line-height: 1.7;
-  -webkit-text-stroke: 0.012em rgba(255, 255, 255, 0.88);
   paint-order: stroke fill;
-  text-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.78),
-    0 3px 10px rgba(15, 23, 42, 0.16);
+  text-shadow: none;
 }
 
 .released-record-list {
@@ -845,7 +831,6 @@ function getReleasedDateParts(dateText: string) {
   gap: 1.25rem;
 }
 
-/* 1. Ticket Stub Card Container */
 .released-record-row {
   position: relative;
   isolation: isolate;
@@ -856,36 +841,31 @@ function getReleasedDateParts(dateText: string) {
   overflow: visible;
   min-height: 9rem;
   padding: 0.95rem;
-  border: 1px solid rgba(139, 92, 26, 0.12);
-  border-radius: 0.75rem;
-  background: linear-gradient(to right, #fcfbf7, #f7f5ee);
+  border: 1px solid rgba(255, 255, 255, 0.78);
+  border-radius: 2rem;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.76), rgba(236, 253, 245, 0.58)),
+    rgba(255, 255, 255, 0.58);
   box-shadow:
-    0 8px 24px -6px rgba(139, 92, 26, 0.06),
-    0 1px 1px 0 rgba(255, 255, 255, 0.8) inset;
+    0 16px 34px rgba(15, 23, 42, 0.12),
+    0 1px 12px rgba(255, 255, 255, 0.76) inset;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
   transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
   cursor: pointer;
 }
 
 .released-record-row:hover {
   transform: translateY(-2px);
-  border-color: rgba(16, 185, 129, 0.25);
+  border-color: rgba(110, 231, 183, 0.78);
   box-shadow:
-    0 16px 32px -12px rgba(139, 92, 26, 0.12),
-    0 1px 1px 0 rgba(255, 255, 255, 0.9) inset;
+    0 18px 36px rgba(6, 95, 70, 0.14),
+    0 1px 12px rgba(255, 255, 255, 0.86) inset;
 }
 
-/* Circular Ticket Bite Notches */
 .released-record-row::before,
 .released-record-row::after {
-  content: "";
-  position: absolute;
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  background: #f1faf6; /* Matches app background blend */
-  z-index: 5;
-  border: 1px solid rgba(139, 92, 26, 0.12);
-  pointer-events: none;
+  display: none;
 }
 
 .released-record-row::before {
@@ -905,7 +885,6 @@ function getReleasedDateParts(dateText: string) {
   z-index: 1;
 }
 
-/* 2. Polaroid Photo Frame */
 .released-record-image {
   --image-glass-alpha: 0.28;
   --image-glow-alpha: 0.18;
@@ -921,38 +900,32 @@ function getReleasedDateParts(dateText: string) {
   min-height: 7.6rem;
   place-items: center;
   overflow: hidden;
-  padding: 0.4rem 0.4rem 1rem 0.4rem; /* Lower padding is wider, classic polaroid border */
-  border-radius: 2px;
-  background: #fafaf9;
-  border: 1px solid rgba(0, 0, 0, 0.06);
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-  transform: rotate(-2deg) translateY(var(--image-lift-y));
+  padding: 0.55rem;
+  border-radius: 1.6rem;
+  background:
+    linear-gradient(180deg, rgba(232, 245, 233, 0.98), rgba(165, 214, 167, 0.82)),
+    #c8e6c9;
+  border: 1px solid rgba(255, 255, 255, 0.84);
+  box-shadow:
+    0 14px 24px rgba(6, 78, 59, 0.14),
+    0 1px 12px rgba(255, 255, 255, 0.8) inset,
+    0 -10px 18px rgba(6, 95, 70, 0.08) inset;
+  transform: translateY(var(--image-lift-y));
   transform-origin: center;
   will-change: transform, box-shadow, background-position;
   transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
 .released-record-row:hover .released-record-image {
-  transform: rotate(-0.5deg) scale(1.02) translateY(-4px);
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08);
+  transform: scale(1.02) translateY(-4px);
+  box-shadow:
+    0 18px 30px rgba(6, 78, 59, 0.16),
+    0 1px 14px rgba(255, 255, 255, 0.86) inset,
+    0 -12px 20px rgba(6, 95, 70, 0.09) inset;
 }
 
-/* Silver Metallic Push-Pin fixed onto Polaroid */
 .released-record-image::before {
-  content: "";
-  position: absolute;
-  top: -0.35rem;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: radial-gradient(circle at 35% 35%, #ffffff 0%, #cbd5e1 55%, #475569 100%);
-  box-shadow:
-    0 2px 3px rgba(0, 0, 0, 0.22),
-    0 0 1px rgba(0, 0, 0, 0.1);
-  z-index: 10;
-  pointer-events: none;
+  display: none;
 }
 
 /* Shimmer overlay */
@@ -972,13 +945,12 @@ function getReleasedDateParts(dateText: string) {
   z-index: 11;
 }
 
-/* 3. Travel Column (Dotted divider line) */
 .released-record-content {
   display: flex;
   flex-direction: column;
   gap: 0.45rem;
   min-width: 0;
-  border-left: 2px dotted rgba(139, 92, 26, 0.25);
+  border-left: 1px solid rgba(255, 255, 255, 0.58);
   padding-left: 1.1rem;
   margin-left: -0.5rem;
 }
@@ -1085,34 +1057,22 @@ function getReleasedDateParts(dateText: string) {
   align-items: center;
   min-width: 0;
   gap: 0.25rem;
-  padding: 0.25rem 0.5rem 0.25rem 0.8rem; /* Extra padding on left for staple */
-  color: #78350f;
+  padding: 0.25rem 0.55rem;
+  color: #1f2937;
   font-size: 0.72rem;
   font-weight: 600;
-  font-family: "Courier New", Courier, monospace;
-  border: 1px solid rgba(139, 92, 26, 0.15);
-  border-radius: 3px;
-  background: #fefdf6;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.01);
+  border: 1px solid rgba(255, 255, 255, 0.82);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.82);
+  box-shadow: 0 6px 14px rgba(15, 23, 42, 0.06);
 }
 
-/* Metal Staple (釘書針) */
 .released-record-chip::before {
-  content: "";
-  position: absolute;
-  left: 4px;
-  top: 50%;
-  transform: translateY(-50%) rotate(90deg);
-  width: 2px;
-  height: 8px;
-  background: #cbd5e1;
-  border-radius: 1px;
-  box-shadow: 0 0.5px 1px rgba(0, 0, 0, 0.25);
-  z-index: 2;
+  display: none;
 }
 
 .released-record-chip :deep(svg) {
-  color: #b45309;
+  color: #047857;
 }
 
 .released-record-chip-text {
@@ -1127,7 +1087,6 @@ function getReleasedDateParts(dateText: string) {
   display: none;
 }
 
-/* 6. Handwritten Yellow Sticky Note */
 .released-record-note {
   position: relative;
   display: flex;
@@ -1136,25 +1095,21 @@ function getReleasedDateParts(dateText: string) {
   align-self: start;
   margin-top: 0.25rem;
   padding: 0.5rem 0.7rem;
-  color: #374151;
+  color: #334155;
   font-size: 0.78rem;
   font-weight: 500;
   line-height: 1.4;
-  border: 1px solid rgba(251, 191, 36, 0.35);
-  border-radius: 4px;
-  background: #fef9c3; /* Sticky note yellow */
-  box-shadow:
-    0 4px 8px -2px rgba(139, 92, 26, 0.05),
-    0 1px 2px rgba(0, 0, 0, 0.02);
-  transform: rotate(0.8deg);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  border-radius: 1.2rem;
+  background: rgba(255, 255, 255, 0.56);
+  box-shadow: 0 8px 16px rgba(15, 23, 42, 0.06);
+  transform: none;
   transition: all 0.3s ease;
 }
 
 .released-record-row:hover .released-record-note {
-  transform: rotate(0deg) translateY(-1px);
-  box-shadow:
-    0 8px 16px -4px rgba(139, 92, 26, 0.1),
-    0 1px 2px rgba(0, 0, 0, 0.02);
+  transform: translateY(-1px);
+  box-shadow: 0 10px 18px rgba(15, 23, 42, 0.08);
 }
 
 .released-record-note p {
@@ -1175,7 +1130,7 @@ function getReleasedDateParts(dateText: string) {
     grid-template-columns: 5.7rem minmax(0, 1fr);
     gap: 0.9rem;
     padding: 0.75rem;
-    border-radius: 0.6rem;
+    border-radius: 1.7rem;
   }
 
   .released-record-row::before {
@@ -1192,7 +1147,8 @@ function getReleasedDateParts(dateText: string) {
     width: 5.7rem;
     min-width: 5.7rem;
     min-height: 6.1rem;
-    padding: 0.35rem 0.35rem 0.8rem 0.35rem;
+    padding: 0.45rem;
+    border-radius: 1.35rem;
   }
 
   .released-record-content {
@@ -1215,7 +1171,7 @@ function getReleasedDateParts(dateText: string) {
     gap: 1.8rem;
     min-height: auto;
     padding: 1.35rem;
-    border-radius: 0.9rem;
+    border-radius: 2rem;
   }
 
   .released-record-row::before {
@@ -1232,7 +1188,7 @@ function getReleasedDateParts(dateText: string) {
     width: 100%;
     min-width: 0;
     min-height: 9rem;
-    padding: 0.5rem 0.5rem 1.4rem 0.5rem;
+    padding: 0.6rem;
   }
 
   .released-record-content {
@@ -1274,7 +1230,7 @@ function getReleasedDateParts(dateText: string) {
 
   .released-record-chip {
     gap: 0.35rem;
-    padding: 0.3rem 0.65rem 0.3rem 0.95rem; /* Extra padding on left for staple on desktop */
+    padding: 0.3rem 0.65rem;
     font-size: 0.82rem;
   }
 
