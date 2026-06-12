@@ -24,10 +24,6 @@
     body {
       background-attachment: scroll;
     }
-
-    .ambient-cute {
-      background-image: url('/img/ambient-glass-sprouts.png?v=bg-20260611') !important;
-    }
   }
 
   ::-webkit-scrollbar {

@@ -10,7 +10,7 @@
       <!-- Pikmin Row for this Variant -->
         <div
           v-if="isGroupVisible(group.key)"
-          class="flex flex-wrap gap-3 px-1 sm:px-2 overflow-visible"
+          class="decor-grid-row overflow-visible"
         >
           <DecorCard
             v-for="(item, index) in group.items"
@@ -20,7 +20,7 @@
           :variant-id="item.variantId"
           :pikmin-type="item.pikminType"
           :animation-delay="Math.min((groupIndex * 8 + index) * 30, 300)"
-            class="w-[calc(12.5%-0.72rem)] min-w-[100px] max-w-[138px]"
+            class="decor-grid-card w-full sm:w-[calc(12.5%-0.72rem)] sm:min-w-[100px] sm:max-w-[138px]"
             @toggle="$emit('toggle', $event)"
           />
         </div>
@@ -184,10 +184,37 @@ onUnmounted(() => {
   overflow: visible;
 }
 
+.decor-grid-row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  justify-items: center;
+  gap: 1rem 0.85rem;
+  width: min(100%, 34rem);
+  margin-inline: auto;
+  padding-inline: 0.35rem;
+}
+
+.decor-grid-card {
+  min-width: 0;
+  max-width: 10.25rem;
+}
+
 .decor-grid-placeholder {
   border: 1px solid rgba(255, 255, 255, 0.46);
   background:
     linear-gradient(135deg, rgba(255, 255, 255, 0.34), rgba(255, 255, 255, 0.12)),
     rgba(255, 255, 255, 0.08);
+}
+
+@media (min-width: 640px) {
+  .decor-grid-row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    gap: 0.75rem;
+    width: 100%;
+    max-width: none;
+    padding-inline: 0.5rem;
+  }
 }
 </style>

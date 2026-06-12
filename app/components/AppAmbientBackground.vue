@@ -355,7 +355,7 @@ onBeforeUnmount(() => {
 .ambient-cute {
   overflow: hidden;
   opacity: calc(1 - var(--immersive-progress));
-  background-image: url("/img/ambient-glass-sprouts.png?v=bg-20260611");
+  background-image: none;
   background-position: center center;
   background-repeat: no-repeat;
   background-size: cover;
@@ -383,6 +383,7 @@ onBeforeUnmount(() => {
     inset: 0 !important;
     height: 100lvh;
     min-height: 100lvh;
+    background-image: none;
     background-position: center center;
     background-size: cover;
     transform: none !important;
