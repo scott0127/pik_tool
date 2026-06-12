@@ -3936,16 +3936,16 @@
           "id": "colored_powder",
           "name": "彩色粉末-世界節慶",
           "nameEn": "Colored Powder - World Celebration",
-          "imageUrl": "/decor_localimg/powder-red.png",
+          "imageUrl": "https://pikmin.wiki.gallery/images/thumb/0/09/Decor_Red_Color_Powder.png/200px-Decor_Red_Color_Powder.png",
           "imageUrls": {
-            "red": "/decor_localimg/powder-red.png",
-            "yellow": "/decor_localimg/powder-yellow.png",
-            "blue": "/decor_localimg/powder-blue.png",
-            "white": "/decor_localimg/powder-white.png",
-            "purple": "/decor_localimg/powder-purple.png",
-            "rock": "/decor_localimg/powder-rock.png",
-            "winged": "/decor_localimg/powder-pink.png",
-            "ice": "/decor_localimg/powder-ice.png"
+            "red": "https://pikmin.wiki.gallery/images/thumb/0/09/Decor_Red_Color_Powder.png/200px-Decor_Red_Color_Powder.png",
+            "yellow": "https://pikmin.wiki.gallery/images/thumb/3/36/Decor_Yellow_Color_Powder.png/200px-Decor_Yellow_Color_Powder.png",
+            "blue": "https://pikmin.wiki.gallery/images/thumb/a/a0/Decor_Blue_Color_Powder.png/200px-Decor_Blue_Color_Powder.png",
+            "white": "https://pikmin.wiki.gallery/images/thumb/e/e4/Decor_White_Color_Powder.png/200px-Decor_White_Color_Powder.png",
+            "purple": "https://pikmin.wiki.gallery/images/thumb/3/39/Decor_Purple_Color_Powder.png/154px-Decor_Purple_Color_Powder.png",
+            "rock": "https://pikmin.wiki.gallery/images/thumb/6/62/Decor_Rock_Color_Powder.png/200px-Decor_Rock_Color_Powder.png",
+            "winged": "https://pikmin.wiki.gallery/images/1/17/Decor_Winged_Color_Powder.png",
+            "ice": "https://pikmin.wiki.gallery/images/thumb/3/30/Decor_Ice_Color_Powder.png/185px-Decor_Ice_Color_Powder.png"
           }
         }
       ],
