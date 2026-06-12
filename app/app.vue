@@ -131,12 +131,6 @@ useHead(() => ({
     {
       rel: 'preload',
       as: 'image',
-      href: '/img/ambient-glass-sprouts.png?v=bg-20260611',
-      media: '(max-width: 767px)'
-    },
-    {
-      rel: 'preload',
-      as: 'image',
       href: '/img/pc_background_extended.png',
       media: '(min-width: 768px)'
     }

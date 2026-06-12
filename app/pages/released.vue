@@ -106,6 +106,18 @@
               </span>
             </div>
 
+            <div class="released-record-date-art" :title="record.releasedAt">
+              <div class="released-record-date-left">
+                <span class="released-record-date-month">{{ getReleasedDateParts(record.releasedAt).month }}</span>
+                <span class="released-record-date-day">{{ getReleasedDateParts(record.releasedAt).day }}</span>
+              </div>
+              <span class="released-record-date-divider" />
+              <div class="released-record-date-right">
+                <span>{{ getReleasedDateParts(record.releasedAt).year }}</span>
+                <span>{{ getReleasedDateParts(record.releasedAt).weekday }}</span>
+              </div>
+            </div>
+
             <div v-if="record.note" class="released-record-note" :title="record.note">
               <span class="released-record-note-mark">"</span>
               <p class="line-clamp-2">{{ record.note }}</p>
@@ -351,7 +363,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, onMounted, nextTick } from 'vue';
+import { ref, computed, watch, onMounted, onBeforeUnmount, nextTick } from 'vue';
 import { gsap } from 'gsap';
 import type { DecorItem, ReleasedPikmin } from '~/types/decor';
 import { PIKMIN_TYPE_COLORS } from '~/types/decor';
@@ -381,6 +393,35 @@ useHead({
   title: () => t('released.title') + ' | ' + t('app.title'),
 });
 
+let releasedImageShineContext: ReturnType<typeof gsap.context> | null = null;
+
+function setupReleasedImageShimmer() {
+  releasedImageShineContext?.revert();
+  releasedImageShineContext = null;
+
+  if (typeof window === 'undefined' || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    return;
+  }
+
+  const targets = gsap.utils.toArray<HTMLElement>('.released-record-image');
+  if (!targets.length) return;
+
+  releasedImageShineContext = gsap.context(() => {
+    gsap.set(targets, { '--shine-x': '-78%' });
+    gsap.to(targets, {
+      '--shine-x': '178%',
+      duration: 2.65,
+      ease: 'sine.inOut',
+      repeat: -1,
+      repeatDelay: 4.8,
+      stagger: {
+        each: 0.42,
+        from: 'random',
+      },
+    });
+  });
+}
+
 onMounted(async () => {
   loadFromLocal();
   if (authStore.isAuthenticated.value) {
@@ -398,7 +439,13 @@ onMounted(async () => {
       { y: 15, opacity: 0, scale: 0.98 },
       { y: 0, opacity: 1, scale: 1, duration: 0.6, stagger: 0.05, ease: 'power2.out', delay: 0.3 }
     );
+
+    setupReleasedImageShimmer();
   });
+});
+
+onBeforeUnmount(() => {
+  releasedImageShineContext?.revert();
 });
 
 watch(() => authStore.isAuthenticated.value, async (isAuth, wasAuth) => {
@@ -466,6 +513,12 @@ const onDetailsLeave = (el: Element, done: () => void) => {
 };
 
 const filteredRecords = computed(() => getRecords());
+
+watch(
+  () => filteredRecords.value.map(record => record.id).join('|'),
+  () => nextTick(setupReleasedImageShimmer),
+  { flush: 'post' }
+);
 
 // --- Modal & Form State ---
 const showModal = ref(false);
@@ -626,6 +679,33 @@ function getDecorCategoryName(decorItemId: string) {
   const category = getCategory(parts.categoryId || '');
   return category?.name || parts.categoryId || '';
 }
+
+function getReleasedDateParts(dateText: string) {
+  const fallback = {
+    month: 'Jun.',
+    day: '--',
+    year: '----',
+    weekday: '---',
+  };
+
+  if (!dateText) return fallback;
+
+  const date = new Date(`${dateText}T00:00:00`);
+  if (Number.isNaN(date.getTime())) {
+    return {
+      ...fallback,
+      day: dateText.slice(-2) || '--',
+      year: dateText.slice(0, 4) || '----',
+    };
+  }
+
+  return {
+    month: new Intl.DateTimeFormat('en', { month: 'short' }).format(date) + '.',
+    day: new Intl.DateTimeFormat('en', { day: '2-digit' }).format(date),
+    year: new Intl.DateTimeFormat('en', { year: 'numeric' }).format(date),
+    weekday: new Intl.DateTimeFormat('en', { weekday: 'short' }).format(date).toUpperCase(),
+  };
+}
 </script>
 
 <style scoped>
@@ -764,6 +844,11 @@ function getDecorCategoryName(decorItemId: string) {
   pointer-events: none;
 }
 
+.released-record-image,
+.released-record-content {
+  z-index: 1;
+}
+
 .released-record-image {
   position: relative;
   align-self: stretch;
@@ -775,6 +860,50 @@ function getDecorCategoryName(decorItemId: string) {
   overflow: hidden;
   padding: 0.72rem;
   border-radius: 1.75rem;
+  background:
+    radial-gradient(circle at 30% 18%, rgba(255, 255, 255, 0.68), transparent 34%),
+    radial-gradient(circle at 76% 84%, rgba(16, 185, 129, 0.16), transparent 40%),
+    linear-gradient(165deg, #e1f4eb 0%, #c6e7d9 54%, #b9dfcf 100%);
+  border: 1px solid rgba(255, 255, 255, 0.66);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.82) inset,
+    0 -14px 24px rgba(13, 148, 136, 0.12) inset,
+    10px 0 18px rgba(255, 255, 255, 0.24) inset,
+    -10px 0 18px rgba(6, 95, 70, 0.08) inset,
+    0 14px 22px rgba(6, 78, 59, 0.16),
+    0 2px 0 rgba(255, 255, 255, 0.72);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+.released-record-image::before {
+  position: absolute;
+  inset: 0;
+  display: block;
+  content: "";
+  border-radius: inherit;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.42) 0%, rgba(255, 255, 255, 0.16) 26%, transparent 54%),
+    linear-gradient(315deg, transparent 0 54%, rgba(255, 255, 255, 0.18) 72%, rgba(255, 255, 255, 0.5) 100%);
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.28) inset,
+    0 0 28px rgba(255, 255, 255, 0.22) inset;
+  pointer-events: none;
+}
+
+.released-record-image::after {
+  position: absolute;
+  top: -38%;
+  left: var(--shine-x, -78%);
+  display: block;
+  width: 78%;
+  height: 180%;
+  content: "";
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.42), transparent);
+  filter: blur(7px);
+  opacity: 0.46;
+  pointer-events: none;
+  transform: rotate(16deg);
 }
 
 .released-record-content {
@@ -919,6 +1048,10 @@ function getDecorCategoryName(decorItemId: string) {
   cursor: help;
 }
 
+.released-record-date-art {
+  display: none;
+}
+
 .released-record-note {
   position: relative;
   display: flex;
@@ -1041,7 +1174,8 @@ function getDecorCategoryName(decorItemId: string) {
 
   .released-record-content {
     align-self: center;
-    gap: 1.35rem;
+    grid-template-rows: auto auto auto 1fr;
+    gap: 1.05rem;
   }
 
   .released-record-header {
@@ -1083,6 +1217,78 @@ function getDecorCategoryName(decorItemId: string) {
 
   .released-record-meta {
     gap: 1rem;
+  }
+
+  .released-record-meta .released-record-chip:first-child {
+    display: none;
+  }
+
+  .released-record-date-art {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(5.4rem, auto) auto minmax(4.6rem, auto);
+    align-items: center;
+    justify-content: start;
+    gap: 1.1rem;
+    width: min(100%, 21rem);
+    min-height: 5rem;
+    color: rgb(15, 23, 42);
+  }
+
+  .released-record-date-art::before {
+    position: absolute;
+    left: 0.1rem;
+    right: 0.5rem;
+    bottom: 0.28rem;
+    height: 1px;
+    content: "";
+    background: repeating-linear-gradient(
+      90deg,
+      rgba(22, 163, 74, 0.48) 0 8px,
+      transparent 8px 16px
+    );
+  }
+
+  .released-record-date-left {
+    display: grid;
+    justify-items: center;
+    color: rgb(22, 163, 74);
+    line-height: 1;
+  }
+
+  .released-record-date-month {
+    font-family: "Brush Script MT", "Segoe Script", cursive;
+    font-size: 1.55rem;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    transform: rotate(-5deg);
+  }
+
+  .released-record-date-day {
+    margin-top: -0.2rem;
+    font-size: 3.35rem;
+    font-weight: 900;
+    letter-spacing: 0;
+  }
+
+  .released-record-date-divider {
+    width: 1px;
+    height: 3.9rem;
+    background: linear-gradient(180deg, transparent, rgba(22, 163, 74, 0.46), transparent);
+  }
+
+  .released-record-date-right {
+    display: grid;
+    gap: 0.28rem;
+    color: rgb(30, 41, 59);
+    font-size: 1.25rem;
+    font-weight: 900;
+    letter-spacing: 0.03em;
+  }
+
+  .released-record-date-right span:last-child {
+    color: rgb(82, 153, 54);
+    font-size: 1.1rem;
   }
 
   .released-record-chip {

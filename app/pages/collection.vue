@@ -584,7 +584,7 @@
           >
             <!-- Category Header (clickable accordion) -->
             <div
-              class="liquid-glass-2026 liquid-glass-readable liquid-glass-dynamic flex items-center gap-3 sticky top-[120px] z-10 -mx-4 px-4 py-3 rounded-xl cursor-pointer group"
+              class="collection-category-header liquid-glass-2026 liquid-glass-readable liquid-glass-dynamic flex items-center gap-3 sticky top-[120px] z-10 px-4 py-3 rounded-xl cursor-pointer group"
               @click="toggleCategory(def.category.id)"
             >
               <Icon :name="getCategoryIcon(def.category.icon)" class="text-2xl flex-shrink-0" />
@@ -716,7 +716,7 @@
           >
             <!-- Category Header (clickable accordion) -->
             <div
-              class="liquid-glass-2026 liquid-glass-readable liquid-glass-dynamic flex items-center gap-3 sticky top-[120px] z-10 -mx-4 px-4 py-3 rounded-xl cursor-pointer group"
+              class="collection-category-header liquid-glass-2026 liquid-glass-readable liquid-glass-dynamic flex items-center gap-3 sticky top-[120px] z-10 px-4 py-3 rounded-xl cursor-pointer group"
               @click="toggleCategory(def.category.id)"
             >
               <Icon :name="getCategoryIcon(def.category.icon)" class="text-2xl flex-shrink-0" />
@@ -1241,6 +1241,10 @@ const handleCollectAll = (categoryId: string, categoryName: string) => {
   border-color: rgba(216, 180, 254, 0.78);
 }
 
+.collection-category-header {
+  width: 100%;
+}
+
 .collection-info-card {
   background:
     linear-gradient(135deg, rgba(236, 253, 245, 0.5), rgba(255, 255, 255, 0.18)),
@@ -1276,6 +1280,26 @@ const handleCollectAll = (categoryId: string, categoryName: string) => {
 }
 
 @media (max-width: 640px) {
+  .collection-category-header {
+    width: calc(100% - 16px);
+    margin-inline: auto;
+    gap: 0.65rem;
+    padding: 0.8rem 0.85rem;
+  }
+
+  .collection-category-header :deep(.liquid-glass-button),
+  .collection-category-header .liquid-glass-button {
+    width: 2.1rem;
+    height: 2.1rem;
+    flex: 0 0 auto;
+    justify-content: center;
+    padding: 0;
+  }
+
+  .collection-category-header .text-right {
+    width: 3.55rem;
+  }
+
   .collection-section-card {
     display: grid;
     grid-template-columns: 48px minmax(0, 1fr);
