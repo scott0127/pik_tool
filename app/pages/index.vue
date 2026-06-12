@@ -19,7 +19,7 @@
             <template #action-missing>
               <div
                 @click="showMissingItems"
-                class="home-action-card group h-full w-full min-h-[220px] p-6 grid relative overflow-hidden bg-white/60 backdrop-blur-md rounded-[2.5rem] shadow-xl hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 cursor-pointer border-2 border-white/60 hover:border-orange-200"
+                class="home-action-card group h-full w-full min-h-[220px] p-6 grid relative overflow-hidden bg-white/62 backdrop-blur-md rounded-[2.25rem] shadow-xl hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 cursor-pointer border-2 border-white/70 hover:border-orange-200"
               >
                    <!-- Soft Aurora Background -->
                    <div class="absolute top-[-20%] right-[-20%] w-64 h-64 bg-orange-200/40 rounded-full blur-2xl pointer-events-none group-hover:bg-orange-300/50 transition-colors duration-700"></div>
@@ -48,7 +48,7 @@
             <template #action-limited>
               <div
                 @click="showUnobtainable"
-                class="home-action-card group h-full w-full min-h-[220px] p-6 grid relative overflow-hidden bg-white/60 backdrop-blur-md rounded-[2.5rem] shadow-xl hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 cursor-pointer border-2 border-white/60 hover:border-purple-200"
+                class="home-action-card group h-full w-full min-h-[220px] p-6 grid relative overflow-hidden bg-white/62 backdrop-blur-md rounded-[2.25rem] shadow-xl hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 cursor-pointer border-2 border-white/70 hover:border-purple-200"
               >
                   <!-- Soft Aurora Background -->
                   <div class="absolute top-[-20%] right-[-20%] w-64 h-64 bg-purple-200/40 rounded-full blur-2xl pointer-events-none group-hover:bg-purple-300/50 transition-colors duration-700"></div>
@@ -77,21 +77,28 @@
             <template #action-map>
               <div
                 @click="router.push('/map')"
-                class="home-action-card group h-full w-full min-h-[220px] p-6 flex flex-col justify-between relative overflow-hidden bg-white/60 backdrop-blur-md rounded-[2.5rem] shadow-xl hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 cursor-pointer border-2 border-white/60 hover:border-emerald-200"
+                class="home-action-card group h-full w-full min-h-[220px] p-6 grid relative overflow-hidden bg-white/62 backdrop-blur-md rounded-[2.25rem] shadow-xl hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 cursor-pointer border-2 border-white/70 hover:border-emerald-200"
               >
                    <!-- Soft Aurora Background -->
                    <div class="absolute top-[-20%] right-[-20%] w-64 h-64 bg-emerald-200/40 rounded-full blur-2xl pointer-events-none group-hover:bg-emerald-300/50 transition-colors duration-700"></div>
                    <div class="absolute bottom-[-20%] left-[-20%] w-64 h-64 bg-teal-100/30 rounded-full blur-2xl pointer-events-none group-hover:bg-teal-200/40 transition-colors duration-700"></div>
 
                   <div class="home-action-icon-row flex items-start justify-between relative z-10 pointer-events-none">
-                       <div class="bg-white/40 border border-white/60 shadow-inner backdrop-blur-md w-14 h-14 rounded-2xl flex items-center justify-center text-3xl group-hover:scale-110 transition-transform duration-300">
+                       <div class="bg-white/58 border border-white/70 shadow-inner backdrop-blur-md w-14 h-14 rounded-2xl flex items-center justify-center text-3xl group-hover:scale-110 transition-transform duration-300">
                            <Icon name="lucide:map-pin" class="text-emerald-700 drop-shadow-sm" />
                        </div>
                   </div>
 
-                  <div class="home-action-copy home-action-copy-bottom relative z-10 group-hover:translate-x-1 transition-transform duration-300 pointer-events-none">
+                  <div class="home-action-copy relative z-10 space-y-1 group-hover:translate-x-1 transition-transform duration-300 pointer-events-none">
                        <h3 class="text-gray-800 text-2xl font-black tracking-tight">{{ $t('home.map.title') }}</h3>
                        <p class="text-gray-500 text-sm font-medium opacity-90 group-hover:text-emerald-600 transition-colors">{{ $t('home.map.desc') }}</p>
+                  </div>
+
+                  <div class="home-action-count relative z-10 flex items-center gap-2 pointer-events-none">
+                       <span class="inline-flex h-9 w-9 items-center justify-center rounded-full bg-emerald-100 text-emerald-700 shadow-sm">
+                         <Icon name="lucide:scan-line" class="h-4 w-4" />
+                       </span>
+                       <span class="text-sm font-black text-emerald-700">{{ $t('home.actions.open_map') }}</span>
                   </div>
               </div>
           </template>
@@ -101,14 +108,14 @@
         <div class="space-y-4">
           <button
             @click="router.push('/collection')"
-            class="w-full flex items-center justify-center gap-3 px-6 py-4 rounded-2xl bg-gradient-to-r from-emerald-500 to-green-600 text-white font-bold shadow-lg hover:shadow-xl transition-all hover:-translate-y-0.5 group"
+            class="w-full flex items-center justify-center gap-3 px-6 py-4 rounded-2xl btn-primary group"
           >
             <span class="text-2xl group-hover:scale-110 transition-transform">📖</span>
             <span>{{ $t('home.actions.browse_collection') }}</span>
           </button>
           <button
             @click="router.push('/map')"
-            class="w-full flex items-center justify-center gap-3 px-6 py-4 rounded-2xl bg-gradient-to-r from-emerald-500 to-green-600 text-white font-bold shadow-lg hover:shadow-xl transition-all hover:-translate-y-0.5 group"
+            class="w-full flex items-center justify-center gap-3 px-6 py-4 rounded-2xl btn-primary group"
           >
             <span class="text-2xl group-hover:scale-110 transition-transform">🗺️</span>
             <span>{{ $t('home.actions.open_map') }}</span>
@@ -352,7 +359,9 @@ const goToCategory = (categoryId: string) => {
 
 @media (max-width: 767px) {
   .home-action-card {
-    min-height: 220px;
+    min-height: 12.6rem;
+    border-radius: 2rem;
+    padding: 1.45rem;
   }
 }
 </style>

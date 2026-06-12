@@ -1298,14 +1298,14 @@ const handleCollectAll = (categoryId: string, categoryName: string) => {
 
 .collection-collect-button {
   color: white;
-  background: linear-gradient(135deg, #22c55e, #16a34a);
-  box-shadow: 0 8px 16px rgba(22, 163, 74, 0.18);
+  background: linear-gradient(135deg, var(--brand-green), var(--brand-green-dark));
+  box-shadow: 0 8px 16px rgba(0, 170, 136, 0.18);
   transition: transform 180ms ease, box-shadow 180ms ease;
 }
 
 .collection-collect-button:hover {
   transform: translateY(-1px);
-  box-shadow: 0 10px 20px rgba(22, 163, 74, 0.22);
+  box-shadow: 0 10px 20px rgba(0, 170, 136, 0.24);
 }
 
 @media (max-width: 640px) {
