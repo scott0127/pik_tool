@@ -11,36 +11,18 @@
   >
     <div
       class="decor-card-shell liquid-glass-soft liquid-glass-dynamic relative rounded-2xl overflow-hidden transition-all duration-300 z-10 border"
-      :class="[
-        isRareVariant
-          ? (isCollected
-              ? 'border-yellow-300/90 shadow-[0_14px_34px_rgba(146,64,14,0.28)] rare-golden-glow'
-              : 'border-slate-300/50 shadow-[0_6px_16px_rgba(15,23,42,0.1)]')
-          : (isCollected
-              ? 'border-emerald-300/90 shadow-[0_12px_30px_rgba(5,150,105,0.24)]'
-              : 'border-slate-300/50 shadow-[0_6px_16px_rgba(15,23,42,0.1)]')
-      ]"
+      :class="borderShadowClass"
     >
       <!-- Image Container -->
       <div
         class="decor-image-stage relative aspect-square p-3 overflow-hidden"
-        :class="isRareVariant
-          ? (isCollected
-              ? 'bg-gradient-to-br from-amber-50/92 via-yellow-50/86 to-orange-50/84'
-              : 'bg-gradient-to-br from-slate-100/88 via-gray-50/82 to-slate-50/78')
-          : (isCollected
-              ? 'bg-gradient-to-br from-white/92 via-emerald-50/84 to-teal-50/80'
-              : 'bg-gradient-to-br from-slate-100/88 via-gray-50/82 to-slate-50/78')"
+        :class="bgGradientClass"
       >
         <!-- Background pattern -->
-        <div class="absolute inset-0" :class="isRareVariant ? (isCollected ? 'opacity-10' : 'opacity-[0.04]') : (isCollected ? 'opacity-5' : 'opacity-[0.03]')">
+        <div class="absolute inset-0" :class="patternOpacityClass">
           <div
             class="absolute inset-0"
-            :style="isCollected
-              ? (isRareVariant
-                  ? 'background-image: radial-gradient(circle, #fbbf24 1px, transparent 1px); background-size: 16px 16px;'
-                  : 'background-image: radial-gradient(circle, #00b92f 1px, transparent 1px); background-size: 20px 20px;')
-              : 'background-image: radial-gradient(circle, #94a3b8 1px, transparent 1px); background-size: 20px 20px;'"
+            :style="patternStyle"
           ></div>
         </div>
 
@@ -89,10 +71,10 @@
         >
           <div
             v-if="!isCollected"
-            class="absolute inset-0 bg-slate-400/18 backdrop-blur-[1px] pointer-events-none flex items-center justify-center"
+            class="absolute inset-0 bg-slate-400/18 sm:backdrop-blur-[1px] pointer-events-none flex items-center justify-center"
           >
             <!-- Lock Icon (SVG) -->
-            <div class="w-9 h-9 rounded-full bg-slate-500/28 backdrop-blur-sm flex items-center justify-center ring-1 ring-white/30">
+            <div class="w-9 h-9 rounded-full bg-slate-500/28 sm:backdrop-blur-sm flex items-center justify-center ring-1 ring-white/30">
               <svg xmlns="http://www.w3.org/2000/svg" class="w-4.5 h-4.5 text-slate-500/70" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <rect width="18" height="11" x="3" y="11" rx="2" ry="2"/>
                 <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
@@ -145,7 +127,7 @@
 
       <!-- Info Section -->
       <div
-        class="p-3 text-center border-t backdrop-blur-sm"
+        class="p-3 text-center border-t sm:backdrop-blur-sm"
         :class="isCollected
           ? 'bg-white/93 border-white/70'
           : 'bg-slate-50/90 border-slate-200/50'"
@@ -213,6 +195,48 @@ const category = computed(() => getCategory(props.categoryId));
 const isCollected = computed(() => checkCollected(props.itemId));
 const imageUrl = computed(() => getImageUrl(props.categoryId, props.variantId, props.pikminType));
 const isRareVariant = computed(() => props.variantId.toLowerCase().includes('rare'));
+
+const borderShadowClass = computed(() => {
+  if (isRareVariant.value) {
+    return isCollected.value
+      ? 'border-yellow-300/90 shadow-[0_14px_34px_rgba(146,64,14,0.28)] rare-golden-glow'
+      : 'border-slate-300/50 shadow-[0_6px_16px_rgba(15,23,42,0.1)]';
+  } else {
+    return isCollected.value
+      ? 'border-emerald-300/90 shadow-[0_12px_30px_rgba(5,150,105,0.24)]'
+      : 'border-slate-300/50 shadow-[0_6px_16px_rgba(15,23,42,0.1)]';
+  }
+});
+
+const bgGradientClass = computed(() => {
+  if (isRareVariant.value) {
+    return isCollected.value
+      ? 'bg-gradient-to-br from-amber-50/92 via-yellow-50/86 to-orange-50/84'
+      : 'bg-gradient-to-br from-slate-100/88 via-gray-50/82 to-slate-50/78';
+  } else {
+    return isCollected.value
+      ? 'bg-gradient-to-br from-white/92 via-emerald-50/84 to-teal-50/80'
+      : 'bg-gradient-to-br from-slate-100/88 via-gray-50/82 to-slate-50/78';
+  }
+});
+
+const patternOpacityClass = computed(() => {
+  if (isRareVariant.value) {
+    return isCollected.value ? 'opacity-10' : 'opacity-[0.04]';
+  } else {
+    return isCollected.value ? 'opacity-5' : 'opacity-[0.03]';
+  }
+});
+
+const patternStyle = computed(() => {
+  if (isCollected.value) {
+    return isRareVariant.value
+      ? 'background-image: radial-gradient(circle, #fbbf24 1px, transparent 1px); background-size: 16px 16px;'
+      : 'background-image: radial-gradient(circle, #00b92f 1px, transparent 1px); background-size: 20px 20px;';
+  } else {
+    return 'background-image: radial-gradient(circle, #94a3b8 1px, transparent 1px); background-size: 20px 20px;';
+  }
+});
 const hasError = ref(false);
 const showRipple = ref(false);
 const isUnlocking = ref(false);
@@ -300,7 +324,14 @@ onBeforeUnmount(() => {
 
 <style scoped>
 .decor-card-shell {
-  will-change: transform;
+  /* Removed persistent will-change to save GPU memory on mobile devices */
+}
+
+@media (max-width: 640px) {
+  .decor-card-shell {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
 }
 
 .pop-in {

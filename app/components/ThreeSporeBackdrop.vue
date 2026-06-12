@@ -3,10 +3,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onBeforeUnmount } from 'vue';
+import { ref, onMounted, onBeforeUnmount, watch } from 'vue';
 import * as THREE from 'three';
+import { useParallax } from '~/composables/useParallax';
 
 const container = ref<HTMLElement | null>(null);
+
+const { isAmbientPaused } = useParallax();
 
 let scene: THREE.Scene;
 let camera: THREE.PerspectiveCamera;
@@ -20,6 +23,20 @@ const mouse = new THREE.Vector2(0, 0);
 const targetMouse = new THREE.Vector2(0, 0);
 let windowHalfX = 0;
 let windowHalfY = 0;
+
+// watch for pause state
+watch(isAmbientPaused, (paused) => {
+  if (paused) {
+    if (animationFrameId !== null) {
+      cancelAnimationFrame(animationFrameId);
+      animationFrameId = null;
+    }
+  } else {
+    if (isRunning && animationFrameId === null) {
+      animate();
+    }
+  }
+});
 
 const init = (): boolean => {
   if (!container.value) return false;

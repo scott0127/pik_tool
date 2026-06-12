@@ -346,10 +346,10 @@
     <ClientOnly>
       <Teleport to="body">
         <Transition
-          enter-active-class="transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)]"
+          enter-active-class="transition-[transform,opacity] duration-360 ease-[cubic-bezier(0.32,0.72,0,1)]"
           enter-from-class="opacity-0 translate-y-full"
           enter-to-class="opacity-100 translate-y-0"
-          leave-active-class="transition-all duration-300 ease-in-out"
+          leave-active-class="transition-[transform,opacity] duration-280 ease-[cubic-bezier(0.32,0.72,0,1)]"
           leave-from-class="opacity-100 translate-y-0"
           leave-to-class="opacity-0 translate-y-full"
         >
@@ -362,12 +362,13 @@
               class="absolute inset-0 bg-gray-900/60 pointer-events-auto transition-opacity"
               @click="isFilterExpanded = false"
             >
-              <ThreeSporeBackdrop class="opacity-80" />
+              <ThreeSporeBackdrop v-if="!isMobile" class="opacity-80" />
             </div>
 
             <!-- Bottom Sheet Content -->
             <div
-              class="liquid-glass-2026 liquid-glass-readable liquid-glass-dynamic relative w-full max-h-[85vh] rounded-t-[2.5rem] pointer-events-auto flex flex-col overflow-hidden"
+              class="liquid-glass-2026 liquid-glass-readable relative w-full max-h-[85vh] rounded-t-[2.5rem] pointer-events-auto flex flex-col overflow-hidden"
+              :class="{ 'liquid-glass-dynamic': !isMobile }"
             >
               <!-- Notch -->
               <div
@@ -489,7 +490,7 @@
 
               <!-- Footer (Sticky) -->
               <div
-                class="p-4 border-t border-white/60 bg-white/20 backdrop-blur-md flex items-center justify-between gap-4"
+                class="p-4 border-t border-white/60 bg-slate-50/95 sm:bg-white/20 sm:backdrop-blur-md flex items-center justify-between gap-4"
               >
                 <button
                   @click="clearAllFilters"
@@ -651,19 +652,17 @@
             </div>
 
             <!-- Collapsible content -->
-            <Transition
-              :css="false"
-              @before-enter="onCategoryContentBeforeEnter"
-              @enter="onCategoryContentEnter"
-              @leave="onCategoryContentLeave"
+            <div
+              class="collection-category-content-wrapper"
+              :class="{ 'is-open': isCategoryExpanded(def.category.id) }"
             >
-              <div v-if="isCategoryExpanded(def.category.id)" class="collection-category-content mt-4">
+              <div class="collection-category-content-inner mt-4">
                 <DecorGrid
                   :items="getItemsForCategory(def.category.id)"
                   @clear-filters="clearAllFilters"
                 />
               </div>
-            </Transition>
+            </div>
           </div>
         </div>
 
@@ -790,19 +789,17 @@
             </div>
 
             <!-- Collapsible content -->
-            <Transition
-              :css="false"
-              @before-enter="onCategoryContentBeforeEnter"
-              @enter="onCategoryContentEnter"
-              @leave="onCategoryContentLeave"
+            <div
+              class="collection-category-content-wrapper"
+              :class="{ 'is-open': isCategoryExpanded(def.category.id) }"
             >
-              <div v-if="isCategoryExpanded(def.category.id)" class="collection-category-content mt-4">
+              <div class="collection-category-content-inner mt-4">
                 <DecorGrid
                   :items="getItemsForCategory(def.category.id)"
                   @clear-filters="clearAllFilters"
                 />
               </div>
-            </Transition>
+            </div>
           </div>
         </div>
       </template>
@@ -834,6 +831,7 @@ import {
 } from "~/types/decor";
 import type { CollectionCategoryFilter } from "~/composables/useCollectionFilters";
 import { gsap } from "gsap";
+import { useParallax } from "~/composables/useParallax";
 
 const route = useRoute();
 const { t, locale } = useI18n();
@@ -856,6 +854,11 @@ const showScrollTop = ref(false);
 // UX: Collapsible filter panel (default collapsed)
 const isFilterExpanded = ref(false);
 
+const { isMobile, isAmbientPaused } = useParallax();
+watch(isFilterExpanded, (expanded) => {
+  isAmbientPaused.value = expanded;
+});
+
 // UX: Accordion - track collapsed categories (default all expanded)
 const collapsedCategories = ref<Set<string>>(new Set());
 let categoryBulkFrame: number | null = null;
@@ -868,105 +871,17 @@ const cancelCategoryBulkToggle = () => {
   }
 };
 
-const prefersReducedMotion = () =>
-  typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-const onCategoryContentBeforeEnter = (el: Element) => {
-  if (prefersReducedMotion()) return;
-
-  const target = el as HTMLElement;
-  const cards = target.querySelectorAll(".decor-grid-card");
-  gsap.set(target, {
-    height: 0,
-    opacity: 0,
-    overflow: "hidden",
-    y: -8,
-  });
-  gsap.set(cards, {
-    y: 12,
-    opacity: 0,
-    scale: 0.96,
-  });
-};
-
-const onCategoryContentEnter = (el: Element, done: () => void) => {
-  if (prefersReducedMotion()) {
-    done();
-    return;
-  }
-
-  const target = el as HTMLElement;
-  const cards = target.querySelectorAll(".decor-grid-card");
-  const height = target.scrollHeight;
-  const tl = gsap.timeline({
-    onComplete: () => {
-      gsap.set(target, { height: "auto", overflow: "visible", clearProps: "y,opacity" });
-      done();
-    },
-  });
-
-  tl.to(target, {
-    height,
-    opacity: 1,
-    y: 0,
-    duration: 0.38,
-    ease: "power3.out",
-  })
-    .to(cards, {
-      y: 0,
-      opacity: 1,
-      scale: 1,
-      duration: 0.32,
-      ease: "power2.out",
-      stagger: {
-        each: 0.018,
-        from: "start",
-      },
-    }, 0.08);
-};
-
-const onCategoryContentLeave = (el: Element, done: () => void) => {
-  if (prefersReducedMotion()) {
-    done();
-    return;
-  }
-
-  const target = el as HTMLElement;
-  gsap.set(target, { height: target.scrollHeight, overflow: "hidden" });
-
-  const tl = gsap.timeline({
-    onComplete: () => {
-      gsap.set(target, { clearProps: "height,overflow,opacity,y,clipPath" });
-      done();
-    },
-  });
-
-  tl.to(target, {
-    clipPath: "inset(0% 0% 8% 0% round 1.25rem)",
-    opacity: 0.72,
-    y: -4,
-    duration: 0.16,
-    ease: "power2.out",
-  })
-    .to(target, {
-      height: 0,
-      opacity: 0,
-      y: -10,
-      clipPath: "inset(0% 0% 100% 0% round 1.25rem)",
-      duration: 0.34,
-      ease: "power3.inOut",
-    }, 0.06);
-};
-
 const toggleCategory = (categoryId: string) => {
   cancelCategoryBulkToggle();
-  const newSet = new Set(collapsedCategories.value);
-  if (newSet.has(categoryId)) {
-    newSet.delete(categoryId);
-  } else {
-    newSet.add(categoryId);
-  }
-  collapsedCategories.value = newSet;
+  requestAnimationFrame(() => {
+    const newSet = new Set(collapsedCategories.value);
+    if (newSet.has(categoryId)) {
+      newSet.delete(categoryId);
+    } else {
+      newSet.add(categoryId);
+    }
+    collapsedCategories.value = newSet;
+  });
 };
 
 const isCategoryExpanded = (categoryId: string) =>
@@ -1460,6 +1375,13 @@ const handleCollectAll = (categoryId: string, categoryName: string) => {
     column-gap: 12px;
     row-gap: 10px;
     padding: 16px 14px;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+
+  .liquid-glass-2026 {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
   }
 
   .collection-section-icon {
@@ -1543,6 +1465,33 @@ const handleCollectAll = (categoryId: string, categoryName: string) => {
     transform: translateY(-15px) rotate(3deg);
     opacity: 1;
   }
+}
+
+/* Accordion CSS Grid height animation */
+.collection-category-content-wrapper {
+  display: grid;
+  grid-template-rows: 0fr;
+  will-change: grid-template-rows;
+  transition: grid-template-rows 320ms cubic-bezier(0.25, 1, 0.5, 1);
+  overflow: hidden;
+}
+
+.collection-category-content-wrapper.is-open {
+  grid-template-rows: 1fr;
+}
+
+.collection-category-content-inner {
+  min-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transform: translateY(-8px);
+  will-change: transform, opacity;
+  transition: opacity 240ms ease, transform 320ms cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.collection-category-content-wrapper.is-open .collection-category-content-inner {
+  opacity: 1;
+  transform: translateY(0);
 }
 </style>
 
