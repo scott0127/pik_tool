@@ -36,11 +36,11 @@
           </span>
           <span class="text-gradient">{{ $t("collection.title") }}</span>
         </h1>
-        <p class="readable-on-art text-slate-700 font-semibold mt-1">{{ $t("collection.subtitle") }}</p>
+        <p class="text-slate-700 font-semibold mt-1">{{ $t("collection.subtitle") }}</p>
       </div>
 
       <!-- Quick stats -->
-      <div class="liquid-glass-soft liquid-glass-dynamic flex items-center gap-4 rounded-2xl px-4 py-2">
+      <div class="bg-white/70 backdrop-blur-md border border-white/70 shadow-md flex items-center gap-4 rounded-2xl px-4 py-2">
         <div class="text-right">
           <p class="text-xs text-gray-500">
             {{ $t("collection.stats.showing") }}
@@ -61,7 +61,7 @@
 
     <!-- Filters Section -->
     <div
-      class="liquid-glass-2026 liquid-glass-readable liquid-glass-dynamic relative rounded-3xl p-5 md:p-6 mb-6 z-10 transition-all duration-300"
+      class="card relative rounded-3xl p-5 md:p-6 mb-6 z-10 transition-all duration-300"
     >
       <!-- Background gradients wrapper (clipped) -->
       <div class="absolute inset-0 overflow-hidden rounded-3xl pointer-events-none -z-10">
@@ -91,14 +91,14 @@
         </div>
         <div
           v-if="activeFilterCount > 0"
-          class="liquid-glass-chip px-3 py-1.5 text-emerald-800 text-sm"
+          class="collection-filter-chip px-3 py-1.5 text-emerald-800 text-sm"
         >
           <Icon name="lucide:filter" class="w-3.5 h-3.5" />
           <span>{{ activeFilterCount }}</span>
         </div>
         <button
           @click="isFilterExpanded = true"
-          class="liquid-glass-soft relative flex items-center gap-2 px-4 py-2.5 text-emerald-800 rounded-xl text-sm font-bold transition-all"
+          class="collection-soft-button relative flex items-center gap-2 px-4 py-2.5 text-emerald-800 rounded-xl text-sm font-bold transition-all"
         >
           <Icon name="lucide:sliders-horizontal" class="w-4 h-4" />
           <span class="hidden sm:inline">{{
@@ -127,7 +127,7 @@
           </span>
           <button
             @click="isFilterExpanded = false"
-            class="liquid-glass-soft flex items-center gap-1.5 px-3 py-1.5 text-gray-600 hover:text-gray-800 rounded-lg text-xs font-bold transition-all"
+            class="collection-soft-button flex items-center gap-1.5 px-3 py-1.5 text-gray-600 hover:text-gray-800 rounded-lg text-xs font-bold transition-all"
           >
             <Icon name="lucide:chevron-up" class="w-3.5 h-3.5" />
             {{ $t("collection.filters.collapse") }}
@@ -229,7 +229,7 @@
         >
           <div
             v-if="hasActiveFilters"
-            class="liquid-glass-soft flex flex-col sm:flex-row sm:items-center justify-between rounded-2xl p-4 gap-4"
+            class="bg-emerald-50/70 border border-emerald-100/80 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between rounded-2xl p-4 gap-4"
           >
             <div class="flex items-center gap-2 flex-wrap">
               <span class="text-sm text-emerald-800 font-bold mr-2">{{
@@ -238,7 +238,7 @@
 
               <span
                 v-if="searchQuery"
-                class="liquid-glass-chip group px-3 py-1.5 text-emerald-800 text-sm"
+                class="collection-filter-chip group px-3 py-1.5 text-emerald-800 text-sm"
               >
                 <Icon name="lucide:search" class="w-3.5 h-3.5 opacity-70" />
                 {{ searchQuery }}
@@ -252,7 +252,7 @@
 
               <span
                 v-if="selectedCategoryType"
-                class="liquid-glass-chip group px-3 py-1.5 text-emerald-800 text-sm"
+                class="collection-filter-chip group px-3 py-1.5 text-emerald-800 text-sm"
               >
                 <Icon
                   name="lucide:layout-grid"
@@ -269,7 +269,7 @@
 
               <span
                 v-if="selectedPikminType"
-                class="liquid-glass-chip group px-3 py-1.5 text-emerald-800 text-sm"
+                class="collection-filter-chip group px-3 py-1.5 text-emerald-800 text-sm"
               >
                 <Icon name="lucide:leaf" class="w-3.5 h-3.5 opacity-70" />
                 {{ selectedPikminType ? PIKMIN_TYPE_NAMES[selectedPikminType] : "" }}
@@ -283,7 +283,7 @@
 
               <span
                 v-if="collectionFilter !== 'all'"
-                class="liquid-glass-chip group px-3 py-1.5 text-emerald-800 text-sm"
+                class="collection-filter-chip group px-3 py-1.5 text-emerald-800 text-sm"
               >
                 <Icon
                   :name="selectedCollectionFilter?.icon || 'lucide:list'"
@@ -300,7 +300,7 @@
 
               <span
                 v-if="isLimitedMode"
-                class="liquid-glass-chip group px-3 py-1.5 text-amber-800 text-sm"
+                class="collection-filter-chip group px-3 py-1.5 text-amber-800 text-sm"
               >
                 <Icon
                   name="lucide:alert-triangle"
@@ -317,7 +317,7 @@
 
               <span
                 v-if="selectedCategoryId"
-                class="liquid-glass-chip group px-3 py-1.5 text-purple-800 text-sm"
+                class="collection-filter-chip group px-3 py-1.5 text-purple-800 text-sm"
               >
                 <Icon name="lucide:folder" class="w-3.5 h-3.5 opacity-70" />
                 {{ getCategoryName(selectedCategoryId) }}
@@ -332,7 +332,7 @@
 
             <button
               @click="clearAllFilters"
-              class="liquid-glass-soft shrink-0 flex items-center gap-2 px-4 py-2 text-gray-700 hover:text-red-700 rounded-xl text-sm font-bold transition-all focus:ring-2 focus:ring-red-200 outline-none"
+              class="collection-soft-button shrink-0 flex items-center gap-2 px-4 py-2 text-gray-700 hover:text-red-700 rounded-xl text-sm font-bold transition-all focus:ring-2 focus:ring-red-200 outline-none"
             >
               <Icon name="lucide:trash-2" class="w-4 h-4" />
               {{ $t("collection.filters.clear") }}
@@ -367,8 +367,7 @@
 
             <!-- Bottom Sheet Content -->
             <div
-              class="liquid-glass-2026 liquid-glass-readable relative w-full max-h-[85vh] rounded-t-[2.5rem] pointer-events-auto flex flex-col overflow-hidden"
-              :class="{ 'liquid-glass-dynamic': !isMobile }"
+              class="bg-white/95 border border-white/70 shadow-2xl relative w-full max-h-[85vh] rounded-t-[2.5rem] pointer-events-auto flex flex-col overflow-hidden"
             >
               <!-- Notch -->
               <div
@@ -393,7 +392,7 @@
                 </span>
                 <button
                   @click="isFilterExpanded = false"
-                  class="liquid-glass-soft p-2 text-gray-500 hover:text-gray-700 rounded-full active:scale-90 transition-transform"
+                  class="collection-soft-button p-2 text-gray-500 hover:text-gray-700 rounded-full active:scale-90 transition-transform"
                 >
                   <Icon name="lucide:x" class="w-5 h-5" />
                 </button>
@@ -494,13 +493,13 @@
               >
                 <button
                   @click="clearAllFilters"
-                  class="liquid-glass-soft flex-1 py-3.5 text-gray-700 hover:text-red-700 rounded-xl text-sm font-bold transition-all active:scale-95"
+                  class="collection-soft-button flex-1 py-3.5 text-gray-700 hover:text-red-700 rounded-xl text-sm font-bold transition-all active:scale-95"
                 >
                   {{ $t("collection.filters.clear") }}
                 </button>
                 <button
                   @click="isFilterExpanded = false"
-                  class="liquid-glass-button flex-[2] py-3.5 rounded-xl text-sm active:scale-95 flex items-center justify-center gap-2"
+                  class="btn-primary flex-[2] py-3.5 rounded-xl text-sm active:scale-95 flex items-center justify-center gap-2"
                 >
                   <Icon name="lucide:check" class="w-5 h-5" />
                   顯示 {{ filteredItems.length }} 個結果
@@ -585,7 +584,7 @@
           >
             <!-- Category Header (clickable accordion) -->
             <div
-              class="collection-category-header liquid-glass-2026 liquid-glass-readable liquid-glass-dynamic flex items-center gap-3 sticky top-[120px] z-10 px-4 py-3 rounded-xl cursor-pointer group"
+              class="collection-category-header flex items-center gap-3 sticky top-[120px] z-10 px-4 py-3 rounded-xl cursor-pointer group"
               @click="toggleCategory(def.category.id)"
             >
               <Icon :name="getCategoryIcon(def.category.icon)" class="text-2xl flex-shrink-0" />
@@ -608,7 +607,7 @@
                     locale === 'en' ? def.category.nameEn : def.category.name,
                   )
                 "
-                class="liquid-glass-button px-3 py-1.5 text-xs rounded-lg flex items-center gap-1"
+                class="collection-collect-button px-3 py-1.5 text-xs rounded-lg flex items-center gap-1"
                 :title="$t('collection.actions.collect_all_tooltip')"
               >
                 <Icon name="lucide:check-check" class="w-3.5 h-3.5" />
@@ -722,7 +721,7 @@
           >
             <!-- Category Header (clickable accordion) -->
             <div
-              class="collection-category-header liquid-glass-2026 liquid-glass-readable liquid-glass-dynamic flex items-center gap-3 sticky top-[120px] z-10 px-4 py-3 rounded-xl cursor-pointer group"
+              class="collection-category-header flex items-center gap-3 sticky top-[120px] z-10 px-4 py-3 rounded-xl cursor-pointer group collection-category-header-special"
               @click="toggleCategory(def.category.id)"
             >
               <Icon :name="getCategoryIcon(def.category.icon)" class="text-2xl flex-shrink-0" />
@@ -745,7 +744,7 @@
                     locale === 'en' ? def.category.nameEn : def.category.name,
                   )
                 "
-                class="liquid-glass-button px-3 py-1.5 text-xs rounded-lg flex items-center gap-1"
+                class="collection-collect-button px-3 py-1.5 text-xs rounded-lg flex items-center gap-1"
                 :title="$t('collection.actions.collect_all_tooltip')"
               >
                 <Icon name="lucide:check-check" class="w-3.5 h-3.5" />
@@ -1147,58 +1146,19 @@ const handleCollectAll = (categoryId: string, categoryName: string) => {
 .collection-section-card {
   position: relative;
   overflow: hidden;
-  background:
-    radial-gradient(circle at 12% 20%, rgba(0, 185, 47, 0.22), transparent 36%),
-    linear-gradient(135deg, rgba(255, 255, 255, 0.48), rgba(255, 255, 255, 0.2)),
-    rgba(255, 255, 255, 0.2);
-  border: 1px solid rgba(255, 255, 255, 0.82);
-  box-shadow:
-    0 18px 38px rgba(15, 23, 42, 0.14),
-    0 1px 14px rgba(255, 255, 255, 0.88) inset,
-    0 -16px 32px rgba(0, 133, 35, 0.06) inset;
-  backdrop-filter: blur(2px) saturate(1.18);
-  -webkit-backdrop-filter: blur(2px) saturate(1.18);
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.72);
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.1);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
 }
 
 .collection-section-card::before {
-  position: absolute;
-  inset: 0;
-  content: "";
-  border-radius: inherit;
-  pointer-events: none;
-  padding: 1px;
-  background:
-    linear-gradient(
-      120deg,
-      rgba(16, 185, 129, 0.9),
-      rgba(45, 212, 191, 0.62) 32%,
-      rgba(255, 255, 255, 0.76) 64%,
-      rgba(16, 185, 129, 0.38)
-    );
-  -webkit-mask:
-    linear-gradient(#000 0 0) content-box,
-    linear-gradient(#000 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-  opacity: 0.9;
+  display: none;
 }
 
 .collection-section-card::after {
-  position: absolute;
-  inset: 0;
-  content: "";
-  border-radius: inherit;
-  pointer-events: none;
-  background:
-    radial-gradient(circle at 6% 50%, rgba(16, 185, 129, 0.22), transparent 28%),
-    linear-gradient(
-      90deg,
-      rgba(16, 185, 129, 0.16),
-      transparent 22%,
-      transparent 78%,
-      rgba(20, 184, 166, 0.14)
-    );
-  opacity: 0.8;
+  display: none;
 }
 
 .collection-section-card > * {
@@ -1207,33 +1167,15 @@ const handleCollectAll = (categoryId: string, categoryName: string) => {
 }
 
 .collection-section-card-purple {
-  background:
-    radial-gradient(circle at 12% 20%, rgba(168, 85, 247, 0.2), transparent 36%),
-    linear-gradient(135deg, rgba(255, 255, 255, 0.48), rgba(255, 255, 255, 0.2)),
-    rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.72);
 }
 
 .collection-section-card-purple::before {
-  background:
-    linear-gradient(
-      120deg,
-      rgba(168, 85, 247, 0.92),
-      rgba(217, 70, 239, 0.62) 34%,
-      rgba(255, 255, 255, 0.76) 64%,
-      rgba(236, 72, 153, 0.34)
-    );
+  display: none;
 }
 
 .collection-section-card-purple::after {
-  background:
-    radial-gradient(circle at 6% 50%, rgba(168, 85, 247, 0.22), transparent 28%),
-    linear-gradient(
-      90deg,
-      rgba(168, 85, 247, 0.16),
-      transparent 22%,
-      transparent 78%,
-      rgba(236, 72, 153, 0.14)
-    );
+  display: none;
 }
 
 .collection-section-icon {
@@ -1243,24 +1185,15 @@ const handleCollectAll = (categoryId: string, categoryName: string) => {
 }
 
 .collection-section-title {
-  -webkit-text-stroke: 0;
   paint-order: normal;
-  text-shadow:
-    0 0 1px rgba(255, 255, 255, 0.92),
-    0 0 5px rgba(255, 255, 255, 0.58),
-    0 1px 0 rgba(255, 255, 255, 0.72),
-    0 2px 7px rgba(15, 23, 42, 0.16);
+  text-shadow: none;
 }
 
 .collection-section-desc,
 .collection-section-count,
 .collection-info-desc {
-  -webkit-text-stroke: 0;
   paint-order: normal;
-  text-shadow:
-    0 0 1px rgba(255, 255, 255, 0.88),
-    0 0 4px rgba(255, 255, 255, 0.46),
-    0 1px 0 rgba(255, 255, 255, 0.62);
+  text-shadow: none;
 }
 
 .collection-section-actions {
@@ -1311,24 +1244,27 @@ const handleCollectAll = (categoryId: string, categoryName: string) => {
 
 .collection-category-header {
   width: 100%;
+  background: linear-gradient(135deg, rgba(236, 253, 245, 0.95), rgba(240, 253, 250, 0.9));
+  border: 1px solid rgba(255, 255, 255, 0.78);
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.collection-category-header-special {
+  background: linear-gradient(135deg, rgba(250, 245, 255, 0.95), rgba(253, 242, 248, 0.9));
 }
 
 .collection-info-card {
-  background:
-    linear-gradient(135deg, rgba(236, 253, 245, 0.5), rgba(255, 255, 255, 0.18)),
-    rgba(255, 255, 255, 0.2);
+  background: rgba(236, 253, 245, 0.72);
   border: 1px solid rgba(255, 255, 255, 0.76);
-  box-shadow:
-    0 12px 28px rgba(15, 23, 42, 0.1),
-    0 1px 12px rgba(255, 255, 255, 0.78) inset;
-  backdrop-filter: blur(2px) saturate(1.16);
-  -webkit-backdrop-filter: blur(2px) saturate(1.16);
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.08);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
 
 .collection-info-card-purple {
-  background:
-    linear-gradient(135deg, rgba(250, 245, 255, 0.52), rgba(255, 255, 255, 0.18)),
-    rgba(255, 255, 255, 0.2);
+  background: rgba(250, 245, 255, 0.74);
 }
 
 .collection-info-icon {
@@ -1339,12 +1275,37 @@ const handleCollectAll = (categoryId: string, categoryName: string) => {
 
 .collection-info-title {
   letter-spacing: 0.01em;
-  -webkit-text-stroke: 0;
   paint-order: normal;
-  text-shadow:
-    0 0 1px rgba(255, 255, 255, 0.88),
-    0 0 4px rgba(255, 255, 255, 0.46),
-    0 1px 0 rgba(255, 255, 255, 0.62);
+  text-shadow: none;
+}
+
+.collection-filter-chip,
+.collection-soft-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  background: rgba(255, 255, 255, 0.78);
+  border: 1px solid rgba(255, 255, 255, 0.82);
+  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.07);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.collection-soft-button:hover {
+  background: rgba(236, 253, 245, 0.9);
+  border-color: rgba(110, 231, 183, 0.7);
+}
+
+.collection-collect-button {
+  color: white;
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+  box-shadow: 0 8px 16px rgba(22, 163, 74, 0.18);
+  transition: transform 180ms ease, box-shadow 180ms ease;
+}
+
+.collection-collect-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 20px rgba(22, 163, 74, 0.22);
 }
 
 @media (max-width: 640px) {
@@ -1355,8 +1316,8 @@ const handleCollectAll = (categoryId: string, categoryName: string) => {
     padding: 0.8rem 0.85rem;
   }
 
-  .collection-category-header :deep(.liquid-glass-button),
-  .collection-category-header .liquid-glass-button {
+  .collection-category-header :deep(.collection-collect-button),
+  .collection-category-header .collection-collect-button {
     width: 2.1rem;
     height: 2.1rem;
     flex: 0 0 auto;
@@ -1375,11 +1336,6 @@ const handleCollectAll = (categoryId: string, categoryName: string) => {
     column-gap: 12px;
     row-gap: 10px;
     padding: 16px 14px;
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
-  }
-
-  .liquid-glass-2026 {
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
   }

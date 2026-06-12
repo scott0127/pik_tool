@@ -10,7 +10,7 @@
     :style="{ animationDelay: `${animationDelay}ms` }"
   >
     <div
-      class="decor-card-shell liquid-glass-soft liquid-glass-dynamic relative rounded-2xl overflow-hidden transition-all duration-300 z-10 border"
+      class="decor-card-shell relative bg-white/80 backdrop-blur-md rounded-2xl overflow-hidden transition-all duration-300 z-10 border"
       :class="borderShadowClass"
     >
       <!-- Image Container -->
@@ -135,7 +135,6 @@
         <p
           class="text-sm font-extrabold truncate"
           :class="isCollected ? 'text-slate-900' : 'text-slate-400'"
-          :style="{ textShadow: '0 1px 2px rgba(255,255,255,0.5)' }"
           :title="locale === 'en' ? variant?.nameEn : variant?.name"
         >
           {{ (locale === 'en' ? variant?.nameEn : variant?.name) || 'Unknown' }}
@@ -143,7 +142,6 @@
         <p
           class="text-xs truncate mt-0.5 font-semibold"
           :class="isCollected ? 'text-slate-700' : 'text-slate-400'"
-          :style="{ textShadow: '0 1px 2px rgba(255,255,255,0.5)' }"
           :title="locale === 'en' ? variant?.name : variant?.nameEn"
         >
           {{ (locale === 'en' ? variant?.name : variant?.nameEn) || '' }}

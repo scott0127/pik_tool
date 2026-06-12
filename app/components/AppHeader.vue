@@ -4,8 +4,8 @@
     <div class="h-1 bg-gradient-to-r from-emerald-400 via-teal-400 to-emerald-400"></div>
     
     <div
-      class="glass-frosted-shell border-t-0 border-x-0"
-      :class="{ 'mobile-menu-shell-open glass-text-plain': showMobileMenu }"
+      class="glass border-t-0 border-x-0"
+      :class="{ 'mobile-menu-shell-open': showMobileMenu }"
     >
       <div class="max-w-8xl mx-auto px-4 py-3">
         <div class="flex items-center justify-between">
@@ -273,7 +273,7 @@
             <!-- Buy Me a Coffee Button (Mobile) -->
             <button 
               @click="handleCoffeeClick"
-              class="mobile-action-button glass-text-light flex items-center justify-center gap-2 bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 text-white rounded-2xl p-4 transition-all w-full max-w-[200px]"
+              class="mobile-action-button flex items-center justify-center gap-2 bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 text-white rounded-2xl p-4 transition-all w-full max-w-[200px]"
             >
               <span class="text-2xl flex-shrink-0">☕</span>
               <span class="font-semibold">{{ $t('header.coffee_mobile') }}</span>
@@ -284,7 +284,7 @@
               href="https://github.com/scott0127/pik_tool"
               target="_blank"
               rel="noopener noreferrer"
-              class="mobile-action-button glass-text-light flex items-center justify-center gap-2 bg-gradient-to-r from-gray-800 to-gray-900 text-white rounded-2xl p-4 hover:from-gray-700 hover:to-gray-800 transition-all w-full max-w-[200px] overflow-hidden"
+              class="mobile-action-button flex items-center justify-center gap-2 bg-gradient-to-r from-gray-800 to-gray-900 text-white rounded-2xl p-4 hover:from-gray-700 hover:to-gray-800 transition-all w-full max-w-[200px] overflow-hidden"
             >
               <span class="text-2xl flex-shrink-0">⭐</span>
               <div class="overflow-hidden">
@@ -297,7 +297,7 @@
             <!-- Feedback Button (Mobile) -->
             <button 
               @click="showFeedbackModal = true; showMobileMenu = false"
-              class="mobile-action-button glass-text-light flex items-center justify-center gap-2 bg-gradient-to-r from-violet-500 to-purple-600 text-white rounded-2xl p-4 hover:from-violet-600 hover:to-purple-700 transition-all w-full max-w-[200px] overflow-hidden"
+              class="mobile-action-button flex items-center justify-center gap-2 bg-gradient-to-r from-violet-500 to-purple-600 text-white rounded-2xl p-4 hover:from-violet-600 hover:to-purple-700 transition-all w-full max-w-[200px] overflow-hidden"
             >
               <span class="text-2xl flex-shrink-0">💬</span>
               <div class="overflow-hidden">
@@ -823,8 +823,7 @@ onUnmounted(() => {
 .mobile-nav-link-active,
 .mobile-nav-link-active :deep(*) {
   color: #fff !important;
-  -webkit-text-stroke: 0 !important;
   paint-order: normal !important;
-  text-shadow: 0 1px 2px rgba(15, 23, 42, 0.22) !important;
+  text-shadow: none !important;
 }
 </style>

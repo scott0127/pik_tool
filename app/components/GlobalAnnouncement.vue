@@ -213,7 +213,6 @@ onBeforeUnmount(() => {
 
 <style scoped>
 .announcement-panel :deep(*) {
-  -webkit-text-stroke: 0;
   paint-order: normal;
 }
 
@@ -370,7 +369,6 @@ onBeforeUnmount(() => {
 .ios-badge,
 .ios-badge :deep(*) {
   color: #fff;
-  -webkit-text-stroke: 0;
   paint-order: normal;
   text-shadow: none;
 }

@@ -1,6 +1,24 @@
 <template>
   <div class="min-h-screen relative">
-    <AppAmbientBackground v-if="!isStandalonePage" />
+    <!-- Background decorations -->
+    <div class="fixed inset-0 pointer-events-none overflow-hidden z-0 hidden md:block">
+      <!-- Floating leaves -->
+      <div class="absolute top-20 left-[5%] text-6xl opacity-10 sway">🌿</div>
+      <div class="absolute top-40 right-[8%] text-5xl opacity-10 sway" style="animation-delay: 1s">🌱</div>
+      <div class="absolute bottom-32 left-[12%] text-4xl opacity-10 float">🌱</div>
+      <div class="absolute bottom-20 right-[15%] text-5xl opacity-10 float-delayed">🌿</div>
+
+      <!-- Gradient orbs -->
+      <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-emerald-300/20 rounded-full blur-3xl"></div>
+      <div class="absolute bottom-1/4 right-1/4 w-80 h-80 bg-teal-300/20 rounded-full blur-3xl"></div>
+    </div>
+
+    <div class="fixed inset-0 pointer-events-none overflow-hidden z-0 md:hidden">
+      <div class="absolute top-[15%] left-[8%] text-6xl opacity-[0.08]">🌿</div>
+      <div class="absolute top-[18%] right-[10%] text-5xl opacity-[0.07]">🌱</div>
+      <div class="absolute top-[44%] left-[-6%] text-6xl opacity-[0.055]">🍃</div>
+      <div class="absolute bottom-[12%] right-[8%] text-5xl opacity-[0.055]">🌿</div>
+    </div>
 
     <!-- Updating Version State -->
     <Transition
@@ -21,7 +39,7 @@
           </div>
           <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">更新載入中</h2>
           <p class="text-gray-500 dark:text-gray-400 font-medium mb-6">發現了新的遊戲資料，正在為您同步...</p>
-          
+
           <div class="flex items-center justify-center gap-2">
             <div class="w-2.5 h-2.5 bg-emerald-500 rounded-full animate-bounce" style="animation-delay: 0ms"></div>
             <div class="w-2.5 h-2.5 bg-emerald-500 rounded-full animate-bounce" style="animation-delay: 150ms"></div>
@@ -57,22 +75,22 @@
         </div>
       </div>
     </Transition>
-    
+
     <!-- Main Content -->
     <div v-show="isAppReady || isStandalonePage" class="relative z-10">
       <AppHeader v-if="!isStandalonePage" />
-      
+
       <main :class="mainClass">
         <NuxtPage />
       </main>
-      
+
       <AppFooter v-if="!isStandalonePage" />
     </div>
 
     <!-- Global Components -->
     <GlobalAnnouncement v-if="!isStandalonePage" />
     <PwaInstallPrompt v-if="!isStandalonePage" />
-    <Toast 
+    <Toast
       v-if="currentToast && isShowingToast"
       :message="currentToast.message"
       :type="currentToast.type"
@@ -132,7 +150,7 @@ useHead(() => ({
       rel: 'preload',
       as: 'image',
       href: '/img/pc_background_extended.png',
-      media: '(min-width: 768px)'
+      media: '(min-width: 1024px)'
     }
   ]
 }));
@@ -152,14 +170,14 @@ const initializeAppShell = async () => {
   appInitStarted = true;
   isInitializing.value = true;
   console.log('[App] Starting initialization...');
-  
+
   try {
     // 1. 先载入本地收藏资料（快速）
     loadCollection();
-    
+
     // 2. 初始化 AuthStore（会获取 session 并监听变化）
     await authStore.initialize();
-    
+
     // 3. 如果已登入，从云端同步
     if (authStore.isAuthenticated.value) {
       console.log('[App] User logged in, syncing from cloud...');
