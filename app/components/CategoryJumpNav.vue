@@ -5,7 +5,7 @@
       enter-active-class="transition-opacity duration-300 ease-out"
       enter-from-class="opacity-0"
       enter-to-class="opacity-100"
-      leave-active-class="transition-opacity duration-200 ease-in"
+      leave-active-class="transition-opacity duration-500 ease-[cubic-bezier(0.65,0,0.35,1)]"
       leave-from-class="opacity-100"
       leave-to-class="opacity-0"
     >
@@ -14,20 +14,18 @@
 
     <!-- Slide-out Drawer -->
     <Transition
-      enter-active-class="transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]"
-      enter-from-class="translate-x-full"
-      enter-to-class="translate-x-0"
-      leave-active-class="transition-transform duration-300 ease-in"
-      leave-from-class="translate-x-0"
-      leave-to-class="translate-x-full"
+      :css="false"
+      @before-enter="onDrawerBeforeEnter"
+      @enter="onDrawerEnter"
+      @leave="onDrawerLeave"
     >
-      <div v-if="isExpanded" class="fixed right-0 top-0 h-[100dvh] w-full max-w-[380px] sm:max-w-[420px] z-50 bg-white/70 backdrop-blur-2xl border-l border-white/80 shadow-2xl flex flex-col overflow-hidden">
+      <div v-if="isExpanded" class="category-drawer fixed right-0 top-0 h-[100dvh] w-full max-w-[380px] sm:max-w-[420px] z-50 bg-white/70 backdrop-blur-2xl border-l border-white/80 shadow-2xl flex flex-col overflow-hidden">
         
         <!-- Generated Artistic Background -->
         <div class="absolute inset-0 -z-10 bg-gradient-to-br from-emerald-50/80 to-teal-50/80"></div>
         
         <!-- Drawer Header -->
-        <div class="flex items-center justify-between px-6 py-5 border-b border-white/40 bg-white/40 backdrop-blur-md shrink-0 shadow-sm relative z-20">
+        <div class="category-drawer-header flex items-center justify-between px-6 py-5 border-b border-white/40 bg-white/40 backdrop-blur-md shrink-0 shadow-sm relative z-20">
           <div class="flex items-center gap-3">
             <div class="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600 shadow-sm border border-emerald-200/50">
               <Icon name="lucide:layout-grid" class="w-4 h-4" />
@@ -40,7 +38,7 @@
         </div>
 
         <!-- Drawer Content -->
-        <div class="flex-1 overflow-y-auto px-6 py-6 custom-scrollbar relative z-10 space-y-8">
+        <div class="category-drawer-content flex-1 overflow-y-auto px-6 py-6 custom-scrollbar relative z-10 space-y-8">
           
           <!-- Regular Categories Grid -->
           <div v-if="regularCategoriesList.length > 0">
@@ -54,7 +52,7 @@
                 v-for="cat in regularCategoriesList"
                 :key="cat.id"
                 @click="scrollToCategoryAndClose(cat.id)"
-                class="group relative flex flex-col items-center gap-1.5 transition-all duration-300 hover:scale-105"
+                class="category-jump-item group relative flex flex-col items-center gap-1.5 transition-all duration-300 hover:scale-105"
                 :title="cat.name"
               >
                 <div class="relative w-12 h-12 bg-white/50 backdrop-blur-md rounded-2xl shadow-sm border border-white/60 flex items-center justify-center group-hover:bg-white/90 group-hover:shadow-md group-hover:border-emerald-200 transition-all">
@@ -89,7 +87,7 @@
                 v-for="cat in specialCategoriesList"
                 :key="cat.id"
                 @click="scrollToCategoryAndClose(cat.id)"
-                class="group relative flex flex-col items-center gap-1.5 transition-all duration-300 hover:scale-105"
+                class="category-jump-item group relative flex flex-col items-center gap-1.5 transition-all duration-300 hover:scale-105"
                 :title="cat.name"
               >
                 <div class="relative w-12 h-12 bg-white/50 backdrop-blur-md rounded-2xl shadow-sm border border-white/60 flex items-center justify-center group-hover:bg-white/90 group-hover:shadow-md group-hover:border-purple-200 transition-all">
@@ -265,6 +263,8 @@
 </template>
 
 <script setup lang="ts">
+import { gsap } from 'gsap';
+
 interface CategoryJumpItem {
   id: string;
   name: string;
@@ -295,6 +295,106 @@ const dockActiveIndex = computed(() => {
   if (activeSection.value === 'bottom') return 3;
   return 0;
 });
+
+const prefersReducedMotion = () =>
+  typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+const onDrawerBeforeEnter = (el: Element) => {
+  if (prefersReducedMotion()) return;
+
+  const drawer = el as HTMLElement;
+  const header = drawer.querySelector('.category-drawer-header');
+  const content = drawer.querySelector('.category-drawer-content');
+  const items = drawer.querySelectorAll('.category-jump-item');
+
+  gsap.set(drawer, {
+    xPercent: 104,
+    opacity: 0,
+    scale: 0.985,
+    filter: 'blur(8px)',
+    transformOrigin: 'right center',
+  });
+  gsap.set(header, { y: -12, opacity: 0 });
+  gsap.set(content, { opacity: 0 });
+  gsap.set(items, { y: 14, opacity: 0, scale: 0.94 });
+};
+
+const onDrawerEnter = (el: Element, done: () => void) => {
+  if (prefersReducedMotion()) {
+    done();
+    return;
+  }
+
+  const drawer = el as HTMLElement;
+  const header = drawer.querySelector('.category-drawer-header');
+  const content = drawer.querySelector('.category-drawer-content');
+  const items = drawer.querySelectorAll('.category-jump-item');
+
+  const tl = gsap.timeline({ onComplete: done });
+  tl.to(drawer, {
+    xPercent: 0,
+    opacity: 1,
+    scale: 1,
+    filter: 'blur(0px)',
+    duration: 0.56,
+    ease: 'expo.out',
+  })
+    .to(header, {
+      y: 0,
+      opacity: 1,
+      duration: 0.28,
+      ease: 'power2.out',
+    }, 0.12)
+    .to(content, {
+      opacity: 1,
+      duration: 0.22,
+      ease: 'power1.out',
+    }, 0.16)
+    .to(items, {
+      y: 0,
+      opacity: 1,
+      scale: 1,
+      duration: 0.34,
+      ease: 'back.out(1.35)',
+      stagger: {
+        each: 0.018,
+        from: 'start',
+      },
+    }, 0.22);
+};
+
+const onDrawerLeave = (el: Element, done: () => void) => {
+  if (prefersReducedMotion()) {
+    done();
+    return;
+  }
+
+  const drawer = el as HTMLElement;
+  const header = drawer.querySelector('.category-drawer-header');
+  const content = drawer.querySelector('.category-drawer-content');
+
+  const tl = gsap.timeline({ onComplete: done });
+  tl.to(content, {
+    x: 18,
+    opacity: 0,
+    scale: 0.985,
+    duration: 0.22,
+    ease: 'power2.inOut',
+  }, 0)
+    .to(header, {
+      x: 12,
+      opacity: 0,
+      duration: 0.2,
+      ease: 'power2.inOut',
+    }, 0.03)
+    .to(drawer, {
+      xPercent: 104,
+      opacity: 0,
+      scale: 0.985,
+      duration: 0.44,
+      ease: 'expo.inOut',
+    }, 0.08);
+};
 
 const scrollToTop = () => {
   window.scrollTo({ top: 0, behavior: 'smooth' });

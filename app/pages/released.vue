@@ -407,17 +407,54 @@ function setupReleasedImageShimmer() {
   if (!targets.length) return;
 
   releasedImageShineContext = gsap.context(() => {
-    gsap.set(targets, { '--shine-x': '-78%' });
-    gsap.to(targets, {
-      '--shine-x': '178%',
-      duration: 2.65,
-      ease: 'sine.inOut',
-      repeat: -1,
-      repeatDelay: 4.8,
-      stagger: {
-        each: 0.42,
-        from: 'random',
-      },
+    targets.forEach((target, index) => {
+      gsap.set(target, {
+        '--shine-x': '-135%',
+        '--image-glow-alpha': 0.18,
+        '--image-glass-alpha': 0.28,
+        '--image-gradient-x': '0%',
+        '--image-depth-alpha': 0.18,
+        '--image-lift-y': '0px',
+      });
+
+      gsap.to(target, {
+        '--image-depth-alpha': 0.62,
+        '--image-lift-y': '-3px',
+        scale: 1.018,
+        duration: 3.8 + (index % 2) * 0.45,
+        ease: 'sine.inOut',
+        repeat: -1,
+        yoyo: true,
+        delay: index * 0.12,
+      });
+
+      const timeline = gsap.timeline({
+        repeat: -1,
+        repeatDelay: 3.9 + (index % 3) * 0.55,
+        delay: index * 0.18,
+      });
+
+      timeline
+        .to(target, {
+          '--image-glow-alpha': 0.48,
+          '--image-glass-alpha': 0.58,
+          '--image-gradient-x': '100%',
+          duration: 0.72,
+          ease: 'sine.out',
+        }, 0)
+        .to(target, {
+          '--shine-x': '135%',
+          duration: 1.28,
+          ease: 'power2.inOut',
+        }, 0.08)
+        .to(target, {
+          '--image-glow-alpha': 0.2,
+          '--image-glass-alpha': 0.32,
+          '--image-gradient-x': '0%',
+          duration: 1.15,
+          ease: 'sine.inOut',
+        }, 0.72)
+        .set(target, { '--shine-x': '-135%' });
     });
   });
 }
@@ -850,6 +887,12 @@ function getReleasedDateParts(dateText: string) {
 }
 
 .released-record-image {
+  --image-glass-alpha: 0.28;
+  --image-glow-alpha: 0.18;
+  --image-gradient-x: 0%;
+  --image-depth-alpha: 0.18;
+  --image-lift-y: 0px;
+  --shine-x: -135%;
   position: relative;
   align-self: stretch;
   display: grid;
@@ -861,19 +904,31 @@ function getReleasedDateParts(dateText: string) {
   padding: 0.72rem;
   border-radius: 1.75rem;
   background:
+    linear-gradient(
+      112deg,
+      rgba(255, 255, 255, calc(var(--image-glow-alpha) * 0.8)),
+      rgba(52, 211, 153, calc(var(--image-glow-alpha) * 0.34)) 52%,
+      rgba(240, 253, 250, calc(var(--image-glow-alpha) * 0.7))
+    ),
     radial-gradient(circle at 30% 18%, rgba(255, 255, 255, 0.68), transparent 34%),
     radial-gradient(circle at 76% 84%, rgba(16, 185, 129, 0.16), transparent 40%),
     linear-gradient(165deg, #e1f4eb 0%, #c6e7d9 54%, #b9dfcf 100%);
+  background-position: var(--image-gradient-x) 50%, 0 0, 0 0, 0 0;
+  background-size: 180% 100%, auto, auto, auto;
   border: 1px solid rgba(255, 255, 255, 0.66);
   box-shadow:
     0 1px 0 rgba(255, 255, 255, 0.82) inset,
     0 -14px 24px rgba(13, 148, 136, 0.12) inset,
     10px 0 18px rgba(255, 255, 255, 0.24) inset,
     -10px 0 18px rgba(6, 95, 70, 0.08) inset,
-    0 14px 22px rgba(6, 78, 59, 0.16),
+    0 0 26px rgba(16, 185, 129, calc(var(--image-glow-alpha) * 0.42)),
+    0 calc(12px + var(--image-depth-alpha) * 10px) calc(18px + var(--image-depth-alpha) * 18px) rgba(6, 78, 59, calc(0.12 + var(--image-depth-alpha) * 0.12)),
     0 2px 0 rgba(255, 255, 255, 0.72);
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
+  transform: translateY(var(--image-lift-y));
+  transform-origin: center;
+  will-change: transform, box-shadow, background-position;
 }
 
 .released-record-image::before {
@@ -883,11 +938,19 @@ function getReleasedDateParts(dateText: string) {
   content: "";
   border-radius: inherit;
   background:
-    linear-gradient(135deg, rgba(255, 255, 255, 0.42) 0%, rgba(255, 255, 255, 0.16) 26%, transparent 54%),
-    linear-gradient(315deg, transparent 0 54%, rgba(255, 255, 255, 0.18) 72%, rgba(255, 255, 255, 0.5) 100%);
+    radial-gradient(
+      circle at 34% 20%,
+      rgba(255, 255, 255, calc(var(--image-glass-alpha) * 0.92)) 0,
+      rgba(236, 253, 245, calc(var(--image-glass-alpha) * 0.42)) 24%,
+      transparent 52%
+    ),
+    linear-gradient(135deg, rgba(255, 255, 255, calc(var(--image-glass-alpha) * 0.74)) 0%, rgba(255, 255, 255, 0.16) 26%, transparent 54%),
+    linear-gradient(315deg, transparent 0 54%, rgba(255, 255, 255, calc(var(--image-glass-alpha) * 0.38)) 72%, rgba(255, 255, 255, calc(var(--image-glass-alpha) * 0.9)) 100%);
   box-shadow:
     0 0 0 1px rgba(255, 255, 255, 0.28) inset,
-    0 0 28px rgba(255, 255, 255, 0.22) inset;
+    0 0 calc(24px + var(--image-depth-alpha) * 16px) rgba(255, 255, 255, calc(var(--image-glass-alpha) * 0.52)) inset,
+    inset 0 calc(-8px - var(--image-depth-alpha) * 10px) calc(18px + var(--image-depth-alpha) * 12px) rgba(6, 95, 70, calc(0.04 + var(--image-depth-alpha) * 0.08));
+  opacity: 0.96;
   pointer-events: none;
 }
 
@@ -896,14 +959,15 @@ function getReleasedDateParts(dateText: string) {
   top: -38%;
   left: var(--shine-x, -78%);
   display: block;
-  width: 78%;
+  width: 86%;
   height: 180%;
   content: "";
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.42), transparent);
-  filter: blur(7px);
-  opacity: 0.46;
+  background: linear-gradient(105deg, transparent 20%, rgba(255, 255, 255, 0.72) 50%, transparent 80%);
+  filter: blur(6px);
+  opacity: calc(0.26 + var(--image-glow-alpha) * 0.88);
   pointer-events: none;
   transform: rotate(16deg);
+  z-index: 2;
 }
 
 .released-record-content {
