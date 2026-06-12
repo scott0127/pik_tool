@@ -303,6 +303,10 @@ onBeforeUnmount(() => {
   will-change: transform;
 }
 
+.pop-in {
+  animation: decor-stream-in 520ms cubic-bezier(0.19, 1, 0.22, 1) both;
+}
+
 .decor-image-stage {
   isolation: isolate;
 }
@@ -416,6 +420,28 @@ onBeforeUnmount(() => {
   }
   100% {
     transform: scale(1);
+  }
+}
+
+@keyframes decor-stream-in {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 14px, 0) scale(0.96);
+  }
+
+  58% {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pop-in {
+    animation: none;
   }
 }
 

@@ -6,6 +6,7 @@
       :key="group.key"
       class="mb-6 decor-grid-group"
       :data-group-key="group.key"
+      :data-group-index="groupIndex"
     >
       <!-- Pikmin Row for this Variant -->
         <div
@@ -19,7 +20,7 @@
           :category-id="item.categoryId"
           :variant-id="item.variantId"
           :pikmin-type="item.pikminType"
-          :animation-delay="Math.min((groupIndex * 8 + index) * 30, 300)"
+          :animation-delay="Math.min(groupIndex * 86 + index * 52, 680)"
             class="decor-grid-card w-full sm:w-[calc(12.5%-0.72rem)] sm:min-w-[100px] sm:max-w-[138px]"
             @toggle="$emit('toggle', $event)"
           />
@@ -71,11 +72,13 @@ defineEmits<{
   'clear-filters': [];
 }>();
 
-const { getVariant } = useDecorData();
+const { getVariant, getImageUrl } = useDecorData();
 const gridRoot = ref<HTMLElement | null>(null);
 const visibleGroupKeys = ref<Set<string>>(new Set());
 const viewportWidth = ref(1024);
 let visibilityObserver: IntersectionObserver | null = null;
+let preloadFrame: number | null = null;
+const preloadedImageUrls = new Set<string>();
 
 // Group items by categoryId + variantId
 const groupedItems = computed(() => {
@@ -105,14 +108,61 @@ const groupedItems = computed(() => {
 
 const isGroupVisible = (key: string) => visibleGroupKeys.value.has(key);
 
-const setGroupVisibility = (key: string, isVisible: boolean) => {
+const preloadGroupImages = (groupKeys: string[]) => {
+  if (typeof window === 'undefined') return;
+
+  groupKeys.forEach((key) => {
+    const group = groupedItems.value.find(itemGroup => itemGroup.key === key);
+    if (!group) return;
+
+    group.items.forEach((item) => {
+      const url = getImageUrl(item.categoryId, item.variantId, item.pikminType);
+      if (!url || preloadedImageUrls.has(url)) return;
+
+      preloadedImageUrls.add(url);
+      const image = new Image();
+      image.decoding = 'async';
+      image.referrerPolicy = 'no-referrer';
+      image.src = url;
+    });
+  });
+};
+
+const scheduleImagePreload = (groupKeys: string[]) => {
+  if (preloadFrame) cancelAnimationFrame(preloadFrame);
+  preloadFrame = requestAnimationFrame(() => {
+    preloadFrame = null;
+    preloadGroupImages(groupKeys);
+  });
+};
+
+const warmNearbyGroups = (key: string) => {
+  const index = groupedItems.value.findIndex(group => group.key === key);
+  if (index < 0) return;
+
   const next = new Set(visibleGroupKeys.value);
-  if (isVisible) {
-    next.add(key);
-  } else {
-    next.delete(key);
+  const keysToPreload: string[] = [];
+  const preloadAhead = viewportWidth.value < 640 ? 5 : 3;
+  const preloadBehind = 1;
+
+  for (let i = Math.max(0, index - preloadBehind); i <= Math.min(groupedItems.value.length - 1, index + preloadAhead); i += 1) {
+    const nextKey = groupedItems.value[i]?.key;
+    if (!nextKey) continue;
+    next.add(nextKey);
+    keysToPreload.push(nextKey);
   }
+
   visibleGroupKeys.value = next;
+  scheduleImagePreload(keysToPreload);
+};
+
+const setGroupVisibility = (key: string, isVisible: boolean) => {
+  if (!isVisible) return;
+
+  const next = new Set(visibleGroupKeys.value);
+  next.add(key);
+  visibleGroupKeys.value = next;
+  warmNearbyGroups(key);
 };
 
 const getGroupPlaceholderHeight = (itemCount: number) => {
@@ -143,12 +193,25 @@ const syncObservedGroups = async () => {
       });
     }, {
       root: null,
-      rootMargin: '900px 0px',
+      rootMargin: viewportWidth.value < 640 ? '2200px 0px' : '1600px 0px',
       threshold: 0,
     });
   }
 
   visibilityObserver.disconnect();
+  const preloadMargin = viewportWidth.value < 640 ? 2200 : 1600;
+  const rootRect = root.getBoundingClientRect();
+  const isRootNearViewport = rootRect.top < window.innerHeight + preloadMargin && rootRect.bottom > -preloadMargin;
+
+  if (isRootNearViewport) {
+    const next = new Set(visibleGroupKeys.value);
+    groupedItems.value.slice(0, viewportWidth.value < 640 ? 4 : 3).forEach(group => {
+      next.add(group.key);
+    });
+    visibleGroupKeys.value = next;
+    scheduleImagePreload([...next]);
+  }
+
   root.querySelectorAll<HTMLElement>('[data-group-key]').forEach((el) => {
     visibilityObserver?.observe(el);
   });
@@ -167,6 +230,7 @@ onMounted(() => {
 watch(() => groupedItems.value.map(group => group.key).join('|'), () => {
   const validKeys = new Set(groupedItems.value.map(group => group.key));
   visibleGroupKeys.value = new Set([...visibleGroupKeys.value].filter(key => validKeys.has(key)));
+  preloadedImageUrls.clear();
   syncObservedGroups();
 });
 
@@ -174,6 +238,7 @@ onUnmounted(() => {
   window.removeEventListener('resize', updateViewportWidth);
   visibilityObserver?.disconnect();
   visibilityObserver = null;
+  if (preloadFrame) cancelAnimationFrame(preloadFrame);
 });
 </script>
 

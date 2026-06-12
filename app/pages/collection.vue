@@ -651,12 +651,19 @@
             </div>
 
             <!-- Collapsible content -->
-            <div v-show="isCategoryExpanded(def.category.id)" class="mt-4">
-              <DecorGrid
-                :items="getItemsForCategory(def.category.id)"
-                @clear-filters="clearAllFilters"
-              />
-            </div>
+            <Transition
+              :css="false"
+              @before-enter="onCategoryContentBeforeEnter"
+              @enter="onCategoryContentEnter"
+              @leave="onCategoryContentLeave"
+            >
+              <div v-if="isCategoryExpanded(def.category.id)" class="collection-category-content mt-4">
+                <DecorGrid
+                  :items="getItemsForCategory(def.category.id)"
+                  @clear-filters="clearAllFilters"
+                />
+              </div>
+            </Transition>
           </div>
         </div>
 
@@ -783,12 +790,19 @@
             </div>
 
             <!-- Collapsible content -->
-            <div v-show="isCategoryExpanded(def.category.id)" class="mt-4">
-              <DecorGrid
-                :items="getItemsForCategory(def.category.id)"
-                @clear-filters="clearAllFilters"
-              />
-            </div>
+            <Transition
+              :css="false"
+              @before-enter="onCategoryContentBeforeEnter"
+              @enter="onCategoryContentEnter"
+              @leave="onCategoryContentLeave"
+            >
+              <div v-if="isCategoryExpanded(def.category.id)" class="collection-category-content mt-4">
+                <DecorGrid
+                  :items="getItemsForCategory(def.category.id)"
+                  @clear-filters="clearAllFilters"
+                />
+              </div>
+            </Transition>
           </div>
         </div>
       </template>
@@ -819,6 +833,7 @@ import {
   type DecorItem,
 } from "~/types/decor";
 import type { CollectionCategoryFilter } from "~/composables/useCollectionFilters";
+import { gsap } from "gsap";
 
 const route = useRoute();
 const { t, locale } = useI18n();
@@ -843,8 +858,108 @@ const isFilterExpanded = ref(false);
 
 // UX: Accordion - track collapsed categories (default all expanded)
 const collapsedCategories = ref<Set<string>>(new Set());
+let categoryBulkFrame: number | null = null;
+let scrollFrame: number | null = null;
+
+const cancelCategoryBulkToggle = () => {
+  if (categoryBulkFrame !== null) {
+    cancelAnimationFrame(categoryBulkFrame);
+    categoryBulkFrame = null;
+  }
+};
+
+const prefersReducedMotion = () =>
+  typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+const onCategoryContentBeforeEnter = (el: Element) => {
+  if (prefersReducedMotion()) return;
+
+  const target = el as HTMLElement;
+  const cards = target.querySelectorAll(".decor-grid-card");
+  gsap.set(target, {
+    height: 0,
+    opacity: 0,
+    overflow: "hidden",
+    y: -8,
+  });
+  gsap.set(cards, {
+    y: 12,
+    opacity: 0,
+    scale: 0.96,
+  });
+};
+
+const onCategoryContentEnter = (el: Element, done: () => void) => {
+  if (prefersReducedMotion()) {
+    done();
+    return;
+  }
+
+  const target = el as HTMLElement;
+  const cards = target.querySelectorAll(".decor-grid-card");
+  const height = target.scrollHeight;
+  const tl = gsap.timeline({
+    onComplete: () => {
+      gsap.set(target, { height: "auto", overflow: "visible", clearProps: "y,opacity" });
+      done();
+    },
+  });
+
+  tl.to(target, {
+    height,
+    opacity: 1,
+    y: 0,
+    duration: 0.38,
+    ease: "power3.out",
+  })
+    .to(cards, {
+      y: 0,
+      opacity: 1,
+      scale: 1,
+      duration: 0.32,
+      ease: "power2.out",
+      stagger: {
+        each: 0.018,
+        from: "start",
+      },
+    }, 0.08);
+};
+
+const onCategoryContentLeave = (el: Element, done: () => void) => {
+  if (prefersReducedMotion()) {
+    done();
+    return;
+  }
+
+  const target = el as HTMLElement;
+  gsap.set(target, { height: target.scrollHeight, overflow: "hidden" });
+
+  const tl = gsap.timeline({
+    onComplete: () => {
+      gsap.set(target, { clearProps: "height,overflow,opacity,y,clipPath" });
+      done();
+    },
+  });
+
+  tl.to(target, {
+    clipPath: "inset(0% 0% 8% 0% round 1.25rem)",
+    opacity: 0.72,
+    y: -4,
+    duration: 0.16,
+    ease: "power2.out",
+  })
+    .to(target, {
+      height: 0,
+      opacity: 0,
+      y: -10,
+      clipPath: "inset(0% 0% 100% 0% round 1.25rem)",
+      duration: 0.34,
+      ease: "power3.inOut",
+    }, 0.06);
+};
 
 const toggleCategory = (categoryId: string) => {
+  cancelCategoryBulkToggle();
   const newSet = new Set(collapsedCategories.value);
   if (newSet.has(categoryId)) {
     newSet.delete(categoryId);
@@ -857,13 +972,44 @@ const toggleCategory = (categoryId: string) => {
 const isCategoryExpanded = (categoryId: string) =>
   !collapsedCategories.value.has(categoryId);
 
+const updateCategoriesInBatches = (categoryIds: string[], expand: boolean) => {
+  cancelCategoryBulkToggle();
+
+  const batchSize = 4;
+  let index = 0;
+  const nextSet = new Set(collapsedCategories.value);
+
+  const runBatch = () => {
+    const end = Math.min(index + batchSize, categoryIds.length);
+    for (; index < end; index += 1) {
+      const id = categoryIds[index];
+      if (expand) {
+        nextSet.delete(id);
+      } else {
+        nextSet.add(id);
+      }
+    }
+
+    collapsedCategories.value = new Set(nextSet);
+
+    if (index < categoryIds.length) {
+      categoryBulkFrame = requestAnimationFrame(runBatch);
+    } else {
+      categoryBulkFrame = null;
+    }
+  };
+
+  runBatch();
+};
+
 const expandAllCategories = () => {
-  collapsedCategories.value = new Set();
+  const allIds = getDecorDefinitions().map((d) => d.category.id);
+  updateCategoriesInBatches(allIds, true);
 };
 
 const collapseAllCategories = () => {
   const allIds = getDecorDefinitions().map((d) => d.category.id);
-  collapsedCategories.value = new Set(allIds);
+  updateCategoriesInBatches(allIds, false);
 };
 
 // UX: Category progress percentage
@@ -936,13 +1082,15 @@ onMounted(() => {
   }
 
   // Scroll listener
-  window.addEventListener("scroll", handleScroll);
+  window.addEventListener("scroll", handleScroll, { passive: true });
 
   // Warn user if they try to leave with unsaved changes
   window.addEventListener("beforeunload", handleBeforeUnload);
 });
 
 onUnmounted(() => {
+  cancelCategoryBulkToggle();
+  if (scrollFrame !== null) cancelAnimationFrame(scrollFrame);
   window.removeEventListener("scroll", handleScroll);
   window.removeEventListener("beforeunload", handleBeforeUnload);
 });
@@ -956,7 +1104,12 @@ const handleBeforeUnload = (e: BeforeUnloadEvent) => {
 };
 
 const handleScroll = () => {
-  showScrollTop.value = window.scrollY > 500;
+  if (scrollFrame !== null) return;
+
+  scrollFrame = requestAnimationFrame(() => {
+    scrollFrame = null;
+    showScrollTop.value = window.scrollY > 500;
+  });
 };
 
 const scrollToTop = () => {
