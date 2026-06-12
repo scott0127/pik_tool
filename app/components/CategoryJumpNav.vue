@@ -9,7 +9,7 @@
       leave-from-class="opacity-100"
       leave-to-class="opacity-0"
     >
-      <div v-if="isExpanded" class="fixed inset-0 bg-black/20 backdrop-blur-sm z-40" @click="isExpanded = false"></div>
+      <div v-if="isExpanded" class="fixed inset-0 bg-black/40 sm:backdrop-blur-sm z-40" @click="isExpanded = false"></div>
     </Transition>
 
     <!-- Slide-out Drawer -->
@@ -19,7 +19,7 @@
       @enter="onDrawerEnter"
       @leave="onDrawerLeave"
     >
-      <div v-if="isExpanded" class="category-drawer fixed right-0 top-0 h-[100dvh] w-full max-w-[380px] sm:max-w-[420px] z-50 bg-white/70 backdrop-blur-2xl border-l border-white/80 shadow-2xl flex flex-col overflow-hidden">
+      <div v-if="isExpanded" class="category-drawer fixed right-0 top-0 h-dvh w-full max-w-[380px] sm:max-w-[420px] z-50 bg-white/95 sm:bg-white/70 sm:backdrop-blur-2xl border-l border-white/80 shadow-2xl flex flex-col overflow-hidden">
         
         <!-- Generated Artistic Background -->
         <div class="absolute inset-0 -z-10 bg-gradient-to-br from-emerald-50/80 to-teal-50/80"></div>
@@ -55,7 +55,7 @@
                 class="category-jump-item group relative flex flex-col items-center gap-1.5 transition-all duration-300 hover:scale-105"
                 :title="cat.name"
               >
-                <div class="relative w-12 h-12 bg-white/50 backdrop-blur-md rounded-2xl shadow-sm border border-white/60 flex items-center justify-center group-hover:bg-white/90 group-hover:shadow-md group-hover:border-emerald-200 transition-all">
+                <div class="relative w-12 h-12 bg-white/85 sm:bg-white/50 sm:backdrop-blur-md rounded-2xl shadow-sm border border-white/60 flex items-center justify-center group-hover:bg-white/90 group-hover:shadow-md group-hover:border-emerald-200 transition-all">
                   <svg class="absolute inset-0 w-full h-full -rotate-90 p-1" viewBox="0 0 28 28">
                     <circle cx="14" cy="14" r="11" fill="none" stroke="#e5e7eb" stroke-width="2" />
                     <circle 
@@ -90,7 +90,7 @@
                 class="category-jump-item group relative flex flex-col items-center gap-1.5 transition-all duration-300 hover:scale-105"
                 :title="cat.name"
               >
-                <div class="relative w-12 h-12 bg-white/50 backdrop-blur-md rounded-2xl shadow-sm border border-white/60 flex items-center justify-center group-hover:bg-white/90 group-hover:shadow-md group-hover:border-purple-200 transition-all">
+                <div class="relative w-12 h-12 bg-white/85 sm:bg-white/50 sm:backdrop-blur-md rounded-2xl shadow-sm border border-white/60 flex items-center justify-center group-hover:bg-white/90 group-hover:shadow-md group-hover:border-purple-200 transition-all">
                   <svg class="absolute inset-0 w-full h-full -rotate-90 p-1" viewBox="0 0 28 28">
                     <circle cx="14" cy="14" r="11" fill="none" stroke="#e5e7eb" stroke-width="2" />
                     <circle 
@@ -127,8 +127,11 @@
         <!-- Top Button -->
         <button
           @click="scrollToTop"
-          class="flex items-center gap-3 w-10 h-10 hover:w-[160px] rounded-full bg-emerald-50 text-emerald-600 shadow-sm border border-emerald-100 hover:border-emerald-300 transition-all duration-300 overflow-hidden relative"
-          :class="activeSection === 'top' ? 'ring-2 ring-emerald-400 w-[160px]' : ''"
+          :class="[
+            pillBtnBaseClass,
+            'bg-emerald-50 text-emerald-600 border-emerald-100 hover:border-emerald-300',
+            activeSection === 'top' ? 'ring-2 ring-emerald-400 w-[160px]' : ''
+          ]"
         >
           <div class="w-10 h-10 min-w-[40px] flex items-center justify-center bg-white rounded-full">
             <Icon name="lucide:arrow-up-to-line" class="w-5 h-5" />
@@ -144,8 +147,11 @@
 
         <!-- Menu Button (Toggle Drawer) -->
         <button
-          @click="isExpanded = true"
-          class="flex items-center gap-3 w-10 h-10 hover:w-[160px] rounded-full bg-cyan-50 text-cyan-600 shadow-sm border border-cyan-100 hover:border-cyan-300 transition-all duration-300 overflow-hidden relative"
+          @click="isExpanded = true; isAmbientPaused = true"
+          :class="[
+            pillBtnBaseClass,
+            'bg-cyan-50 text-cyan-600 border-cyan-100 hover:border-cyan-300'
+          ]"
         >
           <div class="w-10 h-10 min-w-[40px] flex items-center justify-center bg-white rounded-full">
             <Icon name="lucide:layout-grid" class="w-5 h-5" />
@@ -162,8 +168,11 @@
         <button
           v-if="hasSpecial"
           @click="scrollToSpecialFirst"
-          class="flex items-center gap-3 w-10 h-10 hover:w-[160px] rounded-full bg-purple-50 text-purple-600 shadow-sm border border-purple-100 hover:border-purple-300 transition-all duration-300 overflow-hidden relative"
-          :class="activeSection === 'special' ? 'ring-2 ring-purple-400 w-[160px]' : ''"
+          :class="[
+            pillBtnBaseClass,
+            'bg-purple-50 text-purple-600 border-purple-100 hover:border-purple-300',
+            activeSection === 'special' ? 'ring-2 ring-purple-400 w-[160px]' : ''
+          ]"
         >
           <div class="w-10 h-10 min-w-[40px] flex items-center justify-center bg-white rounded-full">
             <Icon name="lucide:star" class="w-5 h-5" />
@@ -181,8 +190,11 @@
         <button
           v-if="hasSpecial"
           @click="scrollToSpecialLast"
-          class="flex items-center gap-3 w-10 h-10 hover:w-[160px] rounded-full bg-amber-50 text-amber-600 shadow-sm border border-amber-100 hover:border-amber-300 transition-all duration-300 overflow-hidden relative"
-          :class="activeSection === 'bottom' ? 'ring-2 ring-amber-400 w-[160px]' : ''"
+          :class="[
+            pillBtnBaseClass,
+            'bg-amber-50 text-amber-600 border-amber-100 hover:border-amber-300',
+            activeSection === 'bottom' ? 'ring-2 ring-amber-400 w-[160px]' : ''
+          ]"
         >
           <div class="w-10 h-10 min-w-[40px] flex items-center justify-center bg-white rounded-full">
             <Icon name="lucide:arrow-down-to-line" class="w-5 h-5" />
@@ -203,7 +215,7 @@
       :class="isExpanded ? 'opacity-0 translate-y-12 pointer-events-none' : 'opacity-100 translate-y-0'"
     >
       <!-- Glowing aura (breathing animation) -->
-      <div class="absolute inset-[-4px] bg-gradient-to-r from-emerald-400/30 via-cyan-400/30 via-purple-400/30 to-amber-400/30 rounded-[2.5rem] blur-lg animate-pulse" style="animation-duration: 4s;"></div>
+      <div class="absolute -inset-1 bg-gradient-to-r from-emerald-400/30 via-cyan-400/30 via-purple-400/30 to-amber-400/30 rounded-[2.5rem] blur-lg animate-pulse" style="animation-duration: 4s;"></div>
 
       <!-- Dock Container -->
       <div class="relative w-full h-[64px] bg-white/70 backdrop-blur-2xl border border-white/90 shadow-[0_8px_30px_rgb(0,0,0,0.12)] rounded-[2rem] p-1.5 flex items-center">
@@ -215,47 +227,27 @@
         ></div>
 
         <!-- Buttons -->
-        <!-- 0: Top -->
-        <button 
-          @click="scrollToTop" 
-          class="relative z-10 flex-1 h-full flex flex-col items-center justify-center gap-0.5 transition-colors duration-300 active:scale-90"
-          :class="dockActiveIndex === 0 ? 'text-emerald-600' : 'text-gray-500 hover:text-gray-700'"
-        >
-          <Icon name="lucide:arrow-up-to-line" class="w-5 h-5 transition-transform duration-500 ease-out" :class="dockActiveIndex === 0 ? 'scale-110 -translate-y-[1px]' : 'scale-100'" />
-          <span class="text-[10px] font-bold tracking-widest transition-opacity duration-300" :class="dockActiveIndex === 0 ? 'opacity-100' : 'opacity-70'">頂部</span>
-        </button>
-
-        <!-- 1: Menu -->
-        <button 
-          @click="isExpanded = true" 
-          class="relative z-10 flex-1 h-full flex flex-col items-center justify-center gap-0.5 transition-colors duration-300 active:scale-90"
-          :class="dockActiveIndex === 1 ? 'text-cyan-600' : 'text-gray-500 hover:text-gray-700'"
-        >
-          <Icon name="lucide:layout-grid" class="w-5 h-5 transition-transform duration-500 ease-out" :class="dockActiveIndex === 1 ? 'scale-110 -translate-y-[1px]' : 'scale-100'" />
-          <span class="text-[10px] font-bold tracking-widest transition-opacity duration-300" :class="dockActiveIndex === 1 ? 'opacity-100' : 'opacity-70'">分類</span>
-        </button>
-
-        <!-- 2: Special -->
-        <button 
-          v-if="hasSpecial"
-          @click="scrollToSpecialFirst" 
-          class="relative z-10 flex-1 h-full flex flex-col items-center justify-center gap-0.5 transition-colors duration-300 active:scale-90"
-          :class="dockActiveIndex === 2 ? 'text-purple-600' : 'text-gray-500 hover:text-gray-700'"
-        >
-          <Icon name="lucide:star" class="w-5 h-5 transition-transform duration-500 ease-out" :class="dockActiveIndex === 2 ? 'scale-110 -translate-y-[1px]' : 'scale-100'" />
-          <span class="text-[10px] font-bold tracking-widest transition-opacity duration-300" :class="dockActiveIndex === 2 ? 'opacity-100' : 'opacity-70'">特殊</span>
-        </button>
-        <div v-else class="flex-1"></div>
-
-        <!-- 3: Bottom -->
-        <button 
-          @click="scrollToSpecialLast" 
-          class="relative z-10 flex-1 h-full flex flex-col items-center justify-center gap-0.5 transition-colors duration-300 active:scale-90"
-          :class="dockActiveIndex === 3 ? 'text-amber-600' : 'text-gray-500 hover:text-gray-700'"
-        >
-          <Icon name="lucide:arrow-down-to-line" class="w-5 h-5 transition-transform duration-500 ease-out" :class="dockActiveIndex === 3 ? 'scale-110 -translate-y-[1px]' : 'scale-100'" />
-          <span class="text-[10px] font-bold tracking-widest transition-opacity duration-300" :class="dockActiveIndex === 3 ? 'opacity-100' : 'opacity-70'">底部</span>
-        </button>
+        <template v-for="item in dockItems" :key="item.index">
+          <button 
+            v-if="item.show"
+            @click="item.action" 
+            class="relative z-10 flex-1 h-full flex flex-col items-center justify-center gap-0.5 transition-colors duration-300 active:scale-90"
+            :class="dockActiveIndex === item.index ? item.colorClass : 'text-gray-500 hover:text-gray-700'"
+          >
+            <Icon 
+              :name="item.icon" 
+              class="w-5 h-5 transition-transform duration-500 ease-out" 
+              :class="dockActiveIndex === item.index ? 'scale-110 -translate-y-[1px]' : 'scale-100'" 
+            />
+            <span 
+              class="text-[10px] font-bold tracking-widest transition-opacity duration-300" 
+              :class="dockActiveIndex === item.index ? 'opacity-100' : 'opacity-70'"
+            >
+              {{ item.label }}
+            </span>
+          </button>
+          <div v-else-if="item.index === 2" class="flex-1"></div>
+        </template>
 
       </div>
     </div>
@@ -264,6 +256,7 @@
 
 <script setup lang="ts">
 import { gsap } from 'gsap';
+import { useParallax } from '~/composables/useParallax';
 
 interface CategoryJumpItem {
   id: string;
@@ -284,6 +277,49 @@ const props = defineProps<{
 const isExpanded = ref(false);
 const isHovered = ref(false);
 const activeSection = ref<'top' | 'special' | 'bottom'>('top');
+
+const { isAmbientPaused } = useParallax();
+
+watch(isExpanded, (val) => {
+  isAmbientPaused.value = val;
+});
+
+const pillBtnBaseClass = 'flex items-center gap-3 w-10 h-10 hover:w-[160px] rounded-full shadow-sm border transition-all duration-300 overflow-hidden relative';
+
+const dockItems = computed(() => [
+  {
+    index: 0,
+    label: '頂部',
+    icon: 'lucide:arrow-up-to-line',
+    colorClass: 'text-emerald-600',
+    action: scrollToTop,
+    show: true
+  },
+  {
+    index: 1,
+    label: '分類',
+    icon: 'lucide:layout-grid',
+    colorClass: 'text-cyan-600',
+    action: () => { isExpanded.value = true; },
+    show: true
+  },
+  {
+    index: 2,
+    label: '特殊',
+    icon: 'lucide:star',
+    colorClass: 'text-purple-600',
+    action: scrollToSpecialFirst,
+    show: props.hasSpecial
+  },
+  {
+    index: 3,
+    label: '底部',
+    icon: 'lucide:arrow-down-to-line',
+    colorClass: 'text-amber-600',
+    action: scrollToSpecialLast,
+    show: true
+  }
+]);
 
 const regularCategoriesList = computed(() => props.categories.filter(c => !c.isSpecial));
 const specialCategoriesList = computed(() => props.categories.filter(c => c.isSpecial));
@@ -306,17 +342,22 @@ const onDrawerBeforeEnter = (el: Element) => {
   const header = drawer.querySelector('.category-drawer-header');
   const content = drawer.querySelector('.category-drawer-content');
   const items = drawer.querySelectorAll('.category-jump-item');
+  const mobile = typeof window !== 'undefined' && window.innerWidth < 640;
 
   gsap.set(drawer, {
     xPercent: 104,
-    opacity: 0,
-    scale: 0.985,
-    filter: 'blur(8px)',
+    opacity: mobile ? 0.9 : 0,
+    scale: mobile ? 1 : 0.985,
     transformOrigin: 'right center',
   });
-  gsap.set(header, { y: -12, opacity: 0 });
-  gsap.set(content, { opacity: 0 });
-  gsap.set(items, { y: 14, opacity: 0, scale: 0.94 });
+  if (mobile) {
+    if (header) gsap.set(header, { opacity: 1, y: 0 });
+    if (content) gsap.set(content, { opacity: 0 });
+  } else {
+    if (header) gsap.set(header, { y: -12, opacity: 0 });
+    if (content) gsap.set(content, { opacity: 0 });
+    if (items.length) gsap.set(items, { y: 14, opacity: 0, scale: 0.94 });
+  }
 };
 
 const onDrawerEnter = (el: Element, done: () => void) => {
@@ -329,38 +370,59 @@ const onDrawerEnter = (el: Element, done: () => void) => {
   const header = drawer.querySelector('.category-drawer-header');
   const content = drawer.querySelector('.category-drawer-content');
   const items = drawer.querySelectorAll('.category-jump-item');
+  const mobile = typeof window !== 'undefined' && window.innerWidth < 640;
 
   const tl = gsap.timeline({ onComplete: done });
-  tl.to(drawer, {
-    xPercent: 0,
-    opacity: 1,
-    scale: 1,
-    filter: 'blur(0px)',
-    duration: 0.56,
-    ease: 'expo.out',
-  })
-    .to(header, {
-      y: 0,
+
+  if (mobile) {
+    tl.to(drawer, {
+      xPercent: 0,
       opacity: 1,
-      duration: 0.28,
+      duration: 0.35,
       ease: 'power2.out',
-    }, 0.12)
-    .to(content, {
-      opacity: 1,
-      duration: 0.22,
-      ease: 'power1.out',
-    }, 0.16)
-    .to(items, {
-      y: 0,
+    })
+      .to(content, {
+        opacity: 1,
+        duration: 0.2,
+        ease: 'power1.out',
+      }, 0.12);
+  } else {
+    tl.to(drawer, {
+      xPercent: 0,
       opacity: 1,
       scale: 1,
-      duration: 0.34,
-      ease: 'back.out(1.35)',
-      stagger: {
-        each: 0.018,
-        from: 'start',
-      },
-    }, 0.22);
+      duration: 0.56,
+      ease: 'expo.out',
+    });
+    if (header) {
+      tl.to(header, {
+        y: 0,
+        opacity: 1,
+        duration: 0.28,
+        ease: 'power2.out',
+      }, 0.12);
+    }
+    if (content) {
+      tl.to(content, {
+        opacity: 1,
+        duration: 0.22,
+        ease: 'power1.out',
+      }, 0.16);
+    }
+    if (items.length) {
+      tl.to(items, {
+        y: 0,
+        opacity: 1,
+        scale: 1,
+        duration: 0.34,
+        ease: 'back.out(1.35)',
+        stagger: {
+          each: 0.018,
+          from: 'start',
+        },
+      }, 0.22);
+    }
+  }
 };
 
 const onDrawerLeave = (el: Element, done: () => void) => {
@@ -372,28 +434,50 @@ const onDrawerLeave = (el: Element, done: () => void) => {
   const drawer = el as HTMLElement;
   const header = drawer.querySelector('.category-drawer-header');
   const content = drawer.querySelector('.category-drawer-content');
+  const mobile = typeof window !== 'undefined' && window.innerWidth < 640;
 
   const tl = gsap.timeline({ onComplete: done });
-  tl.to(content, {
-    x: 18,
-    opacity: 0,
-    scale: 0.985,
-    duration: 0.22,
-    ease: 'power2.inOut',
-  }, 0)
-    .to(header, {
-      x: 12,
+
+  if (mobile) {
+    if (content) {
+      tl.to(content, {
+        opacity: 0,
+        duration: 0.15,
+        ease: 'power2.inOut',
+      }, 0);
+    }
+    tl.to(drawer, {
+      xPercent: 104,
       opacity: 0,
-      duration: 0.2,
+      duration: 0.3,
       ease: 'power2.inOut',
-    }, 0.03)
-    .to(drawer, {
+    }, 0.05);
+  } else {
+    if (content) {
+      tl.to(content, {
+        x: 18,
+        opacity: 0,
+        scale: 0.985,
+        duration: 0.22,
+        ease: 'power2.inOut',
+      }, 0);
+    }
+    if (header) {
+      tl.to(header, {
+        x: 12,
+        opacity: 0,
+        duration: 0.2,
+        ease: 'power2.inOut',
+      }, 0.03);
+    }
+    tl.to(drawer, {
       xPercent: 104,
       opacity: 0,
       scale: 0.985,
       duration: 0.44,
       ease: 'expo.inOut',
     }, 0.08);
+  }
 };
 
 const scrollToTop = () => {

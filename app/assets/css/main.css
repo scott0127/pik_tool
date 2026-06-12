@@ -113,6 +113,15 @@
     pointer-events: none;
   }
 
+  .input-field {
+    @apply w-full px-4 py-2.5 rounded-xl border border-white/40 bg-white/25 text-gray-800 placeholder-gray-500/80 transition-all duration-200 outline-none;
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04), 0 1px 0 rgba(255, 255, 255, 0.8) inset;
+  }
+
+  .input-field:focus {
+    @apply border-emerald-400/80 bg-white/50 ring-2 ring-emerald-400/20;
+  }
+
   .glass-text-green {
     position: relative;
     display: inline-block;

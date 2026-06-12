@@ -34,7 +34,7 @@
 
       <!-- Stats / Counter -->
       <div v-if="getRecordCount() > 0" class="mb-4 text-sm text-gray-600 font-bold tracking-wide gsap-stagger">
-        {{ $t('released.stats.total').replace('{count}', filteredRecords.length.toString()) }}
+        {{ $t('released.stats.total', { count: filteredRecords.length }) }}
       </div>
 
       <!-- Records List -->
@@ -842,43 +842,62 @@ function getReleasedDateParts(dateText: string) {
 
 .released-record-list {
   display: grid;
-  gap: 1rem;
+  gap: 1.25rem;
 }
 
+/* 1. Ticket Stub Card Container */
 .released-record-row {
   position: relative;
   isolation: isolate;
   display: grid;
   grid-template-columns: 7.2rem minmax(0, 1fr);
   align-items: center;
-  gap: 1rem;
-  overflow: hidden;
-  min-height: 8.6rem;
-  padding: 0.85rem;
-  border: 1px solid rgba(255, 255, 255, 0.78);
-  border-radius: 1.9rem;
-  background:
-    radial-gradient(circle at 12% 16%, rgba(255, 255, 255, 0.72), transparent 34%),
-    radial-gradient(circle at 88% 18%, rgba(16, 185, 129, 0.12), transparent 34%),
-    linear-gradient(135deg, rgba(255, 255, 255, 0.48), rgba(236, 253, 245, 0.22)),
-    rgba(255, 255, 255, 0.2);
+  gap: 1.2rem;
+  overflow: visible;
+  min-height: 9rem;
+  padding: 0.95rem;
+  border: 1px solid rgba(139, 92, 26, 0.12);
+  border-radius: 0.75rem;
+  background: linear-gradient(to right, #fcfbf7, #f7f5ee);
   box-shadow:
-    0 16px 38px rgba(6, 78, 59, 0.14),
-    0 1px 14px rgba(255, 255, 255, 0.82) inset;
-  backdrop-filter: blur(4px) saturate(1.12);
-  -webkit-backdrop-filter: blur(4px) saturate(1.12);
+    0 8px 24px -6px rgba(139, 92, 26, 0.06),
+    0 1px 1px 0 rgba(255, 255, 255, 0.8) inset;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  cursor: pointer;
+}
+
+.released-record-row:hover {
+  transform: translateY(-2px);
+  border-color: rgba(16, 185, 129, 0.25);
+  box-shadow:
+    0 16px 32px -12px rgba(139, 92, 26, 0.12),
+    0 1px 1px 0 rgba(255, 255, 255, 0.9) inset;
+}
+
+/* Circular Ticket Bite Notches */
+.released-record-row::before,
+.released-record-row::after {
+  content: "";
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #f1faf6; /* Matches app background blend */
+  z-index: 5;
+  border: 1px solid rgba(139, 92, 26, 0.12);
+  pointer-events: none;
+}
+
+.released-record-row::before {
+  top: -9px;
+  left: 8.55rem;
+  box-shadow: inset 0 -3px 4px rgba(0, 0, 0, 0.04);
 }
 
 .released-record-row::after {
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  content: "";
-  border-radius: inherit;
-  background:
-    linear-gradient(90deg, rgba(255, 255, 255, 0.22), transparent 48%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.16), transparent 56%);
-  pointer-events: none;
+  bottom: -9px;
+  left: 8.55rem;
+  box-shadow: inset 0 3px 4px rgba(0, 0, 0, 0.04);
 }
 
 .released-record-image,
@@ -886,6 +905,7 @@ function getReleasedDateParts(dateText: string) {
   z-index: 1;
 }
 
+/* 2. Polaroid Photo Frame */
 .released-record-image {
   --image-glass-alpha: 0.28;
   --image-glow-alpha: 0.18;
@@ -894,66 +914,48 @@ function getReleasedDateParts(dateText: string) {
   --image-lift-y: 0px;
   --shine-x: -135%;
   position: relative;
-  align-self: stretch;
+  align-self: center;
   display: grid;
   width: 7.2rem;
   min-width: 7.2rem;
-  min-height: 7.2rem;
+  min-height: 7.6rem;
   place-items: center;
   overflow: hidden;
-  padding: 0.72rem;
-  border-radius: 1.75rem;
-  background:
-    linear-gradient(
-      112deg,
-      rgba(255, 255, 255, calc(var(--image-glow-alpha) * 0.8)),
-      rgba(52, 211, 153, calc(var(--image-glow-alpha) * 0.34)) 52%,
-      rgba(240, 253, 250, calc(var(--image-glow-alpha) * 0.7))
-    ),
-    radial-gradient(circle at 30% 18%, rgba(255, 255, 255, 0.68), transparent 34%),
-    radial-gradient(circle at 76% 84%, rgba(16, 185, 129, 0.16), transparent 40%),
-    linear-gradient(165deg, #e1f4eb 0%, #c6e7d9 54%, #b9dfcf 100%);
-  background-position: var(--image-gradient-x) 50%, 0 0, 0 0, 0 0;
-  background-size: 180% 100%, auto, auto, auto;
-  border: 1px solid rgba(255, 255, 255, 0.66);
-  box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.82) inset,
-    0 -14px 24px rgba(13, 148, 136, 0.12) inset,
-    10px 0 18px rgba(255, 255, 255, 0.24) inset,
-    -10px 0 18px rgba(6, 95, 70, 0.08) inset,
-    0 0 26px rgba(16, 185, 129, calc(var(--image-glow-alpha) * 0.42)),
-    0 calc(12px + var(--image-depth-alpha) * 10px) calc(18px + var(--image-depth-alpha) * 18px) rgba(6, 78, 59, calc(0.12 + var(--image-depth-alpha) * 0.12)),
-    0 2px 0 rgba(255, 255, 255, 0.72);
-  backdrop-filter: none;
-  -webkit-backdrop-filter: none;
-  transform: translateY(var(--image-lift-y));
+  padding: 0.4rem 0.4rem 1rem 0.4rem; /* Lower padding is wider, classic polaroid border */
+  border-radius: 2px;
+  background: #fafaf9;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  transform: rotate(-2deg) translateY(var(--image-lift-y));
   transform-origin: center;
   will-change: transform, box-shadow, background-position;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
+.released-record-row:hover .released-record-image {
+  transform: rotate(-0.5deg) scale(1.02) translateY(-4px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08);
+}
+
+/* Silver Metallic Push-Pin fixed onto Polaroid */
 .released-record-image::before {
-  position: absolute;
-  inset: 0;
-  display: block;
   content: "";
-  border-radius: inherit;
-  background:
-    radial-gradient(
-      circle at 34% 20%,
-      rgba(255, 255, 255, calc(var(--image-glass-alpha) * 0.92)) 0,
-      rgba(236, 253, 245, calc(var(--image-glass-alpha) * 0.42)) 24%,
-      transparent 52%
-    ),
-    linear-gradient(135deg, rgba(255, 255, 255, calc(var(--image-glass-alpha) * 0.74)) 0%, rgba(255, 255, 255, 0.16) 26%, transparent 54%),
-    linear-gradient(315deg, transparent 0 54%, rgba(255, 255, 255, calc(var(--image-glass-alpha) * 0.38)) 72%, rgba(255, 255, 255, calc(var(--image-glass-alpha) * 0.9)) 100%);
+  position: absolute;
+  top: -0.35rem;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #ffffff 0%, #cbd5e1 55%, #475569 100%);
   box-shadow:
-    0 0 0 1px rgba(255, 255, 255, 0.28) inset,
-    0 0 calc(24px + var(--image-depth-alpha) * 16px) rgba(255, 255, 255, calc(var(--image-glass-alpha) * 0.52)) inset,
-    inset 0 calc(-8px - var(--image-depth-alpha) * 10px) calc(18px + var(--image-depth-alpha) * 12px) rgba(6, 95, 70, calc(0.04 + var(--image-depth-alpha) * 0.08));
-  opacity: 0.96;
+    0 2px 3px rgba(0, 0, 0, 0.22),
+    0 0 1px rgba(0, 0, 0, 0.1);
+  z-index: 10;
   pointer-events: none;
 }
 
+/* Shimmer overlay */
 .released-record-image::after {
   position: absolute;
   top: -38%;
@@ -962,20 +964,23 @@ function getReleasedDateParts(dateText: string) {
   width: 86%;
   height: 180%;
   content: "";
-  background: linear-gradient(105deg, transparent 20%, rgba(255, 255, 255, 0.72) 50%, transparent 80%);
+  background: linear-gradient(105deg, transparent 20%, rgba(255, 255, 255, 0.6) 50%, transparent 80%);
   filter: blur(6px);
-  opacity: calc(0.26 + var(--image-glow-alpha) * 0.88);
+  opacity: calc(0.2 + var(--image-glow-alpha) * 0.7);
   pointer-events: none;
   transform: rotate(16deg);
-  z-index: 2;
+  z-index: 11;
 }
 
+/* 3. Travel Column (Dotted divider line) */
 .released-record-content {
-  display: grid;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
   min-width: 0;
-  grid-template-rows: auto auto 1fr;
-  gap: 0.72rem;
-  padding: 0.12rem 0 0.08rem;
+  border-left: 2px dotted rgba(139, 92, 26, 0.25);
+  padding-left: 1.1rem;
+  margin-left: -0.5rem;
 }
 
 .released-record-header {
@@ -991,51 +996,42 @@ function getReleasedDateParts(dateText: string) {
 
 .released-record-title {
   max-width: 100%;
-  color: rgb(15, 23, 42);
+  color: #1e293b;
   overflow: hidden;
-  font-size: 1.22rem;
-  font-weight: 900;
-  line-height: 1.1;
+  font-size: 1.15rem;
+  font-weight: 700;
+  line-height: 1.2;
   text-overflow: ellipsis;
   white-space: nowrap;
-  -webkit-text-stroke: 0.014em rgba(255, 255, 255, 0.86);
-  paint-order: stroke fill;
-  text-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.9),
-    0 4px 12px rgba(15, 23, 42, 0.16);
-  cursor: help;
 }
 
 .released-record-category-row {
   display: flex;
   align-items: center;
-  gap: 0.48rem;
+  gap: 0.4rem;
   min-width: 0;
   max-width: 100%;
-  margin-top: 0.36rem;
+  margin-top: 0.25rem;
 }
 
 .released-record-type-dot {
   flex: 0 0 auto;
-  width: 0.78rem;
-  height: 0.78rem;
-  border: 2px solid rgba(255, 255, 255, 0.92);
+  width: 0.55rem;
+  height: 0.55rem;
+  border: 1px solid rgba(255, 255, 255, 0.8);
   border-radius: 999px;
-  box-shadow:
-    0 1px 4px rgba(15, 23, 42, 0.16),
-    0 0 0 3px rgba(255, 255, 255, 0.32);
+  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.12);
 }
 
 .released-record-category {
   display: block;
   min-width: 0;
   overflow: hidden;
-  color: rgb(4, 120, 87);
-  font-size: 0.82rem;
-  font-weight: 900;
+  color: #0f766e;
+  font-size: 0.8rem;
+  font-weight: 600;
   text-overflow: ellipsis;
   white-space: nowrap;
-  cursor: help;
 }
 
 .released-record-actions {
@@ -1046,62 +1042,77 @@ function getReleasedDateParts(dateText: string) {
 
 .released-record-action {
   display: grid;
-  width: 2.15rem;
-  height: 2.15rem;
+  width: 1.85rem;
+  height: 1.85rem;
   place-items: center;
-  border: 1px solid rgba(255, 255, 255, 0.72);
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.62);
-  box-shadow: 0 1px 8px rgba(255, 255, 255, 0.7) inset;
-  transition:
-    background-color 180ms ease,
-    color 180ms ease,
-    transform 180ms ease;
+  border: 1px solid rgba(139, 92, 26, 0.15);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.7);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+  transition: all 0.2s ease;
+  color: #64748b;
 }
 
 .released-record-action:hover {
   transform: translateY(-1px);
+  background: #ffffff;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+  border-color: rgba(16, 185, 129, 0.2);
 }
 
+.released-record-action.text-emerald-700:hover {
+  color: #059669;
+}
+
+.released-record-action.text-red-600:hover {
+  color: #dc2626;
+  background: #fef2f2;
+  border-color: #fca5a5;
+}
+
+/* 4. Typewriter label meta info with staples */
 .released-record-meta {
   display: flex;
-  flex-wrap: nowrap;
-  gap: 0.55rem;
+  flex-wrap: wrap;
+  gap: 0.45rem;
   min-width: 0;
   width: 100%;
-  overflow: hidden;
 }
 
 .released-record-chip {
+  position: relative;
   display: inline-flex;
   align-items: center;
   min-width: 0;
-  max-width: 100%;
-  gap: 0.35rem;
-  padding: 0.38rem 0.66rem;
-  color: rgb(30, 41, 59);
-  font-size: 0.8rem;
-  font-weight: 900;
-  border: 1px solid rgba(255, 255, 255, 0.7);
-  border-radius: 999px;
-  background:
-    linear-gradient(135deg, rgba(255, 255, 255, 0.76), rgba(255, 255, 255, 0.46)),
-    rgba(255, 255, 255, 0.42);
-  box-shadow:
-    0 1px 8px rgba(255, 255, 255, 0.68) inset,
-    0 6px 14px rgba(15, 23, 42, 0.08);
+  gap: 0.25rem;
+  padding: 0.25rem 0.5rem 0.25rem 0.8rem; /* Extra padding on left for staple */
+  color: #78350f;
+  font-size: 0.72rem;
+  font-weight: 600;
+  font-family: "Courier New", Courier, monospace;
+  border: 1px solid rgba(139, 92, 26, 0.15);
+  border-radius: 3px;
+  background: #fefdf6;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.01);
 }
 
-.released-record-chip:first-child {
-  flex: 0 0 auto;
-}
-
-.released-record-chip:nth-child(2) {
-  flex: 1 1 0;
+/* Metal Staple (釘書針) */
+.released-record-chip::before {
+  content: "";
+  position: absolute;
+  left: 4px;
+  top: 50%;
+  transform: translateY(-50%) rotate(90deg);
+  width: 2px;
+  height: 8px;
+  background: #cbd5e1;
+  border-radius: 1px;
+  box-shadow: 0 0.5px 1px rgba(0, 0, 0, 0.25);
+  z-index: 2;
 }
 
 .released-record-chip :deep(svg) {
-  flex: 0 0 auto;
+  color: #b45309;
 }
 
 .released-record-chip-text {
@@ -1109,32 +1120,41 @@ function getReleasedDateParts(dateText: string) {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  cursor: help;
 }
 
+/* 5. Circular Travel Postmark Date Stamp (Desktop only) */
 .released-record-date-art {
   display: none;
 }
 
+/* 6. Handwritten Yellow Sticky Note */
 .released-record-note {
   position: relative;
   display: flex;
   align-items: flex-start;
   gap: 0.35rem;
-  align-self: end;
-  margin-top: 0.05rem;
-  padding: 0.62rem 0.72rem;
-  color: rgb(51, 65, 85);
-  font-size: 0.86rem;
-  font-weight: 800;
-  line-height: 1.5;
-  border: 1px solid rgba(255, 255, 255, 0.68);
-  border-radius: 1.2rem;
-  background:
-    linear-gradient(135deg, rgba(255, 255, 255, 0.42), rgba(255, 255, 255, 0.18)),
-    rgba(255, 255, 255, 0.26);
-  box-shadow: 0 1px 10px rgba(255, 255, 255, 0.58) inset;
-  cursor: help;
+  align-self: start;
+  margin-top: 0.25rem;
+  padding: 0.5rem 0.7rem;
+  color: #374151;
+  font-size: 0.78rem;
+  font-weight: 500;
+  line-height: 1.4;
+  border: 1px solid rgba(251, 191, 36, 0.35);
+  border-radius: 4px;
+  background: #fef9c3; /* Sticky note yellow */
+  box-shadow:
+    0 4px 8px -2px rgba(139, 92, 26, 0.05),
+    0 1px 2px rgba(0, 0, 0, 0.02);
+  transform: rotate(0.8deg);
+  transition: all 0.3s ease;
+}
+
+.released-record-row:hover .released-record-note {
+  transform: rotate(0deg) translateY(-1px);
+  box-shadow:
+    0 8px 16px -4px rgba(139, 92, 26, 0.1),
+    0 1px 2px rgba(0, 0, 0, 0.02);
 }
 
 .released-record-note p {
@@ -1143,63 +1163,41 @@ function getReleasedDateParts(dateText: string) {
 }
 
 .released-record-note-mark {
-  margin-top: -0.2rem;
-  color: rgba(4, 120, 87, 0.76);
-  font-size: 1.4rem;
-  font-weight: 900;
+  margin-top: -0.1rem;
+  color: #059669;
+  font-size: 1.1rem;
+  font-weight: 700;
   line-height: 1;
 }
 
 @media (max-width: 480px) {
   .released-record-row {
     grid-template-columns: 5.7rem minmax(0, 1fr);
-    gap: 0.7rem;
-    padding: 0.65rem;
-    border-radius: 1.55rem;
+    gap: 0.9rem;
+    padding: 0.75rem;
+    border-radius: 0.6rem;
+  }
+
+  .released-record-row::before {
+    top: -9px;
+    left: 6.7rem;
+  }
+
+  .released-record-row::after {
+    bottom: -9px;
+    left: 6.7rem;
   }
 
   .released-record-image {
     width: 5.7rem;
     min-width: 5.7rem;
-    min-height: 6.15rem;
-    padding: 0.65rem;
-    border-radius: 1.25rem;
+    min-height: 6.1rem;
+    padding: 0.35rem 0.35rem 0.8rem 0.35rem;
   }
 
   .released-record-content {
-    gap: 0.56rem;
-  }
-
-  .released-record-header {
-    gap: 0.55rem;
-  }
-
-  .released-record-title {
-    font-size: 1.02rem;
-  }
-
-  .released-record-actions {
-    gap: 0.3rem;
-  }
-
-  .released-record-action {
-    width: 1.8rem;
-    height: 1.8rem;
-    border-radius: 0.75rem;
-  }
-
-  .released-record-chip {
-    padding: 0.3rem 0.5rem;
-    font-size: 0.72rem;
-  }
-
-  .released-record-chip:nth-child(2) {
-    max-width: none;
-  }
-
-  .released-record-note {
-    padding: 0.52rem 0.62rem;
-    font-size: 0.76rem;
+    padding-left: 0.8rem;
+    margin-left: -0.4rem;
   }
 }
 
@@ -1209,176 +1207,153 @@ function getReleasedDateParts(dateText: string) {
   }
 
   .released-record-list {
-    gap: 1.35rem;
+    gap: 1.5rem;
   }
 
   .released-record-row {
-    grid-template-columns: minmax(10.5rem, 12rem) minmax(0, 1fr);
-    gap: 2rem;
-    min-height: 15.5rem;
-    padding: 1.85rem;
-    border-radius: 2.45rem;
-    background:
-      radial-gradient(circle at 13% 16%, rgba(255, 255, 255, 0.86), transparent 32%),
-      radial-gradient(circle at 86% 24%, rgba(187, 247, 208, 0.36), transparent 34%),
-      linear-gradient(135deg, rgba(255, 255, 255, 0.62), rgba(236, 253, 245, 0.26)),
-      rgba(255, 255, 255, 0.22);
-    box-shadow:
-      0 22px 54px rgba(6, 78, 59, 0.16),
-      0 1px 18px rgba(255, 255, 255, 0.86) inset;
+    grid-template-columns: 8.5rem minmax(0, 1fr);
+    gap: 1.8rem;
+    min-height: auto;
+    padding: 1.35rem;
+    border-radius: 0.9rem;
+  }
+
+  .released-record-row::before {
+    top: -9px;
+    left: 10.5rem;
+  }
+
+  .released-record-row::after {
+    bottom: -9px;
+    left: 10.5rem;
   }
 
   .released-record-image {
     width: 100%;
     min-width: 0;
-    min-height: 12.8rem;
-    padding: 1rem;
-    border-radius: 2.1rem;
+    min-height: 9rem;
+    padding: 0.5rem 0.5rem 1.4rem 0.5rem;
   }
 
   .released-record-content {
     align-self: center;
-    grid-template-rows: auto auto auto 1fr;
-    gap: 1.05rem;
-  }
-
-  .released-record-header {
-    gap: 1.25rem;
+    gap: 0.6rem;
+    padding-left: 1.5rem;
+    margin-left: -0.75rem;
   }
 
   .released-record-title {
-    font-size: clamp(2.05rem, 4.2vw, 3.05rem);
-    letter-spacing: 0;
+    font-size: 1.45rem;
+    font-weight: 800;
+    letter-spacing: -0.01em;
   }
 
   .released-record-category {
-    font-size: 1.05rem;
+    font-size: 0.875rem;
   }
 
   .released-record-category-row {
-    margin-top: 0.72rem;
-    gap: 0.62rem;
+    margin-top: 0.3rem;
+    gap: 0.45rem;
   }
 
   .released-record-type-dot {
-    width: 0.9rem;
-    height: 0.9rem;
-  }
-
-  .released-record-actions {
-    gap: 0.75rem;
+    width: 0.6rem;
+    height: 0.6rem;
   }
 
   .released-record-action {
-    width: 3.05rem;
-    height: 3.05rem;
-    border-radius: 1.35rem;
-    background: rgba(255, 255, 255, 0.66);
-    box-shadow:
-      0 1px 10px rgba(255, 255, 255, 0.78) inset,
-      0 10px 20px rgba(15, 23, 42, 0.08);
+    width: 2.25rem;
+    height: 2.25rem;
   }
 
   .released-record-meta {
-    gap: 1rem;
-  }
-
-  .released-record-meta .released-record-chip:first-child {
-    display: none;
-  }
-
-  .released-record-date-art {
-    position: relative;
-    display: grid;
-    grid-template-columns: minmax(5.4rem, auto) auto minmax(4.6rem, auto);
-    align-items: center;
-    justify-content: start;
-    gap: 1.1rem;
-    width: min(100%, 21rem);
-    min-height: 5rem;
-    color: rgb(15, 23, 42);
-  }
-
-  .released-record-date-art::before {
-    position: absolute;
-    left: 0.1rem;
-    right: 0.5rem;
-    bottom: 0.28rem;
-    height: 1px;
-    content: "";
-    background: repeating-linear-gradient(
-      90deg,
-      rgba(22, 163, 74, 0.48) 0 8px,
-      transparent 8px 16px
-    );
-  }
-
-  .released-record-date-left {
-    display: grid;
-    justify-items: center;
-    color: rgb(22, 163, 74);
-    line-height: 1;
-  }
-
-  .released-record-date-month {
-    font-family: "Brush Script MT", "Segoe Script", cursive;
-    font-size: 1.55rem;
-    font-weight: 700;
-    letter-spacing: 0.03em;
-    transform: rotate(-5deg);
-  }
-
-  .released-record-date-day {
-    margin-top: -0.2rem;
-    font-size: 3.35rem;
-    font-weight: 900;
-    letter-spacing: 0;
-  }
-
-  .released-record-date-divider {
-    width: 1px;
-    height: 3.9rem;
-    background: linear-gradient(180deg, transparent, rgba(22, 163, 74, 0.46), transparent);
-  }
-
-  .released-record-date-right {
-    display: grid;
-    gap: 0.28rem;
-    color: rgb(30, 41, 59);
-    font-size: 1.25rem;
-    font-weight: 900;
-    letter-spacing: 0.03em;
-  }
-
-  .released-record-date-right span:last-child {
-    color: rgb(82, 153, 54);
-    font-size: 1.1rem;
+    gap: 0.55rem;
+    padding-right: 5rem; /* Leaves layout space for postmark stamp */
   }
 
   .released-record-chip {
-    gap: 0.58rem;
-    padding: 0.72rem 1.05rem;
-    font-size: 1.05rem;
-    box-shadow:
-      0 1px 10px rgba(255, 255, 255, 0.72) inset,
-      0 10px 20px rgba(15, 23, 42, 0.1);
+    gap: 0.35rem;
+    padding: 0.3rem 0.65rem 0.3rem 0.95rem; /* Extra padding on left for staple on desktop */
+    font-size: 0.82rem;
   }
 
-  .released-record-chip:nth-child(2) {
-    max-width: none;
+  .released-record-chip::before {
+    left: 5px;
+    height: 9px;
+  }
+
+  /* Circular Postmark Date Stamp implementation */
+  .released-record-date-art {
+    position: absolute;
+    bottom: 0.8rem;
+    right: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 4.2rem;
+    height: 4.2rem;
+    border: 2px dashed rgba(5, 150, 105, 0.45);
+    border-radius: 50%;
+    transform: rotate(-10deg);
+    color: rgba(5, 150, 105, 0.7);
+    font-family: "Courier New", Courier, monospace;
+    line-height: 1;
+    pointer-events: none;
+    z-index: 2;
+    background: transparent;
+  }
+
+  .released-record-date-left {
+    display: flex;
+    align-items: baseline;
+    gap: 0.15rem;
+    color: inherit;
+  }
+
+  .released-record-date-month {
+    font-family: inherit;
+    font-size: 0.55rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    margin: 0;
+  }
+
+  .released-record-date-day {
+    font-size: 1.1rem;
+    font-weight: 800;
+    margin: 0;
+  }
+
+  .released-record-date-divider {
+    width: 2.8rem;
+    height: 1px;
+    background: rgba(5, 150, 105, 0.35);
+    margin: 0.15rem 0;
+    display: block;
+  }
+
+  .released-record-date-right {
+    display: flex;
+    align-items: center;
+    gap: 0.2rem;
+    font-size: 0.55rem;
+    font-weight: 700;
   }
 
   .released-record-note {
-    min-height: 4.3rem;
-    padding: 0.98rem 1.22rem;
-    gap: 0.7rem;
-    font-size: 1.02rem;
-    border-radius: 1.55rem;
+    min-height: auto;
+    padding: 0.6rem 0.85rem;
+    padding-right: 5rem; /* Prevents text overlapping the stamp */
+    gap: 0.45rem;
+    font-size: 0.85rem;
+    border-radius: 4px;
   }
 
   .released-record-note-mark {
-    margin-top: -0.35rem;
-    font-size: 2.8rem;
+    margin-top: -0.15rem;
+    font-size: 1.2rem;
   }
 }
 

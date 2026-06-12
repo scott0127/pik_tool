@@ -75,7 +75,7 @@ defineEmits<{
 const { getVariant, getImageUrl } = useDecorData();
 const gridRoot = ref<HTMLElement | null>(null);
 const visibleGroupKeys = ref<Set<string>>(new Set());
-const viewportWidth = ref(1024);
+const viewportWidth = ref(typeof window !== 'undefined' ? window.innerWidth : 1024);
 let visibilityObserver: IntersectionObserver | null = null;
 let preloadFrame: number | null = null;
 const preloadedImageUrls = new Set<string>();
@@ -166,12 +166,25 @@ const setGroupVisibility = (key: string, isVisible: boolean) => {
 };
 
 const getGroupPlaceholderHeight = (itemCount: number) => {
-  const availableWidth = Math.min(Math.max(viewportWidth.value - 32, 320), 1280);
+  const isMobileLayout = viewportWidth.value < 640;
   const gap = 12;
-  const cardWidth = Math.min(Math.max((availableWidth - gap * 7) / 8, 100), 140);
-  const cardsPerRow = Math.max(1, Math.floor((availableWidth + gap) / (cardWidth + gap)));
-  const rows = Math.max(1, Math.ceil(itemCount / Math.min(cardsPerRow, 8)));
-  return `${Math.ceil(rows * (cardWidth + 58) + Math.max(0, rows - 1) * gap)}px`;
+  
+  if (isMobileLayout) {
+    // Mobile is always 3 columns grid
+    const availableWidth = Math.min(viewportWidth.value - 24, 544);
+    const cardWidth = (availableWidth - gap * 2) / 3;
+    const rows = Math.ceil(itemCount / 3);
+    const cardHeight = cardWidth + 58;
+    const rowGap = 16; // 1rem in CSS
+    return `${Math.ceil(rows * cardHeight + Math.max(0, rows - 1) * rowGap)}px`;
+  } else {
+    // Desktop flex layout
+    const availableWidth = Math.min(Math.max(viewportWidth.value - 32, 320), 1280);
+    const cardWidth = Math.min(Math.max((availableWidth - gap * 7) / 8, 100), 140);
+    const cardsPerRow = Math.max(1, Math.floor((availableWidth + gap) / (cardWidth + gap)));
+    const rows = Math.max(1, Math.ceil(itemCount / Math.min(cardsPerRow, 8)));
+    return `${Math.ceil(rows * (cardWidth + 58) + Math.max(0, rows - 1) * gap)}px`;
+  }
 };
 
 const syncObservedGroups = async () => {
@@ -193,24 +206,20 @@ const syncObservedGroups = async () => {
       });
     }, {
       root: null,
-      rootMargin: viewportWidth.value < 640 ? '2200px 0px' : '1600px 0px',
+      rootMargin: viewportWidth.value < 640 ? '800px 0px' : '1200px 0px',
       threshold: 0,
     });
   }
 
   visibilityObserver.disconnect();
-  const preloadMargin = viewportWidth.value < 640 ? 2200 : 1600;
-  const rootRect = root.getBoundingClientRect();
-  const isRootNearViewport = rootRect.top < window.innerHeight + preloadMargin && rootRect.bottom > -preloadMargin;
 
-  if (isRootNearViewport) {
-    const next = new Set(visibleGroupKeys.value);
-    groupedItems.value.slice(0, viewportWidth.value < 640 ? 4 : 3).forEach(group => {
-      next.add(group.key);
-    });
-    visibleGroupKeys.value = next;
-    scheduleImagePreload([...next]);
-  }
+  // Pre-warm the first few groups when mounting to prevent visible placeholders in viewport
+  const next = new Set(visibleGroupKeys.value);
+  groupedItems.value.slice(0, viewportWidth.value < 640 ? 4 : 3).forEach(group => {
+    next.add(group.key);
+  });
+  visibleGroupKeys.value = next;
+  scheduleImagePreload([...next]);
 
   root.querySelectorAll<HTMLElement>('[data-group-key]').forEach((el) => {
     visibilityObserver?.observe(el);

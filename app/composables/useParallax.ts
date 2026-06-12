@@ -14,6 +14,7 @@ const isMobile = ref(false)
 const globalGlassOpacity = ref(0.0)
 const scrollBgScale = ref(1.16)
 const scrollBgY = ref(-10)
+const isAmbientPaused = ref(false)
 
 let bgXSpring: any = null
 let bgYSpring: any = null
@@ -101,6 +102,7 @@ export function useParallax() {
     isMobile,
     globalGlassOpacity,
     scrollBgScale,
-    scrollBgY
+    scrollBgY,
+    isAmbientPaused
   }
 }
