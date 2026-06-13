@@ -25,6 +25,7 @@ export default {
         extend: {
             fontFamily: {
                 sans: ['Nunito', 'Noto Sans TC', 'sans-serif'],
+                display: ['Fredoka', 'Noto Sans TC', 'sans-serif'],
             },
             colors: {
                 // Pikmin type colors

@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@300;400;500;600;700;800&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -20,6 +20,10 @@
     font-family: 'Nunito', 'Noto Sans TC', sans-serif;
     background: linear-gradient(180deg, #E8F5E9 0%, #C8E6C9 50%, #A5D6A7 100%);
     background-attachment: fixed;
+  }
+
+  .font-display {
+    font-family: 'Fredoka', 'Noto Sans TC', sans-serif;
   }
 
   @media (max-width: 767px) {
