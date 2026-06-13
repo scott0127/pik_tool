@@ -16,83 +16,102 @@
 
     <!-- Left Content: Title & Text (Floats forward slightly) -->
     <div class="relative z-10 flex-1 text-center md:text-left transition-transform duration-200 ease-out" :style="textStyle">
-      <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/56 backdrop-blur-md border border-white/70 text-emerald-800 text-xs font-bold uppercase tracking-wider mb-6 shadow-sm hover:scale-105 transition-transform cursor-default">
-        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+      <div class="hero-motion-item inline-flex items-center gap-2.5 px-5 py-2 rounded-full bg-white/45 backdrop-blur-md border border-white/80 text-[#0a5c43] text-xs font-display font-bold uppercase tracking-[0.08em] mb-6 shadow-[0_2px_8px_rgba(0,0,0,0.04)] hover:scale-105 transition-transform cursor-default">
+        <span class="w-2.5 h-2.5 rounded-full bg-[#00be83]"></span>
         {{ $t('hero.badge') }}
       </div>
 
-      <h1 class="home-hero-title text-5xl md:text-7xl font-black text-gray-800 leading-[0.9] mb-6 tracking-tighter drop-shadow-sm">
-        {{ $t('hero.title.prefix') }} <br />
-        <span class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 via-teal-500 to-lime-500 bg-300% animate-gradient">
+      <h1 class="hero-motion-item home-hero-title text-5xl md:text-7xl font-black text-gray-800 leading-[0.9] mb-6 tracking-tighter drop-shadow-sm">
+        <span class="whitespace-nowrap">{{ $t('hero.title.prefix') }}</span> <br />
+        <span class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 via-teal-500 to-lime-500 bg-300% animate-gradient whitespace-nowrap inline-block">
           {{ $t('hero.title.suffix') }}
         </span>
       </h1>
 
-      <p class="home-hero-subtitle text-gray-600 text-lg md:text-xl max-w-md mx-auto md:mx-0 leading-relaxed font-medium mb-12">
+      <p class="hero-motion-item home-hero-subtitle text-gray-600 text-lg md:text-xl max-w-md mx-auto md:mx-0 leading-relaxed font-medium mb-12">
         {{ $t('hero.subtitle.line1') }}<br />
         {{ $t('hero.subtitle.line2') }}
       </p>
 
        <!-- Interactive & Tracker Unified Container -->
-       <div class="flex flex-col items-stretch w-full sm:w-[100%] md:w-[100%] mx-auto md:mx-0 mt-8 gap-3 md:gap-4 relative z-10">
+       <div class="home-hero-stack flex flex-col items-stretch w-full sm:w-[100%] md:w-[100%] mx-auto md:mx-0 mt-8 gap-3 md:gap-4 relative z-10">
 
-           <!-- Interactive Pikmin Spirits -->
-           <div class="relative bg-white/46 backdrop-blur-sm rounded-3xl md:rounded-[2rem] border border-white/60 shadow-sm p-4 w-full flex flex-col md:flex-row md:items-center md:justify-center gap-4 md:gap-2 hover:scale-105 transition-transform duration-300">
-               <!-- Admin Settings Button -->
-               <button v-if="isAdmin" @click.stop="showSettingsModal = true" class="absolute top-3 right-3 z-50 bg-white/60 backdrop-blur-sm shadow-md border border-gray-100/50 rounded-full p-2 text-gray-400 hover:text-emerald-500 hover:scale-110 transition-all">
-                  <Icon name="lucide:settings" class="w-4 h-4" />
-               </button>
-               <!-- Row 1: Reverse Valentine Stickers -->
-               <div class="flex items-center justify-center -space-x-2 md:-space-x-4 relative group h-14 cursor-none w-full md:w-auto">
-                  <div v-for="(pikmin, index) in valentineSpirits" :key="pikmin.id"
-                       class="w-10 h-14 transform transition-all duration-300 hover:scale-125 hover:-translate-y-4 hover:z-20 relative filter drop-shadow-md"
-                       :style="{ zIndex: index }">
-                       <img :src="pikmin.image" :alt="pikmin.name" class="w-full h-full object-contain" />
+            <!-- Interactive Pikmin Spirits -->
+            <section class="hero-motion-item pikmin-stage-card">
+                <!-- Admin Settings Button -->
+                <button v-if="isAdmin" @click.stop="showSettingsModal = true" class="pikmin-stage-settings" aria-label="Hero settings">
+                   <Icon name="lucide:settings" class="w-4 h-4" />
+                </button>
+
+                <div class="pikmin-stage-header">
+                  <div>
+                    <span class="pikmin-stage-kicker">Featured decor</span>
+                    <strong>活動皮克敏展示</strong>
+                  </div>
+                  <span class="pikmin-stage-count">{{ totalFeaturedSpirits }} 隻</span>
+                </div>
+
+                <div class="pikmin-stage-rows">
+                  <div class="pikmin-lane pikmin-lane-valentine">
+                    <div class="pikmin-lane-meta">
+                      <span>{{ row1CategoryName }}</span>
+                      <small>{{ valentineSpirits.length }} 種類</small>
+                    </div>
+                    <div class="pikmin-lane-track">
+                      <div
+                        v-for="(pikmin, index) in valentineSpirits"
+                        :key="pikmin.id"
+                        class="pikmin-stage-item"
+                        :title="pikmin.name"
+                      >
+                        <img :src="pikmin.image" :alt="pikmin.name" />
+                      </div>
+                    </div>
                   </div>
 
-                 <!-- Tooltip (appears on hover of container) -->
-                 <div class="absolute bottom-full mb-3 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-all duration-300 text-[11px] font-bold text-pink-700 bg-white/95 shadow-md border border-pink-100/50 px-3.5 py-1.5 rounded-full pointer-events-none whitespace-nowrap z-40 transform group-hover:-translate-y-1">
-                     {{ row1CategoryName }}
-                 </div>
-              </div>
-
-              <!-- Row 2: Colored Powder -->
-               <div class="flex items-center justify-center -space-x-2 md:-space-x-4 relative group h-14 cursor-none w-full md:w-auto">
-                  <div v-for="(pikmin, index) in powderSpirits" :key="pikmin.id"
-                       class="w-10 h-14 transform transition-all duration-300 hover:scale-125 hover:-translate-y-4 hover:z-20 relative filter drop-shadow-md"
-                       :style="{ zIndex: index }">
-                       <img :src="pikmin.image" :alt="pikmin.name" class="w-full h-full object-contain" />
+                  <div class="pikmin-lane pikmin-lane-powder">
+                    <div class="pikmin-lane-meta">
+                      <span>{{ row2CategoryName }}</span>
+                      <small>{{ powderSpirits.length }} 種類</small>
+                    </div>
+                    <div class="pikmin-lane-track">
+                      <div
+                        v-for="(pikmin, index) in powderSpirits"
+                        :key="pikmin.id"
+                        class="pikmin-stage-item"
+                        :title="pikmin.name"
+                      >
+                        <img :src="pikmin.image" :alt="pikmin.name" />
+                      </div>
+                    </div>
                   </div>
+               </div>
+            </section>
 
-                 <!-- Tooltip (appears on hover of container) -->
-                 <div class="absolute bottom-full mb-3 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-all duration-300 text-[11px] font-bold text-indigo-700 bg-white/95 shadow-md border border-indigo-100/50 px-3.5 py-1.5 rounded-full pointer-events-none whitespace-nowrap z-40 transform group-hover:-translate-y-1">
-                     {{ row2CategoryName }}
-                 </div>
-              </div>
-           </div>
+            <!-- Missing Tracker Badge -->
+            <button @click="showMissingModal = true" class="hero-motion-item missing-summary-card group">
 
-           <!-- Missing Tracker Badge -->
-           <button @click="showMissingModal = true" class="group relative w-full inline-flex flex-col md:flex-row items-center md:justify-between gap-2 md:gap-3 px-5 py-4 min-h-[56px] md:py-3.5 text-sm md:text-[15px] font-medium text-emerald-800 bg-[#e7f9ec] backdrop-blur-sm shadow-[0_4px_15px_-4px_rgba(52,211,153,0.3)] rounded-3xl md:rounded-[2rem] hover:bg-[#d5f5de] focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 overflow-hidden border border-emerald-100/60 transition-transform hover:-translate-y-0.5">
-
-              <div class="flex items-center gap-2">
-                 <Icon name="lucide:search" class="text-xl text-emerald-600 shrink-0" />
-                 <span class="text-gray-700 font-bold whitespace-nowrap">本月皮克敏還少了:</span>
-              </div>
-
-              <div v-if="missingValentine.length > 0 || missingPowder.length > 0" class="flex items-center justify-center flex-wrap gap-2 w-full md:w-auto">
-                  <span v-if="missingValentine.length > 0" class="inline-flex items-center gap-1.5 bg-pink-100/80 text-pink-700 px-3 py-1 rounded-full text-xs md:text-sm font-bold border border-pink-200/60 transition-transform hover:scale-105">
-                    貼紙 <span class="bg-white rounded-full px-1.5 text-pink-800 shadow-sm">{{ missingValentine.length }}</span>
+               <div class="missing-summary-title">
+                  <span class="missing-summary-icon">
+                    <Icon name="lucide:search" />
                   </span>
-                  <span v-if="missingPowder.length > 0" class="inline-flex items-center gap-1.5 bg-indigo-100/80 text-indigo-700 px-3 py-1 rounded-full text-xs md:text-sm font-bold border border-indigo-200/60 transition-transform hover:scale-105">
-                    粉末 <span class="bg-white rounded-full px-1.5 text-indigo-800 shadow-sm">{{ missingPowder.length }}</span>
-                  </span>
-              </div>
-              <span v-else class="text-gray-700 tracking-wide font-normal px-2">
-                🎉 太神啦！近期活動收集完畢！
-              </span>
+                  <span>本月皮克敏還少了</span>
+               </div>
 
-              <span v-if="missingValentine.length > 0 || missingPowder.length > 0" class="text-emerald-600/90 border-b border-emerald-400 group-hover:text-emerald-700 group-hover:border-emerald-600 transition-colors whitespace-nowrap text-[13px] md:text-sm font-semibold pb-0.5 mt-1 md:mt-0 md:ml-1 self-center">點擊查看缺誰</span>
-           </button>
+               <div v-if="missingValentine.length > 0 || missingPowder.length > 0" class="missing-summary-badges">
+                   <span v-if="missingValentine.length > 0" class="missing-summary-badge missing-summary-badge-pink">
+                     貼紙 <span class="bg-white rounded-full px-1.5 text-pink-800 shadow-sm">{{ missingValentine.length }}</span>
+                   </span>
+                   <span v-if="missingPowder.length > 0" class="missing-summary-badge missing-summary-badge-indigo">
+                     粉末 <span class="bg-white rounded-full px-1.5 text-indigo-800 shadow-sm">{{ missingPowder.length }}</span>
+                   </span>
+               </div>
+               <span v-else class="missing-summary-complete">
+                 近期活動收集完畢
+               </span>
+
+               <span v-if="missingValentine.length > 0 || missingPowder.length > 0" class="missing-summary-link">點擊查看缺誰</span>
+            </button>
        </div>
     </div>
 
@@ -231,8 +250,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted } from 'vue';
+import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useAuthStore } from '~/composables/useAuthStore';
 import { useSiteConfig } from '~/composables/useSiteConfig';
 import { useDecorData } from '~/composables/useDecorData';
@@ -254,12 +275,16 @@ const tiltX = ref(0);
 const tiltY = ref(0);
 const deviceTiltEnabled = ref(false);
 let hasDeviceOrientationListener = false;
+let heroMotionContext: ReturnType<typeof gsap.context> | null = null;
+let heroMotionMatchMedia: ReturnType<typeof gsap.matchMedia> | null = null;
 
 onMounted(async () => {
     await fetchHeroConfig();
     if (typeof window !== 'undefined' && 'DeviceOrientationEvent' in window) {
         addDeviceOrientationListener();
     }
+    await nextTick();
+    initHeroMotion();
 });
 
 // Dynamic Categories
@@ -302,6 +327,133 @@ const missingValentine = computed(() => {
 const missingPowder = computed(() => {
     return powderSpirits.value.filter(spirit => !isCollected(spirit.id));
 });
+
+const totalFeaturedSpirits = computed(() => valentineSpirits.value.length + powderSpirits.value.length);
+
+const initHeroMotion = () => {
+    if (!heroContainer.value || typeof window === 'undefined') return;
+
+    heroMotionContext?.revert();
+    heroMotionMatchMedia?.revert();
+    gsap.registerPlugin(ScrollTrigger);
+
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    heroMotionContext = gsap.context(() => {
+        const items = gsap.utils.toArray<HTMLElement>('.hero-motion-item');
+        const pikminItems = gsap.utils.toArray<HTMLElement>('.pikmin-stage-item');
+
+        if (reduceMotion) {
+            gsap.set([...items, ...pikminItems], { clearProps: 'all' });
+            return;
+        }
+
+        const entrance = gsap.timeline({ defaults: { ease: 'power3.out' } });
+
+        entrance
+            .from(items, {
+                y: 18,
+                opacity: 0,
+                duration: 0.72,
+                stagger: 0.08,
+                clearProps: 'transform,opacity',
+            })
+            .from(pikminItems, {
+                y: 12,
+                opacity: 0,
+                scale: 0.92,
+                duration: 0.42,
+                stagger: {
+                    each: 0.025,
+                    from: 'center',
+                },
+                clearProps: 'transform,opacity',
+            }, '-=0.18');
+
+        heroMotionMatchMedia = gsap.matchMedia();
+
+        heroMotionMatchMedia.add('(min-width: 768px)', () => {
+            const story = gsap.timeline({
+                defaults: { ease: 'none' },
+                scrollTrigger: {
+                    trigger: '.home-hero-stack',
+                    start: 'top 18%',
+                    end: '+=760',
+                    scrub: 0.85,
+                    pin: true,
+                    anticipatePin: 1,
+                },
+            });
+
+            story
+                .addLabel('establish')
+                .to('.pikmin-stage-card', { scale: 1, y: 0, duration: 0.4 })
+                .addLabel('focus-first-event')
+                .to('.pikmin-lane-powder', { opacity: 0.44, scale: 0.985, duration: 1 })
+                .to('.pikmin-lane-valentine', { scale: 1.025, y: -2, duration: 1 }, '<')
+                .to('.missing-summary-card', { opacity: 0.62, scale: 0.985, duration: 1 }, '<')
+                .addLabel('focus-second-event')
+                .to('.pikmin-lane-valentine', { opacity: 0.46, scale: 0.985, y: 0, duration: 1 })
+                .to('.pikmin-lane-powder', { opacity: 1, scale: 1.025, y: -2, duration: 1 }, '<')
+                .addLabel('resolve-missing')
+                .to('.pikmin-lane', { opacity: 1, scale: 1, y: 0, duration: 0.8 })
+                .to('.missing-summary-card', { opacity: 1, scale: 1.025, y: -4, duration: 0.8 }, '<')
+                .to('.missing-summary-card', { scale: 1, y: 0, duration: 0.35 });
+        });
+
+        heroMotionMatchMedia.add('(max-width: 767px)', () => {
+            const focusLane = (active: '.pikmin-lane-valentine' | '.pikmin-lane-powder' | '.missing-summary-card') => {
+                const allTargets = ['.pikmin-lane-valentine', '.pikmin-lane-powder', '.missing-summary-card'];
+                allTargets.forEach((target) => {
+                    const isActive = target === active;
+                    gsap.to(target, {
+                        opacity: isActive ? 1 : 0.68,
+                        scale: isActive ? 1.012 : 0.992,
+                        duration: 0.32,
+                        ease: 'power2.out',
+                        overwrite: true,
+                    });
+                });
+            };
+
+            const resetFocus = () => {
+                gsap.to(['.pikmin-lane-valentine', '.pikmin-lane-powder', '.missing-summary-card'], {
+                    opacity: 1,
+                    scale: 1,
+                    duration: 0.28,
+                    ease: 'power2.out',
+                    overwrite: true,
+                });
+            };
+
+            ScrollTrigger.create({
+                trigger: '.pikmin-lane-valentine',
+                start: 'top 62%',
+                end: 'bottom 38%',
+                onEnter: () => focusLane('.pikmin-lane-valentine'),
+                onEnterBack: () => focusLane('.pikmin-lane-valentine'),
+                onLeaveBack: resetFocus,
+            });
+
+            ScrollTrigger.create({
+                trigger: '.pikmin-lane-powder',
+                start: 'top 62%',
+                end: 'bottom 38%',
+                onEnter: () => focusLane('.pikmin-lane-powder'),
+                onEnterBack: () => focusLane('.pikmin-lane-powder'),
+            });
+
+            ScrollTrigger.create({
+                trigger: '.missing-summary-card',
+                start: 'top 68%',
+                end: 'bottom 36%',
+                onEnter: () => focusLane('.missing-summary-card'),
+                onEnterBack: () => focusLane('.missing-summary-card'),
+                onLeave: resetFocus,
+            });
+        });
+    }, heroContainer.value);
+};
 
 const handleMouseMove = (e: MouseEvent) => {
     if (deviceTiltEnabled.value) return;
@@ -354,6 +506,10 @@ const enableDeviceTilt = async () => {
 };
 
 onUnmounted(() => {
+    heroMotionMatchMedia?.revert();
+    heroMotionMatchMedia = null;
+    heroMotionContext?.revert();
+    heroMotionContext = null;
     if (hasDeviceOrientationListener && typeof window !== 'undefined') {
         window.removeEventListener('deviceorientation', handleDeviceOrientation, true);
     }
@@ -383,24 +539,367 @@ const textStyle = computed(() => ({
 .translate-z-\[30px\] { transform: translateZ(30px); }
 .translate-z-\[40px\] { transform: translateZ(40px); }
 
+.home-hero-stack {
+    max-width: 38rem;
+}
+
+.pikmin-stage-card {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    padding: 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.78);
+    border-radius: 2rem;
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.62), rgba(236, 253, 245, 0.54)),
+        rgba(255, 255, 255, 0.46);
+    box-shadow:
+        0 14px 34px rgba(16, 122, 92, 0.12),
+        0 1px 0 rgba(255, 255, 255, 0.86) inset;
+    backdrop-filter: blur(7px);
+    -webkit-backdrop-filter: blur(7px);
+}
+
+.pikmin-stage-card::before {
+    position: absolute;
+    inset: 0.45rem;
+    content: "";
+    pointer-events: none;
+    border: 1px solid rgba(255, 255, 255, 0.56);
+    border-radius: 1.55rem;
+}
+
+.pikmin-stage-settings {
+    position: absolute;
+    top: 0.85rem;
+    right: 0.85rem;
+    z-index: 5;
+    display: inline-flex;
+    width: 2.45rem;
+    height: 2.45rem;
+    align-items: center;
+    justify-content: center;
+    color: #047857;
+    border: 1px solid rgba(255, 255, 255, 0.78);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.72);
+    box-shadow: 0 8px 18px rgba(6, 95, 70, 0.12);
+    transition: transform 220ms ease, background 220ms ease, color 220ms ease;
+}
+
+.pikmin-stage-settings:hover {
+    color: #005f4e;
+    background: rgba(255, 255, 255, 0.92);
+    transform: translateY(-1px) scale(1.03);
+}
+
+.pikmin-stage-header {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 0.85rem;
+    padding-inline: 0.25rem 2.6rem;
+    color: #064e3b;
+}
+
+.pikmin-stage-header strong {
+    display: block;
+    font-size: 1rem;
+    font-weight: 900;
+    line-height: 1.2;
+    letter-spacing: 0.01em;
+}
+
+.pikmin-stage-kicker {
+    display: block;
+    margin-bottom: 0.12rem;
+    color: rgba(5, 95, 70, 0.58);
+    font-size: 0.66rem;
+    font-weight: 900;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+}
+
+.pikmin-stage-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 3.25rem;
+    padding: 0.32rem 0.65rem;
+    color: #047857;
+    border: 1px solid rgba(16, 185, 129, 0.18);
+    border-radius: 999px;
+    background: rgba(236, 253, 245, 0.78);
+    font-size: 0.78rem;
+    font-weight: 900;
+    white-space: nowrap;
+}
+
+.pikmin-stage-rows {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    gap: 0.65rem;
+}
+
+.pikmin-lane {
+    display: grid;
+    grid-template-columns: 5.7rem minmax(0, 1fr);
+    align-items: center;
+    gap: 0.75rem;
+    min-height: 4.2rem;
+    padding: 0.55rem 0.7rem;
+    border: 1px solid rgba(255, 255, 255, 0.66);
+    border-radius: 1.35rem;
+    background: rgba(255, 255, 255, 0.42);
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.66) inset;
+}
+
+.pikmin-lane-meta {
+    min-width: 0;
+    color: #0f172a;
+    text-align: left;
+}
+
+.pikmin-lane-meta span,
+.pikmin-lane-meta small {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.pikmin-lane-meta span {
+    font-size: 0.82rem;
+    font-weight: 900;
+    line-height: 1.2;
+}
+
+.pikmin-lane-meta small {
+    margin-top: 0.18rem;
+    color: #64748b;
+    font-size: 0.68rem;
+    font-weight: 800;
+}
+
+.pikmin-lane-track {
+    display: flex;
+    min-width: 0;
+    align-items: flex-end;
+    justify-content: center;
+    gap: clamp(0.1rem, 1vw, 0.35rem);
+}
+
+.pikmin-stage-item {
+    position: relative;
+    display: flex;
+    width: clamp(1.62rem, 6.5vw, 2.35rem);
+    height: clamp(2.35rem, 8.6vw, 3.35rem);
+    flex: 0 1 auto;
+    align-items: flex-end;
+    justify-content: center;
+    filter: drop-shadow(0 7px 8px rgba(15, 23, 42, 0.13));
+    transform-origin: bottom center;
+    transition: transform 260ms cubic-bezier(0.2, 0.8, 0.2, 1), filter 260ms ease;
+}
+
+.pikmin-stage-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    pointer-events: none;
+}
+
+.pikmin-stage-item:hover {
+    z-index: 4;
+    filter: drop-shadow(0 11px 10px rgba(15, 23, 42, 0.18));
+    transform: translateY(-0.38rem) scale(1.12);
+}
+
+.missing-summary-card {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 0.8rem 1rem;
+    width: 100%;
+    min-height: 5.6rem;
+    padding: 1rem 1.15rem;
+    overflow: hidden;
+    color: #064e3b;
+    border: 1px solid rgba(16, 185, 129, 0.2);
+    border-radius: 1.75rem;
+    background: #e7f9ec;
+    box-shadow:
+        0 10px 22px rgba(16, 122, 92, 0.11),
+        0 1px 0 rgba(255, 255, 255, 0.78) inset;
+    text-align: left;
+    transition: transform 220ms ease, background 220ms ease, box-shadow 220ms ease;
+}
+
+.missing-summary-card:hover {
+    background: #def6e7;
+    box-shadow:
+        0 14px 26px rgba(16, 122, 92, 0.14),
+        0 1px 0 rgba(255, 255, 255, 0.86) inset;
+    transform: translateY(-2px);
+}
+
+.missing-summary-title {
+    display: inline-flex;
+    min-width: 0;
+    align-items: center;
+    gap: 0.7rem;
+    color: #1f2937;
+    font-size: 1rem;
+    font-weight: 900;
+}
+
+.missing-summary-icon {
+    display: inline-flex;
+    width: 2.25rem;
+    height: 2.25rem;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    color: #008c72;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.62);
+    font-size: 1.25rem;
+}
+
+.missing-summary-badges {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 0.45rem;
+}
+
+.missing-summary-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.42rem;
+    padding: 0.34rem 0.7rem;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-weight: 900;
+    white-space: nowrap;
+}
+
+.missing-summary-badge-pink {
+    color: #be185d;
+    border: 1px solid rgba(244, 114, 182, 0.32);
+    background: rgba(252, 231, 243, 0.86);
+}
+
+.missing-summary-badge-indigo {
+    color: #4338ca;
+    border: 1px solid rgba(129, 140, 248, 0.3);
+    background: rgba(224, 231, 255, 0.88);
+}
+
+.missing-summary-complete {
+    justify-self: end;
+    color: #047857;
+    font-size: 0.9rem;
+    font-weight: 900;
+}
+
+.missing-summary-link {
+    grid-column: 1 / -1;
+    justify-self: center;
+    color: #008c72;
+    border-bottom: 1px solid currentColor;
+    font-size: 0.86rem;
+    font-weight: 900;
+    line-height: 1.2;
+}
+
 @media (max-width: 520px) {
     .home-hero-section {
-        min-height: calc(100vh - 8.75rem);
+        min-height: auto;
         justify-content: flex-start;
-        padding-top: 3.75rem;
-        padding-bottom: 2.5rem;
+        padding-top: 2rem;
+        padding-bottom: 1.25rem;
+        gap: 2.75rem;
     }
 
     .home-hero-title {
-        font-size: clamp(3rem, 15vw, 4.7rem);
+        font-size: clamp(3.2rem, 14.8vw, 4.65rem);
         letter-spacing: -0.035em;
+        margin-bottom: 1.6rem;
     }
 
     .home-hero-subtitle {
-        margin-bottom: 4.2rem;
+        margin-bottom: 2.25rem;
         font-size: 1.15rem;
         line-height: 1.72;
         font-weight: 700;
+    }
+
+    .home-hero-stack {
+        max-width: 100%;
+        gap: 1rem;
+    }
+
+    .pikmin-stage-card {
+        padding: 0.9rem;
+        border-radius: 1.75rem;
+    }
+
+    .pikmin-stage-card::before {
+        inset: 0.38rem;
+        border-radius: 1.38rem;
+    }
+
+    .pikmin-stage-header {
+        margin-bottom: 0.75rem;
+        padding-inline: 0.2rem 2.65rem;
+    }
+
+    .pikmin-stage-rows {
+        gap: 0.55rem;
+    }
+
+    .pikmin-lane {
+        grid-template-columns: 4.65rem minmax(0, 1fr);
+        gap: 0.52rem;
+        min-height: 4rem;
+        padding: 0.5rem 0.55rem;
+        border-radius: 1.18rem;
+    }
+
+    .pikmin-lane-meta span {
+        font-size: 0.74rem;
+    }
+
+    .pikmin-lane-meta small {
+        font-size: 0.62rem;
+    }
+
+    .pikmin-stage-item {
+        width: clamp(1.35rem, 6vw, 1.9rem);
+        height: clamp(2rem, 8vw, 2.8rem);
+    }
+
+    .missing-summary-card {
+        grid-template-columns: 1fr;
+        justify-items: center;
+        min-height: auto;
+        padding: 1rem;
+        text-align: center;
+        border-radius: 1.55rem;
+    }
+
+    .missing-summary-badges {
+        justify-content: center;
+    }
+
+    .missing-summary-complete {
+        justify-self: center;
     }
 }
 

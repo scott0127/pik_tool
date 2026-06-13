@@ -24,6 +24,9 @@
   },
   "packageManager": "pnpm@10.11.0+sha512.6540583f41cc5f628eb3d9773ecee802f4f9ef9923cc45b69890fb47991d4b092964694ec3a4f738a420c918a333062c8b925d312f42e4f0c263eb603551f977",
   "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild"
+    ],
     "overrides": {
       "brace-expansion@1": "^1.1.14",
       "brace-expansion@2": "^2.1.0",
@@ -51,6 +54,7 @@
     "eslint": "^9.39.4",
     "happy-dom": "^20.9.0",
     "htmlparser2": "^12.0.0",
+    "playwright": "^1.60.0",
     "tsx": "^4.22.2",
     "vitest": "^4.1.6",
     "vue-tsc": "^3.3.0"
