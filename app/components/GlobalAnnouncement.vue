@@ -352,6 +352,8 @@ onBeforeUnmount(() => {
 }
 
 .announcement-close-button {
+  min-width: 2.75rem;
+  min-height: 2.75rem;
   color: rgb(31 41 55);
   background: rgba(255, 255, 255, 0.72);
   border: 1px solid rgba(75, 85, 99, 0.28);

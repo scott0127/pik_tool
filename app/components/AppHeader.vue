@@ -43,7 +43,7 @@
           </nav>
 
           <!-- Right Section -->
-          <div class="flex items-center gap-3">
+          <div class="app-header-actions flex items-center gap-3">
             <!-- PWA Install Button (iOS) -->
             <button 
               v-if="canInstallIos"
@@ -109,7 +109,7 @@
               :title="$t('header.coffee_mobile')"
             >
               <span class="text-lg group-hover:scale-110 transition-transform">☕</span>
-              <span class="text-sm font-semibold hidden lg:inline">{{ $t('header.coffee') }}</span>
+              <span class="text-sm font-semibold hidden xl:inline">{{ $t('header.coffee') }}</span>
             </button>
 
             <!-- GitHub Star Button (Desktop) -->
@@ -121,16 +121,16 @@
               :title="$t('header.star_mobile')"
             >
               <span class="text-lg group-hover:scale-110 transition-transform">⭐</span>
-              <span class="text-sm font-semibold hidden lg:inline">{{ $t('header.star') }}</span>
+              <span class="text-sm font-semibold hidden xl:inline">{{ $t('header.star') }}</span>
             </a>
 
             <!-- Feedback Button (Desktop) -->
             <button 
               @click="showFeedbackModal = true"
-              class="hidden md:flex items-center gap-2 px-4 h-10 rounded-xl bg-gradient-to-r from-violet-500 to-purple-600 hover:from-violet-600 hover:to-purple-700 !text-white transition-all hover:shadow-lg group overflow-hidden"
+              class="app-feedback-button hidden md:flex items-center gap-2 px-4 h-10 rounded-xl bg-gradient-to-r from-violet-500 to-purple-600 hover:from-violet-600 hover:to-purple-700 !text-white transition-all hover:shadow-lg group overflow-hidden"
               :title="$t('header.feedback')"
             >
-              <div class="hidden lg:block w-24 overflow-hidden">
+              <div class="hidden 2xl:block w-24 overflow-hidden">
                 <span class="inline-block whitespace-nowrap animate-marquee text-sm font-semibold">
                   {{ $t('header.feedback') }}&nbsp;&nbsp;&nbsp;&nbsp;{{ $t('header.feedback') }}&nbsp;&nbsp;&nbsp;&nbsp;
                 </span>
@@ -754,6 +754,29 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
+@media (min-width: 768px) and (max-width: 1360px) {
+  .app-header-inner {
+    padding-inline: 0.875rem;
+  }
+
+  .app-header-actions {
+    gap: 0.5rem;
+  }
+
+  .app-header-actions > button,
+  .app-header-actions > a {
+    min-width: 2.75rem;
+  }
+
+  .app-header-actions .btn-primary {
+    padding-inline: 0.875rem !important;
+  }
+
+  .app-feedback-button {
+    display: none !important;
+  }
+}
+
 @media (max-width: 767px) {
   .app-top-bar {
     height: 5px;

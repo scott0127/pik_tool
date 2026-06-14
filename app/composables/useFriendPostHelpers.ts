@@ -1,6 +1,6 @@
 import { ALL_INTENT_OPTIONS, FRIEND_INTENTS } from "~/constants/intents";
 import { ALL_REGION_OPTIONS, FRIEND_REGIONS } from "~/constants/regions";
-import scrapedImages from "../../scraped_images.json";
+import scrapedImages from "~/data/scraped_images.json";
 
 const PIKMIN_AVATAR_URLS = Object.values(scrapedImages) as string[];
 const LEGACY_INTENT_TAGS = ["mushroom", "postcard"];

@@ -35,3 +35,8 @@ supabase/migration_*.sql
 
 # Local scratch workspace
 scratch/
+
+# Local generated artifacts
+output/
+tmp/
+--port/

@@ -1,7 +1,7 @@
 {
   "version": 8,
   "lastUpdated": "2026-01-09",
-  "source": "Generated from scraped_images.json",
+  "source": "Generated from app/data/scraped_images.json",
   "definitions": [
     {
       "category": {
@@ -1531,7 +1531,7 @@
         },
         {
           "id": "fortune_2",
-          "name": "籤-中吉",
+          "name": "籤-吉",
           "nameEn": "Fortune 2",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/8/87/Decor_Red_Fortune_2.png/100px-Decor_Red_Fortune_2.png",
           "imageUrls": {
@@ -1546,7 +1546,7 @@
         },
         {
           "id": "fortune_3",
-          "name": "籤-小吉",
+          "name": "籤-中吉",
           "nameEn": "Fortune 3",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/b/ba/Decor_Red_Fortune_3.png/100px-Decor_Red_Fortune_3.png",
           "imageUrls": {
@@ -1561,7 +1561,7 @@
         },
         {
           "id": "fortune_4",
-          "name": "籤-末吉",
+          "name": "籤-小吉",
           "nameEn": "Fortune 4",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/7/70/Decor_Red_Fortune_4.png/100px-Decor_Red_Fortune_4.png",
           "imageUrls": {
@@ -1576,7 +1576,7 @@
         },
         {
           "id": "fortune_5",
-          "name": "籤-凶",
+          "name": "籤-末吉",
           "nameEn": "Fortune 5",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/2/2f/Decor_Red_Fortune_5.png/100px-Decor_Red_Fortune_5.png",
           "imageUrls": {
@@ -2538,6 +2538,7 @@
             "blue": "https://pikmin.wiki.gallery/images/thumb/e/ee/Decor_Blue_Present_Sticker_%28Gold%29.png/150px-Decor_Blue_Present_Sticker_%28Gold%29.png",
             "white": "https://pikmin.wiki.gallery/images/thumb/3/33/Decor_White_Present_Sticker_%28Gold%29.png/150px-Decor_White_Present_Sticker_%28Gold%29.png",
             "purple": "https://pikmin.wiki.gallery/images/thumb/d/db/Decor_Purple_Present_Sticker_%28Gold%29.png/150px-Decor_Purple_Present_Sticker_%28Gold%29.png",
+            "rock": "https://pikmin.wiki.gallery/images/thumb/f/fd/Decor_Rock_Present_Sticker_%28Gold%29.png/200px-Decor_Rock_Present_Sticker_%28Gold%29.png",
             "winged": "https://pikmin.wiki.gallery/images/thumb/5/54/Decor_Winged_Present_Sticker_%28Gold%29.png/150px-Decor_Winged_Present_Sticker_%28Gold%29.png"
           }
         }

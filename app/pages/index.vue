@@ -1368,7 +1368,7 @@ onUnmounted(() => {
 
 .home-story-section {
   position: relative;
-  scroll-margin-top: 6rem;
+  scroll-margin-top: clamp(7rem, 13vh, 10rem);
 }
 
 #story-home {
@@ -2480,20 +2480,6 @@ onUnmounted(() => {
   overflow: hidden;
 }
 
-.friend-stream-stage::before {
-  position: absolute;
-  inset: 0.18rem 0.35rem auto;
-  height: 5.9rem;
-  border: 1px solid rgba(255, 255, 255, 0.64);
-  border-radius: 1.35rem;
-  background:
-    radial-gradient(circle at 76% 16%, rgba(224, 242, 254, 0.4), transparent 38%),
-    rgba(255, 255, 255, 0.38);
-  box-shadow: 0 12px 22px rgba(15, 118, 88, 0.06);
-  content: '';
-  pointer-events: none;
-}
-
 .friend-stream-row {
   position: relative;
   z-index: 1;
@@ -2761,7 +2747,7 @@ onUnmounted(() => {
   display: grid;
   grid-template-rows: repeat(5, minmax(0, 1fr));
   gap: 0.08rem;
-  width: 2.5rem;
+  width: 2.9rem;
   padding: 0.2rem 0.18rem;
   border: 0;
   border-radius: 999px 0 0 999px;
@@ -2830,7 +2816,7 @@ onUnmounted(() => {
   z-index: 1;
   display: flex;
   min-width: 0;
-  min-height: 2.22rem;
+  min-height: 2.75rem;
   flex-direction: column;
   align-items: center;
   justify-content: center;
