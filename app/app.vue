@@ -145,14 +145,7 @@ useHead(() => ({
   meta: [
     { name: 'keywords', content: t('app.keywords') }
   ],
-  link: [
-    {
-      rel: 'preload',
-      as: 'image',
-      href: '/img/pc_background_extended.png',
-      media: '(min-width: 1024px)'
-    }
-  ]
+  link: []
 }));
 
 useSeoMeta({
@@ -165,37 +158,36 @@ useSeoMeta({
   ogSiteName: () => t('app.title'),
 });
 
-const initializeAppShell = async () => {
+const initializeAppShell = () => {
   if (appInitStarted) return;
   appInitStarted = true;
-  isInitializing.value = true;
-  console.log('[App] Starting initialization...');
+  
+  // 立刻解除阻擋，讓畫面顯示
+  isInitializing.value = false;
+  console.log('[App] Starting background initialization...');
 
-  try {
-    // 1. 先载入本地收藏资料（快速）
-    loadCollection();
+  // 1. 先载入本地收藏资料（快速）
+  loadCollection();
 
-    // 2. 初始化 AuthStore（会获取 session 并监听变化）
-    await authStore.initialize();
+  // 背景執行 Supabase 同步與登入驗證
+  (async () => {
+    try {
+      // 2. 初始化 AuthStore（会获取 session 并监听变化）
+      await authStore.initialize();
 
-    // 3. 如果已登入，从云端同步
-    if (authStore.isAuthenticated.value) {
-      console.log('[App] User logged in, syncing from cloud...');
-      try {
-        await loadFromCloud();
-      } catch (e) {
-        console.warn('[App] Cloud sync failed:', e);
+      // 3. 如果已登入，从云端同步
+      if (authStore.isAuthenticated.value) {
+        console.log('[App] User logged in, syncing from cloud in background...');
+        try {
+          await loadFromCloud();
+        } catch (e) {
+          console.warn('[App] Cloud sync failed:', e);
+        }
       }
+    } catch (e) {
+      console.error('[App] Background initialization error:', e);
     }
-  } catch (e) {
-    console.error('[App] Initialization error:', e);
-  } finally {
-    console.log('[App] Finishing initialization...');
-    // 快速显示页面
-    setTimeout(() => {
-      isInitializing.value = false;
-    }, 300);
-  }
+  })();
 };
 
 onMounted(async () => {
