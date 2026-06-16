@@ -65,26 +65,30 @@ async function main() {
 
   for (const tile of index.tiles) {
     const tilePath = join(baseDir, 'tiles', tile.file);
-    const tileData = JSON.parse(readFileSync(tilePath, 'utf-8')) as TileData;
+    const tileData = JSON.parse(readFileSync(tilePath, 'utf-8')) as any;
 
-    for (const poi of tileData.pois) {
-      const cellId = getCellId(poi.lat, poi.lon, level);
-      // 檢查是否已經處理過該 cell
-      if (!cellTypes.has(cellId)) {
-        cellTypes.set(cellId, poi.decorType);
-        continue;
-      }
+    const features = tileData.features || [];
+    for (const feat of features) {
+      for (const pt of feat.pts) {
+        const cellId = getCellId(pt[0], pt[1], level);
+        
+        // 檢查是否已經處理過該 cell
+        if (!cellTypes.has(cellId)) {
+          cellTypes.set(cellId, feat.t);
+          continue;
+        }
 
-      const current = cellTypes.get(cellId);
-      
-      // 如果已經標記為混合 (null)，則跳過（保持混合狀態）
-      if (current === null) {
-        continue;
-      }
+        const current = cellTypes.get(cellId);
+        
+        // 如果已經標記為混合 (null)，則跳過（保持混合狀態）
+        if (current === null) {
+          continue;
+        }
 
-      // 如果當前類型與新類型不同，標記為混合 (null)
-      if (current !== poi.decorType) {
-        cellTypes.set(cellId, null);
+        // 如果當前類型與新類型不同，標記為混合 (null)
+        if (current !== feat.t) {
+          cellTypes.set(cellId, null);
+        }
       }
     }
   }

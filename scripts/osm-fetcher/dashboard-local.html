@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OSM 本地解析監控面板</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fira+Code&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #0f172a; color: #f8fafc; }
+        .font-mono { font-family: 'Fira Code', monospace; }
+        
+        /* Cyberpunk styling */
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(51, 65, 85, 0.8);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        
+        .glow-text { text-shadow: 0 0 10px rgba(56, 189, 248, 0.5); }
+        .glow-green { text-shadow: 0 0 10px rgba(34, 197, 94, 0.5); }
+        .glow-amber { text-shadow: 0 0 10px rgba(245, 158, 11, 0.5); }
+        .glow-purple { text-shadow: 0 0 10px rgba(168, 85, 247, 0.5); }
+        
+        .progress-bar-bg { background-color: #1e293b; border-radius: 9999px; overflow: hidden; }
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #3b82f6, #0ea5e9);
+            transition: width 0.3s ease-out;
+            position: relative;
+        }
+        .progress-bar-fill::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            animation: shimmer 1.5s infinite linear;
+        }
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        
+        .log-container {
+            height: 300px;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: #475569 #1e293b;
+        }
+        .log-container::-webkit-scrollbar { width: 6px; }
+        .log-container::-webkit-scrollbar-track { background: #1e293b; }
+        .log-container::-webkit-scrollbar-thumb { background: #475569; border-radius: 3px; }
+
+        .phase-indicator {
+            transition: all 0.3s;
+            border-left: 4px solid transparent;
+        }
+        .phase-active { border-left-color: #38bdf8; background: rgba(56, 189, 248, 0.1); }
+        .phase-done { border-left-color: #22c55e; opacity: 0.7; }
+    </style>
+</head>
+<body class="min-h-screen p-6">
+    <div class="max-w-6xl mx-auto space-y-6">
+        
+        <!-- Header -->
+        <header class="flex justify-between items-center mb-8">
+            <div>
+                <h1 class="text-3xl font-bold glow-text text-sky-400 flex items-center gap-3">
+                    <span class="text-4xl">🚀</span> OSM 3-Pass 深度解析管線
+                </h1>
+                <p class="text-slate-400 mt-1" id="status-text">初始化中...</p>
+            </div>
+            <div class="text-right">
+                <div class="text-sm text-slate-400">已耗時</div>
+                <div class="text-2xl font-mono font-bold text-sky-300" id="elapsed-time">00:00</div>
+            </div>
+        </header>
+
+        <!-- Main Stats & Progress -->
+        <div class="glass-panel rounded-xl p-6">
+            <div class="flex justify-between items-end mb-2">
+                <h2 class="text-lg font-semibold text-slate-200">當前階段進度</h2>
+                <div class="text-right">
+                    <span class="text-3xl font-bold text-white font-mono" id="main-percent">0.0%</span>
+                </div>
+            </div>
+            <div class="progress-bar-bg h-4 mb-2">
+                <div class="progress-bar-fill w-0" id="main-progress"></div>
+            </div>
+            <div class="flex justify-between text-sm text-slate-400 font-mono">
+                <span id="processed-elements">已處理: 0</span>
+                <span>全域檔案掃描: ~32,000,000 筆</span>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <!-- Phases Tracker -->
+            <div class="glass-panel rounded-xl p-6 flex flex-col gap-3">
+                <h2 class="text-lg font-semibold text-slate-200 mb-2 flex items-center gap-2">
+                    <span>🔄</span> 執行階段
+                </h2>
+                
+                <div id="phase-1" class="phase-indicator p-3 rounded bg-slate-800/50">
+                    <div class="font-bold text-slate-200">Pass 1: 目標定位</div>
+                    <div class="text-sm text-slate-400 mt-1">收集 Node, Way 與 Relation</div>
+                </div>
+                
+                <div id="phase-2" class="phase-indicator p-3 rounded bg-slate-800/50">
+                    <div class="font-bold text-slate-200">Pass 2: 關係解索</div>
+                    <div class="text-sm text-slate-400 mt-1">擷取 Relation 依賴的 Way IDs</div>
+                </div>
+                
+                <div id="phase-3" class="phase-indicator p-3 rounded bg-slate-800/50">
+                    <div class="font-bold text-slate-200">Pass 3: 座標補完</div>
+                    <div class="text-sm text-slate-400 mt-1">精確打撈所有目標 Node 座標</div>
+                </div>
+
+                <div id="phase-4" class="phase-indicator p-3 rounded bg-slate-800/50">
+                    <div class="font-bold text-slate-200">S2 展開與裝箱</div>
+                    <div class="text-sm text-slate-400 mt-1">計算幾何並分裝為 15x15 網格</div>
+                </div>
+            </div>
+
+            <!-- Stats Grid -->
+            <div class="glass-panel rounded-xl p-6 md:col-span-3">
+                <h2 class="text-lg font-semibold text-slate-200 mb-4 flex items-center gap-2">
+                    <span>📊</span> 實時數據擷取
+                </h2>
+                
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="bg-slate-800/50 rounded-lg p-4 border border-slate-700">
+                        <div class="text-slate-400 text-sm">單點 (Node) 命中數</div>
+                        <div class="text-3xl font-bold font-mono text-emerald-400 mt-1 glow-green" id="stat-nodes">0</div>
+                    </div>
+                    <div class="bg-slate-800/50 rounded-lg p-4 border border-slate-700">
+                        <div class="text-slate-400 text-sm">線框 (Way) 命中數</div>
+                        <div class="text-3xl font-bold font-mono text-emerald-400 mt-1 glow-green" id="stat-ways">0</div>
+                    </div>
+                    <div class="bg-slate-800/50 rounded-lg p-4 border border-purple-900 bg-purple-900/20">
+                        <div class="text-purple-300 text-sm">關係 (Relation) 命中數</div>
+                        <div class="text-3xl font-bold font-mono text-purple-400 mt-1 glow-purple" id="stat-relations">0</div>
+                    </div>
+                    <div class="bg-slate-800/50 rounded-lg p-4 border border-amber-900 bg-amber-900/20">
+                        <div class="text-amber-300 text-sm">生成 Decor 實例數</div>
+                        <div class="text-3xl font-bold font-mono text-amber-400 mt-1 glow-amber" id="stat-total-pois">-</div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mt-4">
+                    <div class="bg-slate-800/50 rounded-lg p-4 border border-sky-900 bg-sky-900/20">
+                        <div class="text-sky-300 text-sm">單純點位 (Real Points)</div>
+                        <div class="text-2xl font-bold font-mono text-sky-400 mt-1" id="stat-real-points">0</div>
+                    </div>
+                    <div class="bg-slate-800/50 rounded-lg p-4 border border-sky-900 bg-sky-900/20">
+                        <div class="text-sky-300 text-sm">面積/線段 S2 展開數</div>
+                        <div class="text-2xl font-bold font-mono text-sky-400 mt-1" id="stat-area-instances">0</div>
+                    </div>
+                    <div class="bg-slate-800/50 rounded-lg p-4 border border-red-900 bg-red-900/20">
+                        <div class="text-red-300 text-sm">超出邊界丟棄 (Off-Island)</div>
+                        <div class="text-2xl font-bold font-mono text-red-400 mt-1" id="stat-skipped-outside">0</div>
+                    </div>
+                    <div class="bg-slate-800/50 rounded-lg p-4 border border-red-900 bg-red-900/20">
+                        <div class="text-red-300 text-sm">無效座標丟棄</div>
+                        <div class="text-2xl font-bold font-mono text-red-400 mt-1" id="stat-skipped-invalid">0</div>
+                    </div>
+                </div>
+
+                <div class="mt-6">
+                    <h3 class="text-sm font-semibold text-slate-400 mb-2">Decor 分布預覽 (Top 5)</h3>
+                    <div id="poi-chart" class="space-y-2">
+                        <div class="text-sm text-slate-500 italic">資料收集中...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Terminal Log -->
+        <div class="glass-panel rounded-xl p-4">
+            <div class="flex justify-between items-center mb-2 px-2">
+                <h2 class="text-sm font-semibold text-slate-400 flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span> 系統輸出日誌
+                </h2>
+            </div>
+            <div class="log-container bg-[#020617] rounded-lg p-4 font-mono text-sm" id="log-output">
+                <!-- Logs will be inserted here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const ESTIMATED_TOTAL = 32000000;
+        let startTime = new Date();
+        
+        function formatNumber(num) {
+            return new Intl.NumberFormat('en-US').format(num);
+        }
+
+        function updateElapsed() {
+            const now = new Date();
+            const diff = Math.floor((now - startTime) / 1000);
+            const m = String(Math.floor(diff / 60)).padStart(2, '0');
+            const s = String(diff % 60).padStart(2, '0');
+            document.getElementById('elapsed-time').innerText = `${m}:${s}`;
+        }
+        setInterval(updateElapsed, 1000);
+
+        function updatePhases(phase) {
+            ['phase-1', 'phase-2', 'phase-3', 'phase-4'].forEach(id => {
+                document.getElementById(id).className = 'phase-indicator p-3 rounded bg-slate-800/50';
+            });
+            
+            if (phase === 'Pass 1') {
+                document.getElementById('phase-1').classList.add('phase-active');
+            } else if (phase === 'Pass 2') {
+                document.getElementById('phase-1').classList.add('phase-done');
+                document.getElementById('phase-2').classList.add('phase-active');
+            } else if (phase === 'Pass 3') {
+                document.getElementById('phase-1').classList.add('phase-done');
+                document.getElementById('phase-2').classList.add('phase-done');
+                document.getElementById('phase-3').classList.add('phase-active');
+            } else if (phase === 'Generating') {
+                document.getElementById('phase-1').classList.add('phase-done');
+                document.getElementById('phase-2').classList.add('phase-done');
+                document.getElementById('phase-3').classList.add('phase-done');
+                document.getElementById('phase-4').classList.add('phase-active');
+            } else if (phase === 'Done') {
+                document.getElementById('phase-1').classList.add('phase-done');
+                document.getElementById('phase-2').classList.add('phase-done');
+                document.getElementById('phase-3').classList.add('phase-done');
+                document.getElementById('phase-4').classList.add('phase-done');
+                document.getElementById('status-text').innerText = '✅ 3-Pass 深度解析全部完成！';
+                document.getElementById('status-text').className = 'text-green-400 mt-1 font-bold';
+            }
+        }
+
+        async function fetchStatus() {
+            try {
+                const res = await fetch('/api/status');
+                const data = await res.json();
+
+                if (data.startTime) startTime = new Date(data.startTime);
+                
+                // Update Phase
+                updatePhases(data.phase || 'Pass 1');
+                
+                // Update Progress
+                let currentProcess = 0;
+                let maxProcess = 1;
+                
+                if (data.phase === 'Pass 1') {
+                    currentProcess = data.pass1Processed || 0;
+                    maxProcess = ESTIMATED_TOTAL;
+                } else if (data.phase === 'Pass 2') {
+                    currentProcess = data.pass2Processed || 0;
+                    maxProcess = ESTIMATED_TOTAL;
+                } else if (data.phase === 'Pass 3') {
+                    currentProcess = data.pass3Processed || 0;
+                    maxProcess = ESTIMATED_TOTAL;
+                } else if (data.phase === 'Generating' || data.phase === 'Done') {
+                    currentProcess = 1;
+                    maxProcess = 1;
+                }
+                
+                const percent = Math.min(100, (currentProcess / maxProcess) * 100).toFixed(1);
+                
+                document.getElementById('main-percent').innerText = `${percent}%`;
+                document.getElementById('main-progress').style.width = `${percent}%`;
+                
+                if (data.phase === 'Pass 1' || data.phase === 'Pass 2' || data.phase === 'Pass 3') {
+                    document.getElementById('processed-elements').innerText = `目前階段已掃描: ${formatNumber(currentProcess)} 元素`;
+                } else {
+                    document.getElementById('processed-elements').innerText = `✅ 全檔掃描完成`;
+                }
+
+                // Update Stats
+                document.getElementById('stat-nodes').innerText = formatNumber(data.foundNodes || 0);
+                document.getElementById('stat-ways').innerText = formatNumber(data.foundWays || 0);
+                document.getElementById('stat-relations').innerText = formatNumber(data.foundRelations || 0);
+                
+                if (data.stats && data.stats.totalPOIs > 0) {
+                    document.getElementById('stat-total-pois').innerText = formatNumber(data.stats.totalPOIs);
+                }
+
+                if (data.stats && data.stats.fullStats) {
+                    const fs = data.stats.fullStats;
+                    document.getElementById('stat-real-points').innerText = formatNumber(fs.realPointPois || 0);
+                    document.getElementById('stat-area-instances').innerText = formatNumber(fs.areaOrLineDecorInstances || 0);
+                    document.getElementById('stat-skipped-outside').innerText = formatNumber(fs.skippedOutsideBbox || 0);
+                    document.getElementById('stat-skipped-invalid').innerText = formatNumber(fs.skippedInvalidCoords || 0);
+                }
+
+                // Update Logs
+                if (data.logs && data.logs.length > 0) {
+                    const logContainer = document.getElementById('log-output');
+                    logContainer.innerHTML = data.logs.map(log => 
+                        `<div class="mb-1 ${log.includes('❌') ? 'text-red-400' : log.includes('✅') ? 'text-green-400' : 'text-slate-300'}">${log}</div>`
+                    ).join('');
+                    logContainer.scrollTop = logContainer.scrollHeight;
+                }
+
+                // Update POI Chart if generating
+                if (data.stats && data.stats.poisByType && Object.keys(data.stats.poisByType).length > 0) {
+                    const sorted = Object.entries(data.stats.poisByType)
+                        .sort((a, b) => b[1] - a[1])
+                        .slice(0, 5);
+                    
+                    const maxCount = sorted[0][1];
+                    const chartHtml = sorted.map(([type, count]) => `
+                        <div class="flex items-center text-sm">
+                            <div class="w-24 text-slate-300 truncate" title="${type}">${type}</div>
+                            <div class="flex-1 ml-2">
+                                <div class="h-4 bg-sky-500 rounded" style="width: ${(count/maxCount)*100}%"></div>
+                            </div>
+                            <div class="w-16 text-right font-mono text-slate-400">${formatNumber(count)}</div>
+                        </div>
+                    `).join('');
+                    document.getElementById('poi-chart').innerHTML = chartHtml;
+                }
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        setInterval(fetchStatus, 1000);
+        fetchStatus();
+    </script>
+</body>
+</html>

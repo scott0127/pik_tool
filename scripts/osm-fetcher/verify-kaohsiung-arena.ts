@@ -37,7 +37,13 @@ interface POI {
   lon: number;
   name: string;
   decorType: string;
-  decorName?: string;
+}
+
+interface CompressedFeature {
+  id: string;
+  t: string;
+  n: string;
+  pts: [number, number][];
 }
 
 interface TileIndexEntry {
@@ -97,9 +103,19 @@ function main() {
     throw new Error(`找不到 tile 檔：${tilePath}`);
   }
 
-  const tileData = JSON.parse(readFileSync(tilePath, 'utf-8')) as { bbox: BoundingBox; pois: POI[] };
+  const tileData = JSON.parse(readFileSync(tilePath, 'utf-8')) as { bbox: BoundingBox; features: CompressedFeature[] };
+  
+  const pois: POI[] = tileData.features.flatMap(feat => 
+    feat.pts.map((pt, i) => ({
+      id: `${feat.id}-${i}`,
+      lat: pt[0],
+      lon: pt[1],
+      name: feat.n,
+      decorType: feat.t
+    }))
+  );
   // 500 公尺不是判定條件本身，而是用來輸出一個可人工檢查的合理鄰域。
-  const nearby = tileData.pois
+  const nearby = pois
     .map((poi) => ({
       ...poi,
       distanceMeters: distanceMeters(TARGET.lat, TARGET.lon, poi.lat, poi.lon),

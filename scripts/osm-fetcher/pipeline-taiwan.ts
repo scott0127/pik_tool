@@ -110,10 +110,9 @@ async function main() {
     console.log(`\n⏭️  步驟 1 已跳過（${skipClean ? '--skip-clean' : '--skip-fetch'} 模式）`);
   }
 
-  // ============ 步驟 2：抓取 OSM 資料 ============
   if (!skipFetch) {
     const limitArg = limit ? ` --limit ${limit}` : '';
-    await runStep(2, '抓取台灣 OSM 資料', `npx tsx scripts/osm-fetcher/fetch-taiwan.ts${limitArg}`);
+    await runStep(2, '解析本地 OSM 資料', `npx tsx scripts/osm-fetcher/parse-taiwan.ts "C:\\Users\\scott\\Downloads\\taiwan-260615.osm.pbf"${limitArg}`);
 
     // 如果有 limit，檢查是否全部完成
     if (limit && existsSync(progressFile)) {

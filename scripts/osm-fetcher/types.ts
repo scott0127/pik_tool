@@ -33,6 +33,14 @@ export interface POIData {
   iconUrl?: string;
 }
 
+/** 壓縮後的 POI 群組特徵 */
+export interface CompressedFeature {
+  id: string; // original OSM id, e.g., "way-12345"
+  t: string;  // decorType
+  n: string;  // name
+  pts: [number, number][]; // [lat, lon]
+}
+
 /** 區域 POI 資料檔案格式 */
 export interface RegionPOIFile {
   /** 資料版本 */
@@ -45,10 +53,10 @@ export interface RegionPOIFile {
   bbox: BoundingBox;
   /** 生成時間 (ISO 8601) */
   generatedAt: string;
-  /** POI 數量 */
+  /** POI 數量 (壓縮特徵數) */
   poiCount: number;
-  /** POI 資料列表 */
-  pois: POIData[];
+  /** 壓縮的特徵列表 */
+  features: CompressedFeature[];
 }
 
 /** Overpass API 回應元素 */

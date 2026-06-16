@@ -1,24 +1,41 @@
 /**
- * 台灣本島大尺度切片合併與網格裁切 (Streaming / Bucket approach)
+ * merge-taiwan.fixed.ts
  *
- * 使用方式：
- *   npx tsx scripts/osm-fetcher/merge-taiwan.ts
+ * 目的：將 app/data/regions/taiwan_chunks/chunk_*.json 合併成前端實際使用的：
+ * - public/data/regions/taiwan_main_island/index.json
+ * - public/data/regions/taiwan_main_island/tiles/rX_cY.json
+ * - public/data/regions/taiwan_main_island/s2_l17_single.json
+ * - public/data/regions/taiwan_main_island/single/<decorType>.json
  *
- * 重點：
- * - 避免將所有 POI (數百萬筆) 同時載入記憶體
- * - 即時將讀取的 POI 分配進前端所需的 S2 Level 16(或自訂Grid) Bucket
- * - 同步產出單格 s2_l17_single.json 作為中繼檔，管線後續會拆成前端使用的小檔
+ * 修正重點：
+ * - 不再宣稱 streaming 但全部塞進記憶體；tile 輸出改用 JSONL bucket 暫存，再逐 tile 串流寫出。
+ * - 不再把 bbox 外座標 clamp 到邊界 tile；bbox 外直接 skip 並統計。
+ * - 直接產生前端 pure mode 會載入的 single/<decorType>.json。
+ * - 輸出 mixed cell dropped 統計，避免誤以為 s2_l17_single 是完整 cell map。
  */
 
-import { readdirSync, readFileSync, writeFileSync, mkdirSync, existsSync } from 'fs';
+import {
+  createReadStream,
+  createWriteStream,
+  existsSync,
+  mkdirSync,
+  readdirSync,
+  readFileSync,
+  rmSync,
+  writeFileSync,
+} from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
-import { REGIONS, getRegion } from './regions.js';
-import type { BoundingBox, POIData } from './types';
+import { once } from 'events';
+import readline from 'readline';
+import { REGIONS } from './regions.js';
+import type { BoundingBox, CompressedFeature } from './types';
 // @ts-ignore
 import { S2 } from 's2-geometry';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
+
+type NullableDecor = string | null;
 
 interface TileIndexEntry {
   id: string;
@@ -35,19 +52,44 @@ interface RegionIndex {
   tiles: TileIndexEntry[];
 }
 
+interface MergeStats {
+  totalParsed: number;
+  totalDeduplicated: number;
+  totalWrittenToTiles: number;
+  duplicateSkipped: number;
+  outsideBboxSkipped: number;
+  invalidCoordSkipped: number;
+  singleCells: number;
+  mixedCellsDropped: number;
+  cellCountByType: Record<string, number>;
+  poiCountByType: Record<string, number>;
+}
+
+const REGION_ID = process.env.OSM_REGION_ID || 'taiwan_main_island';
+const REGION = REGIONS[REGION_ID];
+if (!REGION) throw new Error(`Unknown region: ${REGION_ID}`);
+
+const S2_LEVEL = Number(process.env.OSM_S2_LEVEL || 17);
+const FRONTEND_GRID = Number(process.env.OSM_FRONTEND_GRID || REGION.gridSize || 12);
+const CHUNKS_DIR = process.env.OSM_CHUNKS_DIR || join(__dirname, '../../app/data/regions/taiwan_chunks');
+const OUTPUT_DIR = process.env.OSM_OUTPUT_DIR || join(__dirname, `../../public/data/regions/${REGION.id}`);
+const TILES_DIR = join(OUTPUT_DIR, 'tiles');
+const SINGLE_DIR = join(OUTPUT_DIR, 'single');
+const TMP_BUCKET_DIR = join(OUTPUT_DIR, '.tmp_tile_buckets');
+
 function splitBboxToGrid(bbox: BoundingBox, gridSize: number): BoundingBox[] {
   const { north, south, east, west } = bbox;
   const latStep = (north - south) / gridSize;
   const lonStep = (east - west) / gridSize;
   const grids: BoundingBox[] = [];
 
-  for (let i = 0; i < gridSize; i++) {
-    for (let j = 0; j < gridSize; j++) {
+  for (let row = 0; row < gridSize; row++) {
+    for (let col = 0; col < gridSize; col++) {
       grids.push({
-        south: south + i * latStep,
-        north: south + (i + 1) * latStep,
-        west: west + j * lonStep,
-        east: west + (j + 1) * lonStep,
+        south: south + row * latStep,
+        north: south + (row + 1) * latStep,
+        west: west + col * lonStep,
+        east: west + (col + 1) * lonStep,
       });
     }
   }
@@ -55,9 +97,20 @@ function splitBboxToGrid(bbox: BoundingBox, gridSize: number): BoundingBox[] {
   return grids;
 }
 
-function getTileIndex(lat: number, lon: number, bbox: BoundingBox, gridSize: number) {
+function isFiniteCoord(lat: unknown, lon: unknown): lat is number {
+  return typeof lat === 'number' && typeof lon === 'number' && Number.isFinite(lat) && Number.isFinite(lon);
+}
+
+function isWithinBbox(lat: number, lon: number, bbox: BoundingBox) {
+  return lat >= bbox.south && lat <= bbox.north && lon >= bbox.west && lon <= bbox.east;
+}
+
+function getTileIndexStrict(lat: number, lon: number, bbox: BoundingBox, gridSize: number) {
+  if (!isWithinBbox(lat, lon, bbox)) return null;
+
   const latStep = (bbox.north - bbox.south) / gridSize;
   const lonStep = (bbox.east - bbox.west) / gridSize;
+  // The clamp here only handles exact north/east border values after strict bbox validation.
   const row = Math.min(gridSize - 1, Math.max(0, Math.floor((lat - bbox.south) / latStep)));
   const col = Math.min(gridSize - 1, Math.max(0, Math.floor((lon - bbox.west) / lonStep)));
   return { row, col };
@@ -68,78 +121,248 @@ function getCellId(lat: number, lon: number, level: number) {
   return S2.keyToId(key);
 }
 
-async function main() {
-  const region = REGIONS.taiwan_main_island;
-  const CHUNKS_DIR = join(__dirname, '../../app/data/regions/taiwan_chunks');
-  const OUTPUT_DIR = join(__dirname, '../../public/data/regions/taiwan_main_island');
-  const TILES_DIR = join(OUTPUT_DIR, 'tiles');
+function resetDir(dir: string) {
+  rmSync(dir, { recursive: true, force: true });
+  mkdirSync(dir, { recursive: true });
+}
 
-  const FRONTEND_GRID = region.gridSize || 12; // 12x12 = 144 tiles
-  
-  if (!existsSync(TILES_DIR)) {
-    mkdirSync(TILES_DIR, { recursive: true });
+async function writeAsync(stream: NodeJS.WritableStream, data: string) {
+  if (!stream.write(data)) {
+    await once(stream, 'drain');
+  }
+}
+
+async function closeStream(stream: NodeJS.WritableStream) {
+  stream.end();
+  await once(stream, 'finish');
+}
+
+function updateCellType(cellTypes: Map<string, NullableDecor>, cellId: string, decorType: string) {
+  if (!cellTypes.has(cellId)) {
+    cellTypes.set(cellId, decorType);
+    return;
   }
 
-  // 1. 初始化 Bucket
-  console.log(`📦 初始化 ${FRONTEND_GRID}x${FRONTEND_GRID} 個前端載入 Bucket...`);
+  const current = cellTypes.get(cellId);
+  if (current !== null && current !== decorType) {
+    cellTypes.set(cellId, null);
+  }
+}
+
+async function writeTileFromBucket(bucketFile: string, tileFile: string, bbox: BoundingBox) {
+  const out = createWriteStream(tileFile, { encoding: 'utf-8' });
+  let count = 0;
+  let first = true;
+
+  await writeAsync(out, `{"bbox":${JSON.stringify(bbox)},"features":[`);
+
+  if (existsSync(bucketFile)) {
+    const rl = readline.createInterface({
+      input: createReadStream(bucketFile, { encoding: 'utf-8' }),
+      crlfDelay: Infinity,
+    });
+
+    for await (const line of rl) {
+      if (!line.trim()) continue;
+      if (!first) await writeAsync(out, ',');
+      await writeAsync(out, line);
+      first = false;
+      count++;
+    }
+  }
+
+  await writeAsync(out, ']}');
+  await closeStream(out);
+  return count;
+}
+
+async function writeAllSingleCells(cellTypes: Map<string, NullableDecor>, outputPath: string) {
+  const out = createWriteStream(outputPath, { encoding: 'utf-8' });
+  let first = true;
+  let count = 0;
+
+  await writeAsync(out, `{"version":"2.0.0","regionId":${JSON.stringify(REGION.id)},"level":${S2_LEVEL},"generatedAt":${JSON.stringify(new Date().toISOString())},"cells":[`);
+
+  for (const [cellId, decorType] of cellTypes.entries()) {
+    if (!decorType) continue;
+    if (!first) await writeAsync(out, ',');
+    await writeAsync(out, JSON.stringify({ cellId, decorType }));
+    first = false;
+    count++;
+  }
+
+  await writeAsync(out, `],"cellCount":${count}}`);
+  await closeStream(out);
+  return count;
+}
+
+function writePerTypeSingleCells(cellTypes: Map<string, NullableDecor>, singleDir: string) {
+  const grouped = new Map<string, string[]>();
+  let mixed = 0;
+
+  for (const [cellId, decorType] of cellTypes.entries()) {
+    if (!decorType) {
+      mixed++;
+      continue;
+    }
+    const list = grouped.get(decorType) || [];
+    list.push(cellId);
+    grouped.set(decorType, list);
+  }
+
+  const indexData: { decorType: string; cellCount: number; file: string }[] = [];
+  for (const [decorType, cellIds] of grouped.entries()) {
+    cellIds.sort((a, b) => (BigInt(a) < BigInt(b) ? -1 : BigInt(a) > BigInt(b) ? 1 : 0));
+
+    const fileName = `${decorType}.json`;
+    const filePath = join(singleDir, fileName);
+    const data = {
+      decorType,
+      cellCount: cellIds.length,
+      cells: cellIds.map(cellId => ({ cellId })),
+    };
+    writeFileSync(filePath, JSON.stringify(data), 'utf-8');
+    indexData.push({ decorType, cellCount: cellIds.length, file: fileName });
+  }
+
+  indexData.sort((a, b) => b.cellCount - a.cellCount);
+  writeFileSync(join(singleDir, 'index.json'), JSON.stringify({
+    version: '2.0.0',
+    regionId: REGION.id,
+    level: S2_LEVEL,
+    generatedAt: new Date().toISOString(),
+    totalCellCount: indexData.reduce((sum, item) => sum + item.cellCount, 0),
+    mixedCellCountDropped: mixed,
+    types: indexData,
+  }, null, 2), 'utf-8');
+
+  return { grouped, mixed };
+}
+
+async function main() {
+  const region = REGION;
   const tileBboxes = splitBboxToGrid(region.bbox, FRONTEND_GRID);
-  // 我們仍在記憶體中保留 buckets，但因為是以全島為主，POI若非常多，
-  // 最佳解是串流寫入檔案。但為求實作單純，先嘗試直接推入陣列
-  // Node.js 預設至少能扛 1.5GB 陣列 (約 500萬筆 JS Object)
-  const tileBuckets: POIData[][] = Array.from({ length: tileBboxes.length }, () => []);
 
-  const cellTypes = new Map<string, string | null>();
-  const seenIds = new Set<string>();
+  console.log(`📦 Region: ${region.id}`);
+  console.log(`📦 Chunks dir: ${CHUNKS_DIR}`);
+  console.log(`📦 Output dir: ${OUTPUT_DIR}`);
+  console.log(`📦 Frontend grid: ${FRONTEND_GRID}x${FRONTEND_GRID}, S2 L${S2_LEVEL}`);
 
-  // 2. 爬梳所有下載好的 Chunks
-  console.log(`\n讀取 chunk 檔案...`);
   if (!existsSync(CHUNKS_DIR)) {
     console.error(`❌ 找不到目錄 ${CHUNKS_DIR}`);
     process.exit(1);
   }
 
-  const files = readdirSync(CHUNKS_DIR).filter(f => f.startsWith('chunk_') && f.endsWith('.json'));
+  const files = readdirSync(CHUNKS_DIR)
+    .filter(f => f.startsWith('chunk_') && f.endsWith('.json'))
+    .sort();
+
   if (files.length === 0) {
-    console.error(`❌ 沒有 chunk 檔案可供合併`);
+    console.error('❌ 沒有 chunk 檔案可供合併');
     process.exit(1);
   }
 
-  let totalParsed = 0;
-  let totalDeduplicated = 0;
+  mkdirSync(OUTPUT_DIR, { recursive: true });
+  resetDir(TILES_DIR);
+  resetDir(SINGLE_DIR);
+  resetDir(TMP_BUCKET_DIR);
+
+  const stats: MergeStats = {
+    totalParsed: 0,
+    totalDeduplicated: 0,
+    totalWrittenToTiles: 0,
+    duplicateSkipped: 0,
+    outsideBboxSkipped: 0,
+    invalidCoordSkipped: 0,
+    singleCells: 0,
+    mixedCellsDropped: 0,
+    cellCountByType: {},
+    poiCountByType: {},
+  };
+
+  const cellTypes = new Map<string, NullableDecor>();
+  const seenIds = new Set<string>();
+  const bucketStreams = tileBboxes.map((_bbox, i) =>
+    createWriteStream(join(TMP_BUCKET_DIR, `bucket_${i}.jsonl`), { encoding: 'utf-8' })
+  );
+
+  console.log('\n讀取 chunk 檔案並分配到暫存 tile bucket...');
 
   for (const file of files) {
     const p = join(CHUNKS_DIR, file);
-    const content = JSON.parse(readFileSync(p, 'utf-8'));
-    const chunkPois: POIData[] = content.pois || [];
+    const content = JSON.parse(readFileSync(p, 'utf-8')) as { features?: CompressedFeature[] };
+    const chunkFeatures = Array.isArray(content.features) ? content.features : [];
 
-    for (const poi of chunkPois) {
-      // 避免相鄰 Chunk 的邊界物件重複抓取
-      if (seenIds.has(poi.id)) continue;
-      seenIds.add(poi.id);
+    let acceptedInFile = 0;
+    for (const feat of chunkFeatures) {
+      stats.totalParsed++;
 
-      // 分發至對應的 Tile Bucket
-      const { row, col } = getTileIndex(poi.lat, poi.lon, region.bbox, FRONTEND_GRID);
-      const index = row * FRONTEND_GRID + col;
-      tileBuckets[index].push(poi);
-      totalDeduplicated++;
+      const tileBuckets = new Map<number, [number, number][]>();
 
-      // 同步計算單格雷達 (s2_l17_single)
-      const cellId = getCellId(poi.lat, poi.lon, 17);
-      if (!cellTypes.has(cellId)) {
-        cellTypes.set(cellId, poi.decorType);
-      } else {
-        const current = cellTypes.get(cellId);
-        if (current !== null && current !== poi.decorType) {
-          cellTypes.set(cellId, null); // 衝突變混合
+      for (const pt of feat.pts) {
+        const lat = pt[0];
+        const lon = pt[1];
+
+        if (!isFiniteCoord(lat, lon)) {
+          stats.invalidCoordSkipped++;
+          continue;
         }
+
+        const tileIndex = getTileIndexStrict(lat, lon, region.bbox, FRONTEND_GRID);
+        if (!tileIndex) {
+          stats.outsideBboxSkipped++;
+          continue;
+        }
+
+        const index = tileIndex.row * FRONTEND_GRID + tileIndex.col;
+        let arr = tileBuckets.get(index);
+        if (!arr) {
+          arr = [];
+          tileBuckets.set(index, arr);
+        }
+        arr.push(pt);
+
+        const cellId = getCellId(lat, lon, S2_LEVEL);
+        updateCellType(cellTypes, cellId, feat.t);
       }
+
+      if (seenIds.has(feat.id)) {
+        // Wait! In parse-taiwan, features are grouped by ID before writing to chunk.
+        // But what if it appears in multiple chunks? Then seenIds would block it.
+        // But parse-taiwan puts the whole feature in ONE chunk (the chunk of its first point).
+        // So a feature ID is unique across chunks anyway!
+        // But let's skip the seenIds check for now or apply it per feature.
+      }
+      
+      if (tileBuckets.size === 0) continue;
+      
+      if (seenIds.has(feat.id)) {
+        stats.duplicateSkipped++;
+        continue;
+      }
+      seenIds.add(feat.id);
+
+      for (const [index, pts] of tileBuckets.entries()) {
+        const partialFeat: CompressedFeature = {
+          id: feat.id,
+          t: feat.t,
+          n: feat.n,
+          pts: pts,
+        };
+        await writeAsync(bucketStreams[index], JSON.stringify(partialFeat) + '\n');
+      }
+
+      stats.totalDeduplicated++;
+      acceptedInFile++;
+      stats.poiCountByType[feat.t] = (stats.poiCountByType[feat.t] || 0) + feat.pts.length;
     }
-    totalParsed += chunkPois.length;
-    console.log(`  讀取 ${file}: +${chunkPois.length} (累積合併去重: ${totalDeduplicated})`);
+
+    console.log(`  ${file}: +${chunkFeatures.length.toLocaleString()} parsed, +${acceptedInFile.toLocaleString()} accepted, total accepted ${stats.totalDeduplicated.toLocaleString()}`);
   }
 
-  // 3. 輸出前端 Tiles (同 split-region 格式)
-  console.log(`\n💾 正在寫入前端 Tile JSON...`);
+  await Promise.all(bucketStreams.map(closeStream));
+
+  console.log('\n💾 正在串流寫入前端 Tile JSON...');
   const indexEntries: TileIndexEntry[] = [];
 
   for (let i = 0; i < tileBboxes.length; i++) {
@@ -147,18 +370,16 @@ async function main() {
     const col = i % FRONTEND_GRID;
     const tileId = `r${row}_c${col}`;
     const fileName = `${tileId}.json`;
-    const tileData = {
-      bbox: tileBboxes[i],
-      pois: tileBuckets[i],
-    };
+    const bucketFile = join(TMP_BUCKET_DIR, `bucket_${i}.jsonl`);
+    const tileFile = join(TILES_DIR, fileName);
+    const count = await writeTileFromBucket(bucketFile, tileFile, tileBboxes[i]);
 
-    writeFileSync(join(TILES_DIR, fileName), JSON.stringify(tileData), 'utf-8');
-
+    stats.totalWrittenToTiles += count;
     indexEntries.push({
       id: tileId,
       bbox: tileBboxes[i],
       file: fileName,
-      poiCount: tileBuckets[i].length,
+      poiCount: count,
     });
   }
 
@@ -173,25 +394,41 @@ async function main() {
   writeFileSync(join(OUTPUT_DIR, 'index.json'), JSON.stringify(index), 'utf-8');
   console.log(`✅ 寫入主索引: ${join(OUTPUT_DIR, 'index.json')}`);
 
-  // 4. 輸出單一雷達飾品格中繼檔 (同 build-s2-singletons 格式)
-  console.log(`\n💾 正在寫入 S2 單一飾品格資料...`);
-  const cells = Array.from(cellTypes.entries())
-    .filter(([, decorType]) => decorType)
-    .map(([cellId, decorType]) => ({ cellId, decorType: decorType as string }));
+  console.log('\n💾 正在寫入 S2 單一飾品格資料...');
+  stats.singleCells = await writeAllSingleCells(cellTypes, join(OUTPUT_DIR, `s2_l${S2_LEVEL}_single.json`));
+  const perType = writePerTypeSingleCells(cellTypes, SINGLE_DIR);
+  stats.mixedCellsDropped = perType.mixed;
 
-  const singleData = {
-    version: '1.0.0',
+  for (const [decorType, cells] of perType.grouped.entries()) {
+    stats.cellCountByType[decorType] = cells.length;
+  }
+
+  const statsPath = join(OUTPUT_DIR, 'merge-stats.json');
+  writeFileSync(statsPath, JSON.stringify({
+    version: '2.0.0',
     regionId: region.id,
-    level: 17,
     generatedAt: new Date().toISOString(),
-    cellCount: cells.length,
-    cells,
-  };
+    chunksDir: CHUNKS_DIR,
+    outputDir: OUTPUT_DIR,
+    frontendGrid: FRONTEND_GRID,
+    s2Level: S2_LEVEL,
+    stats,
+  }, null, 2), 'utf-8');
 
-  writeFileSync(join(OUTPUT_DIR, `s2_l17_single.json`), JSON.stringify(singleData), 'utf-8');
-  console.log(`✅ 完成單一飾品格索引: ${cells.length} 個 cells`);
+  rmSync(TMP_BUCKET_DIR, { recursive: true, force: true });
 
-  console.log(`\n🎉 台灣本島大尺度合併與裁切作業全數完成！`);
+  console.log('\n🎉 台灣本島大尺度合併與裁切完成');
+  console.log(`  parsed: ${stats.totalParsed.toLocaleString()}`);
+  console.log(`  accepted/deduplicated: ${stats.totalDeduplicated.toLocaleString()}`);
+  console.log(`  written to tiles: ${stats.totalWrittenToTiles.toLocaleString()}`);
+  console.log(`  single cells: ${stats.singleCells.toLocaleString()}`);
+  console.log(`  mixed cells dropped: ${stats.mixedCellsDropped.toLocaleString()}`);
+  console.log(`  outside bbox skipped: ${stats.outsideBboxSkipped.toLocaleString()}`);
+  console.log(`  duplicate skipped: ${stats.duplicateSkipped.toLocaleString()}`);
+  console.log(`  stats: ${statsPath}`);
+  console.log('\n下一步可選：');
+  console.log('  node scripts/encode-s2-cells.cjs');
+  console.log('  node scripts/optimize-tiles.cjs');
 }
 
 main().catch(err => {

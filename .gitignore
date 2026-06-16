@@ -40,3 +40,10 @@ scratch/
 output/
 tmp/
 --port/
+
+# OSM Pipeline and Data
+*.osm.pbf
+scripts/osm-fetcher/dashboard*-status.json
+scripts/osm-fetcher/archive/
+scripts/osm-fetcher/scratch/
+app/data/regions/
