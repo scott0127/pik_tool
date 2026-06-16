@@ -301,26 +301,54 @@
         </div>
 
         <div class="story-visual release-visual" aria-label="Release feature preview">
-          <div class="release-duplicate-stack" aria-hidden="true">
-            <span>重複</span>
-            <span>重複</span>
-            <span>重複</span>
-          </div>
-          <div class="release-memory-card">
-            <div class="release-pikmin-portrait">
-              <Icon name="lucide:leaf" />
+          <!-- Three Identical Pikmin Slots (Top Area) -->
+          <div class="release-pikmin-deck" aria-hidden="true">
+            <div class="release-pikmin-slot slot-1">
+              <div class="release-pikmin-card-inner">
+                <img src="https://pikmin.wiki.gallery/images/thumb/a/a7/Decor_Red_Chef_Hat.png/100px-Decor_Red_Chef_Hat.png" alt="小紅皮" />
+                <span>小紅皮</span>
+              </div>
+              <div class="release-stamp">放生</div>
             </div>
-            <div class="release-memory-copy">
-              <strong>小紅皮</strong>
-              <span>餐廳 · 2026-06-11</span>
-              <small>因為我要測試</small>
+            <div class="release-pikmin-slot slot-2">
+              <div class="release-pikmin-card-inner">
+                <img src="https://pikmin.wiki.gallery/images/thumb/a/a7/Decor_Red_Chef_Hat.png/100px-Decor_Red_Chef_Hat.png" alt="小紅皮" />
+                <span>小紅皮</span>
+              </div>
+              <div class="release-stamp">放生</div>
+            </div>
+            <div class="release-pikmin-slot slot-3">
+              <div class="release-pikmin-card-inner">
+                <img src="https://pikmin.wiki.gallery/images/thumb/a/a7/Decor_Red_Chef_Hat.png/100px-Decor_Red_Chef_Hat.png" alt="小紅皮" />
+                <span>小紅皮</span>
+              </div>
+              <!-- Slot 3 is kept, so it has no stamp overlay -->
             </div>
           </div>
-          <div class="release-organize-label">
-            <Icon name="lucide:archive" />
-            <span>整理成一筆回憶</span>
+
+          <!-- The Vertical Path & Merge Node (Middle Area) -->
+          <div class="release-connector-path" aria-hidden="true">
+            <div class="release-path-line"></div>
           </div>
-          <div class="release-soft-path"></div>
+
+          <!-- The Final Integrated Memory (Bottom Area) -->
+          <div class="release-result-container">
+            <div class="release-memory-card">
+              <div class="release-pikmin-portrait">
+                <img src="https://pikmin.wiki.gallery/images/thumb/a/a7/Decor_Red_Chef_Hat.png/120px-Decor_Red_Chef_Hat.png" alt="小小紅皮" />
+              </div>
+              <div class="release-memory-copy">
+                <strong>小小紅皮</strong>
+                <span>餐廳 · 2026-06-11</span>
+                <small>鼎王麻辣鍋，補鴨血補豆腐冰水一壺，白飯</small>
+              </div>
+            </div>
+            <!-- The Status Badge: integrated nicely below the card so it never overlaps -->
+            <div class="release-organize-label">
+              <Icon name="lucide:archive" />
+              <span>整理成一筆回憶</span>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -1265,20 +1293,40 @@ const initHomeScrollMotion = () => {
     }
 
     const releaseTimeline = gsap.timeline({
-      scrollTrigger: {
-        trigger: '.story-chapter-release',
-        start: 'top 74%',
-        end: 'top 28%',
-        scrub: 0.75,
-      },
+      paused: true,
     });
 
     releaseTimeline
-      .fromTo('.release-duplicate-stack span', { x: -18, y: 18, opacity: 0, rotate: -4 }, { x: 0, y: 0, opacity: 1, rotate: 0, stagger: 0.06, duration: 0.24, ease: 'power2.out' })
-      .to('.release-duplicate-stack span', { x: 48, y: -8, opacity: 0.18, scale: 0.82, stagger: 0.035, duration: 0.22, ease: 'power2.inOut' }, 0.34)
-      .fromTo('.release-memory-card', { y: 18, scale: 0.94, opacity: 0.62 }, { y: 0, scale: 1, opacity: 1, duration: 0.28, ease: 'power3.out' }, 0.44)
-      .fromTo('.release-soft-path', { scaleX: 0, transformOrigin: 'center' }, { scaleX: 1, duration: 0.22, ease: 'none' }, 0.56)
-      .fromTo('.release-organize-label', { y: 12, opacity: 0 }, { y: 0, opacity: 1, duration: 0.22, ease: 'power2.out' }, 0.64);
+      // 1. Initial state setup for cards and stamps
+      .fromTo('.release-pikmin-slot.slot-1', { scale: 0.75, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.2, ease: 'power2.out' }, 0)
+      .fromTo('.release-pikmin-slot.slot-2', { scale: 0.75, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.2, ease: 'power2.out' }, 0.1)
+      .fromTo('.release-pikmin-slot.slot-3', { scale: 0.75, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.2, ease: 'power2.out' }, 0.2)
+      .fromTo('.release-pikmin-slot.slot-1 .release-stamp', { scale: 3, opacity: 0, rotate: -30 }, { scale: 3, opacity: 0, rotate: -30, duration: 0.01 }, 0)
+      .fromTo('.release-pikmin-slot.slot-2 .release-stamp', { scale: 3, opacity: 0, rotate: 30 }, { scale: 3, opacity: 0, rotate: 30, duration: 0.01 }, 0)
+      
+      // 2. Stamps slam down sequentially
+      .to('.release-pikmin-slot.slot-1 .release-stamp', { scale: 1, opacity: 1, rotate: -12, duration: 0.2, ease: 'power2.in' }, 0.4)
+      .to('.release-pikmin-slot.slot-2 .release-stamp', { scale: 1, opacity: 1, rotate: 15, duration: 0.2, ease: 'power2.in' }, 0.6)
+      
+      // 3. Animate the connector path line
+      .fromTo('.release-path-line', { scaleY: 0, transformOrigin: 'top center' }, { scaleY: 1, duration: 0.18 }, 0.75)
+      
+      // 4. Fade in and slide up the final memory card
+      .fromTo('.release-memory-card', { y: 16, scale: 0.92, opacity: 0 }, { y: 0, scale: 1, opacity: 1, duration: 0.26, ease: 'power3.out' }, 0.8)
+      
+      // 5. Fade in the organization label
+      .fromTo('.release-organize-label', { y: 10, opacity: 0 }, { y: 0, opacity: 1, duration: 0.22, ease: 'power2.out' }, 0.9);
+
+    const releaseRoot = homePage.value?.querySelector<HTMLElement>('.story-chapter-release') ?? null;
+    if (releaseRoot) {
+      ScrollTrigger.create({
+        trigger: releaseRoot,
+        start: 'top 55%',
+        onEnter: () => releaseTimeline.restart(true),
+        onEnterBack: () => releaseTimeline.restart(true),
+        onLeaveBack: () => releaseTimeline.pause(0),
+      });
+    }
 
     const refreshStoryLayout = () => {
       moveStoryPill(activeStoryIndex.value, true);
@@ -2594,102 +2642,192 @@ onUnmounted(() => {
 }
 
 .release-visual {
-  display: grid;
-  place-items: center;
-  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 17.5rem;
+  padding: 1.25rem;
+  gap: 0.65rem;
 }
 
-.release-duplicate-stack {
+.release-pikmin-deck {
+  display: flex;
+  justify-content: center;
+  gap: 0.8rem;
+  width: 100%;
+  height: 5.2rem;
+  align-items: center;
+  position: relative;
+}
+
+.release-pikmin-slot {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 4.5rem;
+  height: 4.8rem;
+  will-change: transform, opacity;
+}
+
+.release-pikmin-card-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+  padding: 0.3rem 0.3rem 0.4rem;
+  border-radius: 0.85rem;
+  border: 1px solid rgba(16, 185, 129, 0.16);
+  background: rgba(255, 255, 255, 0.82);
+  box-shadow: 0 4px 10px rgba(15, 118, 88, 0.05);
+  width: 100%;
+}
+
+.release-pikmin-card-inner img {
+  width: 2.8rem;
+  height: 2.8rem;
+  object-fit: contain;
+}
+
+.release-pikmin-card-inner span {
+  font-size: 0.68rem;
+  font-weight: 850;
+  color: #1e293b;
+}
+
+.release-stamp {
   position: absolute;
-  top: 1rem;
-  left: 1rem;
-  z-index: 1;
-  display: grid;
-  gap: 0.35rem;
+  top: 0.8rem;
+  left: 0.35rem;
+  right: 0.35rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px double #ef4444;
+  border-radius: 50%;
+  color: #ef4444;
+  font-size: 0.7rem;
+  font-weight: 950;
+  padding: 0.22rem 0;
+  background: rgba(254, 242, 242, 0.9);
+  box-shadow: 0 0 6px rgba(239, 68, 68, 0.15);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 10;
+  letter-spacing: 0.06em;
+  will-change: transform, opacity;
 }
 
-.release-duplicate-stack span {
-  display: inline-flex;
-  width: fit-content;
-  padding: 0.34rem 0.72rem;
-  color: #047857;
-  border: 1px solid rgba(16, 185, 129, 0.18);
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.72);
-  box-shadow: 0 8px 16px rgba(15, 118, 88, 0.08);
-  font-size: 0.78rem;
-  font-weight: 900;
+.release-connector-path {
+  position: relative;
+  width: 100%;
+  height: 2.2rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.release-path-line {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: linear-gradient(180deg, rgba(16, 185, 129, 0.5) 0%, rgba(16, 185, 129, 0.08) 100%);
+}
+
+
+.release-result-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.65rem;
+  width: 100%;
 }
 
 .release-memory-card {
   position: relative;
-  z-index: 2;
   display: grid;
-  grid-template-columns: 4.8rem minmax(0, 1fr);
-  gap: 0.9rem;
+  grid-template-columns: 3.8rem minmax(0, 1fr);
+  gap: 0.8rem;
   width: 100%;
   align-items: center;
-  padding: 0.9rem;
-  border-radius: 1.35rem;
-  background: rgba(255, 255, 255, 0.72);
-  box-shadow: 0 14px 24px rgba(15, 118, 88, 0.12);
+  padding: 0.75rem;
+  border-radius: 1.2rem;
+  background: rgba(255, 255, 255, 0.82);
+  border: 1px solid rgba(255, 255, 255, 0.72);
+  box-shadow: 0 12px 22px rgba(15, 118, 88, 0.09);
+  opacity: 0;
+  will-change: transform, opacity;
 }
 
 .release-pikmin-portrait {
-  display: grid;
-  height: 5.8rem;
-  place-items: center;
-  color: #047857;
-  border-radius: 1.15rem;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 4rem;
+  border-radius: 0.95rem;
   background: linear-gradient(180deg, #dcfce7, #a7f3d0);
-  font-size: 2rem;
+  overflow: hidden;
+}
+
+.release-pikmin-portrait img {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  max-width: 92%;
+  max-height: 92%;
+  object-fit: contain;
 }
 
 .release-memory-copy {
   display: grid;
-  gap: 0.25rem;
+  gap: 0.18rem;
   min-width: 0;
 }
 
 .release-memory-copy strong {
   color: #172033;
-  font-size: 1.25rem;
+  font-size: 1.05rem;
   font-weight: 950;
 }
 
-.release-memory-copy span,
-.release-memory-copy small {
+.release-memory-copy span {
   overflow: hidden;
   color: #64748b;
+  font-size: 0.8rem;
   font-weight: 850;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.release-soft-path {
-  position: absolute;
-  width: 76%;
-  height: 3px;
-  border-radius: 999px;
-  background: linear-gradient(90deg, transparent, rgba(16, 185, 129, 0.34), transparent);
-  transform: translateY(4.8rem);
+.release-memory-copy small {
+  color: #78889b;
+  font-size: 0.78rem;
+  font-weight: 800;
+  line-height: 1.35;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .release-organize-label {
-  position: absolute;
-  right: 1rem;
-  bottom: 1rem;
   display: inline-flex;
   align-items: center;
-  gap: 0.42rem;
-  padding: 0.45rem 0.75rem;
+  gap: 0.38rem;
+  padding: 0.42rem 0.8rem;
   color: #047857;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.78);
-  box-shadow: 0 8px 16px rgba(15, 118, 88, 0.1);
+  background: rgba(255, 255, 255, 0.88);
+  border: 1px solid rgba(16, 185, 129, 0.16);
+  box-shadow: 0 6px 12px rgba(15, 118, 88, 0.04);
   font-size: 0.78rem;
   font-weight: 900;
   opacity: 0;
+  will-change: transform, opacity;
 }
 
 .home-story-sign {

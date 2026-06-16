@@ -1,4 +1,3 @@
-
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import { writeFileSync, existsSync, mkdirSync, readFileSync } from 'fs';
@@ -27,6 +26,7 @@ const DECOR_RULES = [
   { id: 'electronics', name: '電器行', icon: '🔌', tags: ['shop=appliance', 'shop=electronics', 'shop=computer', 'shop=mobile_phone'] },
   { id: 'hardware', name: '五金行', icon: '🔧', tags: ['shop=doityourself', 'shop=hardware', 'shop=tools'] },
   { id: 'library', name: '圖書館／書店', icon: '📚', tags: ['amenity=library', 'shop=books'] },
+  { id: 'stationery', name: '文具店', icon: '✏️', tags: ['shop=stationery', 'shop=craft'] },
   // 生活服務類
   { id: 'pharmacy', name: '藥局', icon: '💊', tags: ['amenity=pharmacy', 'shop=chemist', 'healthcare=pharmacy'] },
   { id: 'hair_salon', name: '美髮院', icon: '💇', tags: ['shop=hairdresser'] },
@@ -62,8 +62,56 @@ const OVERPASS_SERVERS = [
   'https://overpass.kumi.systems/api/interpreter',
 ];
 
-const REQUEST_DELAY_MS = 15000;
+const REQUEST_DELAY_MS = 5000;
 const MAX_RETRIES = 5;
+const RETRY_DELAYS = [5000, 10000, 30000, 30000, 30000]; // 每輪重試等待: 5s, 10s, 30s, 30s, 30s
+const RATE_LIMIT_DELAYS = [5000, 10000, 30000]; // 429 限速等待: 5s, 10s, 30s
+
+// ============ Dashboard 狀態檔 ============
+const STATUS_FILE = join(__dirname, 'dashboard-status.json');
+interface DashboardStatus {
+  gridSize: number;
+  totalChunks: number;
+  completed: string[];
+  failed: string[];
+  currentChunk: { id: string; row: number; col: number; server: string; retry: number; maxRetries: number } | null;
+  countdown: number;
+  countdownTotal: number;
+  countdownLabel: string;
+  logs: string[];
+  stats: { totalPOIs: number; startTime: string; avgTimePerChunk: number; poisByType: Record<string, number> };
+  isRunning: boolean;
+}
+const dashboardLogs: string[] = [];
+const poisByType: Record<string, number> = {};
+let dashboardStatus: DashboardStatus = {
+  gridSize: 15, totalChunks: 225, completed: [], failed: [],
+  currentChunk: null, countdown: 0, countdownTotal: 0, countdownLabel: '',
+  logs: [], stats: { totalPOIs: 0, startTime: new Date().toISOString(), avgTimePerChunk: 0, poisByType: {} },
+  isRunning: true,
+};
+function addLog(msg: string) {
+  const ts = new Date().toLocaleTimeString('zh-TW', { hour12: false });
+  const line = `[${ts}] ${msg}`;
+  dashboardLogs.push(line);
+  if (dashboardLogs.length > 200) dashboardLogs.shift();
+  dashboardStatus.logs = dashboardLogs;
+}
+function writeStatus() {
+  try { writeFileSync(STATUS_FILE, JSON.stringify(dashboardStatus), 'utf-8'); } catch {}
+}
+async function delayWithCountdown(ms: number, label: string): Promise<void> {
+  dashboardStatus.countdownTotal = Math.ceil(ms / 1000);
+  dashboardStatus.countdownLabel = label;
+  const steps = Math.ceil(ms / 1000);
+  for (let i = steps; i > 0; i--) {
+    dashboardStatus.countdown = i;
+    writeStatus();
+    await new Promise(r => setTimeout(r, 1000));
+  }
+  dashboardStatus.countdown = 0;
+  writeStatus();
+}
 
 interface ChunkData {
   id: string;
@@ -106,12 +154,21 @@ out center geom;
   `.trim();
 }
 
-async function fetchOverpass(query: string): Promise<OverpassResponse> {
+async function fetchOverpass(query: string, chunkId?: string): Promise<OverpassResponse> {
   let lastError: Error | null = null;
+  let rateLimitCount = 0;
   for (let retry = 0; retry < MAX_RETRIES; retry++) {
     for (const server of OVERPASS_SERVERS) {
       try {
+        const serverShort = server.includes('overpass-api.de') ? 'overpass-api.de' : 'kumi.systems';
         console.log(`  → 伺服器: ${server} (重試 ${retry + 1}/${MAX_RETRIES})`);
+        addLog(`🔄 區塊 ${chunkId || '?'}: 嘗試 ${serverShort} (${retry + 1}/${MAX_RETRIES})`);
+        if (dashboardStatus.currentChunk) {
+          dashboardStatus.currentChunk.server = server;
+          dashboardStatus.currentChunk.retry = retry + 1;
+        }
+        writeStatus();
+
         const response = await fetch(server, {
           method: 'POST',
           body: query,
@@ -123,8 +180,11 @@ async function fetchOverpass(query: string): Promise<OverpassResponse> {
         });
 
         if (response.status === 429) {
-          console.log(`    ⚠️ 429 Too Many Requests，等待 60 秒...`);
-          await delay(60000);
+          const waitMs = RATE_LIMIT_DELAYS[Math.min(rateLimitCount, RATE_LIMIT_DELAYS.length - 1)];
+          rateLimitCount++;
+          console.log(`    ⚠️ 429 Too Many Requests，等待 ${waitMs / 1000} 秒...`);
+          addLog(`⚠️ 429 限速，等待 ${waitMs / 1000} 秒...`);
+          await delayWithCountdown(waitMs, '429 限速等待');
           continue;
         }
 
@@ -133,12 +193,15 @@ async function fetchOverpass(query: string): Promise<OverpassResponse> {
       } catch (err) {
         lastError = err as Error;
         console.log(`    ❌ 失敗: ${lastError.message}`);
+        addLog(`❌ 區塊 ${chunkId || '?'}: ${lastError.message}`);
       }
     }
     
     if (retry < MAX_RETRIES - 1) {
-      console.log(`  ⏳ 等待 60 秒後重試所有伺服器...`);
-      await delay(60000);
+      const waitMs = RETRY_DELAYS[Math.min(retry, RETRY_DELAYS.length - 1)];
+      console.log(`  ⏳ 等待 ${waitMs / 1000} 秒後重試所有伺服器...`);
+      addLog(`⏳ 等待 ${waitMs / 1000} 秒後重試...`);
+      await delayWithCountdown(waitMs, '重試等待');
     }
   }
 
@@ -347,49 +410,106 @@ async function main() {
     console.log(`📡 載入進度：已完成 ${progress.completed.length} / ${chunks.length} 區塊`);
   }
 
+  // 初始化 dashboard 狀態
+  const startTime = new Date();
+  dashboardStatus.gridSize = gridSize;
+  dashboardStatus.totalChunks = chunks.length;
+  dashboardStatus.completed = [...progress.completed];
+  dashboardStatus.stats.startTime = startTime.toISOString();
+  dashboardStatus.isRunning = true;
+  addLog('🚀 台灣本島 OSM 資料抓取啟動');
+  writeStatus();
+
   console.log(`🗺️  開始抓取 台灣本島大尺度切片`);
   
   const pendingChunks = chunks.filter(c => !progress.completed.includes(c.id));
   console.log(`📊 剩餘區塊：${pendingChunks.length}\n`);
+  addLog(`📊 剩餘區塊：${pendingChunks.length}`);
 
   let count = 0;
+  const chunkTimes: number[] = [];
+
   for (const chunk of pendingChunks) {
     if (limit > 0 && count >= limit) {
       console.log(`⏹️ 達到限制 limit=${limit}，暫停抓取`);
+      addLog(`⏹️ 達到限制 limit=${limit}，暫停`);
       break;
     }
 
+    const chunkStart = Date.now();
     console.log(`[處理區塊 ${chunk.id}] R: ${chunk.row}, C: ${chunk.col}`);
+    addLog(`📍 開始處理區塊 ${chunk.id} (R:${chunk.row}, C:${chunk.col})`);
+    
+    // 更新 dashboard 當前區塊
+    dashboardStatus.currentChunk = {
+      id: chunk.id, row: chunk.row, col: chunk.col,
+      server: '', retry: 0, maxRetries: MAX_RETRIES,
+    };
+    writeStatus();
+
     const query = buildOverpassQuery(chunk.bbox);
 
     try {
-      const response = await fetchOverpass(query);
+      const response = await fetchOverpass(query, chunk.id);
       const pois = transformToPOIs(response);
       
       const chunkFile = join(outputDir, `chunk_${chunk.id}.json`);
       writeFileSync(chunkFile, JSON.stringify({ bbox: chunk.bbox, pois }, null, 2), 'utf-8');
       
       console.log(`  ✅ 取得 ${pois.length} 個 POI（包含擴展）。寫入 ${chunkFile}`);
+      addLog(`✅ 區塊 ${chunk.id}: 取得 ${pois.length} 個 POI`);
+
+      // 統計 POI 類型
+      for (const poi of pois) {
+        poisByType[poi.decorType] = (poisByType[poi.decorType] || 0) + 1;
+      }
+      dashboardStatus.stats.totalPOIs += pois.length;
+      dashboardStatus.stats.poisByType = { ...poisByType };
 
       progress.completed.push(chunk.id);
       writeFileSync(progressFile, JSON.stringify(progress, null, 2), 'utf-8');
+      dashboardStatus.completed = [...progress.completed];
+
+      // 計算平均時間
+      const chunkElapsed = (Date.now() - chunkStart) / 1000;
+      chunkTimes.push(chunkElapsed);
+      dashboardStatus.stats.avgTimePerChunk = chunkTimes.reduce((a, b) => a + b, 0) / chunkTimes.length;
 
       count++;
+      dashboardStatus.currentChunk = null;
+      writeStatus();
+
       if (count < pendingChunks.length && (limit === 0 || count < limit)) {
         console.log(`  ⏳ 遵守規範，冷卻等待 ${REQUEST_DELAY_MS / 1000} 秒...\n`);
-        await delay(REQUEST_DELAY_MS);
+        await delayWithCountdown(REQUEST_DELAY_MS, '冷卻等待');
       }
     } catch (error) {
-       console.error(`  ❌ 區塊 ${chunk.id} 本次嘗試最終失敗: ${error instanceof Error ? error.message : String(error)}`);
+       const errMsg = error instanceof Error ? error.message : String(error);
+       console.error(`  ❌ 區塊 ${chunk.id} 本次嘗試最終失敗: ${errMsg}`);
        console.log(`⚠️ 跳過此區塊並繼續處理下一個。您可以稍後再次執行腳本來補齊漏網之魚。`);
+       addLog(`💥 區塊 ${chunk.id} 最終失敗: ${errMsg}`);
+       dashboardStatus.failed.push(chunk.id);
+       dashboardStatus.currentChunk = null;
+       writeStatus();
        continue;
     }
   }
 
+  dashboardStatus.isRunning = false;
+  dashboardStatus.currentChunk = null;
   if (progress.completed.length === chunks.length) {
     console.log(`\n🎉 台灣本島所有區塊皆以抓取完畢！`);
     console.log(`下一步：執行 npx tsx scripts/osm-fetcher/merge-taiwan.ts 將資料合併並裁切至前端目錄！`);
+    addLog('🎉 全部完成！');
+  } else {
+    addLog(`⏹️ 已停止。完成 ${progress.completed.length}/${chunks.length}`);
   }
+  writeStatus();
 }
 
-main().catch(err => console.error(err));
+main().catch(err => {
+  addLog(`💥 致命錯誤: ${err.message || err}`);
+  dashboardStatus.isRunning = false;
+  writeStatus();
+  console.error(err);
+});
