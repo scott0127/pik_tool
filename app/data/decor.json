@@ -1892,6 +1892,43 @@
     },
     {
       "category": {
+        "id": "Stationery Store",
+        "name": "文具店",
+        "nameEn": "Stationery Store",
+        "type": "regular",
+        "icon": "noto:pencil"
+      },
+      "variants": [
+        {
+          "id": "Stationery",
+          "name": "文具",
+          "nameEn": "Stationery",
+          "imageUrl": "https://pikmin.wiki.gallery/images/thumb/b/b7/Decor_Red_Stationery.png/200px-Decor_Red_Stationery.png",
+          "imageUrls": {
+            "red": "https://pikmin.wiki.gallery/images/thumb/b/b7/Decor_Red_Stationery.png/200px-Decor_Red_Stationery.png",
+            "yellow": "https://pikmin.wiki.gallery/images/thumb/e/ea/Decor_Yellow_Stationery.png/189px-Decor_Yellow_Stationery.png",
+            "blue": "https://pikmin.wiki.gallery/images/thumb/9/95/Decor_Blue_Stationery.png/200px-Decor_Blue_Stationery.png",
+            "white": "https://pikmin.wiki.gallery/images/6/60/Decor_White_Stationery.png",
+            "purple": "https://pikmin.wiki.gallery/images/thumb/8/82/Decor_Purple_Stationery.png/200px-Decor_Purple_Stationery.png",
+            "rock": "https://pikmin.wiki.gallery/images/thumb/d/d7/Decor_Rock_Stationery.png/200px-Decor_Rock_Stationery.png",
+            "winged": "https://pikmin.wiki.gallery/images/7/73/Decor_Winged_Stationery.png",
+            "ice": "https://pikmin.wiki.gallery/images/thumb/0/0d/Decor_Ice_Stationery.png/200px-Decor_Ice_Stationery.png"
+          }
+        }
+      ],
+      "availablePikminTypes": [
+        "red",
+        "yellow",
+        "blue",
+        "white",
+        "purple",
+        "rock",
+        "winged",
+        "ice"
+      ]
+    },
+    {
+      "category": {
         "id": "mario",
         "name": "瑪利歐",
         "nameEn": "Mario",
