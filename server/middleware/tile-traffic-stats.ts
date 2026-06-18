@@ -3,10 +3,24 @@ import { resolve, sep } from 'node:path';
 import { defineEventHandler, getRequestHeader, getRequestURL } from 'h3';
 
 const TILE_PATH_RE = /^\/data\/regions\/[^/]+\/tiles\/[^/]+\.json$/;
-const LOG_EVERY_REQUESTS = Number(process.env.TILE_STATS_LOG_EVERY || 25);
-const LOG_EVERY_MS = Number(process.env.TILE_STATS_LOG_INTERVAL_MS || 5 * 60 * 1000);
+const parsePositiveInt = (value: string | undefined, fallback: number) => {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) && parsed > 0 ? Math.floor(parsed) : fallback;
+};
+
+const parseNonNegativeInt = (value: string | undefined, fallback: number) => {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) && parsed >= 0 ? Math.floor(parsed) : fallback;
+};
+
+const LOG_EVERY_REQUESTS = parseNonNegativeInt(process.env.TILE_STATS_LOG_EVERY, 25);
+const LOG_EVERY_MS = parsePositiveInt(process.env.TILE_STATS_LOG_INTERVAL_MS, 5 * 60 * 1000);
+const COUNTER_LIMIT = parsePositiveInt(process.env.TILE_STATS_COUNTER_LIMIT, 128);
+const SIZE_CACHE_LIMIT = parsePositiveInt(process.env.TILE_STATS_SIZE_CACHE_LIMIT, 512);
+const RESET_EVERY_MS = parsePositiveInt(process.env.TILE_STATS_RESET_INTERVAL_MS, 6 * 60 * 60 * 1000);
 const TOP_LIMIT = 8;
 const MAX_LABEL_LENGTH = 140;
+const OTHER_KEY = '__other__';
 
 type CounterMap = Map<string, number>;
 
@@ -32,8 +46,41 @@ const state: TileTrafficState = {
 
 const sizeCache = new Map<string, number>();
 
-function increment(map: CounterMap, key: string) {
-  map.set(key, (map.get(key) || 0) + 1);
+function incrementBounded(map: CounterMap, key: string) {
+  if (map.has(key)) {
+    map.set(key, (map.get(key) || 0) + 1);
+    return;
+  }
+
+  if (map.size >= COUNTER_LIMIT) {
+    map.set(OTHER_KEY, (map.get(OTHER_KEY) || 0) + 1);
+    return;
+  }
+
+  map.set(key, 1);
+}
+
+function setSizeCache(pathname: string, size: number) {
+  if (sizeCache.has(pathname)) {
+    sizeCache.delete(pathname);
+  }
+
+  sizeCache.set(pathname, size);
+
+  if (sizeCache.size > SIZE_CACHE_LIMIT) {
+    const oldestKey = sizeCache.keys().next().value as string | undefined;
+    if (oldestKey) sizeCache.delete(oldestKey);
+  }
+}
+
+function resetState(now: number) {
+  state.since = now;
+  state.lastLogAt = 0;
+  state.requests = 0;
+  state.estimatedBytes = 0;
+  state.paths.clear();
+  state.userAgents.clear();
+  state.referers.clear();
 }
 
 function sanitizeLabel(value: string | undefined | null, fallback: string) {
@@ -69,11 +116,11 @@ function getTileSize(pathname: string) {
     if (!existsSync(candidate)) continue;
 
     const size = statSync(candidate).size;
-    sizeCache.set(pathname, size);
+    setSizeCache(pathname, size);
     return size;
   }
 
-  sizeCache.set(pathname, 0);
+  setSizeCache(pathname, 0);
   return 0;
 }
 
@@ -110,13 +157,17 @@ export default defineEventHandler((event) => {
   if (!TILE_PATH_RE.test(pathname)) return;
 
   const now = Date.now();
+  if (now - state.since >= RESET_EVERY_MS) {
+    resetState(now);
+  }
+
   const size = getTileSize(pathname);
 
   state.requests += 1;
   state.estimatedBytes += size;
-  increment(state.paths, pathname);
-  increment(state.userAgents, sanitizeLabel(getRequestHeader(event, 'user-agent'), 'unknown'));
-  increment(state.referers, sanitizeLabel(getRequestHeader(event, 'referer'), 'direct'));
+  incrementBounded(state.paths, pathname);
+  incrementBounded(state.userAgents, sanitizeLabel(getRequestHeader(event, 'user-agent'), 'unknown'));
+  incrementBounded(state.referers, sanitizeLabel(getRequestHeader(event, 'referer'), 'direct'));
 
   if (shouldLog(now)) {
     logSummary(now);

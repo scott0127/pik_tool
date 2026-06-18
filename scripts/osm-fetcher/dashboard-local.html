@@ -3,200 +3,1237 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OSM 本地解析監控面板</title>
+    <title>OSM Taiwan Pipeline Atlas</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fira+Code&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        zinc: {
+                            950: '#09090b',
+                            900: '#18181b',
+                            850: '#202024',
+                            800: '#27272a',
+                            700: '#3f3f46',
+                            600: '#52525b',
+                            500: '#71717a',
+                            450: '#8e8e93',
+                            400: '#a1a1aa',
+                            300: '#d4d4d8',
+                            200: '#e4e4e7',
+                            100: '#f4f4f5'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+                        mono: ['Fira Code', 'SF Mono', 'Courier New', 'monospace']
+                    }
+                }
+            }
+        }
+    </script>
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #0f172a; color: #f8fafc; }
-        .font-mono { font-family: 'Fira Code', monospace; }
-        
-        /* Cyberpunk styling */
-        .glass-panel {
-            background: rgba(30, 41, 59, 0.7);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(51, 65, 85, 0.8);
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        body { 
+            background-color: #09090b; 
+            color: #f4f4f5; 
+            letter-spacing: -0.015em;
         }
         
-        .glow-text { text-shadow: 0 0 10px rgba(56, 189, 248, 0.5); }
-        .glow-green { text-shadow: 0 0 10px rgba(34, 197, 94, 0.5); }
-        .glow-amber { text-shadow: 0 0 10px rgba(245, 158, 11, 0.5); }
-        .glow-purple { text-shadow: 0 0 10px rgba(168, 85, 247, 0.5); }
-        
-        .progress-bar-bg { background-color: #1e293b; border-radius: 9999px; overflow: hidden; }
-        .progress-bar-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #3b82f6, #0ea5e9);
-            transition: width 0.3s ease-out;
-            position: relative;
+        /* Premium Minimalist Panels */
+        .premium-panel {
+            background-color: #0d0d10;
+            border: 1px solid #1f1f23;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.5);
         }
-        .progress-bar-fill::after {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-            animation: shimmer 1.5s infinite linear;
-        }
-        @keyframes shimmer {
-            0% { transform: translateX(-100%); }
-            100% { transform: translateX(100%); }
-        }
-        
+
         .log-container {
-            height: 300px;
+            height: 380px;
             overflow-y: auto;
-            scrollbar-width: thin;
-            scrollbar-color: #475569 #1e293b;
         }
-        .log-container::-webkit-scrollbar { width: 6px; }
-        .log-container::-webkit-scrollbar-track { background: #1e293b; }
-        .log-container::-webkit-scrollbar-thumb { background: #475569; border-radius: 3px; }
 
         .phase-indicator {
-            transition: all 0.3s;
-            border-left: 4px solid transparent;
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            border-left: 2px solid transparent;
         }
-        .phase-active { border-left-color: #38bdf8; background: rgba(56, 189, 248, 0.1); }
-        .phase-done { border-left-color: #22c55e; opacity: 0.7; }
+        .phase-active { 
+            border-left-color: #a78bfa; 
+            background-color: rgba(167, 139, 250, 0.04);
+            color: #ffffff;
+        }
+        .phase-done { 
+            border-left-color: #10b981; 
+            background-color: rgba(16, 185, 129, 0.02);
+            opacity: 0.6; 
+        }
+
+        /* Hide scrollbars completely */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* Heatmap density colors - premium single-hue violet contribution map */
+        .heat-empty { background-color: rgba(24, 24, 27, 0.35); border: 1px solid rgba(255, 255, 255, 0.02); }
+        .heat-low { background-color: rgba(139, 92, 246, 0.12); border: 1px solid rgba(139, 92, 246, 0.25); color: #c084fc; }
+        .heat-medium { background-color: rgba(139, 92, 246, 0.28); border: 1px solid rgba(139, 92, 246, 0.45); color: #d8b4fe; }
+        .heat-high { background-color: rgba(139, 92, 246, 0.55); border: 1px solid rgba(139, 92, 246, 0.75); color: #f3e8ff; }
+        .heat-extreme { background-color: #8b5cf6; border: 1px solid #a78bfa; color: #ffffff; font-weight: 700; }
+
+        /* Tab Transitions */
+        .tab-content {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.15s ease-in-out;
+        }
+        .tab-content.active {
+            display: block;
+            opacity: 1;
+        }
+
+        /* Hover animation for SVG donut chart segments */
+        circle.donut-segment {
+            transition: stroke-width 0.2s cubic-bezier(0.16, 1, 0.3, 1), filter 0.2s ease;
+        }
+        circle.donut-segment:hover {
+            stroke-width: 7;
+            filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.15));
+        }
+
+
+        /* ==================== Redesign System: Atlas Minimal Motion ==================== */
+        :root {
+            --bg: #050506;
+            --surface: rgba(13, 13, 18, 0.72);
+            --surface-strong: rgba(18, 18, 25, 0.86);
+            --hairline: rgba(255, 255, 255, 0.075);
+            --hairline-strong: rgba(255, 255, 255, 0.13);
+            --text-soft: rgba(244, 244, 245, 0.72);
+            --muted: rgba(161, 161, 170, 0.66);
+            --accent: #a78bfa;
+            --accent-2: #22d3ee;
+            --accent-3: #f0abfc;
+            --success: #34d399;
+            --danger: #fb7185;
+            --radius-xl: 26px;
+            --radius-lg: 18px;
+            --shadow-panel: 0 24px 80px rgba(0, 0, 0, 0.44), inset 0 1px 0 rgba(255,255,255,0.055);
+            --shadow-lift: 0 28px 110px rgba(0, 0, 0, 0.56), 0 0 40px rgba(167,139,250,0.06), inset 0 1px 0 rgba(255,255,255,0.08);
+            --spring: cubic-bezier(0.16, 1, 0.3, 1);
+            --mx: 52%;
+            --my: 18%;
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            background:
+                radial-gradient(780px circle at var(--mx) var(--my), rgba(167, 139, 250, 0.15), transparent 42%),
+                radial-gradient(980px circle at 10% -8%, rgba(34, 211, 238, 0.13), transparent 38%),
+                radial-gradient(920px circle at 90% 8%, rgba(240, 171, 252, 0.08), transparent 35%),
+                linear-gradient(135deg, #040405 0%, #08080b 48%, #0e0d13 100%) !important;
+            color: #f8fafc;
+            overflow-x: hidden;
+            font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            z-index: -3;
+            pointer-events: none;
+            background-image:
+                linear-gradient(rgba(255,255,255,0.036) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.026) 1px, transparent 1px);
+            background-size: 72px 72px;
+            mask-image: radial-gradient(circle at 50% 10%, black 0%, rgba(0,0,0,0.70) 30%, transparent 78%);
+        }
+
+        body::after {
+            content: "";
+            position: fixed;
+            inset: 0;
+            z-index: -2;
+            pointer-events: none;
+            opacity: 0.38;
+            background:
+                repeating-linear-gradient(0deg, rgba(255,255,255,0.04) 0 1px, transparent 1px 3px);
+            mix-blend-mode: overlay;
+            mask-image: radial-gradient(circle at var(--mx) var(--my), rgba(0,0,0,0.82), transparent 62%);
+        }
+
+        .ambient-field {
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .ambient-orb {
+            position: absolute;
+            border-radius: 999px;
+            filter: blur(42px);
+            opacity: 0.42;
+            transform: translate3d(0,0,0);
+            animation: orbFloat 14s var(--spring) infinite alternate;
+        }
+        .orb-primary { width: 360px; height: 360px; left: 7%; top: 8%; background: rgba(167,139,250,0.22); }
+        .orb-secondary { width: 420px; height: 420px; right: 4%; top: 18%; background: rgba(34,211,238,0.12); animation-delay: -4s; }
+        .orb-tertiary { width: 280px; height: 280px; left: 55%; bottom: 3%; background: rgba(16,185,129,0.11); animation-delay: -8s; }
+
+        .data-thread {
+            position: absolute;
+            height: 1px;
+            width: 48vw;
+            transform: rotate(-16deg);
+            opacity: 0.42;
+            background: linear-gradient(90deg, transparent, rgba(167,139,250,.46), rgba(34,211,238,.22), transparent);
+            animation: threadScan 8s linear infinite;
+        }
+        .thread-a { top: 22%; left: -18%; }
+        .thread-b { top: 72%; right: -12%; animation-delay: -3.5s; transform: rotate(13deg); }
+
+        @keyframes orbFloat {
+            from { transform: translate3d(-18px, -12px, 0) scale(0.98); }
+            to { transform: translate3d(22px, 18px, 0) scale(1.06); }
+        }
+        @keyframes threadScan {
+            0% { translate: -24vw 0; opacity: 0; }
+            16% { opacity: .36; }
+            70% { opacity: .24; }
+            100% { translate: 100vw 0; opacity: 0; }
+        }
+
+        .w-full.max-w-7xl.mx-auto.flex-1 {
+            position: relative;
+            z-index: 1;
+        }
+
+        header {
+            position: relative;
+            padding: 18px !important;
+            margin-bottom: 22px !important;
+            border: 1px solid var(--hairline) !important;
+            border-radius: var(--radius-xl);
+            background: linear-gradient(135deg, rgba(18,18,24,0.66), rgba(9,9,12,0.34));
+            box-shadow: var(--shadow-panel);
+            backdrop-filter: blur(18px) saturate(1.1);
+            overflow: hidden;
+        }
+        header::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            border-radius: inherit;
+            background:
+                linear-gradient(110deg, rgba(255,255,255,0.09), transparent 28%, transparent 68%, rgba(167,139,250,0.10)),
+                radial-gradient(420px circle at 8% 0%, rgba(167,139,250,0.16), transparent 50%);
+            opacity: .85;
+        }
+        header > * { position: relative; z-index: 1; }
+        header h1 {
+            font-size: clamp(1rem, 1.7vw, 1.45rem) !important;
+            letter-spacing: -0.045em !important;
+            line-height: 1.05;
+        }
+        header h1::after {
+            content: " / LOCAL DATA OBSERVATORY";
+            display: inline-block;
+            margin-left: 9px;
+            font-family: var(--tw-font-mono, 'Fira Code', monospace);
+            font-size: 9px;
+            letter-spacing: .18em;
+            color: rgba(167,139,250,.72);
+            vertical-align: middle;
+        }
+
+        .premium-panel,
+        .bg-zinc-900\/30.border,
+        .bg-zinc-900\/40.border,
+        .bg-zinc-950.border,
+        #tile-modal > div {
+            border-color: var(--hairline) !important;
+            background:
+                linear-gradient(145deg, rgba(255,255,255,0.045), rgba(255,255,255,0.015) 36%, rgba(9,9,13,0.72)),
+                radial-gradient(640px circle at 0% 0%, rgba(167,139,250,0.07), transparent 38%),
+                var(--surface) !important;
+            box-shadow: var(--shadow-panel);
+            backdrop-filter: blur(18px) saturate(1.18);
+        }
+
+        .premium-panel,
+        .rounded-xl { border-radius: var(--radius-xl) !important; }
+        .rounded-lg { border-radius: var(--radius-lg) !important; }
+
+        .premium-panel,
+        .bg-zinc-900\/30.border,
+        .bg-zinc-900\/40.border {
+            position: relative;
+            overflow: hidden;
+            transition: transform .42s var(--spring), border-color .42s var(--spring), box-shadow .42s var(--spring), background .42s var(--spring);
+        }
+        .premium-panel::before,
+        .bg-zinc-900\/30.border::before,
+        .bg-zinc-900\/40.border::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            border-radius: inherit;
+            background: linear-gradient(115deg, rgba(255,255,255,0.10), transparent 18%, transparent 72%, rgba(167,139,250,0.12));
+            opacity: 0;
+            transition: opacity .42s var(--spring);
+        }
+        .premium-panel:hover,
+        .bg-zinc-900\/30.border:hover,
+        .bg-zinc-900\/40.border:hover {
+            transform: translateY(-2px);
+            border-color: var(--hairline-strong) !important;
+            box-shadow: var(--shadow-lift);
+        }
+        .premium-panel:hover::before,
+        .bg-zinc-900\/30.border:hover::before,
+        .bg-zinc-900\/40.border:hover::before { opacity: 1; }
+
+        .metric-card {
+            position: relative;
+            isolation: isolate;
+            min-height: 92px;
+        }
+        .metric-card::after {
+            content: "";
+            position: absolute;
+            inset: auto 14px 12px 14px;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(167,139,250,.55), transparent);
+            opacity: .42;
+        }
+        .metric-card [id^="stat-"] {
+            font-size: clamp(1.05rem, 1.7vw, 1.55rem) !important;
+            letter-spacing: -0.06em;
+            text-shadow: 0 0 24px rgba(167,139,250,0.16);
+        }
+
+        /* Refined segmented control */
+        .flex.p-1.bg-zinc-900\/40.border.border-zinc-800\/80.rounded-xl {
+            position: sticky;
+            top: 16px;
+            z-index: 20;
+            width: fit-content;
+            max-width: 100%;
+            padding: 6px !important;
+            border-color: rgba(255,255,255,.085) !important;
+            background: rgba(8,8,11,0.68) !important;
+            box-shadow: 0 18px 55px rgba(0,0,0,.34), inset 0 1px 0 rgba(255,255,255,.06);
+            backdrop-filter: blur(16px) saturate(1.2);
+        }
+        #btn-tab-monitor, #btn-tab-heatmap, #btn-tab-categories, #btn-tab-sharecard,
+        #btn-ratio-landscape, #btn-ratio-square,
+        #btn-theme-cyberpunk, #btn-theme-forest, #btn-theme-dark, #btn-theme-ocean,
+        button[onclick="downloadShareCard()"], button[onclick="closeModal()"] {
+            transition: transform .28s var(--spring), background .28s var(--spring), color .28s var(--spring), border-color .28s var(--spring), box-shadow .28s var(--spring) !important;
+        }
+        #btn-tab-monitor:hover, #btn-tab-heatmap:hover, #btn-tab-categories:hover, #btn-tab-sharecard:hover,
+        #btn-ratio-landscape:hover, #btn-ratio-square:hover,
+        #btn-theme-cyberpunk:hover, #btn-theme-forest:hover, #btn-theme-dark:hover, #btn-theme-ocean:hover,
+        button[onclick="downloadShareCard()"]:hover, button[onclick="closeModal()"]:hover {
+            transform: translateY(-1px);
+        }
+        #btn-tab-monitor.bg-zinc-800,
+        #btn-tab-monitor.bg-zinc-850,
+        #btn-tab-heatmap.bg-zinc-800,
+        #btn-tab-categories.bg-zinc-800,
+        #btn-tab-sharecard.bg-zinc-800 {
+            background: linear-gradient(135deg, rgba(244,244,245,0.92), rgba(196,181,253,0.92)) !important;
+            color: #07070a !important;
+            box-shadow: 0 10px 26px rgba(167,139,250,.22), inset 0 1px 0 rgba(255,255,255,.55) !important;
+        }
+
+        #main-progress {
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(90deg, #c4b5fd 0%, #67e8f9 48%, #f0abfc 100%) !important;
+            box-shadow: 0 0 24px rgba(167,139,250,0.32), 0 0 42px rgba(34,211,238,0.10);
+        }
+        #main-progress::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.58), transparent);
+            transform: translateX(-120%);
+            animation: progressGlint 1.85s linear infinite;
+        }
+        @keyframes progressGlint { to { transform: translateX(140%); } }
+
+        .phase-indicator {
+            position: relative;
+            border-left: 0 !important;
+            isolation: isolate;
+        }
+        .phase-indicator::after {
+            content: "";
+            position: absolute;
+            left: 12px;
+            top: 12px;
+            bottom: 12px;
+            width: 2px;
+            border-radius: 999px;
+            background: rgba(255,255,255,0.08);
+            transition: background .28s var(--spring), box-shadow .28s var(--spring);
+        }
+        .phase-indicator > * { padding-left: 12px; }
+        .phase-active {
+            background: linear-gradient(135deg, rgba(167,139,250,0.13), rgba(34,211,238,0.035)) !important;
+            border-color: rgba(167,139,250,0.28) !important;
+            opacity: 1 !important;
+        }
+        .phase-active::after {
+            background: linear-gradient(#c4b5fd, #67e8f9);
+            box-shadow: 0 0 18px rgba(167,139,250,.45);
+        }
+        .phase-done {
+            background: linear-gradient(135deg, rgba(52,211,153,0.08), rgba(52,211,153,0.015)) !important;
+            border-color: rgba(52,211,153,0.16) !important;
+            opacity: 0.72 !important;
+        }
+        .phase-done::after {
+            background: var(--success);
+            box-shadow: 0 0 16px rgba(52,211,153,.28);
+        }
+
+        .log-container {
+            background:
+                linear-gradient(180deg, rgba(0,0,0,.52), rgba(0,0,0,.30)),
+                radial-gradient(640px circle at 100% 0%, rgba(167,139,250,.08), transparent 42%) !important;
+            border-color: rgba(255,255,255,.075) !important;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,.035), inset 0 -24px 80px rgba(0,0,0,.28);
+        }
+        .log-container div { animation: logLine .34s var(--spring) both; }
+        @keyframes logLine { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+
+        .heat-empty,
+        .heat-low,
+        .heat-medium,
+        .heat-high,
+        .heat-extreme {
+            transition: transform .22s var(--spring), filter .22s var(--spring), box-shadow .22s var(--spring), border-color .22s var(--spring);
+        }
+        .heat-empty { background-color: rgba(39,39,42,0.23) !important; border: 1px solid rgba(255,255,255,0.035) !important; }
+        .heat-low { background: rgba(99,102,241,0.14) !important; border-color: rgba(129,140,248,0.26) !important; color: #c7d2fe !important; }
+        .heat-medium { background: rgba(124,58,237,0.26) !important; border-color: rgba(167,139,250,0.46) !important; color: #ddd6fe !important; }
+        .heat-high { background: rgba(139,92,246,0.55) !important; border-color: rgba(196,181,253,0.74) !important; color: #f5f3ff !important; box-shadow: 0 0 14px rgba(139,92,246,.16); }
+        .heat-extreme { background: linear-gradient(135deg, #a78bfa, #22d3ee) !important; border-color: rgba(255,255,255,0.55) !important; color: #050506 !important; box-shadow: 0 0 24px rgba(167,139,250,.28); }
+        #heatmap-grid > div:hover { transform: translateY(-2px) scale(1.14) !important; filter: brightness(1.16); z-index: 5; }
+
+        input, select {
+            background: rgba(5,5,7,0.62) !important;
+            border-color: rgba(255,255,255,0.09) !important;
+            transition: border-color .2s var(--spring), box-shadow .2s var(--spring), background .2s var(--spring) !important;
+        }
+        input:focus, select:focus {
+            border-color: rgba(167,139,250,0.56) !important;
+            box-shadow: 0 0 0 4px rgba(167,139,250,0.10) !important;
+            background: rgba(7,7,10,0.86) !important;
+        }
+
+        .tab-content.active {
+            display: block;
+            opacity: 1;
+            animation: tabReveal .52s var(--spring) both;
+        }
+        @keyframes tabReveal {
+            from { opacity: 0; transform: translateY(14px) scale(.992); filter: blur(8px); }
+            to { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+        }
+
+        .reveal-item { will-change: transform, opacity; }
+
+        .magnetic-card {
+            transform-style: preserve-3d;
+        }
+        .magnetic-card:hover {
+            transform: translateY(-3px) perspective(900px) rotateX(var(--tilt-y, 0deg)) rotateY(var(--tilt-x, 0deg));
+        }
+
+        circle.donut-segment {
+            transition: stroke-width .25s var(--spring), filter .25s var(--spring), opacity .25s var(--spring);
+            filter: drop-shadow(0 0 3px rgba(255,255,255,0.03));
+        }
+        circle.donut-segment:hover {
+            stroke-width: 7.5 !important;
+            filter: drop-shadow(0 0 8px rgba(255,255,255,0.17));
+        }
+
+        #share-card-container {
+            background:
+                radial-gradient(650px circle at 85% 8%, rgba(167,139,250,.20), transparent 42%),
+                radial-gradient(520px circle at 10% 85%, rgba(34,211,238,.09), transparent 40%),
+                linear-gradient(135deg, rgba(13,13,18,1), rgba(5,5,7,1)) !important;
+            border: 1px solid rgba(255,255,255,.10);
+            box-shadow: 0 40px 120px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.08) !important;
+        }
+        #share-card-container::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            background-image: linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px);
+            background-size: 40px 40px;
+            mask-image: radial-gradient(circle at 40% 40%, black, transparent 72%);
+        }
+
+        #tile-modal:not(.hidden) > div {
+            animation: modalPop .42s var(--spring) both;
+        }
+        @keyframes modalPop {
+            from { opacity: 0; transform: translateY(18px) scale(.97); filter: blur(8px); }
+            to { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+        }
+
+        .text-zinc-350 { color: rgba(212, 212, 216, 0.84) !important; }
+        .text-zinc-450 { color: rgba(161, 161, 170, 0.82) !important; }
+        .text-zinc-550 { color: rgba(113, 113, 122, 0.82) !important; }
+        .text-zinc-555 { color: rgba(113, 113, 122, 0.72) !important; }
+        .text-zinc-650 { color: rgba(82, 82, 91, 0.82) !important; }
+        .bg-zinc-850 { background-color: rgba(32,32,36,.72) !important; }
+        .border-zinc-850 { border-color: rgba(39,39,42,.92) !important; }
+
+        @media (max-width: 640px) {
+            body { padding: 14px !important; }
+            header h1::after { display: block; margin-left: 0; margin-top: 5px; }
+            .flex.p-1.bg-zinc-900\/40.border.border-zinc-800\/80.rounded-xl {
+                width: 100%;
+                overflow-x: auto;
+                justify-content: flex-start;
+            }
+            #btn-tab-monitor, #btn-tab-heatmap, #btn-tab-categories, #btn-tab-sharecard { white-space: nowrap; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.001ms !important;
+                animation-iteration-count: 1 !important;
+                scroll-behavior: auto !important;
+                transition-duration: 0.001ms !important;
+            }
+        }
+
+
+
+        /* Category wheel chart: equal-sector radial selector inspired by the uploaded reference */
+        .category-wheel-wrap {
+            position: relative;
+            width: min(18rem, 72vw);
+            height: min(18rem, 72vw);
+            display: grid;
+            place-items: center;
+            isolation: isolate;
+        }
+
+        .category-wheel {
+            --wheel-glow: rgba(52, 211, 153, 0.28);
+            position: absolute;
+            inset: 0;
+            border-radius: 9999px;
+            background: var(--wheel-gradient);
+            box-shadow:
+                0 0 0 1px rgba(255,255,255,0.08) inset,
+                0 24px 80px rgba(0,0,0,0.48),
+                0 0 48px var(--wheel-glow);
+            overflow: hidden;
+            animation: wheelReveal 720ms cubic-bezier(.16,1,.3,1) both;
+        }
+
+        .category-wheel::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            border-radius: inherit;
+            background:
+                radial-gradient(circle at 38% 28%, rgba(255,255,255,0.20), transparent 24%),
+                radial-gradient(circle at 70% 72%, rgba(0,0,0,0.28), transparent 42%),
+                conic-gradient(from 90deg, rgba(255,255,255,0.16), transparent 18%, rgba(0,0,0,0.20) 54%, transparent 78%, rgba(255,255,255,0.12));
+            mix-blend-mode: soft-light;
+            pointer-events: none;
+        }
+
+        .category-wheel::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            border-radius: inherit;
+            border: 1px solid rgba(255,255,255,0.10);
+            box-shadow: inset 0 0 36px rgba(0,0,0,0.42);
+            pointer-events: none;
+        }
+
+        .wheel-core {
+            position: relative;
+            z-index: 4;
+            width: 42%;
+            height: 42%;
+            border-radius: 9999px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            background:
+                radial-gradient(circle at 50% 25%, rgba(255,255,255,0.08), transparent 46%),
+                linear-gradient(180deg, rgba(24, 27, 32, 0.98), rgba(9, 10, 13, 0.98));
+            border: 1px solid rgba(255,255,255,0.08);
+            box-shadow:
+                0 20px 55px rgba(0,0,0,0.56),
+                inset 0 1px 0 rgba(255,255,255,0.10);
+        }
+
+        .wheel-sector-badge {
+            position: absolute;
+            z-index: 5;
+            width: 2.35rem;
+            height: 2.35rem;
+            border-radius: 9999px;
+            display: grid;
+            place-items: center;
+            font-size: 1rem;
+            line-height: 1;
+            transform: translate(-50%, -50%);
+            background: rgba(5, 8, 10, 0.34);
+            border: 1px solid rgba(255,255,255,0.13);
+            box-shadow: 0 10px 24px rgba(0,0,0,0.28), inset 0 1px 0 rgba(255,255,255,0.14);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            cursor: pointer;
+            opacity: .82;
+            animation: badgePop 520ms cubic-bezier(.16,1,.3,1) both;
+            animation-delay: calc(var(--i, 0) * 42ms + 180ms);
+        }
+
+        .wheel-sector-badge:hover {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1.12);
+            border-color: rgba(255,255,255,0.32);
+            background: rgba(255,255,255,0.10);
+        }
+
+        .wheel-caption {
+            position: absolute;
+            z-index: 6;
+            bottom: -1.75rem;
+            left: 50%;
+            transform: translateX(-50%);
+            white-space: nowrap;
+            font-size: 9px;
+            letter-spacing: .08em;
+            color: rgba(212,212,216,.45);
+        }
+
+        @keyframes wheelReveal {
+            0% { opacity: 0; transform: scale(.94) rotate(-14deg); filter: blur(8px); }
+            100% { opacity: 1; transform: scale(1) rotate(0deg); filter: blur(0); }
+        }
+
+        @keyframes badgePop {
+            0% { opacity: 0; transform: translate(-50%, -50%) scale(.72); }
+            100% { opacity: .82; transform: translate(-50%, -50%) scale(1); }
+        }
+
     </style>
 </head>
-<body class="min-h-screen p-6">
-    <div class="max-w-6xl mx-auto space-y-6">
-        
+<body class="min-h-screen p-4 md:p-8 flex flex-col justify-between antialiased">
+    <div class="ambient-field" aria-hidden="true">
+        <span class="ambient-orb orb-primary"></span>
+        <span class="ambient-orb orb-secondary"></span>
+        <span class="ambient-orb orb-tertiary"></span>
+        <span class="data-thread thread-a"></span>
+        <span class="data-thread thread-b"></span>
+    </div>
+    
+    <div class="w-full max-w-7xl mx-auto flex-1">
         <!-- Header -->
-        <header class="flex justify-between items-center mb-8">
-            <div>
-                <h1 class="text-3xl font-bold glow-text text-sky-400 flex items-center gap-3">
-                    <span class="text-4xl">🚀</span> OSM 3-Pass 深度解析管線
-                </h1>
-                <p class="text-slate-400 mt-1" id="status-text">初始化中...</p>
+        <header class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 pb-6 border-b border-zinc-900">
+            <div class="flex items-center gap-3">
+                <div class="p-2 bg-zinc-900/60 border border-zinc-800 rounded-lg">
+                    <!-- Database SVG Icon -->
+                    <svg class="w-5 h-5 text-zinc-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/><path d="M3 12c0 1.66 4 3 9 3s9-1.34 9-3"/></svg>
+                </div>
+                <div>
+                    <div class="flex items-center gap-2">
+                        <h1 class="text-base font-semibold tracking-tight text-white">
+                            Taiwan OSM Pipeline Atlas
+                        </h1>
+                        <span class="text-[9px] px-1.5 py-0.5 bg-zinc-900 text-zinc-400 rounded border border-zinc-800 font-mono uppercase tracking-wider">Local</span>
+                    </div>
+                    <p class="text-xs text-zinc-400 mt-1 flex items-center gap-2">
+                        <span id="pipeline-status-dot" class="w-1.5 h-1.5 rounded-full bg-zinc-700"></span>
+                        <span id="status-text" class="font-medium">系統初始化中...</span>
+                    </p>
+                </div>
             </div>
-            <div class="text-right">
-                <div class="text-sm text-slate-400">已耗時</div>
-                <div class="text-2xl font-mono font-bold text-sky-300" id="elapsed-time">00:00</div>
+            
+            <div class="flex items-center gap-4 bg-zinc-900/40 border border-zinc-800 px-4 py-2 rounded-xl font-mono text-xs">
+                <div>
+                    <div class="text-[9px] text-zinc-500 font-semibold uppercase tracking-wider flex items-center gap-1">
+                        <!-- Clock SVG Icon -->
+                        <svg class="w-3 h-3 text-zinc-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                        管線計時
+                    </div>
+                    <div class="text-sm font-semibold text-white tracking-tight mt-0.5" id="elapsed-time">00:00</div>
+                </div>
             </div>
         </header>
 
-        <!-- Main Stats & Progress -->
-        <div class="glass-panel rounded-xl p-6">
-            <div class="flex justify-between items-end mb-2">
-                <h2 class="text-lg font-semibold text-slate-200">當前階段進度</h2>
-                <div class="text-right">
-                    <span class="text-3xl font-bold text-white font-mono" id="main-percent">0.0%</span>
-                </div>
-            </div>
-            <div class="progress-bar-bg h-4 mb-2">
-                <div class="progress-bar-fill w-0" id="main-progress"></div>
-            </div>
-            <div class="flex justify-between text-sm text-slate-400 font-mono">
-                <span id="processed-elements">已處理: 0</span>
-                <span>全域檔案掃描: ~32,000,000 筆</span>
-            </div>
+        <!-- Segmented Tab Bar -->
+        <div class="flex p-1 bg-zinc-900/40 border border-zinc-800/80 rounded-xl mb-8 w-full sm:w-fit text-xs font-medium gap-1">
+            <button onclick="switchTab('tab-monitor')" id="btn-tab-monitor" class="px-4 py-2 rounded-lg bg-zinc-850 text-white shadow-sm transition-all duration-150 flex items-center gap-2 cursor-pointer">
+                <!-- Activity icon -->
+                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+                監控
+            </button>
+            <button onclick="switchTab('tab-heatmap')" id="btn-tab-heatmap" class="px-4 py-2 rounded-lg text-zinc-400 hover:text-zinc-200 transition-all duration-150 flex items-center gap-2 cursor-pointer">
+                <!-- Map icon -->
+                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/><line x1="9" y1="3" x2="9" y2="18"/><line x1="15" y1="6" x2="15" y2="21"/></svg>
+                熱力
+            </button>
+            <button onclick="switchTab('tab-categories')" id="btn-tab-categories" class="px-4 py-2 rounded-lg text-zinc-400 hover:text-zinc-200 transition-all duration-150 flex items-center gap-2 cursor-pointer">
+                <!-- Chart icon -->
+                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg>
+                類別
+            </button>
+            <button onclick="switchTab('tab-sharecard')" id="btn-tab-sharecard" class="px-4 py-2 rounded-lg text-zinc-400 hover:text-zinc-200 transition-all duration-150 flex items-center gap-2 cursor-pointer">
+                <!-- Share icon -->
+                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+                分享卡
+            </button>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-            <!-- Phases Tracker -->
-            <div class="glass-panel rounded-xl p-6 flex flex-col gap-3">
-                <h2 class="text-lg font-semibold text-slate-200 mb-2 flex items-center gap-2">
-                    <span>🔄</span> 執行階段
-                </h2>
-                
-                <div id="phase-1" class="phase-indicator p-3 rounded bg-slate-800/50">
-                    <div class="font-bold text-slate-200">Pass 1: 目標定位</div>
-                    <div class="text-sm text-slate-400 mt-1">收集 Node, Way 與 Relation</div>
+        <!-- ==================== TAB 1: MONITOR ==================== -->
+        <div id="tab-monitor" class="tab-content active space-y-6">
+            <!-- Progress Panel -->
+            <div class="premium-panel rounded-xl p-6 relative overflow-hidden">
+                <div class="flex justify-between items-end mb-3">
+                    <div>
+                        <h2 class="text-xs font-semibold text-zinc-500 uppercase tracking-widest">當前解析進度</h2>
+                        <div class="text-zinc-300 text-xs mt-1 font-medium" id="processed-stage-desc">正在掃描全域 PBF 檔案...</div>
+                    </div>
+                    <div class="text-right">
+                        <span class="text-2xl font-bold text-white font-mono tracking-tight" id="main-percent">0.0%</span>
+                    </div>
                 </div>
-                
-                <div id="phase-2" class="phase-indicator p-3 rounded bg-slate-800/50">
-                    <div class="font-bold text-slate-200">Pass 2: 關係解索</div>
-                    <div class="text-sm text-slate-400 mt-1">擷取 Relation 依賴的 Way IDs</div>
+                <div class="w-full bg-zinc-900 h-1.5 rounded-full overflow-hidden border border-zinc-800">
+                    <div class="h-full bg-zinc-200 rounded-full transition-all duration-300 w-0" id="main-progress"></div>
                 </div>
-                
-                <div id="phase-3" class="phase-indicator p-3 rounded bg-slate-800/50">
-                    <div class="font-bold text-slate-200">Pass 3: 座標補完</div>
-                    <div class="text-sm text-slate-400 mt-1">精確打撈所有目標 Node 座標</div>
-                </div>
-
-                <div id="phase-4" class="phase-indicator p-3 rounded bg-slate-800/50">
-                    <div class="font-bold text-slate-200">S2 展開與裝箱</div>
-                    <div class="text-sm text-slate-400 mt-1">計算幾何並分裝為 15x15 網格</div>
+                <div class="flex justify-between text-[10px] text-zinc-500 font-mono mt-2">
+                    <span id="processed-elements">已處理: 0 元素</span>
+                    <span>全島估計: ~32,000,000 筆 OSM 數據</span>
                 </div>
             </div>
 
             <!-- Stats Grid -->
-            <div class="glass-panel rounded-xl p-6 md:col-span-3">
-                <h2 class="text-lg font-semibold text-slate-200 mb-4 flex items-center gap-2">
-                    <span>📊</span> 實時數據擷取
-                </h2>
-                
-                <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                    <div class="bg-slate-800/50 rounded-lg p-4 border border-slate-700">
-                        <div class="text-slate-400 text-sm">單點 (Node) 命中數</div>
-                        <div class="text-3xl font-bold font-mono text-emerald-400 mt-1 glow-green" id="stat-nodes">0</div>
+            <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                <!-- Phases Tracker -->
+                <div class="bg-zinc-900/30 border border-zinc-800/80 rounded-xl p-5 flex flex-col gap-2.5">
+                    <h2 class="text-xs font-bold text-zinc-400 uppercase tracking-widest mb-2 flex items-center gap-1.5">
+                        <svg class="w-3.5 h-3.5 text-zinc-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+                        執行管線階段
+                    </h2>
+                    
+                    <div id="phase-1" class="phase-indicator p-3 rounded-lg bg-zinc-900/40 border border-zinc-800/50">
+                        <div class="font-semibold text-xs text-zinc-300">Pass 1: 目標定位</div>
+                        <div class="text-[10px] text-zinc-500 mt-0.5">篩選 Node, Way 與 Relation</div>
                     </div>
-                    <div class="bg-slate-800/50 rounded-lg p-4 border border-slate-700">
-                        <div class="text-slate-400 text-sm">線框 (Way) 命中數</div>
-                        <div class="text-3xl font-bold font-mono text-emerald-400 mt-1 glow-green" id="stat-ways">0</div>
+                    
+                    <div id="phase-2" class="phase-indicator p-3 rounded-lg bg-zinc-900/40 border border-zinc-800/50">
+                        <div class="font-semibold text-xs text-zinc-300">Pass 2: 關係解索</div>
+                        <div class="text-[10px] text-zinc-500 mt-0.5">對照 Relation 關聯之 Way IDs</div>
                     </div>
-                    <div class="bg-slate-800/50 rounded-lg p-4 border border-purple-900 bg-purple-900/20">
-                        <div class="text-purple-300 text-sm">關係 (Relation) 命中數</div>
-                        <div class="text-3xl font-bold font-mono text-purple-400 mt-1 glow-purple" id="stat-relations">0</div>
+                    
+                    <div id="phase-3" class="phase-indicator p-3 rounded-lg bg-zinc-900/40 border border-zinc-800/50">
+                        <div class="font-semibold text-xs text-zinc-300">Pass 3: 座標補完</div>
+                        <div class="text-[10px] text-zinc-500 mt-0.5">打撈目標 Node 精確座標</div>
                     </div>
-                    <div class="bg-slate-800/50 rounded-lg p-4 border border-amber-900 bg-amber-900/20">
-                        <div class="text-amber-300 text-sm">生成 Decor 實例數</div>
-                        <div class="text-3xl font-bold font-mono text-amber-400 mt-1 glow-amber" id="stat-total-pois">-</div>
+
+                    <div id="phase-4" class="phase-indicator p-3 rounded-lg bg-zinc-900/40 border border-zinc-800/50">
+                        <div class="font-semibold text-xs text-zinc-300">裝箱與 Tile 生成</div>
+                        <div class="text-[10px] text-zinc-500 mt-0.5">幾何展開並分裝為 12x12 Tiles</div>
                     </div>
                 </div>
 
-                <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mt-4">
-                    <div class="bg-slate-800/50 rounded-lg p-4 border border-sky-900 bg-sky-900/20">
-                        <div class="text-sky-300 text-sm">單純點位 (Real Points)</div>
-                        <div class="text-2xl font-bold font-mono text-sky-400 mt-1" id="stat-real-points">0</div>
+                <!-- Stats Details -->
+                <div class="bg-zinc-900/30 border border-zinc-800/80 rounded-xl p-6 lg:col-span-3 flex flex-col justify-between gap-6">
+                    <div>
+                        <h2 class="text-xs font-bold text-zinc-400 uppercase tracking-widest mb-4 flex items-center gap-1.5">
+                            <svg class="w-3.5 h-3.5 text-zinc-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg>
+                            實時數據擷取
+                        </h2>
+                        
+                        <!-- Top Row Cards -->
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            <div class="bg-zinc-900/40 rounded-xl p-4 border border-zinc-800/60">
+                                <div class="text-zinc-500 text-[9px] font-bold uppercase tracking-wider">Node 命中</div>
+                                <div class="text-lg font-bold font-mono text-white mt-1" id="stat-nodes">0</div>
+                            </div>
+                            <div class="bg-zinc-900/40 rounded-xl p-4 border border-zinc-800/60">
+                                <div class="text-zinc-500 text-[9px] font-bold uppercase tracking-wider">Way 命中</div>
+                                <div class="text-lg font-bold font-mono text-white mt-1" id="stat-ways">0</div>
+                            </div>
+                            <div class="bg-zinc-900/40 rounded-xl p-4 border border-zinc-800/60">
+                                <div class="text-zinc-500 text-[9px] font-bold uppercase tracking-wider">Relation 命中</div>
+                                <div class="text-lg font-bold font-mono text-white mt-1" id="stat-relations">0</div>
+                            </div>
+                            <div class="bg-zinc-900/40 rounded-xl p-4 border border-zinc-800/60">
+                                <div class="text-zinc-500 text-[9px] font-bold uppercase tracking-wider">生成飾品實例</div>
+                                <div class="text-lg font-bold font-mono text-violet-400 mt-1" id="stat-total-pois">-</div>
+                            </div>
+                        </div>
+
+                        <!-- Secondary Row Cards -->
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
+                            <div class="bg-zinc-900/40 rounded-xl p-4 border border-zinc-800/60">
+                                <div class="text-zinc-500 text-[9px] font-bold uppercase tracking-wider">單純點位</div>
+                                <div class="text-sm font-semibold font-mono text-zinc-300 mt-0.5" id="stat-real-points">0</div>
+                            </div>
+                            <div class="bg-zinc-900/40 rounded-xl p-4 border border-zinc-800/60">
+                                <div class="text-zinc-500 text-[9px] font-bold uppercase tracking-wider">面積線段展開</div>
+                                <div class="text-sm font-semibold font-mono text-zinc-300 mt-0.5" id="stat-area-instances">0</div>
+                            </div>
+                            <div class="bg-zinc-900/40 rounded-xl p-4 border border-zinc-800/60">
+                                <div class="text-zinc-500 text-[9px] font-bold uppercase tracking-wider">邊界外丟棄</div>
+                                <div class="text-sm font-semibold font-mono text-zinc-500 mt-0.5" id="stat-skipped-outside">0</div>
+                            </div>
+                            <div class="bg-zinc-900/40 rounded-xl p-4 border border-zinc-800/60">
+                                <div class="text-zinc-500 text-[9px] font-bold uppercase tracking-wider">無效座標丟棄</div>
+                                <div class="text-sm font-semibold font-mono text-zinc-500 mt-0.5" id="stat-skipped-invalid">0</div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="bg-slate-800/50 rounded-lg p-4 border border-sky-900 bg-sky-900/20">
-                        <div class="text-sky-300 text-sm">面積/線段 S2 展開數</div>
-                        <div class="text-2xl font-bold font-mono text-sky-400 mt-1" id="stat-area-instances">0</div>
+
+                    <!-- Top 5 Preview -->
+                    <div class="border-t border-zinc-900 pt-4">
+                        <h3 class="text-[9px] font-bold text-zinc-550 uppercase tracking-widest mb-3">大類分佈 TOP 5</h3>
+                        <div id="poi-chart" class="grid grid-cols-2 md:grid-cols-5 gap-3">
+                            <div class="text-xs text-zinc-650 italic py-2">資料讀取中...</div>
+                        </div>
                     </div>
-                    <div class="bg-slate-800/50 rounded-lg p-4 border border-red-900 bg-red-900/20">
-                        <div class="text-red-300 text-sm">超出邊界丟棄 (Off-Island)</div>
-                        <div class="text-2xl font-bold font-mono text-red-400 mt-1" id="stat-skipped-outside">0</div>
+                </div>
+            </div>
+
+            <!-- Terminal Log -->
+            <div class="bg-zinc-900/30 border border-zinc-800/80 rounded-xl p-5">
+                <div class="flex justify-between items-center mb-3 border-b border-zinc-900 pb-2.5">
+                    <h2 class="text-xs font-bold text-zinc-400 uppercase tracking-widest flex items-center gap-2">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> 數據解析日誌輸出
+                    </h2>
+                </div>
+                <div class="log-container bg-black/40 rounded-lg p-4 font-mono text-xs text-zinc-400 border border-zinc-850 no-scrollbar" id="log-output">
+                    <!-- Logs loaded dynamically -->
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== TAB 2: HEATMAP ==================== -->
+        <div id="tab-heatmap" class="tab-content space-y-6">
+            <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                <!-- Side Panel Info -->
+                <div class="bg-zinc-900/30 border border-zinc-800/80 rounded-xl p-5 flex flex-col justify-between gap-6">
+                    <div>
+                        <h2 class="text-xs font-bold text-zinc-400 uppercase tracking-widest mb-2 flex items-center gap-1.5">
+                            <svg class="w-3.5 h-3.5 text-zinc-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/><line x1="9" y1="3" x2="9" y2="18"/><line x1="15" y1="6" x2="15" y2="21"/></svg>
+                            台灣 POI 熱力分佈
+                        </h2>
+                        <p class="text-zinc-400 text-xs leading-relaxed mt-2.5">
+                            此處將台灣劃分為 12x12 格 Tile 網格，由北至南排布。顏色代表點位裝載密集度。
+                        </p>
+                        <div class="mt-4 p-3 bg-zinc-950/60 rounded-lg border border-zinc-900 text-[10px] space-y-1.5 text-zinc-400 font-mono">
+                            <div class="flex justify-between"><span>網格大小</span><span class="text-zinc-300">12 × 12</span></div>
+                            <div class="flex justify-between"><span>BBOX 範圍</span><span class="text-zinc-300">S21.75 - N25.30</span></div>
+                            <div class="flex justify-between"><span>已裝載 Tile</span><span class="text-zinc-300" id="heatmap-total-tiles">--</span></div>
+                        </div>
                     </div>
-                    <div class="bg-slate-800/50 rounded-lg p-4 border border-red-900 bg-red-900/20">
-                        <div class="text-red-300 text-sm">無效座標丟棄</div>
-                        <div class="text-2xl font-bold font-mono text-red-400 mt-1" id="stat-skipped-invalid">0</div>
+
+                    <!-- Legend -->
+                    <div class="space-y-3 border-t border-zinc-900 pt-4">
+                        <h3 class="text-[9px] font-bold text-zinc-550 uppercase tracking-widest">熱力圖例 (POI 數量)</h3>
+                        <div class="grid grid-cols-5 gap-1 text-[8px] text-center font-mono font-bold">
+                            <div class="p-1 rounded heat-empty">0</div>
+                            <div class="p-1 rounded heat-low">1-1k</div>
+                            <div class="p-1 rounded heat-medium">1k-5k</div>
+                            <div class="p-1 rounded heat-high">5k-15k</div>
+                            <div class="p-1 rounded heat-extreme">&gt;15k</div>
+                        </div>
+                        <div class="text-[9px] text-zinc-550 italic text-center flex items-center justify-center gap-1.5 mt-2">
+                            <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                            點擊網格探查該區詳細點位
+                        </div>
                     </div>
                 </div>
 
-                <div class="mt-6">
-                    <h3 class="text-sm font-semibold text-slate-400 mb-2">Decor 分布預覽 (Top 5)</h3>
-                    <div id="poi-chart" class="space-y-2">
-                        <div class="text-sm text-slate-500 italic">資料收集中...</div>
+                <!-- Heatmap Grid -->
+                <div class="bg-zinc-900/30 border border-zinc-800/80 rounded-xl p-6 lg:col-span-3 flex justify-center items-center">
+                    <div class="relative w-full max-w-sm aspect-[10/12] flex flex-col">
+                        <!-- Column Labels (West -> East) -->
+                        <div class="flex h-5 w-full text-center items-center justify-between text-[8px] font-mono text-zinc-600 pr-5 pl-5 select-none">
+                            <span>C0 (西)</span>
+                            <span>C4</span>
+                            <span>C8</span>
+                            <span>C11 (東)</span>
+                        </div>
+
+                        <div class="flex flex-1 w-full gap-2">
+                            <!-- Row Labels (North -> South, rendered from R11 down to R0) -->
+                            <div class="flex flex-col justify-between text-[8px] font-mono text-zinc-600 py-1 w-8 text-right pr-1 select-none">
+                                <span>R11 (北)</span>
+                                <span>R8</span>
+                                <span>R4</span>
+                                <span>R0 (南)</span>
+                            </div>
+
+                            <!-- Grid body -->
+                            <div id="heatmap-grid" class="flex-1 grid grid-cols-12 gap-1 bg-black/20 p-1.5 rounded-lg border border-zinc-900">
+                                <!-- Generated dynamically -->
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Terminal Log -->
-        <div class="glass-panel rounded-xl p-4">
-            <div class="flex justify-between items-center mb-2 px-2">
-                <h2 class="text-sm font-semibold text-slate-400 flex items-center gap-2">
-                    <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span> 系統輸出日誌
-                </h2>
+        <!-- ==================== TAB 3: CATEGORIES ==================== -->
+        <div id="tab-categories" class="tab-content space-y-6">
+            <!-- Search & Filters -->
+            <div class="bg-zinc-900/30 border border-zinc-800/80 rounded-xl p-5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <div>
+                    <h2 class="text-xs font-bold text-zinc-400 uppercase tracking-widest flex items-center gap-2">
+                        <svg class="w-3.5 h-3.5 text-zinc-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg>
+                        飾品分類統計
+                    </h2>
+                    <p class="text-zinc-550 text-[10px] mt-0.5">根據 6 大分類分組統計項目佔比</p>
+                </div>
+                <div class="flex gap-2 w-full sm:w-auto">
+                    <div class="relative w-full sm:w-48">
+                        <svg class="w-3 h-3 text-zinc-500 absolute left-2.5 top-2.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                        <input type="text" id="category-search" oninput="renderCategories()" placeholder="搜尋類別名稱..." 
+                               class="bg-zinc-950 border border-zinc-850 rounded-lg pl-8 pr-3 py-1.5 text-xs text-zinc-200 focus:outline-none focus:border-zinc-700 w-full">
+                    </div>
+                    <select id="category-sort" onchange="renderCategories()" class="bg-zinc-950 border border-zinc-850 rounded-lg px-2 py-1.5 text-xs text-zinc-200 focus:outline-none focus:border-zinc-700">
+                        <option value="count-desc">數量降序</option>
+                        <option value="count-asc">數量升序</option>
+                        <option value="name">字母排序</option>
+                    </select>
+                </div>
             </div>
-            <div class="log-container bg-[#020617] rounded-lg p-4 font-mono text-sm" id="log-output">
-                <!-- Logs will be inserted here -->
+
+            <!-- Categories Grid (6 major groups) -->
+            <div id="categories-grid" class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Group cards rendered dynamically -->
+            </div>
+        </div>
+
+        <!-- ==================== TAB 4: SHARE CARD ==================== -->
+        <div id="tab-sharecard" class="tab-content space-y-6">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Customization Panel -->
+                <div class="bg-zinc-900/30 border border-zinc-800/80 rounded-xl p-5 flex flex-col justify-between gap-6">
+                    <div class="space-y-4">
+                        <h2 class="text-xs font-bold text-zinc-400 uppercase tracking-widest flex items-center gap-1.5">
+                            <svg class="w-3.5 h-3.5 text-zinc-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+                            設計分享卡
+                        </h2>
+                        
+                        <!-- Title control -->
+                        <div class="space-y-1">
+                            <label class="text-[9px] font-bold text-zinc-550 uppercase tracking-wider">主要標題</label>
+                            <input type="text" id="card-title-input" oninput="updateCardPreview()" value="台灣 OSM 點位數據報告" 
+                                   class="w-full bg-zinc-950 border border-zinc-850 rounded-lg px-3 py-1.5 text-xs text-zinc-200 focus:outline-none focus:border-zinc-700">
+                        </div>
+
+                        <!-- Subtitle control -->
+                        <div class="space-y-1">
+                            <label class="text-[9px] font-bold text-zinc-550 uppercase tracking-wider">副標題</label>
+                            <input type="text" id="card-subtitle-input" oninput="updateCardPreview()" value="基於三階段 PBF 解析管線 • 全島裝箱統計" 
+                                   class="w-full bg-zinc-950 border border-zinc-850 rounded-lg px-3 py-1.5 text-xs text-zinc-200 focus:outline-none focus:border-zinc-700">
+                        </div>
+
+                        <!-- Format preset -->
+                        <div class="space-y-1">
+                            <label class="text-[9px] font-bold text-zinc-550 uppercase tracking-wider">卡片比例</label>
+                            <div class="grid grid-cols-2 gap-2">
+                                <button onclick="setCardRatio('landscape')" id="btn-ratio-landscape" class="px-3 py-1.5 bg-zinc-200 text-zinc-950 rounded-lg text-xs font-semibold cursor-pointer">
+                                    橫版 16:9
+                                </button>
+                                <button onclick="setCardRatio('square')" id="btn-ratio-square" class="px-3 py-1.5 bg-zinc-950 text-zinc-400 border border-zinc-850 rounded-lg text-xs font-semibold cursor-pointer">
+                                    方形 1:1
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Theme selection -->
+                        <div class="space-y-1">
+                            <label class="text-[9px] font-bold text-zinc-550 uppercase tracking-wider">配色風格主題</label>
+                            <div class="grid grid-cols-2 gap-2">
+                                <button onclick="setCardTheme('cyberpunk')" id="btn-theme-cyberpunk" class="px-2 py-1.5 bg-zinc-200 text-zinc-950 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 cursor-pointer">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-violet-500"></span> 深空極光
+                                </button>
+                                <button onclick="setCardTheme('forest')" id="btn-theme-forest" class="px-2 py-1.5 bg-zinc-950 text-zinc-400 border border-zinc-850 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 cursor-pointer">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> 苔綠森林
+                                </button>
+                                <button onclick="setCardTheme('dark')" id="btn-theme-dark" class="px-2 py-1.5 bg-zinc-950 text-zinc-400 border border-zinc-850 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 cursor-pointer">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-zinc-400"></span> 深海極簡
+                                </button>
+                                <button onclick="setCardTheme('ocean')" id="btn-theme-ocean" class="px-2 py-1.5 bg-zinc-950 text-zinc-400 border border-zinc-850 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 cursor-pointer">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span> 冰川海洋
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Elements Toggle -->
+                        <div class="space-y-2 pt-2">
+                            <label class="text-[9px] font-bold text-zinc-550 uppercase tracking-wider block">顯示元素</label>
+                            <div class="flex items-center gap-2">
+                                <input type="checkbox" id="show-mini-map" onchange="updateCardPreview()" checked class="rounded bg-zinc-950 border-zinc-800 text-zinc-300 focus:ring-zinc-700 h-3.5 w-3.5">
+                                <span class="text-xs text-zinc-400">顯示台灣網格熱力圖</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <input type="checkbox" id="show-top-chart" onchange="updateCardPreview()" checked class="rounded bg-zinc-950 border-zinc-800 text-zinc-300 focus:ring-zinc-700 h-3.5 w-3.5">
+                                <span class="text-xs text-zinc-400">顯示大類排行</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Downloader -->
+                    <button onclick="downloadShareCard()" class="w-full bg-zinc-200 hover:bg-zinc-300 text-zinc-950 font-semibold py-2 px-4 rounded-lg transition-all duration-150 flex items-center justify-center gap-2 text-xs uppercase tracking-wider shadow cursor-pointer">
+                        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                        導出高解析分享圖
+                    </button>
+                </div>
+
+                <!-- Preview Area -->
+                <div class="lg:col-span-2 flex flex-col items-center justify-start py-6 bg-zinc-900/10 rounded-xl border border-zinc-900 custom-scroll overflow-x-auto min-h-[500px]">
+                    <div class="text-[9px] text-zinc-555 font-bold mb-4 uppercase tracking-widest">分享卡片畫布預覽 (Capture Area)</div>
+                    
+                    <!-- The actual card node to capture -->
+                    <div id="share-card-container" class="rounded-xl flex flex-col justify-between p-8 font-sans select-none overflow-hidden relative shadow-2xl shrink-0" style="width: 800px; height: 450px; background-color: #0d0d10;">
+                        
+                        <!-- Background decoration -->
+                        <div id="card-bg-gradient" class="absolute -inset-10 opacity-20 blur-3xl -z-10 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-violet-500/20 via-indigo-500/5 to-transparent"></div>
+                        <div id="card-border" class="absolute inset-0 border border-zinc-800 rounded-xl pointer-events-none -z-10"></div>
+                        
+                        <!-- Top Header -->
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <div id="card-title" class="text-base font-bold text-white leading-tight">台灣 OSM 點位數據報告</div>
+                                <div id="card-subtitle" class="text-[9px] text-zinc-400 mt-1">基於三階段 PBF 解析管線 • 全島裝箱統計</div>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-[8px] text-zinc-500 font-bold uppercase tracking-wider">OSM PIPELINE LOCAL</div>
+                                <div class="text-[10px] text-violet-400 font-mono font-semibold" id="card-date">2026-06-17</div>
+                            </div>
+                        </div>
+
+                        <!-- Card Body (Grid: Map on left, stats on right) -->
+                        <div class="grid grid-cols-12 gap-6 items-center my-4 flex-1">
+                            
+                            <!-- Mini Taiwan Heatmap -->
+                            <div id="card-map-wrapper" class="col-span-5 flex justify-center">
+                                <div class="w-[120px] aspect-[10/12] flex flex-col items-center justify-center">
+                                    <div id="card-heatmap-grid" class="w-full aspect-square grid grid-cols-12 gap-0.5 bg-black/40 p-1.5 rounded border border-zinc-900">
+                                        <!-- Mini cells loaded dynamically -->
+                                    </div>
+                                    <div class="text-[7px] text-zinc-550 mt-1.5 text-center font-mono">台灣 POI 密度分佈 (12x12 Grid)</div>
+                                </div>
+                            </div>
+
+                            <!-- Key Statistics -->
+                            <div id="card-stats-wrapper" class="col-span-7 flex flex-col gap-4">
+                                <div class="grid grid-cols-2 gap-3">
+                                    <div class="bg-white/[0.01] p-3 rounded-lg border border-zinc-800/80">
+                                        <div class="text-[8px] text-zinc-500 uppercase tracking-wider font-semibold">總體 POI 幾何點</div>
+                                        <div class="text-sm font-bold text-white font-mono mt-1" id="card-stat-total">--</div>
+                                    </div>
+                                    <div class="bg-white/[0.01] p-3 rounded-lg border border-zinc-800/80">
+                                        <div class="text-[8px] text-zinc-500 uppercase tracking-wider font-semibold">裝載 POI 實例</div>
+                                        <div class="text-sm font-bold text-violet-400 font-mono mt-1" id="card-stat-pois">--</div>
+                                    </div>
+                                </div>
+
+                                <!-- Dynamic breakdown or Top chart -->
+                                <div id="card-top-wrapper" class="bg-white/[0.01] p-3 rounded-lg border border-zinc-800/80 flex flex-col gap-1.5">
+                                    <div class="text-[8px] text-zinc-550 font-bold border-b border-zinc-900 pb-1 flex justify-between uppercase tracking-wider">
+                                        <span>大類分佈排行</span>
+                                        <span>點位個數</span>
+                                    </div>
+                                    <div id="card-top-list" class="space-y-1 text-[8px] text-zinc-400 font-mono">
+                                        <!-- Top categories list -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Footer -->
+                        <div class="flex justify-between items-end border-t border-zinc-900 pt-3 text-[8px] text-zinc-500">
+                            <div>數據來源: OpenStreetMap Taiwan • 本地 PBF 解算成果</div>
+                            <div class="font-semibold tracking-tight">Antigravity OSM Pipeline Generator</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Tile Details Modal -->
+    <div id="tile-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
+        <div class="bg-zinc-950 border border-zinc-850 rounded-xl w-full max-w-2xl overflow-hidden shadow-2xl flex flex-col max-h-[85vh]">
+            <!-- Header -->
+            <div class="p-5 border-b border-zinc-900 flex justify-between items-center bg-zinc-900/10">
+                <div>
+                    <h3 class="text-sm font-bold text-white flex items-center gap-2" id="modal-tile-title">
+                        <span>Tile 詳情</span>
+                    </h3>
+                    <div class="text-[9px] text-zinc-500 font-mono mt-0.5" id="modal-tile-coords">r0_c0</div>
+                </div>
+                <button onclick="closeModal()" class="text-zinc-500 hover:text-white text-lg font-bold font-mono focus:outline-none cursor-pointer">&times;</button>
+            </div>
+            
+            <!-- Body -->
+            <div class="p-5 overflow-y-auto no-scrollbar flex-1 space-y-5">
+                <!-- Grid info -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+                    <div class="bg-zinc-900/30 p-3 rounded-lg border border-zinc-900">
+                        <div class="text-[8px] text-zinc-500 uppercase font-semibold">總裝箱 POI</div>
+                        <div class="text-lg font-bold text-violet-400 mt-0.5 font-mono" id="modal-poi-count">0</div>
+                    </div>
+                    <div class="bg-zinc-900/30 p-3 rounded-lg border border-zinc-900">
+                        <div class="text-[8px] text-zinc-500 uppercase font-semibold">點位 (Points)</div>
+                        <div class="text-lg font-bold text-zinc-300 mt-0.5 font-mono" id="modal-points-count">0</div>
+                    </div>
+                    <div class="col-span-2 bg-zinc-900/30 p-3 rounded-lg border border-zinc-900 text-left font-mono text-[9px] text-zinc-500 flex flex-col justify-center gap-0.5">
+                        <div id="modal-bbox-n">N: --</div>
+                        <div id="modal-bbox-s">S: --</div>
+                        <div id="modal-bbox-e">E: --</div>
+                        <div id="modal-bbox-w">W: --</div>
+                    </div>
+                </div>
+
+                <!-- Categories distribution -->
+                <div>
+                    <h4 class="text-[9px] font-bold text-zinc-550 uppercase tracking-widest mb-2.5">此區飾品類別分佈</h4>
+                    <div id="modal-categories-list" class="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
+                        <!-- Loaded dynamically -->
+                    </div>
+                </div>
+
+                <!-- Feature list -->
+                <div>
+                    <h4 class="text-[9px] font-bold text-zinc-550 uppercase tracking-widest mb-2 flex justify-between items-center">
+                        <span>精準點位列表 (顯示前 50 筆)</span>
+                        <span id="modal-feature-list-count" class="text-[8px] text-zinc-650 font-mono"></span>
+                    </h4>
+                    <div class="bg-black/20 rounded-lg border border-zinc-900 divide-y divide-zinc-900 max-h-48 overflow-y-auto no-scrollbar" id="modal-features-list">
+                        <!-- Loaded dynamically -->
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Footer -->
+            <div class="p-4 bg-zinc-900/10 border-t border-zinc-900 flex justify-end">
+                <button onclick="closeModal()" class="px-4 py-1.5 bg-zinc-200 hover:bg-zinc-300 text-zinc-950 rounded-lg text-xs font-semibold transition-all cursor-pointer">
+                    關閉
+                </button>
             </div>
         </div>
     </div>
 
+    <!-- Footer of the page -->
+    <footer class="mt-8 pt-4 border-t border-zinc-900 text-center text-[9px] text-zinc-650 font-mono">
+        OSM Pipeline Local Dashboard • Build v4.0 • Premium Minimalist Design
+    </footer>
+
     <script>
+        // SVG Icons dictionary for groups
+        const GROUP_ICONS = {
+            '自然生態': `<svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>`,
+            '餐飲美食': `<svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>`,
+            '交通運輸': `<svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="3" width="16" height="16" rx="2"/><path d="M3 11h18M8 15h.01M16 15h.01M6 19-2 3M18 19l2 3"/></svg>`,
+            '民生購物': `<svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4zM3 6h18M16 10a4 4 0 0 1-8 0"/></svg>`,
+            '生活服務': `<svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>`,
+            '特殊其他': `<svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>`
+        };
+
+        // Decor rules lookups
+        const DECOR_RULES = {
+            restaurant: { name: '餐廳', icon: '🍽️', group: '餐飲美食' },
+            cafe: { name: '咖啡廳', icon: '☕', group: '餐飲美食' },
+            sweetshop: { name: '甜點店', icon: '🍰', group: '餐飲美食' },
+            bakery: { name: '麵包店', icon: '🥐', group: '餐飲美食' },
+            burger: { name: '漢堡店', icon: '🍔', group: '餐飲美食' },
+            italian: { name: '義式餐廳', icon: '🍕', group: '餐飲美食' },
+            ramen: { name: '拉麵店', icon: '🥡', group: '餐飲美食' },
+            sushi: { name: '壽司店', icon: '🍣', group: '餐飲美食' },
+            curry: { name: '咖哩餐廳', icon: '🍛', group: '餐飲美食' },
+            korean: { name: '韓式餐廳', icon: '🇰🇷', group: '餐飲美食' },
+            taco: { name: '墨西哥餐廳', icon: '🌮', group: '餐飲美食' },
+            
+            convenience: { name: '便利商店', icon: '🏪', group: '民生購物' },
+            supermarket: { name: '超市', icon: '🛒', group: '民生購物' },
+            cosmetics: { name: '化妝品商店', icon: '💄', group: '民生購物' },
+            clothing: { name: '服飾店', icon: '👔', group: '民生購物' },
+            electronics: { name: '電器行', icon: '🔌', group: '民生購物' },
+            hardware: { name: '五金行', icon: '🔧', group: '民生購物' },
+            library: { name: '圖書館書店', icon: '📚', group: '民生購物' },
+            stationery: { name: '文具店', icon: '✏️', group: '民生購物' },
+            
+            pharmacy: { name: '藥局', icon: '💊', group: '生活服務' },
+            hair_salon: { name: '美髮院', icon: '💇', group: '生活服務' },
+            laundry: { name: '自助洗衣店', icon: '🧺', group: '生活服務' },
+            post_office: { name: '郵局', icon: '✉️', group: '生活服務' },
+            hotel: { name: '飯店', icon: '🏨', group: '生活服務' },
+            university: { name: '大學學院', icon: '🎓', group: '生活服務' },
+            
+            station: { name: '車站', icon: '🚂', group: '交通運輸' },
+            bus_stop: { name: '公車站', icon: '🚌', group: '交通運輸' },
+            airport: { name: '機場', icon: '✈️', group: '交通運輸' },
+            bridge: { name: '橋樑', icon: '🌉', group: '交通運輸' },
+            
+            park: { name: '公園', icon: '🍀', group: '自然生態' },
+            forest: { name: '森林', icon: '🌲', group: '自然生態' },
+            waterside: { name: '水邊', icon: '🌊', group: '自然生態' },
+            beach: { name: '海邊', icon: '🏖️', group: '自然生態' },
+            mountain: { name: '山丘', icon: '⛰️', group: '自然生態' },
+            zoo: { name: '動物園', icon: '🦁', group: '自然生態' },
+            theme_park: { name: '主題樂園', icon: '🎢', group: '自然生態' },
+            art_gallery: { name: '美術館', icon: '🎨', group: '自然生態' },
+            stadium: { name: '體育館', icon: '🏟️', group: '自然生態' },
+            movie_theater: { name: '電影院', icon: '🎬', group: '自然生態' },
+            shrine: { name: '神社', icon: '⛩️', group: '自然生態' },
+            
+            roadside: { name: '路邊', icon: '🏷️', group: '特殊其他' },
+            weather_rain: { name: '雨天', icon: '🌧️', group: '特殊其他' },
+            weather_snow: { name: '下雪', icon: '🌨️', group: '特殊其他' }
+        };
+
         const ESTIMATED_TOTAL = 32000000;
         let startTime = new Date();
+        let globalStatusData = null;
+        let cardRatio = 'landscape';
+        let cardTheme = 'cyberpunk';
         
         function formatNumber(num) {
             return new Intl.NumberFormat('en-US').format(num);
         }
 
+        function formatCompactNumber(num) {
+            if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
+            if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
+            return num;
+        }
+
         function updateElapsed() {
+            if (!globalStatusData || !globalStatusData.isRunning) return;
             const now = new Date();
             const diff = Math.floor((now - startTime) / 1000);
             const m = String(Math.floor(diff / 60)).padStart(2, '0');
@@ -207,7 +1244,7 @@
 
         function updatePhases(phase) {
             ['phase-1', 'phase-2', 'phase-3', 'phase-4'].forEach(id => {
-                document.getElementById(id).className = 'phase-indicator p-3 rounded bg-slate-800/50';
+                document.getElementById(id).className = 'phase-indicator p-3 rounded-lg bg-zinc-900/40 border border-zinc-800/50';
             });
             
             if (phase === 'Pass 1') {
@@ -219,7 +1256,7 @@
                 document.getElementById('phase-1').classList.add('phase-done');
                 document.getElementById('phase-2').classList.add('phase-done');
                 document.getElementById('phase-3').classList.add('phase-active');
-            } else if (phase === 'Generating') {
+            } else if (phase === 'Generating' || phase === 'Writing Chunks') {
                 document.getElementById('phase-1').classList.add('phase-done');
                 document.getElementById('phase-2').classList.add('phase-done');
                 document.getElementById('phase-3').classList.add('phase-done');
@@ -229,21 +1266,72 @@
                 document.getElementById('phase-2').classList.add('phase-done');
                 document.getElementById('phase-3').classList.add('phase-done');
                 document.getElementById('phase-4').classList.add('phase-done');
-                document.getElementById('status-text').innerText = '✅ 3-Pass 深度解析全部完成！';
-                document.getElementById('status-text').className = 'text-green-400 mt-1 font-bold';
             }
         }
 
+        // Switch Tabs (Pill style control)
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => {
+                el.classList.remove('active');
+            });
+            document.getElementById(tabId).classList.add('active');
+
+            const tabs = ['tab-monitor', 'tab-heatmap', 'tab-categories', 'tab-sharecard'];
+
+            tabs.forEach(id => {
+                const btn = document.getElementById(`btn-${id}`);
+                if (id === tabId) {
+                    btn.className = "px-4 py-2 rounded-lg bg-zinc-800 text-white shadow-sm transition-all duration-150 flex items-center gap-2 cursor-pointer";
+                } else {
+                    btn.className = "px-4 py-2 rounded-lg text-zinc-400 hover:text-zinc-200 transition-all duration-150 flex items-center gap-2 cursor-pointer";
+                }
+            });
+
+            if (tabId === 'tab-heatmap') {
+                renderHeatmap();
+            } else if (tabId === 'tab-categories') {
+                renderCategories();
+            } else if (tabId === 'tab-sharecard') {
+                renderShareCardHeatmap();
+                updateCardPreview();
+            }
+        }
+
+        // Fetch Status API
         async function fetchStatus() {
             try {
                 const res = await fetch('/api/status');
                 const data = await res.json();
+                globalStatusData = data;
 
                 if (data.startTime) startTime = new Date(data.startTime);
                 
-                // Update Phase
                 updatePhases(data.phase || 'Pass 1');
                 
+                const dot = document.getElementById('pipeline-status-dot');
+                if (data.isRunning) {
+                    dot.className = "w-1.5 h-1.5 rounded-full bg-amber-500 animate-ping";
+                    document.getElementById('status-text').innerText = `正在執行 [${data.phase}]...`;
+                    document.getElementById('status-text').className = "text-amber-400 font-medium";
+                } else if (data.phase === 'Done') {
+                    dot.className = "w-1.5 h-1.5 rounded-full bg-emerald-500";
+                    document.getElementById('status-text').innerText = '資料庫解析完成';
+                    document.getElementById('status-text').className = "text-emerald-400 font-semibold";
+                } else {
+                    dot.className = "w-1.5 h-1.5 rounded-full bg-zinc-600";
+                    document.getElementById('status-text').innerText = '管線已停止/待命中';
+                    document.getElementById('status-text').className = "text-zinc-500";
+                }
+                
+                const phaseDesc = {
+                    'Pass 1': '正在定位所有目標 POI Node、Way 與 Relation...',
+                    'Pass 2': '正在尋找關聯的 Ways 以擴充目標座標清單...',
+                    'Pass 3': '正在打撈所需要的 Node 精確經緯度以還原幾何特徵...',
+                    'Writing Chunks': '正在將點位進行分裝裝箱寫入中...',
+                    'Done': '全部三階段解算程序已完成！'
+                };
+                document.getElementById('processed-stage-desc').innerText = phaseDesc[data.phase] || '處理中...';
+
                 // Update Progress
                 let currentProcess = 0;
                 let maxProcess = 1;
@@ -257,20 +1345,19 @@
                 } else if (data.phase === 'Pass 3') {
                     currentProcess = data.pass3Processed || 0;
                     maxProcess = ESTIMATED_TOTAL;
-                } else if (data.phase === 'Generating' || data.phase === 'Done') {
+                } else if (data.phase === 'Generating' || data.phase === 'Writing Chunks' || data.phase === 'Done') {
                     currentProcess = 1;
                     maxProcess = 1;
                 }
                 
                 const percent = Math.min(100, (currentProcess / maxProcess) * 100).toFixed(1);
-                
                 document.getElementById('main-percent').innerText = `${percent}%`;
                 document.getElementById('main-progress').style.width = `${percent}%`;
                 
                 if (data.phase === 'Pass 1' || data.phase === 'Pass 2' || data.phase === 'Pass 3') {
                     document.getElementById('processed-elements').innerText = `目前階段已掃描: ${formatNumber(currentProcess)} 元素`;
                 } else {
-                    document.getElementById('processed-elements').innerText = `✅ 全檔掃描完成`;
+                    document.getElementById('processed-elements').innerText = `全檔掃描已完工`;
                 }
 
                 // Update Stats
@@ -293,37 +1380,722 @@
                 // Update Logs
                 if (data.logs && data.logs.length > 0) {
                     const logContainer = document.getElementById('log-output');
-                    logContainer.innerHTML = data.logs.map(log => 
-                        `<div class="mb-1 ${log.includes('❌') ? 'text-red-400' : log.includes('✅') ? 'text-green-400' : 'text-slate-300'}">${log}</div>`
-                    ).join('');
-                    logContainer.scrollTop = logContainer.scrollHeight;
+                    const isAtBottom = logContainer.scrollHeight - logContainer.clientHeight <= logContainer.scrollTop + 20;
+                    
+                    logContainer.innerHTML = data.logs.map(log => {
+                        let colorClass = 'text-zinc-400';
+                        if (log.includes('❌') || log.includes('💥')) colorClass = 'text-red-400 font-semibold';
+                        else if (log.includes('✅') || log.includes('🎉')) colorClass = 'text-emerald-400';
+                        else if (log.includes('🔄') || log.includes('💾')) colorClass = 'text-amber-500';
+                        return `<div class="mb-1 ${colorClass}">${log}</div>`;
+                    }).join('');
+                    
+                    if (isAtBottom || data.isRunning) {
+                        logContainer.scrollTop = logContainer.scrollHeight;
+                    }
                 }
 
-                // Update POI Chart if generating
-                if (data.stats && data.stats.poisByType && Object.keys(data.stats.poisByType).length > 0) {
+                // Update Top 5 preview
+                if (data.stats && data.stats.poisByType) {
                     const sorted = Object.entries(data.stats.poisByType)
                         .sort((a, b) => b[1] - a[1])
                         .slice(0, 5);
                     
-                    const maxCount = sorted[0][1];
-                    const chartHtml = sorted.map(([type, count]) => `
-                        <div class="flex items-center text-sm">
-                            <div class="w-24 text-slate-300 truncate" title="${type}">${type}</div>
-                            <div class="flex-1 ml-2">
-                                <div class="h-4 bg-sky-500 rounded" style="width: ${(count/maxCount)*100}%"></div>
-                            </div>
-                            <div class="w-16 text-right font-mono text-slate-400">${formatNumber(count)}</div>
-                        </div>
-                    `).join('');
-                    document.getElementById('poi-chart').innerHTML = chartHtml;
+                    if (sorted.length > 0) {
+                        document.getElementById('poi-chart').innerHTML = sorted.map(([type, count]) => {
+                            const meta = DECOR_RULES[type] || { name: type, icon: '🏷️' };
+                            return `
+                                <div class="bg-zinc-900/40 p-3 rounded-lg border border-zinc-800/50 flex flex-col justify-between">
+                                    <div class="flex items-center gap-1.5 text-xs text-zinc-500 truncate">
+                                        <span>${meta.icon}</span>
+                                        <span class="font-medium truncate" title="${meta.name}">${meta.name}</span>
+                                    </div>
+                                    <div class="mt-2 text-sm font-bold font-mono text-zinc-300">${formatNumber(count)}</div>
+                                </div>
+                            `;
+                        }).join('');
+                    }
                 }
             } catch (err) {
                 console.error(err);
             }
         }
 
-        setInterval(fetchStatus, 1000);
-        fetchStatus();
+        // ==================== HEATMAP RENDER ====================
+        function renderHeatmap() {
+            const container = document.getElementById('heatmap-grid');
+            container.innerHTML = '';
+            
+            if (!globalStatusData || !globalStatusData.stats || !globalStatusData.stats.tiles) {
+                container.innerHTML = '<div class="col-span-12 text-zinc-650 italic text-center py-12 text-xs">未加載到 Tile 索引資料...</div>';
+                return;
+            }
+
+            const tiles = globalStatusData.stats.tiles; 
+            const completedCount = tiles.filter(t => t.poiCount > 0).length;
+            document.getElementById('heatmap-total-tiles').innerText = `${completedCount} / ${tiles.length}`;
+            
+            // Reversing the rows so R11 (North) is at the top
+            for (let r = 11; r >= 0; r--) {
+                for (let c = 0; c < 12; c++) {
+                    const tileId = `r${r}_c${c}`;
+                    const tile = tiles.find(t => t.id === tileId);
+                    
+                    const cell = document.createElement('div');
+                    cell.className = 'aspect-square rounded-sm flex flex-col justify-center items-center text-[7px] font-mono font-semibold cursor-pointer transition-all duration-150 hover:scale-110 hover:z-10 hover:shadow-lg ';
+                    cell.setAttribute('data-id', tileId);
+                    
+                    if (tile && tile.poiCount > 0) {
+                        const count = tile.poiCount;
+                        cell.title = `Tile: ${tileId}\nPOI 數: ${formatNumber(count)}\nBounds:\nN: ${tile.bbox.north.toFixed(4)}\nS: ${tile.bbox.south.toFixed(4)}\nE: ${tile.bbox.east.toFixed(4)}\nW: ${tile.bbox.west.toFixed(4)}`;
+                        
+                        if (count < 1000) cell.classList.add('heat-low');
+                        else if (count < 5000) cell.classList.add('heat-medium');
+                        else if (count < 15000) cell.classList.add('heat-high');
+                        else cell.classList.add('heat-extreme');
+                        
+                        cell.innerText = count >= 1000 ? `${(count/1000).toFixed(0)}k` : count;
+                        cell.onclick = () => openTileDetails(tile);
+                    } else {
+                        cell.classList.add('heat-empty');
+                        cell.title = `Tile: ${tileId} (無點位)`;
+                        cell.onclick = () => openTileDetails({ id: tileId, poiCount: 0, bbox: { south: 21.75 + r * (3.55/12), north: 21.75 + (r+1) * (3.55/12), west: 120.0 + c * (2.1/12), east: 120.0 + (c+1) * (2.1/12) } });
+                    }
+                    container.appendChild(cell);
+                }
+            }
+        }
+
+        // Modal Tile Details
+        async function openTileDetails(tile) {
+            document.getElementById('modal-tile-title').innerHTML = `網格區塊詳情: <span class="text-violet-400 font-bold font-mono">${tile.id}</span>`;
+            document.getElementById('modal-tile-coords').innerText = `橫列 (Row) ${tile.id.split('_')[0].substring(1)} • 直欄 (Col) ${tile.id.split('_')[1].substring(1)}`;
+            document.getElementById('modal-poi-count').innerText = formatNumber(tile.poiCount);
+            
+            document.getElementById('modal-bbox-n').innerText = `N: ${tile.bbox.north.toFixed(5)}`;
+            document.getElementById('modal-bbox-s').innerText = `S: ${tile.bbox.south.toFixed(5)}`;
+            document.getElementById('modal-bbox-e').innerText = `E: ${tile.bbox.east.toFixed(5)}`;
+            document.getElementById('modal-bbox-w').innerText = `W: ${tile.bbox.west.toFixed(5)}`;
+            
+            const catsList = document.getElementById('modal-categories-list');
+            const featsList = document.getElementById('modal-features-list');
+            
+            catsList.innerHTML = '<div class="col-span-4 text-center py-2 text-zinc-650 text-xs">載入中...</div>';
+            featsList.innerHTML = '<div class="text-center py-8 text-zinc-650 text-xs">載入資料檔...</div>';
+            document.getElementById('modal-points-count').innerText = '-';
+            document.getElementById('modal-feature-list-count').innerText = '';
+
+            document.getElementById('tile-modal').classList.remove('hidden');
+
+            if (tile.poiCount === 0) {
+                catsList.innerHTML = '<div class="col-span-4 text-center py-2 text-zinc-600 italic text-xs">無裝箱飾品數據</div>';
+                featsList.innerHTML = '<div class="text-center py-8 text-zinc-600 italic text-xs">此區沒有任何景點特徵點位</div>';
+                document.getElementById('modal-points-count').innerText = '0';
+                return;
+            }
+
+            try {
+                const res = await fetch(`/api/tile/${tile.id}.json`);
+                if (!res.ok) throw new Error('Failed to load tile');
+                const tileData = await res.json();
+                
+                if (tileData && tileData.features) {
+                    const features = tileData.features;
+                    
+                    const cats = {};
+                    let totalPoints = 0;
+                    features.forEach(f => {
+                        cats[f.t] = (cats[f.t] || 0) + 1;
+                        totalPoints += f.pts.length;
+                    });
+                    
+                    document.getElementById('modal-points-count').innerText = formatNumber(totalPoints);
+
+                    const sortedCats = Object.entries(cats).sort((a,b) => b[1] - a[1]);
+                    catsList.innerHTML = sortedCats.map(([t, count]) => {
+                        const meta = DECOR_RULES[t] || { name: t, icon: '🏷️' };
+                        return `
+                            <div class="bg-zinc-900/40 p-2 rounded border border-zinc-800 flex justify-between items-center text-xs">
+                                <span class="truncate text-zinc-400" title="${meta.name}">${meta.icon} ${meta.name}</span>
+                                <span class="font-mono font-semibold text-violet-400">${count}</span>
+                            </div>
+                        `;
+                    }).join('');
+
+                    document.getElementById('modal-feature-list-count').innerText = `(顯示前 50 / 共 ${features.length} 筆)`;
+                    const showFeats = features.slice(0, 50);
+                    featsList.innerHTML = showFeats.map(f => {
+                        const meta = DECOR_RULES[f.t] || { name: f.t, icon: '🏷️' };
+                        const nameText = f.n && f.n !== '未命名' && !f.n.startsWith('未命名') ? f.n : `<span class="text-zinc-600 italic">未命名 (${meta.name})</span>`;
+                        return `
+                            <div class="p-3 hover:bg-white/[0.01] flex justify-between items-center text-xs font-mono">
+                                <div class="flex flex-col gap-0.5">
+                                    <div class="font-medium text-zinc-300">${nameText}</div>
+                                    <div class="text-[9px] text-zinc-600">${f.id}</div>
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <span class="px-1.5 py-0.5 bg-zinc-900 text-[9px] rounded border border-zinc-800 text-zinc-500">${meta.icon} ${meta.name}</span>
+                                    <span class="text-zinc-555 text-[10px]">${f.pts.length} 節點</span>
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+                }
+            } catch (err) {
+                catsList.innerHTML = '<div class="col-span-4 text-center py-2 text-rose-500 text-xs font-semibold">加載失敗</div>';
+                featsList.innerHTML = `<div class="text-center py-8 text-rose-500 text-xs font-semibold">讀取 JSON 發生錯誤: ${err.message}</div>`;
+            }
+        }
+
+        // Hover Donut Segment Action (Enlarged)
+        function hoverDonutSegment(groupKey, name, count, pct, isHover) {
+            const nameEl = document.getElementById(`name-${groupKey}`);
+            const countEl = document.getElementById(`count-${groupKey}`);
+            const pctEl = document.getElementById(`percent-${groupKey}`);
+            const labelEl = document.getElementById(`percent-label-${groupKey}`);
+
+            if (isHover) {
+                nameEl.innerText = name;
+                nameEl.className = "text-xs font-semibold text-zinc-300 truncate max-w-[110px]";
+                countEl.innerText = formatNumber(count);
+                countEl.className = "text-lg font-mono font-bold text-white mt-1";
+                pctEl.innerText = pct + '%';
+                labelEl.innerText = "組內佔比";
+            } else {
+                const container = document.getElementById(`donut-container-${groupKey}`);
+                const total = parseInt(container.getAttribute('data-total'));
+                const totalPct = parseFloat(container.getAttribute('data-total-pct')).toFixed(1) + '%';
+                
+                nameEl.innerText = '小計';
+                nameEl.className = "text-[11px] text-zinc-500 font-semibold truncate max-w-[100px]";
+                countEl.innerText = formatCompactNumber(total);
+                countEl.className = "text-xl font-mono font-bold text-white mt-1";
+                pctEl.innerText = totalPct;
+                labelEl.innerText = "組佔比";
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('tile-modal').classList.add('hidden');
+        }
+
+        // ==================== CATEGORIES RENDER (6 INDIVIDUAL DONUTS - ENLARGED & SURROUNDED) ====================
+        function renderCategories() {
+            const gridContainer = document.getElementById('categories-grid');
+
+            if (!globalStatusData || !globalStatusData.stats || !globalStatusData.stats.poisByType) {
+                gridContainer.innerHTML = '<div class="col-span-2 text-zinc-650 italic text-center py-8 text-xs">暫無統計數據</div>';
+                return;
+            }
+
+            const poisByType = globalStatusData.stats.poisByType;
+            const searchVal = document.getElementById('category-search').value.trim().toLowerCase();
+            const sortBy = document.getElementById('category-sort').value;
+
+            // Premium monochromatic palettes for donut chart segments (shades of group colors)
+            const GROUP_PALETTES = {
+                '自然生態': ['#10b981', '#34d399', '#6ee7b7', '#a7f3d0', '#059669', '#047857', '#065f46', '#064e3b', '#022c22'], // Green
+                '餐飲美食': ['#f43f5e', '#fb7185', '#fda4af', '#fecdd3', '#e11d48', '#be123c', '#9f1239', '#881337', '#4c0519'], // Rose/Red
+                '交通運輸': ['#6366f1', '#818cf8', '#a5b4fc', '#c7d2fe', '#4f46e5', '#3730a3', '#312e81', '#1e1b4b'],         // Indigo
+                '民生購物': ['#f59e0b', '#fbbf24', '#fcd34d', '#fde68a', '#d97706', '#b45309', '#92400e', '#78350f'],         // Amber
+                '生活服務': ['#06b6d4', '#22d3ee', '#67e8f9', '#a5f3fc', '#0891b2', '#0e7490', '#155e75', '#164e63'],         // Cyan
+                '特殊其他': ['#64748b', '#94a3b8', '#cbd5e1', '#e2e8f0', '#475569', '#334155', '#1e293b', '#0f172a']          // Slate
+            };
+
+            const groupKeys = {
+                '自然生態': 'nature',
+                '餐飲美食': 'food',
+                '交通運輸': 'transit',
+                '民生購物': 'shop',
+                '生活服務': 'service',
+                '特殊其他': 'special'
+            };
+
+            const totalPOIs = Object.values(poisByType).reduce((acc, val) => acc + val, 0);
+
+            // Map all categories
+            const items = Object.entries(DECOR_RULES).map(([id, rule]) => {
+                const count = poisByType[id] || 0;
+                return {
+                    id,
+                    name: rule.name,
+                    icon: rule.icon,
+                    group: rule.group || '特殊其他',
+                    count,
+                    percent: totalPOIs > 0 ? (count / totalPOIs) * 100 : 0
+                };
+            });
+
+            // Aggregate counts by group
+            const groupCounts = {
+                '自然生態': 0,
+                '餐飲美食': 0,
+                '交通運輸': 0,
+                '民生購物': 0,
+                '生活服務': 0,
+                '特殊其他': 0
+            };
+            items.forEach(item => {
+                if (groupCounts[item.group] !== undefined) {
+                    groupCounts[item.group] += item.count;
+                } else {
+                    groupCounts['特殊其他'] += item.count;
+                }
+            });
+
+            // Filter search
+            const filteredItems = items.filter(item => {
+                return item.name.toLowerCase().includes(searchVal) || item.id.toLowerCase().includes(searchVal);
+            });
+
+            // Distribute items
+            const groupedLists = {
+                '自然生態': [],
+                '餐飲美食': [],
+                '交通運輸': [],
+                '民生購物': [],
+                '生活服務': [],
+                '特殊其他': []
+            };
+            filteredItems.forEach(item => {
+                if (groupedLists[item.group]) {
+                    groupedLists[item.group].push(item);
+                } else {
+                    groupedLists['特殊其他'].push(item);
+                }
+            });
+
+            // Sort items inside each group
+            Object.values(groupedLists).forEach(groupItems => {
+                if (sortBy === 'count-desc') {
+                    groupItems.sort((a, b) => b.count - a.count);
+                } else if (sortBy === 'count-asc') {
+                    groupItems.sort((a, b) => a.count - b.count);
+                } else if (sortBy === 'name') {
+                    groupItems.sort((a, b) => a.name.localeCompare(b.name, 'zh-TW'));
+                }
+            });
+
+            // Render cards
+            let cardsHtml = '';
+            let hasData = false;
+            
+            const sortedGroups = Object.keys(groupedLists).sort((a, b) => groupCounts[b] - groupCounts[a]);
+
+            sortedGroups.forEach(gName => {
+                const groupItems = groupedLists[gName];
+                if (groupItems.length === 0) return;
+                hasData = true;
+
+                const groupIcon = GROUP_ICONS[gName] || GROUP_ICONS['特殊其他'];
+                const groupTotal = groupCounts[gName];
+                const groupPct = totalPOIs > 0 ? (groupTotal / totalPOIs) * 100 : 0;
+                const groupKey = groupKeys[gName] || 'special';
+                const colors = GROUP_PALETTES[gName] || GROUP_PALETTES['特殊其他'];
+
+                // Generate radial wheel sectors inspired by the reference image.
+                // Intent: equal-width category sectors as an elegant selector; exact proportions stay in the labels/bars.
+                const activeGroupItems = groupItems.filter(i => i.count > 0);
+                const wheelItems = groupItems.length > 0 ? groupItems : activeGroupItems;
+                const sectorCount = Math.max(wheelItems.length, 1);
+                const sectorDeg = 360 / sectorCount;
+                const gapDeg = Math.min(1.15, sectorDeg * 0.12);
+
+                const wheelGradientParts = wheelItems.map((item, index) => {
+                    const color = item.count > 0 ? colors[index % colors.length] : 'rgba(63,63,70,.34)';
+                    const start = index * sectorDeg;
+                    const end = (index + 1) * sectorDeg;
+                    const solidEnd = Math.max(start, end - gapDeg);
+                    return `${color} ${start.toFixed(2)}deg ${solidEnd.toFixed(2)}deg, rgba(8, 10, 12, 0.72) ${solidEnd.toFixed(2)}deg ${end.toFixed(2)}deg`;
+                }).join(', ');
+
+                const wheelGradient = `conic-gradient(from -90deg, ${wheelGradientParts})`;
+                const wheelGlow = colors[1] || colors[0] || '#34d399';
+                const iconRadius = 30; // percent distance from center; keeps icons inside each slice.
+                const wheelBadgesHtml = wheelItems.map((item, index) => {
+                    const midDeg = (index * sectorDeg) + (sectorDeg / 2) - 90;
+                    const rad = midDeg * Math.PI / 180;
+                    const x = 50 + iconRadius * Math.cos(rad);
+                    const y = 50 + iconRadius * Math.sin(rad);
+                    const inGroupPct = groupTotal > 0 ? ((item.count / groupTotal) * 100).toFixed(1) : '0.0';
+                    const color = item.count > 0 ? colors[index % colors.length] : '#3f3f46';
+                    const safeTitle = `${item.name}｜${formatNumber(item.count)}｜${inGroupPct}%`;
+                    return `
+                        <button class="wheel-sector-badge" type="button"
+                                title="${safeTitle}"
+                                style="left:${x.toFixed(2)}%; top:${y.toFixed(2)}%; --i:${index}; border-color:${color}66;"
+                                onmouseover="hoverDonutSegment('${groupKey}', '${item.icon} ${item.name}', ${item.count}, ${inGroupPct}, true)"
+                                onmouseout="hoverDonutSegment('${groupKey}', '', 0, 0, false)">
+                            <span aria-hidden="true">${item.icon}</span>
+                        </button>
+                    `;
+                }).join('');
+
+                // Split subcategories into Left and Right Columns
+                const leftCount = Math.ceil(groupItems.length / 2);
+                const leftItems = groupItems.slice(0, leftCount);
+                const rightItems = groupItems.slice(leftCount);
+
+                const renderColumnHtml = (colItems, offsetIndex) => {
+                    return colItems.map((item, idx) => {
+                        const globalIdx = offsetIndex + idx;
+                        const color = item.count > 0 ? colors[globalIdx % colors.length] : '#27272a';
+                        const pctString = item.percent.toFixed(2);
+                        const inGroupPct = groupTotal > 0 ? ((item.count / groupTotal) * 100).toFixed(1) : '0.0';
+                        
+                        return `
+                            <div class="group/item flex flex-col py-1 transition-all duration-150 rounded cursor-pointer"
+                                 onmouseover="hoverDonutSegment('${groupKey}', '${item.icon} ${item.name}', ${item.count}, ${inGroupPct}, true)"
+                                 onmouseout="hoverDonutSegment('${groupKey}', '', 0, 0, false)">
+                                <div class="flex justify-between items-center text-[10.5px] mb-0.5">
+                                    <span class="text-zinc-400 font-medium flex items-center gap-1.5 truncate">
+                                        <span class="w-1.5 h-1.5 rounded-full shrink-0" style="background-color: ${color}"></span>
+                                        <span class="truncate text-zinc-350">${item.icon} ${item.name}</span>
+                                    </span>
+                                    <span class="font-mono text-zinc-400 shrink-0">
+                                        ${formatNumber(item.count)} 
+                                        <span class="text-[9.5px] text-zinc-600 ml-1 font-normal">${pctString}%</span>
+                                    </span>
+                                </div>
+                                <!-- 1.5px high progress line -->
+                                <div class="w-full bg-zinc-950/40 h-[1.5px] rounded-full overflow-hidden border border-zinc-900/50">
+                                    <div class="h-full rounded-full transition-all duration-300" style="background-color: ${color}; width: ${item.percent}%"></div>
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+                };
+
+                const leftListHtml = renderColumnHtml(leftItems, 0);
+                const rightListHtml = renderColumnHtml(rightItems, leftCount);
+
+                cardsHtml += `
+                    <div class="premium-panel rounded-xl p-6 flex flex-col justify-between hover:border-zinc-800 transition-all duration-200">
+                        <!-- Card Header -->
+                        <div class="flex justify-between items-center border-b border-zinc-900 pb-3 mb-5">
+                            <h3 class="text-xs font-bold text-zinc-300 flex items-center gap-2 uppercase tracking-wider">
+                                <span class="text-zinc-450">${groupIcon}</span>
+                                <span>${gName}</span>
+                            </h3>
+                            <div class="flex items-center gap-3 font-mono">
+                                <div class="text-right">
+                                    <div class="text-[10px] font-bold text-white">${formatNumber(groupTotal)}</div>
+                                    <div class="text-[8px] text-zinc-550 -mt-0.5">小計 (${groupPct.toFixed(1)}%)</div>
+                                </div>
+                                <span class="text-[8px] px-1.5 py-0.5 bg-zinc-900/60 rounded-md border border-zinc-850 text-zinc-500 font-normal">
+                                    ${groupItems.length} 個類別
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <!-- Card Content (3-column layout: Left Column, Center Donut, Right Column) -->
+                        <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
+                            <!-- Left: List (First Half) -->
+                            <div class="order-2 md:order-1 md:col-span-4 space-y-2.5">
+                                ${leftListHtml}
+                            </div>
+                            
+                            <!-- Center: Radial category wheel -->
+                            <div class="order-1 md:order-2 md:col-span-4 flex justify-center py-5 md:py-2">
+                                <div id="donut-container-${groupKey}" data-total="${groupTotal}" data-total-pct="${groupPct}" class="category-wheel-wrap shrink-0">
+                                    <div class="category-wheel" style="--wheel-gradient: ${wheelGradient}; --wheel-glow: ${wheelGlow}33;"></div>
+                                    ${wheelBadgesHtml}
+                                    <div class="wheel-core select-none pointer-events-none leading-tight">
+                                        <span id="name-${groupKey}" class="text-[10px] text-zinc-500 font-semibold truncate max-w-[100px]">小計</span>
+                                        <span id="count-${groupKey}" class="text-3xl md:text-4xl font-light text-white mt-1 tracking-tight">${formatCompactNumber(groupTotal)}</span>
+                                        <span id="percent-${groupKey}" class="text-[11px] text-zinc-300 font-mono mt-2">${groupPct.toFixed(1)}%</span>
+                                        <span id="percent-label-${groupKey}" class="text-[8px] text-zinc-600 mt-0.5 font-medium tracking-wider">組佔比</span>
+                                    </div>
+                                    <div class="wheel-caption">每個扇形代表一個子分類，比例顯示於列表與互動中心</div>
+                                </div>
+                            </div>
+
+                            <!-- Right: List (Second Half) -->
+                            <div class="order-3 md:col-span-4 space-y-2.5">
+                                ${rightListHtml}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            if (!hasData) {
+                gridContainer.innerHTML = '<div class="col-span-2 text-zinc-650 italic text-center py-8 text-xs">找不到相符的類別</div>';
+            } else {
+                gridContainer.innerHTML = cardsHtml;
+            }
+        }
+
+        // ==================== SOCIAL SHARE CARD PREVIEW ====================
+        function renderShareCardHeatmap() {
+            const container = document.getElementById('card-heatmap-grid');
+            container.innerHTML = '';
+            
+            if (!globalStatusData || !globalStatusData.stats || !globalStatusData.stats.tiles) {
+                for (let i = 0; i < 144; i++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'heat-empty rounded-sm';
+                    container.appendChild(cell);
+                }
+                return;
+            }
+
+            const tiles = globalStatusData.stats.tiles;
+            for (let r = 11; r >= 0; r--) {
+                for (let c = 0; c < 12; c++) {
+                    const tileId = `r${r}_c${c}`;
+                    const tile = tiles.find(t => t.id === tileId);
+                    const cell = document.createElement('div');
+                    cell.className = 'rounded-sm';
+                    
+                    if (tile && tile.poiCount > 0) {
+                        const count = tile.poiCount;
+                        if (count < 1000) cell.className += ' heat-low';
+                        else if (count < 5000) cell.className += ' heat-medium';
+                        else if (count < 15000) cell.className += ' heat-high';
+                        else cell.className += ' heat-extreme';
+                    } else {
+                        cell.className += ' heat-empty';
+                    }
+                    container.appendChild(cell);
+                }
+            }
+        }
+
+        function updateCardPreview() {
+            const title = document.getElementById('card-title-input').value;
+            const subtitle = document.getElementById('card-subtitle-input').value;
+            document.getElementById('card-title').innerText = title;
+            document.getElementById('card-subtitle').innerText = subtitle;
+
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('card-date').innerText = today;
+
+            const showMap = document.getElementById('show-mini-map').checked;
+            const showTop = document.getElementById('show-top-chart').checked;
+
+            document.getElementById('card-map-wrapper').style.display = showMap ? 'flex' : 'none';
+            document.getElementById('card-stats-wrapper').className = showMap ? 'col-span-7 flex flex-col gap-4' : 'col-span-12 flex flex-col gap-4';
+            document.getElementById('card-top-wrapper').style.display = showTop ? 'flex' : 'none';
+
+            if (globalStatusData && globalStatusData.stats) {
+                const totalGeom = globalStatusData.stats.fullStats ? globalStatusData.stats.fullStats.generatedDecorInstances : 6442718;
+                document.getElementById('card-stat-total').innerText = formatNumber(totalGeom);
+                document.getElementById('card-stat-pois').innerText = formatNumber(globalStatusData.stats.totalPOIs || 350477);
+
+                if (globalStatusData.stats.poisByType) {
+                    const sorted = Object.entries(globalStatusData.stats.poisByType)
+                        .sort((a,b) => b[1] - a[1])
+                        .slice(0, 4);
+                    
+                    document.getElementById('card-top-list').innerHTML = sorted.map(([t, count], index) => {
+                        const meta = DECOR_RULES[t] || { name: t, icon: '🏷' };
+                        return `
+                            <div class="flex justify-between items-center py-0.5">
+                                <span class="truncate text-zinc-450 font-medium">#${index+1} ${meta.icon} ${meta.name}</span>
+                                <span class="font-bold text-zinc-300 font-mono">${formatNumber(count)}</span>
+                            </div>
+                        `;
+                    }).join('');
+                }
+            }
+
+            const card = document.getElementById('share-card-container');
+            if (cardRatio === 'square') {
+                card.style.width = '600px';
+                card.style.height = '600px';
+                document.querySelector('#share-card-container .grid').className = "grid grid-cols-1 gap-4 items-center my-4 flex-1";
+                document.getElementById('card-map-wrapper').className = "col-span-1 flex justify-center py-2";
+                document.getElementById('card-stats-wrapper').className = "col-span-1 flex flex-col gap-3";
+            } else {
+                card.style.width = '800px';
+                card.style.height = '450px';
+                document.querySelector('#share-card-container .grid').className = "grid grid-cols-12 gap-6 items-center my-4 flex-1";
+                document.getElementById('card-map-wrapper').className = "col-span-5 flex justify-center";
+                document.getElementById('card-stats-wrapper').className = showMap ? 'col-span-7 flex flex-col gap-4' : 'col-span-12 flex flex-col gap-4';
+            }
+
+            const border = document.getElementById('card-border');
+            const bgGrad = document.getElementById('card-bg-gradient');
+            card.style.color = '#f4f4f5';
+            
+            if (cardTheme === 'cyberpunk') {
+                card.style.backgroundColor = '#07070a';
+                border.className = 'absolute inset-0 border border-zinc-800 rounded-xl pointer-events-none -z-10';
+                bgGrad.className = 'absolute -inset-10 opacity-20 blur-3xl -z-10 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-violet-500/20 via-indigo-500/5 to-transparent';
+                document.getElementById('card-title').className = 'text-base font-bold text-white leading-tight';
+                document.getElementById('card-stat-pois').className = 'text-sm font-bold text-violet-400 mt-1';
+            } else if (cardTheme === 'forest') {
+                card.style.backgroundColor = '#040c09';
+                border.className = 'absolute inset-0 border border-emerald-950 rounded-xl pointer-events-none -z-10';
+                bgGrad.className = 'absolute -inset-10 opacity-20 blur-3xl -z-10 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-emerald-500/20 via-lime-500/5 to-transparent';
+                document.getElementById('card-title').className = 'text-base font-bold text-emerald-100 leading-tight';
+                document.getElementById('card-stat-pois').className = 'text-sm font-bold text-emerald-400 mt-1';
+            } else if (cardTheme === 'dark') {
+                card.style.backgroundColor = '#000000';
+                border.className = 'absolute inset-0 border border-zinc-900 rounded-xl pointer-events-none -z-10';
+                bgGrad.className = 'absolute -inset-10 opacity-5 blur-3xl -z-10 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-zinc-500/20 via-transparent to-transparent';
+                document.getElementById('card-title').className = 'text-base font-bold text-white leading-tight';
+                document.getElementById('card-stat-pois').className = 'text-sm font-bold text-white mt-1';
+            } else if (cardTheme === 'ocean') {
+                card.style.backgroundColor = '#040b14';
+                border.className = 'absolute inset-0 border border-blue-950 rounded-xl pointer-events-none -z-10';
+                bgGrad.className = 'absolute -inset-10 opacity-20 blur-3xl -z-10 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-blue-500/20 via-sky-500/5 to-transparent';
+                document.getElementById('card-title').className = 'text-base font-bold text-blue-100 leading-tight';
+                document.getElementById('card-stat-pois').className = 'text-sm font-bold text-blue-400 mt-1';
+            }
+        }
+
+        function setCardRatio(ratio) {
+            cardRatio = ratio;
+            
+            const btnLandscape = document.getElementById('btn-ratio-landscape');
+            const btnSquare = document.getElementById('btn-ratio-square');
+            
+            if (ratio === 'square') {
+                btnSquare.className = "px-3 py-1.5 bg-zinc-200 text-zinc-950 rounded-lg text-xs font-semibold cursor-pointer";
+                btnLandscape.className = "px-3 py-1.5 bg-zinc-950 text-zinc-400 border border-zinc-850 rounded-lg text-xs font-semibold cursor-pointer";
+            } else {
+                btnLandscape.className = "px-3 py-1.5 bg-zinc-200 text-zinc-950 rounded-lg text-xs font-semibold cursor-pointer";
+                btnSquare.className = "px-3 py-1.5 bg-zinc-950 text-zinc-400 border border-zinc-850 rounded-lg text-xs font-semibold cursor-pointer";
+            }
+            updateCardPreview();
+        }
+
+        function setCardTheme(theme) {
+            cardTheme = theme;
+            
+            const themes = ['cyberpunk', 'forest', 'dark', 'ocean'];
+            themes.forEach(t => {
+                const btn = document.getElementById(`btn-theme-${t}`);
+                if (t === theme) {
+                    btn.className = "px-2 py-1.5 bg-zinc-200 text-zinc-950 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 cursor-pointer";
+                } else {
+                    btn.className = "px-2 py-1.5 bg-zinc-950 text-zinc-400 border border-zinc-850 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 cursor-pointer";
+                }
+            });
+            updateCardPreview();
+        }
+
+        function downloadShareCard() {
+            const card = document.getElementById('share-card-container');
+            
+            html2canvas(card, {
+                backgroundColor: null, 
+                scale: 2, 
+                useCORS: true,
+                logging: false
+            }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = `taiwan-osm-${cardTheme}-${cardRatio}.png`;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            }).catch(err => {
+                alert('導出圖片發生錯誤: ' + err.message);
+            });
+        }
+
+
+
+        // ==================== ATLAS MOTION LAYER ====================
+        const motionOK = !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        let pointerRAF = null;
+
+        function decorateDynamicUI() {
+            const metricIds = [
+                'stat-nodes', 'stat-ways', 'stat-relations', 'stat-total-pois',
+                'stat-real-points', 'stat-area-instances', 'stat-skipped-outside', 'stat-skipped-invalid'
+            ];
+
+            metricIds.forEach(id => {
+                const el = document.getElementById(id);
+                const card = el ? el.closest('div') : null;
+                if (card) card.classList.add('metric-card', 'magnetic-card');
+            });
+
+            document.querySelectorAll('.premium-panel, .bg-zinc-900\\/30.border, .bg-zinc-900\\/40.border').forEach(el => {
+                el.classList.add('magnetic-card');
+            });
+
+            document.querySelectorAll('#poi-chart > div, #categories-grid > div').forEach(el => {
+                el.classList.add('magnetic-card');
+            });
+        }
+
+        function runTabMotion(tabId) {
+            const root = document.getElementById(tabId);
+            if (!root || !motionOK) return;
+            const children = Array.from(root.children).filter(Boolean);
+            children.forEach(el => el.classList.add('reveal-item'));
+
+            if (window.gsap) {
+                gsap.fromTo(children,
+                    { y: 18, opacity: 0, filter: 'blur(10px)' },
+                    { y: 0, opacity: 1, filter: 'blur(0px)', duration: 0.62, ease: 'power3.out', stagger: 0.045, overwrite: true }
+                );
+            }
+        }
+
+        function initPointerAtmosphere() {
+            if (!motionOK) return;
+            window.addEventListener('pointermove', (event) => {
+                if (pointerRAF) cancelAnimationFrame(pointerRAF);
+                pointerRAF = requestAnimationFrame(() => {
+                    const x = (event.clientX / window.innerWidth) * 100;
+                    const y = (event.clientY / window.innerHeight) * 100;
+                    document.documentElement.style.setProperty('--mx', `${x}%`);
+                    document.documentElement.style.setProperty('--my', `${y}%`);
+                });
+            }, { passive: true });
+        }
+
+        function initMagneticCards() {
+            if (!motionOK) return;
+            document.addEventListener('pointermove', (event) => {
+                const card = event.target.closest('.magnetic-card');
+                if (!card) return;
+                const rect = card.getBoundingClientRect();
+                const px = (event.clientX - rect.left) / rect.width - 0.5;
+                const py = (event.clientY - rect.top) / rect.height - 0.5;
+                card.style.setProperty('--tilt-x', `${px * 2.2}deg`);
+                card.style.setProperty('--tilt-y', `${py * -2.2}deg`);
+            }, { passive: true });
+
+            document.addEventListener('pointerout', (event) => {
+                const card = event.target.closest('.magnetic-card');
+                if (!card) return;
+                card.style.setProperty('--tilt-x', '0deg');
+                card.style.setProperty('--tilt-y', '0deg');
+            }, { passive: true });
+        }
+
+        // Wrap existing functions without changing core data behavior.
+        const baseSwitchTab = switchTab;
+        switchTab = function(tabId) {
+            baseSwitchTab(tabId);
+            requestAnimationFrame(() => {
+                decorateDynamicUI();
+                runTabMotion(tabId);
+            });
+        };
+
+        const baseFetchStatus = fetchStatus;
+        fetchStatus = async function() {
+            await baseFetchStatus();
+            decorateDynamicUI();
+        };
+
+        // ==================== INITIALIZATION ====================
+        async function init() {
+            initPointerAtmosphere();
+            initMagneticCards();
+            decorateDynamicUI();
+            await fetchStatus();
+            runTabMotion('tab-monitor');
+            setInterval(fetchStatus, 2000);
+        }
+
+        window.onload = init;
     </script>
 </body>
 </html>

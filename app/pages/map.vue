@@ -833,7 +833,10 @@ let leafletMap: any = null; // 不使用 ref，直接用普通變數
 
 // 狀態管理
 const showPanel = ref(true);
-const selectedFilters = ref<string[]>(decorRules.slice(0, 43).map(r => r.id)); // 預設只選前 43 個一般分類，避免查詢過重
+const defaultSelectedFilters = decorRules
+  .filter(rule => rule.tags.length > 0 && rule.region !== 'JP')
+  .map(rule => rule.id);
+const selectedFilters = ref<string[]>(defaultSelectedFilters);
 
 // 搜尋功能狀態
 const searchQuery = ref('');

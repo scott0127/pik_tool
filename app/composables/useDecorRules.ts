@@ -1,7 +1,7 @@
 import type { DecorRule } from '~/types/map';
 
 // 基於 Pikmin Bloom Wiki 標準規則 + 台灣 OSM 在地化優化
-// 完整 42 個一般分類，OSM 標籤經 Wiki 驗證
+// 完整 43 個一般分類，OSM 標籤經 Wiki 驗證
 export const decorRules: DecorRule[] = [
   // 餐飲類 (Food & Dining)
   { id: 'restaurant', name: '餐廳', icon: '🍽️', iconName: 'noto:fork-and-knife-with-plate', tags: ['amenity=restaurant'] },
@@ -24,6 +24,7 @@ export const decorRules: DecorRule[] = [
   { id: 'electronics', name: '電器行', icon: '🔌', iconName: 'noto:electric-plug', tags: ['shop=appliance', 'shop=electronics', 'shop=computer', 'shop=mobile_phone'] },
   { id: 'hardware', name: '五金行', icon: '🔧', iconName: 'noto:wrench', tags: ['shop=doityourself', 'shop=hardware', 'shop=tools'] },
   { id: 'library', name: '圖書館／書店', icon: '📚', iconName: 'noto:books', tags: ['amenity=library', 'shop=books'] },
+  { id: 'stationery', name: '文具店', icon: '✏️', iconName: 'noto:pencil', tags: ['shop=stationery', 'shop=craft'] },
   
   // 生活服務類 (Services)
   { id: 'pharmacy', name: '藥局', icon: '💊', iconName: 'noto:pill', tags: ['amenity=pharmacy', 'shop=chemist', 'healthcare=pharmacy'] },

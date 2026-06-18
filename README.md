@@ -66,7 +66,7 @@
 - **框架**：Nuxt 3
 - **資料庫**：Supabase
 - **樣式**：Tailwind CSS
-- **部署**：Vercel / Netlify
+- **部署**：Render Static Site / Vercel / Netlify
 
 ## 📦 安裝與開發
 
@@ -99,10 +99,28 @@ SUPABASE_KEY=your_supabase_key
 
 ### 生產環境建置
 
+本專案正式部署建議使用靜態輸出，避免在 512MB Web Service 上長時間運行 Nuxt/Nitro Node server：
+
+```bash
+pnpm run render:build
+```
+
+輸出目錄：
+
+```txt
+.output/public
+```
+
+Render 建議建立 Static Site，build command 使用 `pnpm run render:build`，publish directory 使用 `.output/public`。Repo 根目錄的 `render.yaml` 已提供可回溯的 Static Site Blueprint。
+
+若只是本機預覽 Node build：
+
 ```bash
 pnpm build
 pnpm preview
 ```
+
+Render 記憶體與部署細節請見 [`docs/operations/render-memory.md`](docs/operations/render-memory.md)。
 
 ## 📝 授權條款
 

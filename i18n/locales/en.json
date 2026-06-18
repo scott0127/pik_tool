@@ -331,6 +331,7 @@
             "other": "Other"
         },
         "form": {
+            "label_type": "Feedback Type",
             "email_label": "Email (Optional)",
             "message_label": "Details",
             "email_placeholder": "Leave email if you need a reply",

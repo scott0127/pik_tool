@@ -61,6 +61,7 @@ export interface DecorVariant {
   imageUrl?: string;
   localImage?: string;
   isRare?: boolean;
+  baseVariantId?: string;
 }
 
 // Decor item that can be collected (combines category + variant + pikmin type)
@@ -80,8 +81,90 @@ export interface DecorDefinition {
 }
 
 // Collection state stored in localStorage
+export type CollectionInventoryBucket =
+  | 'seedling'
+  | 'preDecor'
+  | 'decor'
+  | 'rare'
+  | 'releaseNoDecor'
+  | 'releaseWithDecor';
+
+export interface CollectionInventoryItem {
+  seedlingCount: number;         // Small seedlings still in inventory/planter
+  preDecorCount: number;         // Small seedling plucked, below 4 hearts
+  decorCount: number;            // Huge seedling plucked or 4-heart gift decor obtained
+  rareCount: number;             // Rare decor Pikmin
+  releaseNoDecorCount: number;   // Released before obtaining decor
+  releaseWithDecorCount: number; // Released after obtaining decor
+  updatedAt?: string;
+}
+
+export type RarePointAction =
+  | 'pluck_seedling'
+  | 'pluck_huge_seedling'
+  | 'gift_expedition'
+  | 'release_no_decor'
+  | 'release_with_decor'
+  | 'manual_adjustment';
+
+export type CollectionEventSource = 'manual' | 'legacy-toggle' | 'bulk' | 'migration' | 'rare-points' | 'undo';
+
+export type CollectionEventType = 'inventory_adjustment' | 'rare_points_adjustment';
+
+export interface CollectionEvent {
+  id: string;
+  type: CollectionEventType;
+  createdAt: string;
+  source: CollectionEventSource;
+  categoryId?: string;
+  itemId?: string;
+  bucket?: CollectionInventoryBucket;
+  delta?: number;
+  previousCount?: number;
+  newCount?: number;
+  rarePointAction?: RarePointAction;
+  pointsDelta?: number;
+  previousPoints?: number;
+  newPoints?: number;
+  revertedEventId?: string;
+  note?: string;
+}
+
+export interface RareDecorProgress {
+  categoryId: string;
+  points: number;
+  giftsAvailable: number;
+  giftsSpent: number;
+  updatedAt?: string;
+}
+
+export interface CollectionDetails {
+  inventory: Record<string, CollectionInventoryItem>;
+  rareProgress: Record<string, RareDecorProgress>;
+  events: CollectionEvent[];
+}
+
+export interface CategoryInventorySummary {
+  categoryId: string;
+  seedlingCount: number;
+  preDecorCount: number;
+  decorCount: number;
+  rareCount: number;
+  releaseNoDecorCount: number;
+  releaseWithDecorCount: number;
+  collectedCount: number;
+  totalItems: number;
+  eventCount: number;
+  hasRareDecor: boolean;
+  rarePoints: number;
+  rareLevel: number;
+  nextRareLevelPoints: number | null;
+  pointsToNextRareLevel: number | null;
+}
+
 export interface CollectionState {
   collected: Record<string, boolean>;  // Key: DecorItem.id, Value: collected or not
+  details?: CollectionDetails;         // Traceable v2 inventory/event data
   lastUpdated: string;                 // ISO date string
   version: number;                     // For migration purposes
 }

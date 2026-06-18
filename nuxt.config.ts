@@ -30,7 +30,7 @@ const withSecurityHeaders = (headers: Record<string, string>) => ({
 
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
-  devtools: { enabled: true },
+  devtools: { enabled: process.env.NODE_ENV !== 'production' },
   sourcemap: false,
   
   modules: ['@nuxtjs/tailwindcss', '@nuxtjs/supabase', '@nuxt/icon', '@nuxtjs/i18n'],
@@ -174,5 +174,21 @@ export default defineNuxtConfig({
     // public/data is hundreds of MB; build-time Brotli/Gzip compression stalls
     // deployment builds and duplicates large JSON assets.
     compressPublicAssets: false,
+    prerender: {
+      crawlLinks: true,
+      routes: [
+        '/',
+        '/auth',
+        '/auth/callback',
+        '/auth/update-password',
+        '/change-password',
+        '/collection',
+        '/feedback',
+        '/forza-music-overlay',
+        '/friends',
+        '/map',
+        '/released',
+      ],
+    },
   },
 })

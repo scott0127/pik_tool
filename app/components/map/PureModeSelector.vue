@@ -375,6 +375,7 @@ const allTypes = [
   { id: 'pharmacy', name: '藥局', emoji: '💊', iconName: 'noto:pill' },
   { id: 'post_office', name: '郵局', emoji: '📮', iconName: 'noto:envelope' },
   { id: 'library', name: '圖書館', emoji: '📚', iconName: 'noto:books' },
+  { id: 'stationery', name: '文具店', emoji: '✏️', iconName: 'noto:pencil' },
   { id: 'hotel', name: '飯店', emoji: '🏨', iconName: 'noto:hotel' },
   { id: 'university', name: '大學', emoji: '🎓', iconName: 'noto:graduation-cap' },
   { id: 'stadium', name: '體育場', emoji: '🏟️', iconName: 'noto:stadium' },

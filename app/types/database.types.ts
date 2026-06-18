@@ -13,16 +13,19 @@ export interface Database {
         Row: {
           user_id: string
           collected_items: string[] | null
+          collection_details: Json | null
           updated_at: string | null
         }
         Insert: {
           user_id: string
           collected_items?: string[] | null
+          collection_details?: Json | null
           updated_at?: string | null
         }
         Update: {
           user_id?: string
           collected_items?: string[] | null
+          collection_details?: Json | null
           updated_at?: string | null
         }
         Relationships: [

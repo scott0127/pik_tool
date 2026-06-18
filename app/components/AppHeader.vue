@@ -169,7 +169,7 @@
               <NuxtLink
                 v-else
                 to="/auth"
-                class="btn-primary text-sm !py-2 !px-4"
+                class="btn-primary text-sm !py-2 !px-4 whitespace-nowrap shrink-0"
               >
                 {{ $t('auth.login') }}
               </NuxtLink>

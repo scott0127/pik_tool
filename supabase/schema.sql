@@ -37,8 +37,12 @@ CREATE TABLE IF NOT EXISTS user_collections (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID UNIQUE REFERENCES auth.users(id) ON DELETE CASCADE,
   collected_items JSONB DEFAULT '[]'::jsonb,
+  collection_details JSONB DEFAULT '{"inventory":{},"rareProgress":{},"events":[]}'::jsonb,
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
+
+ALTER TABLE user_collections
+  ADD COLUMN IF NOT EXISTS collection_details JSONB DEFAULT '{"inventory":{},"rareProgress":{},"events":[]}'::jsonb;
 
 -- Enable RLS
 ALTER TABLE user_collections ENABLE ROW LEVEL SECURITY;
@@ -90,8 +94,8 @@ BEGIN
   INSERT INTO public.user_profiles (id, username)
   VALUES (NEW.id, NEW.raw_user_meta_data->>'username');
   
-  INSERT INTO public.user_collections (user_id, collected_items)
-  VALUES (NEW.id, '[]'::jsonb);
+  INSERT INTO public.user_collections (user_id, collected_items, collection_details)
+  VALUES (NEW.id, '[]'::jsonb, '{"inventory":{},"rareProgress":{},"events":[]}'::jsonb);
   
   RETURN NEW;
 END;

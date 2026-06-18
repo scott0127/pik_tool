@@ -471,8 +471,8 @@ const activeStoryIndex = ref(0);
 const isStoryNavPeeking = ref(false);
 let homeMotionContext: ReturnType<typeof gsap.context> | null = null;
 let homeResizeCleanup: (() => void) | null = null;
-let storyNavPeekTimer: ReturnType<typeof window.setTimeout> | null = null;
-let homeInitRetryTimer: ReturnType<typeof window.setTimeout> | null = null;
+let storyNavPeekTimer: number | null = null;
+let homeInitRetryTimer: number | null = null;
 let homeInitToken = 0;
 
 // Stats
@@ -503,7 +503,25 @@ const storyNavItems = [
 
 const activeStoryLabel = computed(() => storyNavItems[activeStoryIndex.value]?.label ?? storyNavItems[0].label);
 
-const catalogPreviewScenarios = [
+type CatalogScenarioId = 'restaurant' | 'park' | 'station';
+
+type CatalogPreviewItem = {
+  type: PikminType;
+  label: string;
+  collected: boolean;
+  unlockDemo?: boolean;
+  image: string;
+};
+
+type CatalogPreviewScenario = {
+  id: CatalogScenarioId;
+  query: string;
+  progressTitle: string;
+  progressImage: string;
+  items: readonly CatalogPreviewItem[];
+};
+
+const catalogPreviewScenarios: readonly CatalogPreviewScenario[] = [
   {
     id: 'restaurant',
     query: '廚師帽',
@@ -641,8 +659,7 @@ const catalogPreviewScenarios = [
   },
 ] as const;
 
-type CatalogScenarioId = (typeof catalogPreviewScenarios)[number]['id'];
-type CatalogPreviewScenario = (typeof catalogPreviewScenarios)[number];
+const defaultCatalogScenario = catalogPreviewScenarios[0]!;
 
 const getCatalogMissingCount = (scenario: CatalogPreviewScenario) => (
   scenario.items.filter(item => !item.collected).length
@@ -931,7 +948,7 @@ const initHomeScrollMotion = () => {
     let activeCatalogId: CatalogScenarioId = 'restaurant';
 
     const getCatalogScenario = (id: CatalogScenarioId) => (
-      catalogPreviewScenarios.find(scenario => scenario.id === id) ?? catalogPreviewScenarios[0]
+      catalogPreviewScenarios.find(scenario => scenario.id === id) ?? defaultCatalogScenario
     );
 
     const getCatalogSet = (id: CatalogScenarioId) => (

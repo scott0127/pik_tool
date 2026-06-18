@@ -5,9 +5,11 @@
   "scripts": {
     "prebuild": "node scripts/write-version.mjs",
     "build": "nuxt build",
+    "build:static": "nuxt generate",
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
+    "render:build": "pnpm run build:static",
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
@@ -49,12 +51,15 @@
     "@nuxtjs/tailwindcss": "^6.14.0",
     "@supabase/supabase-js": "^2.106.0",
     "@types/three": "^0.184.1",
+    "@types/through2": "^2.0.41",
     "@vue/compiler-sfc": "^3.5.34",
     "dotenv": "^17.4.2",
     "eslint": "^9.39.4",
     "happy-dom": "^20.9.0",
     "htmlparser2": "^12.0.0",
+    "osm-pbf-parser": "^2.3.0",
     "playwright": "^1.60.0",
+    "through2": "^5.0.1",
     "tsx": "^4.22.2",
     "vitest": "^4.1.6",
     "vue-tsc": "^3.3.0"

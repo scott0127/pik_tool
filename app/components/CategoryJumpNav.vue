@@ -130,14 +130,14 @@
           :class="[
             pillBtnBaseClass,
             'bg-emerald-50 text-emerald-600 border-emerald-100 hover:border-emerald-300',
-            activeSection === 'top' ? 'ring-2 ring-emerald-400 w-[160px]' : ''
+            activeSection === 'top' ? 'ring-2 ring-emerald-400' : ''
           ]"
         >
           <div class="w-10 h-10 min-w-[40px] flex items-center justify-center bg-white rounded-full">
             <Icon name="lucide:arrow-up-to-line" class="w-5 h-5" />
           </div>
           <span class="whitespace-nowrap font-bold text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-100"
-                :class="activeSection === 'top' ? 'opacity-100' : ''">
+          >
             {{ $t('collection.scroll.top') }}
           </span>
         </button>
@@ -171,14 +171,14 @@
           :class="[
             pillBtnBaseClass,
             'bg-purple-50 text-purple-600 border-purple-100 hover:border-purple-300',
-            activeSection === 'special' ? 'ring-2 ring-purple-400 w-[160px]' : ''
+            activeSection === 'special' ? 'ring-2 ring-purple-400' : ''
           ]"
         >
           <div class="w-10 h-10 min-w-[40px] flex items-center justify-center bg-white rounded-full">
             <Icon name="lucide:star" class="w-5 h-5" />
           </div>
           <span class="whitespace-nowrap font-bold text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-100"
-                :class="activeSection === 'special' ? 'opacity-100' : ''">
+          >
             {{ $t('collection.scroll.special') }}
           </span>
         </button>
@@ -193,14 +193,14 @@
           :class="[
             pillBtnBaseClass,
             'bg-amber-50 text-amber-600 border-amber-100 hover:border-amber-300',
-            activeSection === 'bottom' ? 'ring-2 ring-amber-400 w-[160px]' : ''
+            activeSection === 'bottom' ? 'ring-2 ring-amber-400' : ''
           ]"
         >
           <div class="w-10 h-10 min-w-[40px] flex items-center justify-center bg-white rounded-full">
             <Icon name="lucide:arrow-down-to-line" class="w-5 h-5" />
           </div>
           <span class="whitespace-nowrap font-bold text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-100"
-                :class="activeSection === 'bottom' ? 'opacity-100' : ''">
+          >
             {{ $t('collection.scroll.bottom') }}
           </span>
         </button>

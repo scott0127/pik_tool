@@ -656,6 +656,7 @@
               :class="{ 'is-open': isCategoryExpanded(def.category.id) }"
             >
               <div class="collection-category-content-inner mt-4">
+                <CollectionInventoryPanel :category-id="def.category.id" />
                 <DecorGrid
                   :items="getItemsForCategory(def.category.id)"
                   @clear-filters="clearAllFilters"
@@ -793,6 +794,7 @@
               :class="{ 'is-open': isCategoryExpanded(def.category.id) }"
             >
               <div class="collection-category-content-inner mt-4">
+                <CollectionInventoryPanel :category-id="def.category.id" />
                 <DecorGrid
                   :items="getItemsForCategory(def.category.id)"
                   @clear-filters="clearAllFilters"
@@ -897,6 +899,7 @@ const updateCategoriesInBatches = (categoryIds: string[], expand: boolean) => {
     const end = Math.min(index + batchSize, categoryIds.length);
     for (; index < end; index += 1) {
       const id = categoryIds[index];
+      if (!id) continue;
       if (expand) {
         nextSet.delete(id);
       } else {

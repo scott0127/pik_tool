@@ -58,6 +58,17 @@ interface TileData {
   pois: RegionData['pois'];
 }
 
+interface RawTileData {
+  bbox: { north: number; south: number; east: number; west: number };
+  features?: Array<{
+    id: string;
+    n: string;
+    t: string;
+    pts: Array<[number, number]>;
+  }>;
+  pois?: RegionData['pois'];
+}
+
 /** 支援的區域列表 */
 const SUPPORTED_REGIONS = ['taipei', 'taiwan_main_island'] as const;
 type SupportedRegion = typeof SUPPORTED_REGIONS[number];
@@ -172,7 +183,32 @@ async function loadTile(regionId: SupportedRegion, tileFile: string): Promise<Ti
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
-      const tileData: TileData = await response.json();
+      const rawData: RawTileData = await response.json();
+      
+      let expandedPois: RegionData['pois'] = [];
+      if (rawData.features) {
+        for (const feat of rawData.features) {
+          for (let i = 0; i < feat.pts.length; i++) {
+            const pt = feat.pts[i];
+            if (!pt) continue;
+            expandedPois.push({
+              id: `${feat.id}-${i}`,
+              lat: pt[0],
+              lon: pt[1],
+              name: feat.n,
+              decorType: feat.t
+            });
+          }
+        }
+      } else if (rawData.pois) {
+        expandedPois = rawData.pois;
+      }
+      
+      const tileData: TileData = {
+        bbox: rawData.bbox,
+        pois: expandedPois
+      };
+      
       touchTileCache(cacheKey, tileData);
       return tileData;
     } catch (err) {

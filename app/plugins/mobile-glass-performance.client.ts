@@ -14,9 +14,9 @@ export default defineNuxtPlugin((nuxtApp) => {
     setMobileClass()
 
     media.addEventListener('change', setMobileClass)
-  })
 
-  nuxtApp.hook('app:beforeUnmount', () => {
-    media?.removeEventListener('change', setMobileClass)
+    window.addEventListener('beforeunload', () => {
+      media?.removeEventListener('change', setMobileClass)
+    }, { once: true })
   })
 })

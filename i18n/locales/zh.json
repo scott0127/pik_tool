@@ -329,6 +329,7 @@
             "other": "其他"
         },
         "form": {
+            "label_type": "回饋類型",
             "email_label": "Email（選填）",
             "message_label": "詳細內容",
             "email_placeholder": "如需回覆請留下您的 Email",
