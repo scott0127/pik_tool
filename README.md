@@ -99,26 +99,16 @@ SUPABASE_KEY=your_supabase_key
 
 ### 生產環境建置
 
-本專案正式部署建議使用靜態輸出，避免在 512MB Web Service 上長時間運行 Nuxt/Nitro Node server：
-
-```bash
-pnpm run render:build
-```
-
-輸出目錄：
-
-```txt
-.output/public
-```
-
-Render 建議建立 Static Site，build command 使用 `pnpm run render:build`，publish directory 使用 `.output/public`。Repo 根目錄的 `render.yaml` 已提供可回溯的 Static Site Blueprint。
-
-若只是本機預覽 Node build：
+目前正式部署維持 Render Web Service：
 
 ```bash
 pnpm build
-pnpm preview
+node .output/server/index.mjs
 ```
+
+Repo 根目錄的 `render.yaml` 是 Web Service Blueprint。Render 的 build command 使用 `pnpm run build`，start command 使用 `node .output/server/index.mjs`。
+
+若要本機預覽 Node build，也可以使用 `pnpm preview`。
 
 Render 記憶體與部署細節請見 [`docs/operations/render-memory.md`](docs/operations/render-memory.md)。
 

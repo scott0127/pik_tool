@@ -1,58 +1,18 @@
 services:
   - type: web
-    name: pik-tool-static
-    runtime: static
-    buildCommand: corepack enable && pnpm install --frozen-lockfile && pnpm run render:build
-    staticPublishPath: ./.output/public
+    name: pik_tool
+    runtime: node
+    plan: free
+    buildCommand: corepack enable && pnpm install --frozen-lockfile && pnpm run build
+    startCommand: node .output/server/index.mjs
     envVars:
       - key: NODE_VERSION
         value: "22"
-      - key: SKIP_INSTALL_DEPS
-        value: "true"
-    headers:
-      - path: /*
-        name: X-Content-Type-Options
-        value: nosniff
-      - path: /*
-        name: X-Frame-Options
-        value: DENY
-      - path: /*
-        name: Referrer-Policy
-        value: strict-origin-when-cross-origin
-      - path: /*
-        name: Permissions-Policy
-        value: camera=(), microphone=(), geolocation=()
-      - path: /*
-        name: Content-Security-Policy
-        value: "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https://pikmin.wiki.gallery https://*.tile.openstreetmap.org; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.iconify.design https://api.simplesvg.com https://api.unisvg.com https://nominatim.openstreetmap.org https://overpass-api.de https://overpass.kumi.systems https://maps.mail.ru; worker-src 'self' blob:; manifest-src 'self'; upgrade-insecure-requests"
-      - path: /version.json
-        name: Cache-Control
-        value: no-cache, no-store, must-revalidate
-      - path: /data/*
-        name: Cache-Control
-        value: public, max-age=86400, stale-while-revalidate=604800
-      - path: /img/*
-        name: Cache-Control
-        value: public, max-age=604800, stale-while-revalidate=2592000
-      - path: /_nuxt/*
-        name: Cache-Control
-        value: public, max-age=31536000, immutable
-      - path: /icon.png
-        name: Cache-Control
-        value: public, max-age=604800, stale-while-revalidate=2592000
-      - path: /favicon.ico
-        name: Cache-Control
-        value: public, max-age=604800, stale-while-revalidate=2592000
-      - path: /manifest.webmanifest
-        name: Cache-Control
-        value: public, max-age=86400, stale-while-revalidate=604800
-      - path: /og-image.png
-        name: Cache-Control
-        value: public, max-age=86400
-      - path: /sw.js
-        name: Cache-Control
-        value: no-cache
-    routes:
-      - type: rewrite
-        source: /*
-        destination: /index.html
+      - key: NODE_OPTIONS
+        value: "--max-old-space-size=384"
+      - key: TILE_STATS_DISABLED
+        value: "1"
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_KEY
+        sync: false

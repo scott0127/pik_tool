@@ -19,10 +19,6 @@
             <Icon name="lucide:badge-check" class="w-3.5 h-3.5" />
             {{ labels.decor }} {{ summary.decorCount }}
           </span>
-          <span v-if="visibleRareCount > 0" class="inventory-chip inventory-chip-rare">
-            <Icon name="lucide:sparkles" class="w-3.5 h-3.5" />
-            {{ labels.rare }} {{ visibleRareCount }}
-          </span>
           <span class="inventory-chip">
             <Icon name="lucide:heart-off" class="w-3.5 h-3.5" />
             {{ labels.releaseSummary }} {{ summary.releaseNoDecorCount }}/{{ summary.releaseWithDecorCount }}
@@ -53,34 +49,71 @@
       <div v-if="isExpanded" class="inventory-panel-body">
         <div v-if="summary.hasRareDecor" class="rare-progress-panel">
           <div class="rare-progress-main">
-            <div>
+            <div class="rare-progress-copy">
               <p class="rare-progress-title">
                 <Icon name="lucide:sparkles" class="w-4 h-4" />
-                {{ labels.scoreRules }}
+                {{ labels.rarePoints }}
               </p>
               <p class="rare-progress-value">
-                {{ labels.currentScore }} Lv. {{ rareProgress.level }} · {{ rareProgress.points }} pt
+                Lv. {{ rareProgress.level }}
               </p>
             </div>
-            <div class="rare-progress-next">
-              <span v-if="rareProgress.pointsToNextRareLevel !== null">
-                {{ labels.nextLevel }} {{ rareProgress.pointsToNextRareLevel }}
-              </span>
-              <span v-else>{{ labels.maxLevel }}</span>
+            <div class="rare-progress-score">
+              <strong>{{ rareProgress.points }}</strong>
+              <span>pt</span>
             </div>
           </div>
 
-          <div class="rare-rule-grid">
+          <div class="rare-progress-track-row">
             <div
-              v-for="rule in scoreRules"
-              :key="rule.id"
-              class="rare-rule-card"
+              class="rare-progress-track"
+              role="progressbar"
+              :aria-valuenow="Math.round(rareProgressPercent)"
+              aria-valuemin="0"
+              aria-valuemax="100"
             >
-              <Icon :name="rule.icon" class="w-3.5 h-3.5" />
-              <span>{{ rule.label }}</span>
-              <strong>+{{ rule.points }}</strong>
+              <span class="rare-progress-track-fill" :style="rareProgressBarStyle" />
+            </div>
+            <div class="rare-progress-meta">
+              <span v-if="!rareProgress.isCategoryComplete" class="rare-progress-next">
+                {{ labels.completeRegularFirst }}
+              </span>
+              <span v-else-if="rareProgress.pointsToNextRareLevel !== null" class="rare-progress-next">
+                {{ labels.nextLevel }} {{ rareProgress.pointsToNextRareLevel }} pt
+              </span>
+              <span v-else class="rare-progress-next">{{ labels.maxLevel }}</span>
+              <button
+                type="button"
+                class="rare-score-toggle"
+                :aria-expanded="showScoreRules"
+                @click.stop="showScoreRules = !showScoreRules"
+              >
+                <Icon :name="showScoreRules ? 'lucide:chevron-up' : 'lucide:circle-help'" class="w-3.5 h-3.5" />
+                {{ showScoreRules ? labels.hideScoreRules : labels.scoreQuestion }}
+              </button>
             </div>
           </div>
+
+          <Transition
+            enter-active-class="transition duration-200 ease-out"
+            enter-from-class="opacity-0 -translate-y-1"
+            enter-to-class="opacity-100 translate-y-0"
+            leave-active-class="transition duration-150 ease-in"
+            leave-from-class="opacity-100 translate-y-0"
+            leave-to-class="opacity-0 -translate-y-1"
+          >
+            <div v-if="showScoreRules" class="rare-rule-grid">
+              <div
+                v-for="rule in scoreRules"
+                :key="rule.id"
+                class="rare-rule-card"
+              >
+                <Icon :name="rule.icon" class="w-3.5 h-3.5" />
+                <span>{{ rule.label }}</span>
+                <strong>+{{ rule.points }}</strong>
+              </div>
+            </div>
+          </Transition>
         </div>
 
         <div class="inventory-rows">
@@ -106,7 +139,7 @@
                 <div class="inventory-item-title">
                   <div class="inventory-item-main">
                     <span class="inventory-pikmin-badge" :class="pikminBadgeClass(item.pikminType)">
-                      {{ t(`pikmin_types_short.${item.pikminType}`) }}
+                      <span class="sr-only">{{ t(`pikmin_types_short.${item.pikminType}`) }}</span>
                     </span>
                     <span class="inventory-item-id">{{ t(`pikmin_types.${item.pikminType}`) }}</span>
                   </div>
@@ -120,7 +153,7 @@
 
                 <div class="inventory-control-stack">
                   <div
-                    v-for="control in getPrimaryControls(row.isRare)"
+                    v-for="control in primaryControls"
                     :key="control.id"
                     class="inventory-control-card"
                     :class="`inventory-control-${control.tone}`"
@@ -211,6 +244,54 @@
                     </div>
                   </div>
                 </div>
+
+                <div class="inventory-mobile-control-grid">
+                  <div
+                    v-for="(control, controlIndex) in mobileControls"
+                    :key="control.id"
+                    class="inventory-mobile-control-card"
+                    :class="[
+                      `inventory-control-${control.tone}`,
+                      getMobileControlClass(),
+                      'mobile-strip-control',
+                    ]"
+                  >
+                    <div class="inventory-mobile-control-head">
+                      <span class="inventory-control-icon">
+                        <Icon :name="control.icon" class="w-4 h-4" />
+                      </span>
+                      <span class="inventory-control-text">
+                        <span class="inventory-control-label" :title="control.label">
+                          {{ control.shortLabel || control.label }}
+                        </span>
+                        <span v-if="control.scoreText" class="inventory-control-score">{{ control.scoreText }}</span>
+                      </span>
+                    </div>
+
+                    <div class="inventory-control-stepper" :aria-label="control.label">
+                      <button
+                        type="button"
+                        class="inventory-stepper-hit inventory-stepper-minus"
+                        :aria-label="`${labels.decrease} ${control.label}`"
+                        :disabled="getBucketCount(item.id, control.id) === 0"
+                        @click.stop="adjust(item.id, control.id, -1)"
+                      >
+                        <Icon name="lucide:minus" class="w-4 h-4" />
+                      </button>
+                      <strong class="inventory-stepper-value">
+                        {{ getBucketCount(item.id, control.id) }}
+                      </strong>
+                      <button
+                        type="button"
+                        class="inventory-stepper-hit inventory-stepper-plus"
+                        :aria-label="`${labels.increase} ${control.label}`"
+                        @click.stop="adjust(item.id, control.id, 1)"
+                      >
+                        <Icon name="lucide:plus" class="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+                </div>
               </article>
             </div>
           </div>
@@ -259,6 +340,7 @@ const {
 } = useCollection();
 
 const isExpanded = ref(false);
+const showScoreRules = ref(false);
 
 type InventoryControlTone =
   | 'seedling'
@@ -271,6 +353,7 @@ type InventoryControlTone =
 interface InventoryControl {
   id: CollectionInventoryBucket;
   label: string;
+  shortLabel?: string;
   icon: string;
   tone: InventoryControlTone;
   scoreText?: string;
@@ -284,13 +367,20 @@ const labels = computed(() => {
       preDecor: 'Small seedling plucked, <4 hearts',
       decor: 'Huge seedling / 4-heart decor',
       rare: 'Rare upgraded',
+      seedlingShort: 'Seedling',
+      preDecorShort: '<4 hearts',
+      decorShort: 'Get decor',
+      rareShort: 'Rare',
       releaseSummary: 'Released none/decor',
       manage: 'Manage',
       close: 'Close',
       rarePoints: 'Rare Decor Points',
       scoreRules: 'Rare Decor Point rules',
+      scoreQuestion: 'Scoring?',
+      hideScoreRules: 'Hide rules',
       currentScore: 'Current',
       nextLevel: 'To next Lv.',
+      completeRegularFirst: 'Complete regular decor first',
       maxLevel: 'Max tracked',
       recentEvents: 'Recent trace',
       noEvents: 'No trace events yet',
@@ -301,8 +391,8 @@ const labels = computed(() => {
       releaseLine: 'Released',
       releaseNoDecor: 'Released without decor',
       releaseWithDecor: 'Released with decor',
-      releaseNoDecorShort: 'No decor',
-      releaseWithDecorShort: 'With decor',
+      releaseNoDecorShort: 'Release plain',
+      releaseWithDecorShort: 'Release decor',
       inventoryOnly: 'Inventory',
       noScore: 'No score',
       recordTotal: 'Records',
@@ -317,13 +407,20 @@ const labels = computed(() => {
     preDecor: '小盆栽拔苗未滿4心',
     decor: '大盆栽拔苗/滿4心拿裝飾品',
     rare: '已升稀有',
+    seedlingShort: '小盆栽',
+    preDecorShort: '未滿4心',
+    decorShort: '拿裝飾(含大盆)',
+    rareShort: '已升稀有',
     releaseSummary: '放生 無/有裝飾',
     manage: '管理',
     close: '收合',
     rarePoints: '稀有裝飾點數',
     scoreRules: '稀有裝飾點數規則',
+    scoreQuestion: '計分？',
+    hideScoreRules: '收合規則',
     currentScore: '目前',
     nextLevel: '距下級',
+    completeRegularFirst: '先集滿普通裝飾',
     maxLevel: '已達追蹤上限',
     recentEvents: '近期紀錄',
     noEvents: '尚無紀錄',
@@ -334,8 +431,8 @@ const labels = computed(() => {
     releaseLine: '放生',
     releaseNoDecor: '無裝飾品放生',
     releaseWithDecor: '有裝飾品放生',
-    releaseNoDecorShort: '無裝飾',
-    releaseWithDecorShort: '有裝飾',
+    releaseNoDecorShort: '無裝放生',
+    releaseWithDecorShort: '有裝放生',
     inventoryOnly: '庫存',
     noScore: '不計分',
     recordTotal: '紀錄',
@@ -357,6 +454,7 @@ const primaryControls = computed<InventoryControl[]>(() => [
   {
     id: 'seedling',
     label: labels.value.seedling,
+    shortLabel: labels.value.seedlingShort,
     icon: 'lucide:sprout',
     tone: 'seedling',
     scoreText: labels.value.inventoryOnly,
@@ -364,6 +462,7 @@ const primaryControls = computed<InventoryControl[]>(() => [
   {
     id: 'preDecor',
     label: labels.value.preDecor,
+    shortLabel: labels.value.preDecorShort,
     icon: 'lucide:heart',
     tone: 'preDecor',
     scoreText: pointText(rarePointValues.pluck_seedling),
@@ -371,30 +470,26 @@ const primaryControls = computed<InventoryControl[]>(() => [
   {
     id: 'decor',
     label: labels.value.decor,
+    shortLabel: labels.value.decorShort,
     icon: 'lucide:badge-check',
     tone: 'decor',
     scoreText: pointText(rarePointValues.gift_expedition),
-  },
-  {
-    id: 'rare',
-    label: labels.value.rare,
-    icon: 'lucide:sparkles',
-    tone: 'rare',
-    scoreText: labels.value.noScore,
   },
 ]);
 
 const releaseControls = computed<InventoryControl[]>(() => [
   {
     id: 'releaseNoDecor',
-    label: labels.value.releaseNoDecorShort,
+    label: labels.value.releaseNoDecor,
+    shortLabel: labels.value.releaseNoDecorShort,
     icon: 'lucide:heart-off',
     tone: 'releaseNoDecor',
     scoreText: pointText(rarePointValues.release_no_decor),
   },
   {
     id: 'releaseWithDecor',
-    label: labels.value.releaseWithDecorShort,
+    label: labels.value.releaseWithDecor,
+    shortLabel: labels.value.releaseWithDecorShort,
     icon: 'lucide:badge-minus',
     tone: 'releaseWithDecor',
     scoreText: pointText(rarePointValues.release_with_decor),
@@ -436,25 +531,78 @@ const scoreRules = computed<Array<{ id: string; label: string; icon: string; poi
 
 const pikminOrder: PikminType[] = ['red', 'yellow', 'blue', 'white', 'purple', 'rock', 'winged', 'ice'];
 
-const summary = computed(() => getCategoryInventorySummary(props.categoryId));
 const rareProgress = computed(() => getRareProgress(props.categoryId));
 const recentEvents = computed(() => getRecentCollectionEvents(8, props.categoryId));
+
+const getRareLevelStartPoints = (points: number): number => {
+  if (points < 800) return 0;
+  if (points < 1200) return 800;
+  if (points < 3000) return 1200;
+  return 3000 + Math.floor((points - 3000) / 5000) * 5000;
+};
+
+const rareProgressPercent = computed(() => {
+  const progress = rareProgress.value;
+  if (!progress.isCategoryComplete) return 0;
+  if (progress.nextRareLevelPoints === null) return 100;
+
+  const startPoints = getRareLevelStartPoints(progress.points);
+  const targetPoints = progress.nextRareLevelPoints;
+  const range = targetPoints - startPoints;
+  if (range <= 0) return 0;
+
+  return Math.min(100, Math.max(0, ((progress.points - startPoints) / range) * 100));
+});
+
+const rareProgressBarStyle = computed(() => ({
+  width: `${rareProgressPercent.value}%`,
+}));
 
 const isRareDecorItem = (item: DecorItem): boolean => {
   const variant = getVariant(item.categoryId, item.variantId);
   return Boolean(variant?.isRare || item.variantId.toLowerCase().includes('rare'));
 };
 
-const visibleRareCount = computed(() => {
-  return getItemsByCategory(props.categoryId).reduce((total, item) => {
-    if (isRareDecorItem(item)) return total;
-    return total + getInventoryItem(item.id).rareCount;
-  }, 0);
+const ordinaryItems = computed(() =>
+  getItemsByCategory(props.categoryId).filter(item => !isRareDecorItem(item)),
+);
+
+const summary = computed(() => {
+  const base = getCategoryInventorySummary(props.categoryId);
+  const ordinarySummary = ordinaryItems.value.reduce(
+    (totals, item) => {
+      const inventory = getInventoryItem(item.id);
+      totals.seedlingCount += inventory.seedlingCount;
+      totals.preDecorCount += inventory.preDecorCount;
+      totals.decorCount += inventory.decorCount;
+      totals.releaseNoDecorCount += inventory.releaseNoDecorCount;
+      totals.releaseWithDecorCount += inventory.releaseWithDecorCount;
+      return totals;
+    },
+    {
+      seedlingCount: 0,
+      preDecorCount: 0,
+      decorCount: 0,
+      releaseNoDecorCount: 0,
+      releaseWithDecorCount: 0,
+    },
+  );
+
+  return {
+    ...base,
+    ...ordinarySummary,
+    rareCount: 0,
+    totalItems: ordinaryItems.value.length,
+  };
 });
 
-const getPrimaryControls = (isRareRow: boolean): InventoryControl[] => {
-  if (!isRareRow) return primaryControls.value;
-  return primaryControls.value.filter(control => control.id !== 'rare');
+const mobileControls = computed<InventoryControl[]>(() => [
+  ...primaryControls.value,
+  ...releaseControls.value,
+]);
+
+const getMobileControlClass = (): string => {
+  return 'mobile-span-6';
 };
 
 const rows = computed(() => {
@@ -466,7 +614,7 @@ const rows = computed(() => {
     items: DecorItem[];
   }>();
 
-  getItemsByCategory(props.categoryId).forEach((item) => {
+  ordinaryItems.value.forEach((item) => {
     const variant = getVariant(item.categoryId, item.variantId);
     if (!groups.has(item.variantId)) {
       groups.set(item.variantId, {
@@ -504,7 +652,6 @@ const getItemRecordTotal = (item: DecorItem): number => {
     inventory.seedlingCount +
     inventory.preDecorCount +
     inventory.decorCount +
-    (isRareDecorItem(item) ? 0 : inventory.rareCount) +
     inventory.releaseNoDecorCount +
     inventory.releaseWithDecorCount
   );
@@ -515,8 +662,7 @@ const adjust = (itemId: string, bucket: CollectionInventoryBucket, delta: number
 };
 
 const pikminBadgeClass = (pikminType: PikminType) => {
-  const textClass = pikminType === 'white' || pikminType === 'yellow' ? 'text-gray-800' : 'text-white';
-  return `${PIKMIN_TYPE_COLORS[pikminType]} ${textClass}`;
+  return PIKMIN_TYPE_COLORS[pikminType];
 };
 
 const formatEventTime = (dateString: string): string => {
@@ -670,40 +816,120 @@ const formatEvent = (event: CollectionEvent): string => {
 
 .inventory-panel-body {
   display: grid;
-  gap: 1rem;
-  margin-top: 1rem;
+  gap: 0.85rem;
+  margin-top: 0.85rem;
 }
 
 .rare-progress-panel {
   display: grid;
-  gap: 0.75rem;
-  padding: 0.85rem;
+  gap: 0.5rem;
+  padding: 0.62rem 0.7rem;
   border: 1px solid rgba(245, 158, 11, 0.22);
-  border-radius: 0.85rem;
-  background: rgba(255, 251, 235, 0.64);
+  border-radius: 0.78rem;
+  background: linear-gradient(180deg, rgba(255, 251, 235, 0.72), rgba(255, 247, 237, 0.58));
 }
 
 .rare-progress-main {
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
+  gap: 0.65rem;
 }
 
 .rare-progress-title {
   color: rgb(146 64 14);
+  font-size: 0.78rem;
 }
 
 .rare-progress-value {
-  margin-top: 0.15rem;
-  color: rgb(120 53 15);
+  margin-top: 0.05rem;
+  color: rgb(154 52 18);
+  font-size: 0.86rem;
   font-weight: 900;
+  font-variant-numeric: tabular-nums;
+}
+
+.rare-progress-score {
+  display: inline-flex;
+  align-items: baseline;
+  justify-content: flex-end;
+  gap: 0.12rem;
+  color: rgb(120 53 15);
+  font-variant-numeric: tabular-nums;
+}
+
+.rare-progress-score strong {
+  font-size: 1.08rem;
+  line-height: 1;
+}
+
+.rare-progress-score span {
+  font-size: 0.66rem;
+  font-weight: 900;
+}
+
+.rare-progress-track-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.rare-progress-track {
+  overflow: hidden;
+  height: 0.38rem;
+  border-radius: 999px;
+  background: rgba(254, 215, 170, 0.58);
+  box-shadow: inset 0 1px 2px rgba(146, 64, 14, 0.08);
+}
+
+.rare-progress-track-fill {
+  display: block;
+  height: 100%;
+  min-width: 0.2rem;
+  border-radius: inherit;
+  background: linear-gradient(90deg, rgb(245 158 11), rgb(217 119 6));
+  transition: width 220ms ease;
+}
+
+.rare-progress-meta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.35rem;
 }
 
 .rare-progress-next {
   color: rgb(146 64 14);
-  font-size: 0.78rem;
-  font-weight: 800;
+  font-size: 0.68rem;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.rare-score-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.28rem;
+  min-height: 1.72rem;
+  padding: 0.26rem 0.5rem;
+  border: 1px solid rgba(245, 158, 11, 0.24);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.82);
+  color: rgb(146 64 14);
+  font-size: 0.68rem;
+  font-weight: 900;
+  transition: background 160ms ease, border-color 160ms ease, transform 160ms ease;
+}
+
+.rare-score-toggle:hover,
+.rare-score-toggle:focus-visible {
+  border-color: rgba(245, 158, 11, 0.42);
+  background: rgba(254, 243, 199, 0.8);
+}
+
+.rare-score-toggle:active {
+  transform: scale(0.98);
 }
 
 .rare-rule-grid {
@@ -730,19 +956,19 @@ const formatEvent = (event: CollectionEvent): string => {
 
 .inventory-rows {
   display: grid;
-  gap: 0.95rem;
+  gap: 0.78rem;
 }
 
 .inventory-row-group {
   border-top: 1px solid rgba(148, 163, 184, 0.18);
-  padding-top: 0.85rem;
+  padding-top: 0.78rem;
 }
 
 .inventory-row-title {
   display: flex;
   align-items: center;
   gap: 0.45rem;
-  margin-bottom: 0.7rem;
+  margin-bottom: 0.58rem;
   color: rgb(30 41 59);
   font-size: 0.92rem;
   font-weight: 900;
@@ -760,14 +986,14 @@ const formatEvent = (event: CollectionEvent): string => {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
   align-items: start;
-  gap: 0.75rem;
+  gap: 0.65rem;
 }
 
 .inventory-item-cell {
   min-width: 0;
-  padding: 0.8rem;
+  padding: 0.68rem;
   border: 1px solid rgba(226, 232, 240, 0.9);
-  border-radius: 0.85rem;
+  border-radius: 0.82rem;
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.88), rgba(248, 250, 252, 0.76));
   box-shadow: 0 8px 18px rgba(15, 23, 42, 0.05);
 }
@@ -777,7 +1003,7 @@ const formatEvent = (event: CollectionEvent): string => {
   align-items: center;
   justify-content: space-between;
   gap: 0.45rem;
-  margin-bottom: 0.7rem;
+  margin-bottom: 0.56rem;
 }
 
 .inventory-item-main {
@@ -791,11 +1017,11 @@ const formatEvent = (event: CollectionEvent): string => {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 1.55rem;
-  height: 1.55rem;
-  border-radius: 0.5rem;
-  font-size: 0.7rem;
-  font-weight: 900;
+  width: 0.72rem;
+  height: 0.72rem;
+  border: 2px solid rgba(255, 255, 255, 0.95);
+  border-radius: 999px;
+  box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.08), 0 2px 5px rgba(15, 23, 42, 0.12);
 }
 
 .inventory-item-id {
@@ -1048,6 +1274,10 @@ const formatEvent = (event: CollectionEvent): string => {
   background: rgba(204, 251, 241, 0.78);
 }
 
+.inventory-mobile-control-grid {
+  display: none;
+}
+
 .inventory-event-log {
   padding-top: 0.85rem;
   border-top: 1px solid rgba(148, 163, 184, 0.18);
@@ -1083,8 +1313,7 @@ const formatEvent = (event: CollectionEvent): string => {
 }
 
 @media (max-width: 640px) {
-  .inventory-panel-header,
-  .rare-progress-main {
+  .inventory-panel-header {
     align-items: stretch;
     flex-direction: column;
   }
@@ -1099,6 +1328,155 @@ const formatEvent = (event: CollectionEvent): string => {
 
   .inventory-item-title {
     align-items: flex-start;
+    margin-bottom: 0.46rem;
+  }
+
+  .rare-progress-panel {
+    gap: 0.42rem;
+    padding: 0.54rem 0.62rem;
+  }
+
+  .rare-progress-track-row {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.34rem;
+  }
+
+  .rare-progress-meta {
+    justify-content: space-between;
+  }
+
+  .rare-progress-next {
+    font-size: 0.66rem;
+  }
+
+  .inventory-control-stack,
+  .inventory-release-panel {
+    display: none;
+  }
+
+  .inventory-mobile-control-grid {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 0.42rem;
+  }
+
+  .inventory-mobile-control-card {
+    display: grid;
+    grid-template-rows: minmax(2.15rem, 1fr) auto;
+    gap: 0.34rem;
+    min-width: 0;
+    min-height: 5.62rem;
+    padding: 0.36rem;
+    border: 1px solid rgba(148, 163, 184, 0.18);
+    border-radius: 0.72rem;
+    background: rgba(255, 255, 255, 0.86);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.95);
+  }
+
+  .mobile-span-6 {
+    grid-column: span 6;
+  }
+
+  .mobile-span-3 {
+    grid-column: span 3;
+  }
+
+  .mobile-span-2 {
+    grid-column: span 2;
+  }
+
+  .inventory-mobile-control-head {
+    display: grid;
+    grid-template-columns: 1.42rem minmax(0, 1fr);
+    align-items: center;
+    gap: 0.28rem;
+    min-width: 0;
+  }
+
+  .inventory-mobile-control-card .inventory-control-icon {
+    width: 1.42rem;
+    height: 1.42rem;
+    flex-basis: 1.42rem;
+    border-radius: 0.48rem;
+  }
+
+  .inventory-mobile-control-card .inventory-control-text {
+    gap: 0.16rem;
+  }
+
+  .inventory-mobile-control-card .inventory-control-label {
+    display: -webkit-box;
+    overflow: hidden;
+    min-height: 1.42rem;
+    font-size: 0.68rem;
+    line-height: 1.12;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+
+  .inventory-mobile-control-card .inventory-control-score {
+    justify-self: start;
+    padding: 0.08rem 0.28rem;
+    border-radius: 999px;
+    font-size: 0.56rem;
+  }
+
+  .inventory-mobile-control-card.mobile-strip-control {
+    grid-template-columns: minmax(0, 1fr) minmax(6.45rem, 38%);
+    grid-template-rows: auto;
+    align-items: center;
+    gap: 0.48rem;
+    min-height: 3.62rem;
+    padding: 0.42rem 0.5rem;
+    border-radius: 0.78rem;
+  }
+
+  .mobile-strip-control .inventory-mobile-control-head {
+    grid-template-columns: 2.14rem minmax(0, 1fr);
+    gap: 0.52rem;
+  }
+
+  .mobile-strip-control .inventory-control-icon {
+    width: 2.14rem;
+    height: 2.14rem;
+    flex-basis: 2.14rem;
+    border-radius: 50%;
+  }
+
+  .mobile-strip-control .inventory-control-label {
+    min-height: 0;
+    font-size: 0.82rem;
+    line-height: 1.15;
+  }
+
+  .mobile-strip-control .inventory-control-score {
+    margin-top: 0.06rem;
+    font-size: 0.58rem;
+  }
+
+  .mobile-strip-control .inventory-control-stepper {
+    grid-template-columns: 1.94rem minmax(1.7rem, 1fr) 1.94rem;
+  }
+
+  .mobile-strip-control .inventory-stepper-hit {
+    min-width: 1.94rem;
+    min-height: 2.04rem;
+  }
+
+  .inventory-mobile-control-card.mobile-span-2 .inventory-mobile-control-head {
+    grid-template-columns: 1.32rem minmax(0, 1fr);
+    gap: 0.24rem;
+  }
+
+  .inventory-mobile-control-card.mobile-span-2 .inventory-control-icon {
+    width: 1.32rem;
+    height: 1.32rem;
+    flex-basis: 1.32rem;
+  }
+
+  .inventory-mobile-control-card.mobile-span-2 .inventory-control-label {
+    min-height: 1.52rem;
+    font-size: 0.64rem;
   }
 
   .inventory-control-card {
@@ -1107,16 +1485,62 @@ const formatEvent = (event: CollectionEvent): string => {
   }
 
   .inventory-control-stepper {
-    grid-template-columns: 3rem minmax(2rem, 1fr) 3rem;
+    grid-template-columns: 1.82rem minmax(1.35rem, 1fr) 1.82rem;
     width: 100%;
+    border-radius: 0.65rem;
   }
 
   .inventory-stepper-hit {
-    min-width: 3rem;
+    min-width: 1.82rem;
+    min-height: 2.1rem;
   }
 
-  .inventory-release-grid {
-    grid-template-columns: minmax(0, 1fr);
+  .inventory-stepper-value {
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 380px) {
+  .inventory-mobile-control-grid {
+    gap: 0.36rem;
+  }
+
+  .inventory-mobile-control-card {
+    min-height: 5.5rem;
+    padding: 0.34rem;
+  }
+
+  .inventory-mobile-control-card.mobile-strip-control {
+    grid-template-columns: minmax(0, 1fr) minmax(5.9rem, 36%);
+    min-height: 3.48rem;
+    padding: 0.38rem 0.44rem;
+  }
+
+  .mobile-strip-control .inventory-mobile-control-head {
+    grid-template-columns: 1.98rem minmax(0, 1fr);
+    gap: 0.42rem;
+  }
+
+  .mobile-strip-control .inventory-control-icon {
+    width: 1.98rem;
+    height: 1.98rem;
+    flex-basis: 1.98rem;
+  }
+
+  .mobile-strip-control .inventory-control-label {
+    font-size: 0.76rem;
+  }
+
+  .inventory-mobile-control-card .inventory-control-label {
+    font-size: 0.62rem;
+  }
+
+  .inventory-control-stepper {
+    grid-template-columns: 1.7rem minmax(1.25rem, 1fr) 1.7rem;
+  }
+
+  .inventory-stepper-hit {
+    min-width: 1.7rem;
   }
 }
 </style>
