@@ -865,6 +865,9 @@ const collapsedCategories = ref<Set<string>>(new Set());
 let categoryBulkFrame: number | null = null;
 let scrollFrame: number | null = null;
 
+const decorDefinitions = computed(() => getDecorDefinitions());
+const categoryIds = computed(() => decorDefinitions.value.map((d) => d.category.id));
+
 const cancelCategoryBulkToggle = () => {
   if (categoryBulkFrame !== null) {
     cancelAnimationFrame(categoryBulkFrame);
@@ -920,21 +923,57 @@ const updateCategoriesInBatches = (categoryIds: string[], expand: boolean) => {
 };
 
 const expandAllCategories = () => {
-  const allIds = getDecorDefinitions().map((d) => d.category.id);
-  updateCategoriesInBatches(allIds, true);
+  updateCategoriesInBatches(categoryIds.value, true);
 };
 
 const collapseAllCategories = () => {
-  const allIds = getDecorDefinitions().map((d) => d.category.id);
+  const allIds = categoryIds.value;
   updateCategoriesInBatches(allIds, false);
 };
 
-// UX: Category progress percentage
+interface CategoryProgress {
+  collected: number;
+  total: number;
+  percent: number;
+  text: string;
+}
+
+const emptyCategoryProgress: CategoryProgress = {
+  collected: 0,
+  total: 0,
+  percent: 0,
+  text: "0/0",
+};
+
+// UX: Category progress, cached per render instead of recalculated per binding.
+const categoryProgressById = computed(() => {
+  const progressById = new Map<string, CategoryProgress>();
+
+  decorDefinitions.value.forEach((def) => {
+    const items = getItemsByCategory(def.category.id);
+    let collected = 0;
+
+    items.forEach((item) => {
+      if (isCollected(item.id)) collected += 1;
+    });
+
+    const total = items.length;
+    progressById.set(def.category.id, {
+      collected,
+      total,
+      percent: total > 0 ? Math.round((collected / total) * 100) : 0,
+      text: `${collected}/${total}`,
+    });
+  });
+
+  return progressById;
+});
+
+const getCategoryProgressData = (categoryId: string): CategoryProgress =>
+  categoryProgressById.value.get(categoryId) ?? emptyCategoryProgress;
+
 const getCategoryProgressPercent = (categoryId: string): number => {
-  const items = getItemsByCategory(categoryId);
-  if (items.length === 0) return 0;
-  const collected = items.filter((item) => isCollected(item.id)).length;
-  return Math.round((collected / items.length) * 100);
+  return getCategoryProgressData(categoryId).percent;
 };
 
 const collectionFilters = computed(() => [
@@ -1050,11 +1089,11 @@ const scrollToSpecialCategories = () => {
 
 // Separate regular and special categories
 const regularCategories = computed(() => {
-  return getDecorDefinitions().filter((d) => d.category.type === "regular");
+  return decorDefinitions.value.filter((d) => d.category.type === "regular");
 });
 
 const specialCategories = computed(() => {
-  return getDecorDefinitions().filter((d) => d.category.type !== "regular");
+  return decorDefinitions.value.filter((d) => d.category.type !== "regular");
 });
 
 const regularCategoriesCount = computed(() => regularCategories.value.length);
@@ -1064,15 +1103,13 @@ const specialCategoriesCount = computed(() => specialCategories.value.length);
 const jumpNavCategories = computed(() => {
   const allDefs = [...regularCategories.value, ...specialCategories.value];
   return allDefs.map((def) => {
-    const items = getItemsByCategory(def.category.id);
-    const collected = items.filter((item) => isCollected(item.id)).length;
-    const total = items.length;
+    const progress = getCategoryProgressData(def.category.id);
     return {
       id: def.category.id,
       name: locale.value === "en" ? def.category.nameEn : def.category.name,
       icon: getCategoryIcon(def.category.icon),
-      progress: total > 0 ? Math.round((collected / total) * 100) : 0,
-      progressText: `${collected}/${total}`,
+      progress: progress.percent,
+      progressText: progress.text,
       isSpecial: def.category.type !== "regular",
     };
   });
@@ -1102,9 +1139,7 @@ const getItemsForCategory = (categoryId: string): DecorItem[] => {
 };
 
 const getCategoryProgress = (categoryId: string): string => {
-  const items = getItemsByCategory(categoryId);
-  const collected = items.filter((item) => isCollected(item.id)).length;
-  return `${collected}/${items.length}`;
+  return getCategoryProgressData(categoryId).text;
 };
 
 const getCategoryTypeName = (typeId: string): string => {
@@ -1115,8 +1150,7 @@ const getCategoryTypeName = (typeId: string): string => {
 };
 
 const getCategoryName = (categoryId: string): string => {
-  const definitions = getDecorDefinitions();
-  const found = definitions.find((d) => d.category.id === categoryId);
+  const found = decorDefinitions.value.find((d) => d.category.id === categoryId);
   if (!found) return categoryId;
   return locale.value === "en" ? found.category.nameEn : found.category.name;
 };
@@ -1124,7 +1158,10 @@ const getCategoryName = (categoryId: string): string => {
 // Handle collect all button click with confirmation
 const handleCollectAll = (categoryId: string, categoryName: string) => {
   const items = getItemsByCategory(categoryId);
-  const uncollectedCount = items.filter((item) => !isCollected(item.id)).length;
+  let uncollectedCount = 0;
+  items.forEach((item) => {
+    if (!isCollected(item.id)) uncollectedCount += 1;
+  });
 
   if (uncollectedCount === 0) {
     alert(t("collection.alerts.collected_all", { category: categoryName }));

@@ -2,61 +2,73 @@ import type { DecorDefinition, DecorItem, PikminType, DecorCategoryType } from '
 import { PIKMIN_TYPES } from '~/types/decor';
 import decorData from '~/data/decor.json';
 
+const decorDefinitions = decorData.definitions as DecorDefinition[];
+const allDecorItems: DecorItem[] = [];
+const itemsByCategory = new Map<string, DecorItem[]>();
+const itemsByCategoryType = new Map<DecorCategoryType, DecorItem[]>();
+const variantsByKey = new Map<string, DecorDefinition['variants'][number]>();
+const categoriesById = new Map<string, DecorDefinition['category']>();
+
+decorDefinitions.forEach((def) => {
+  categoriesById.set(def.category.id, def.category);
+  const availableTypes = def.availablePikminTypes || PIKMIN_TYPES;
+
+  if (!itemsByCategoryType.has(def.category.type)) {
+    itemsByCategoryType.set(def.category.type, []);
+  }
+
+  def.variants.forEach((variant) => {
+    variantsByKey.set(`${def.category.id}_${variant.id}`, variant);
+
+    const variantImageUrls = (variant as any).imageUrls;
+    let typesToGenerate: PikminType[];
+
+    if (variantImageUrls && typeof variantImageUrls === 'object') {
+      const availableTypesInVariant = new Set(Object.keys(variantImageUrls) as PikminType[]);
+      typesToGenerate = PIKMIN_TYPES.filter(type => availableTypesInVariant.has(type));
+    } else {
+      typesToGenerate = availableTypes as PikminType[];
+    }
+
+    typesToGenerate.forEach((pikminType) => {
+      const item: DecorItem = {
+        id: `${def.category.id}_${variant.id}_${pikminType}`,
+        categoryId: def.category.id,
+        variantId: variant.id,
+        pikminType,
+        available: true,
+      };
+
+      allDecorItems.push(item);
+
+      if (!itemsByCategory.has(def.category.id)) {
+        itemsByCategory.set(def.category.id, []);
+      }
+      itemsByCategory.get(def.category.id)!.push(item);
+      itemsByCategoryType.get(def.category.type)!.push(item);
+    });
+  });
+});
+
 export function useDecorData() {
   // Get all decor definitions from JSON
   const getDecorDefinitions = (): DecorDefinition[] => {
-    return decorData.definitions as DecorDefinition[];
+    return decorDefinitions;
   };
 
   // Get all possible decor items (category + variant + pikmin type combinations)
   const getAllDecorItems = (): DecorItem[] => {
-    const definitions = getDecorDefinitions();
-    const items: DecorItem[] = [];
-
-    definitions.forEach(def => {
-      const availableTypes = def.availablePikminTypes || PIKMIN_TYPES;
-      
-      def.variants.forEach(variant => {
-        const variantImageUrls = (variant as any).imageUrls;
-        let typesToGenerate: PikminType[];
-        
-        if (variantImageUrls && typeof variantImageUrls === 'object') {
-          // 只生成有圖片的顏色，按照 PIKMIN_TYPES 的順序排列
-          const availableTypesInVariant = new Set(Object.keys(variantImageUrls) as PikminType[]);
-          typesToGenerate = PIKMIN_TYPES.filter(type => availableTypesInVariant.has(type));
-        } else {
-          // Fallback: 如果沒有 imageUrls，使用 availablePikminTypes
-          typesToGenerate = availableTypes as PikminType[];
-        }
-        
-        typesToGenerate.forEach(pikminType => {
-          items.push({
-            id: `${def.category.id}_${variant.id}_${pikminType}`,
-            categoryId: def.category.id,
-            variantId: variant.id,
-            pikminType: pikminType,
-            available: true,
-          });
-        });
-      });
-    });
-
-    return items;
+    return allDecorItems;
   };
 
   // Get items filtered by category
   const getItemsByCategory = (categoryId: string): DecorItem[] => {
-    return getAllDecorItems().filter(item => item.categoryId === categoryId);
+    return itemsByCategory.get(categoryId) ?? [];
   };
 
   // Get items filtered by category type (regular, special, etc.)
   const getItemsByCategoryType = (type: DecorCategoryType): DecorItem[] => {
-    const definitions = getDecorDefinitions();
-    const categoryIds = definitions
-      .filter(def => def.category.type === type)
-      .map(def => def.category.id);
-    
-    return getAllDecorItems().filter(item => categoryIds.includes(item.categoryId));
+    return itemsByCategoryType.get(type) ?? [];
   };
 
   // Get items filtered by Pikmin type
@@ -66,17 +78,12 @@ export function useDecorData() {
 
   // Get a specific variant by ID
   const getVariant = (categoryId: string, variantId: string) => {
-    const definitions = getDecorDefinitions();
-    const def = definitions.find(d => d.category.id === categoryId);
-    if (!def) return null;
-    return def.variants.find(v => v.id === variantId) || null;
+    return variantsByKey.get(`${categoryId}_${variantId}`) || null;
   };
 
   // Get category by ID
   const getCategory = (categoryId: string) => {
-    const definitions = getDecorDefinitions();
-    const def = definitions.find(d => d.category.id === categoryId);
-    return def?.category || null;
+    return categoriesById.get(categoryId) || null;
   };
 
   // Get image URL for a specific Pikmin type

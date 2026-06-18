@@ -106,13 +106,23 @@ const groupedItems = computed(() => {
   return Array.from(groups.values());
 });
 
+const groupedItemsByKey = computed(() => {
+  return new Map(groupedItems.value.map(group => [group.key, group]));
+});
+
+const groupIndexByKey = computed(() => {
+  return new Map(groupedItems.value.map((group, index) => [group.key, index]));
+});
+
+const groupedItemKeys = computed(() => groupedItems.value.map(group => group.key));
+
 const isGroupVisible = (key: string) => visibleGroupKeys.value.has(key);
 
 const preloadGroupImages = (groupKeys: string[]) => {
   if (typeof window === 'undefined') return;
 
   groupKeys.forEach((key) => {
-    const group = groupedItems.value.find(itemGroup => itemGroup.key === key);
+    const group = groupedItemsByKey.value.get(key);
     if (!group) return;
 
     group.items.forEach((item) => {
@@ -137,7 +147,7 @@ const scheduleImagePreload = (groupKeys: string[]) => {
 };
 
 const warmNearbyGroups = (key: string) => {
-  const index = groupedItems.value.findIndex(group => group.key === key);
+  const index = groupIndexByKey.value.get(key) ?? -1;
   if (index < 0) return;
 
   const next = new Set(visibleGroupKeys.value);
@@ -236,8 +246,8 @@ onMounted(() => {
   syncObservedGroups();
 });
 
-watch(() => groupedItems.value.map(group => group.key).join('|'), () => {
-  const validKeys = new Set(groupedItems.value.map(group => group.key));
+watch(groupedItemKeys, (keys) => {
+  const validKeys = new Set(keys);
   visibleGroupKeys.value = new Set([...visibleGroupKeys.value].filter(key => validKeys.has(key)));
   preloadedImageUrls.clear();
   syncObservedGroups();

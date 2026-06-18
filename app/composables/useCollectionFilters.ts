@@ -1,5 +1,5 @@
 import { computed, type Ref } from "vue";
-import type { DecorCategoryType, DecorItem, PikminType } from "~/types/decor";
+import { DECOR_CATEGORY_TYPES, type DecorCategoryType, type DecorItem, type PikminType } from "~/types/decor";
 
 export type CollectionStatusFilter = "all" | "collected" | "uncollected";
 export type CollectionCategoryFilter =
@@ -27,6 +27,8 @@ const ANNIVERSARY_CATEGORY_IDS = [
   "4th-anniversary-flower-box",
   "4th-anniversary-snack",
 ];
+const ANNIVERSARY_CATEGORY_ID_SET = new Set(ANNIVERSARY_CATEGORY_IDS);
+const EMPTY_ITEM_ID_SET = new Set<string>();
 
 export const useCollectionFilters = ({
   searchQuery,
@@ -53,36 +55,50 @@ export const useCollectionFilters = ({
 
   const hasActiveFilters = computed(() => activeFilterCount.value > 0);
 
+  const itemIdsByCategoryType = computed(() => {
+    const idsByType = new Map<DecorCategoryType, Set<string>>();
+
+    DECOR_CATEGORY_TYPES.forEach(({ id }) => {
+      idsByType.set(id, new Set(getItemsByCategoryType(id).map(item => item.id)));
+    });
+
+    return idsByType;
+  });
+
+  const getCategoryTypeItemIds = (type: DecorCategoryType): Set<string> =>
+    itemIdsByCategoryType.value.get(type) ?? EMPTY_ITEM_ID_SET;
+
+  const limitedItemIds = computed(() => {
+    const ids = new Set<string>();
+
+    LIMITED_CATEGORY_TYPES.forEach((type) => {
+      getCategoryTypeItemIds(type).forEach(id => ids.add(id));
+    });
+
+    return ids;
+  });
+
   const filteredItems = computed(() => {
     let items = searchQuery.value ? searchItems(searchQuery.value) : getAllDecorItems();
 
     if (isLimitedMode.value) {
-      const limitedItemIds = new Set(
-        LIMITED_CATEGORY_TYPES.flatMap((type) => getItemsByCategoryType(type)).map(
-          (item) => item.id,
-        ),
-      );
-      items = items.filter((item) => limitedItemIds.has(item.id));
+      items = items.filter((item) => limitedItemIds.value.has(item.id));
     }
 
     if (selectedCategoryType.value) {
       const categoryType = selectedCategoryType.value;
 
       if (categoryType === "uncollected-regular") {
-        const regularItemIds = new Set(
-          getItemsByCategoryType("regular").map((item) => item.id),
-        );
+        const regularItemIds = getCategoryTypeItemIds("regular");
         items = items.filter(
           (item) => regularItemIds.has(item.id) && !isCollected(item.id),
         );
       } else if (categoryType === "anniversary") {
         items = items.filter((item) =>
-          ANNIVERSARY_CATEGORY_IDS.includes(item.categoryId),
+          ANNIVERSARY_CATEGORY_ID_SET.has(item.categoryId),
         );
       } else {
-        const categoryTypeItemIds = new Set(
-          getItemsByCategoryType(categoryType).map((item) => item.id),
-        );
+        const categoryTypeItemIds = getCategoryTypeItemIds(categoryType);
         items = items.filter((item) => categoryTypeItemIds.has(item.id));
       }
     }
