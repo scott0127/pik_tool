@@ -1,5 +1,5 @@
 <template>
-  <section class="collection-inventory-panel">
+  <section ref="panelEl" class="collection-inventory-panel">
     <div class="inventory-panel-header">
       <div class="inventory-panel-copy">
         <p class="inventory-panel-kicker">
@@ -30,7 +30,7 @@
         <button
           type="button"
           class="inventory-action-button inventory-action-button-primary"
-          @click.stop="isExpanded = !isExpanded"
+          @click.stop="toggleExpanded"
         >
           <Icon :name="isExpanded ? 'lucide:chevron-up' : 'lucide:sliders-horizontal'" class="w-4 h-4" />
           {{ isExpanded ? labels.close : labels.manage }}
@@ -39,12 +39,14 @@
     </div>
 
     <Transition
-      enter-active-class="transition duration-220 ease-out"
-      enter-from-class="opacity-0 -translate-y-2"
-      enter-to-class="opacity-100 translate-y-0"
-      leave-active-class="transition duration-150 ease-in"
-      leave-from-class="opacity-100 translate-y-0"
-      leave-to-class="opacity-0 -translate-y-2"
+      @before-enter="beforeSmoothEnter"
+      @enter="smoothEnter"
+      @after-enter="afterSmoothTransition"
+      @enter-cancelled="afterSmoothTransition"
+      @before-leave="beforeSmoothLeave"
+      @leave="smoothLeave"
+      @after-leave="afterSmoothTransition"
+      @leave-cancelled="afterSmoothTransition"
     >
       <div v-if="isExpanded" class="inventory-panel-body">
         <div v-if="summary.hasRareDecor" class="rare-progress-panel">
@@ -95,12 +97,14 @@
           </div>
 
           <Transition
-            enter-active-class="transition duration-200 ease-out"
-            enter-from-class="opacity-0 -translate-y-1"
-            enter-to-class="opacity-100 translate-y-0"
-            leave-active-class="transition duration-150 ease-in"
-            leave-from-class="opacity-100 translate-y-0"
-            leave-to-class="opacity-0 -translate-y-1"
+            @before-enter="beforeSmoothEnter"
+            @enter="smoothEnter"
+            @after-enter="afterSmoothTransition"
+            @enter-cancelled="afterSmoothTransition"
+            @before-leave="beforeSmoothLeave"
+            @leave="smoothLeave"
+            @after-leave="afterSmoothTransition"
+            @leave-cancelled="afterSmoothTransition"
           >
             <div v-if="showScoreRules" class="rare-rule-grid">
               <div
@@ -135,6 +139,8 @@
                 v-for="item in row.items"
                 :key="item.id"
                 class="inventory-item-cell"
+                :class="{ 'inventory-item-cell-mobile-collapsed': isMobileItemCollapsed(item.id) }"
+                :data-mobile-inventory-item-id="item.id"
               >
                 <div class="inventory-item-title">
                   <div class="inventory-item-main">
@@ -245,7 +251,42 @@
                   </div>
                 </div>
 
-                <div class="inventory-mobile-control-grid">
+                <Transition
+                  @before-enter="beforeSmoothEnter"
+                  @enter="smoothEnter"
+                  @after-enter="afterSmoothTransition"
+                  @enter-cancelled="afterSmoothTransition"
+                  @before-leave="beforeSmoothLeave"
+                  @leave="smoothLeave"
+                  @after-leave="afterSmoothTransition"
+                  @leave-cancelled="afterSmoothTransition"
+                >
+                  <button
+                    v-if="isMobileItemCollapsed(item.id)"
+                    type="button"
+                    class="inventory-mobile-collapsed-summary"
+                    :aria-label="`${labels.expandColor} ${t('pikmin_types.' + item.pikminType)}`"
+                    @click.stop="expandMobileItem(item.id)"
+                  >
+                    <span>
+                      <Icon name="lucide:panel-top-open" class="w-4 h-4" />
+                      {{ labels.autoCollapsed }}
+                    </span>
+                    <strong>{{ labels.expandColor }}</strong>
+                  </button>
+                </Transition>
+
+                <Transition
+                  @before-enter="beforeSmoothEnter"
+                  @enter="smoothEnter"
+                  @after-enter="afterSmoothTransition"
+                  @enter-cancelled="afterSmoothTransition"
+                  @before-leave="beforeSmoothLeave"
+                  @leave="smoothLeave"
+                  @after-leave="afterSmoothTransition"
+                  @leave-cancelled="afterSmoothTransition"
+                >
+                  <div v-if="!isMobileItemCollapsed(item.id)" class="inventory-mobile-control-grid">
                   <div
                     v-for="(control, controlIndex) in mobileControls"
                     :key="control.id"
@@ -291,24 +332,50 @@
                       </button>
                     </div>
                   </div>
-                </div>
+                  </div>
+                </Transition>
               </article>
             </div>
           </div>
         </div>
 
         <div class="inventory-event-log">
-          <div class="inventory-event-log-title">
-            <Icon name="lucide:list-restart" class="w-4 h-4" />
-            {{ labels.recentEvents }}
-          </div>
-          <ol v-if="recentEvents.length > 0" class="inventory-event-list">
-            <li v-for="event in recentEvents" :key="event.id">
-              <span>{{ formatEvent(event) }}</span>
-              <time>{{ formatEventTime(event.createdAt) }}</time>
-            </li>
-          </ol>
-          <p v-else class="inventory-event-empty">{{ labels.noEvents }}</p>
+          <button
+            type="button"
+            class="inventory-event-log-toggle"
+            :aria-expanded="showRecentEvents"
+            @click.stop="showRecentEvents = !showRecentEvents"
+          >
+            <span class="inventory-event-log-title">
+              <Icon name="lucide:list-restart" class="w-4 h-4" />
+              {{ labels.recentEvents }}
+            </span>
+            <span class="inventory-event-log-summary">
+              {{ recentEvents.length }} {{ labels.eventCountUnit }}
+              <Icon :name="showRecentEvents ? 'lucide:chevron-up' : 'lucide:chevron-down'" class="w-3.5 h-3.5" />
+            </span>
+          </button>
+
+          <Transition
+            @before-enter="beforeSmoothEnter"
+            @enter="smoothEnter"
+            @after-enter="afterSmoothTransition"
+            @enter-cancelled="afterSmoothTransition"
+            @before-leave="beforeSmoothLeave"
+            @leave="smoothLeave"
+            @after-leave="afterSmoothTransition"
+            @leave-cancelled="afterSmoothTransition"
+          >
+            <div v-if="showRecentEvents" class="inventory-event-log-body">
+              <ol v-if="recentEvents.length > 0" class="inventory-event-list">
+                <li v-for="event in recentEvents" :key="event.id">
+                  <span>{{ formatEvent(event) }}</span>
+                  <time>{{ formatEventTime(event.createdAt) }}</time>
+                </li>
+              </ol>
+              <p v-else class="inventory-event-empty">{{ labels.noEvents }}</p>
+            </div>
+          </Transition>
         </div>
       </div>
     </Transition>
@@ -341,6 +408,126 @@ const {
 
 const isExpanded = ref(false);
 const showScoreRules = ref(false);
+const showRecentEvents = ref(false);
+const panelEl = ref<HTMLElement | null>(null);
+const collapsedMobileItems = ref<Set<string>>(new Set());
+let mobileAutoCollapseObserver: IntersectionObserver | null = null;
+let mobileAutoCollapseFrame: number | null = null;
+
+const smoothTransitionDuration = 280;
+const smoothTransitionCss =
+  `height ${smoothTransitionDuration}ms cubic-bezier(0.22, 1, 0.36, 1), ` +
+  'opacity 180ms ease, transform 260ms cubic-bezier(0.22, 1, 0.36, 1)';
+const fastPanelCloseDuration = 180;
+const fastPanelCloseCss =
+  `height ${fastPanelCloseDuration}ms cubic-bezier(0.4, 0, 0.2, 1), ` +
+  'opacity 120ms ease, transform 160ms cubic-bezier(0.4, 0, 0.2, 1)';
+const tallPanelAnimationThreshold = 900;
+
+const prefersReducedMotion = () =>
+  typeof window !== 'undefined' &&
+  window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+const clearSmoothStyles = (element: HTMLElement) => {
+  element.style.height = '';
+  element.style.opacity = '';
+  element.style.overflow = '';
+  element.style.transform = '';
+  element.style.transition = '';
+  element.style.contain = '';
+};
+
+const finishOnHeightTransition = (
+  element: HTMLElement,
+  done: () => void,
+  fallbackMs = smoothTransitionDuration + 80,
+) => {
+  let isDone = false;
+  const finish = () => {
+    if (isDone) return;
+    isDone = true;
+    element.removeEventListener('transitionend', onTransitionEnd);
+    done();
+  };
+  const onTransitionEnd = (event: TransitionEvent) => {
+    if (event.target === element && event.propertyName === 'height') finish();
+  };
+
+  element.addEventListener('transitionend', onTransitionEnd);
+  window.setTimeout(finish, fallbackMs);
+};
+
+const beforeSmoothEnter = (el: Element) => {
+  const element = el as HTMLElement;
+  if (prefersReducedMotion()) return;
+
+  element.style.height = '0px';
+  element.style.opacity = '0';
+  element.style.overflow = 'hidden';
+  element.style.transform = 'translateY(-6px)';
+};
+
+const smoothEnter = (el: Element, done: () => void) => {
+  const element = el as HTMLElement;
+  if (prefersReducedMotion()) {
+    done();
+    return;
+  }
+
+  const targetHeight = element.scrollHeight;
+  element.style.transition = smoothTransitionCss;
+  requestAnimationFrame(() => {
+    element.style.height = `${targetHeight}px`;
+    element.style.opacity = '1';
+    element.style.transform = 'translateY(0)';
+  });
+  finishOnHeightTransition(element, done);
+};
+
+const beforeSmoothLeave = (el: Element) => {
+  const element = el as HTMLElement;
+  if (prefersReducedMotion()) return;
+
+  if (element.classList.contains('inventory-panel-body')) {
+    disconnectMobileAutoCollapse();
+  }
+
+  element.style.height = `${element.scrollHeight}px`;
+  element.style.opacity = '1';
+  element.style.overflow = 'hidden';
+  element.style.transform = 'translateY(0)';
+};
+
+const smoothLeave = (el: Element, done: () => void) => {
+  const element = el as HTMLElement;
+  if (prefersReducedMotion()) {
+    done();
+    return;
+  }
+
+  const isTallPanel =
+    element.classList.contains('inventory-panel-body') &&
+    element.scrollHeight > tallPanelAnimationThreshold;
+
+  if (isTallPanel) {
+    element.style.contain = 'layout paint';
+  }
+  element.style.transition = isTallPanel ? fastPanelCloseCss : smoothTransitionCss;
+  requestAnimationFrame(() => {
+    element.style.height = '0px';
+    element.style.opacity = '0';
+    element.style.transform = 'translateY(-6px)';
+  });
+  finishOnHeightTransition(
+    element,
+    done,
+    (isTallPanel ? fastPanelCloseDuration : smoothTransitionDuration) + 80,
+  );
+};
+
+const afterSmoothTransition = (el: Element) => {
+  clearSmoothStyles(el as HTMLElement);
+};
 
 type InventoryControlTone =
   | 'seedling'
@@ -384,6 +571,7 @@ const labels = computed(() => {
       maxLevel: 'Max tracked',
       recentEvents: 'Recent trace',
       noEvents: 'No trace events yet',
+      eventCountUnit: 'records',
       pluckSeedling: 'Pluck small seedling',
       pluckHugeSeedling: 'Pluck huge seedling',
       giftExpedition: '4-heart gift expedition',
@@ -398,6 +586,8 @@ const labels = computed(() => {
       recordTotal: 'Records',
       decrease: 'Decrease',
       increase: 'Increase',
+      autoCollapsed: 'Auto-collapsed',
+      expandColor: 'Expand',
     };
   }
 
@@ -424,6 +614,7 @@ const labels = computed(() => {
     maxLevel: '已達追蹤上限',
     recentEvents: '近期紀錄',
     noEvents: '尚無紀錄',
+    eventCountUnit: '筆',
     pluckSeedling: '小盆栽拔苗',
     pluckHugeSeedling: '大盆栽拔苗',
     giftExpedition: '滿4心拿裝飾品',
@@ -438,6 +629,8 @@ const labels = computed(() => {
     recordTotal: '紀錄',
     decrease: '減少',
     increase: '增加',
+    autoCollapsed: '已自動收合',
+    expandColor: '展開',
   };
 });
 
@@ -601,6 +794,15 @@ const mobileControls = computed<InventoryControl[]>(() => [
   ...releaseControls.value,
 ]);
 
+const toggleExpanded = () => {
+  if (isExpanded.value) {
+    disconnectMobileAutoCollapse();
+    showRecentEvents.value = false;
+  }
+
+  isExpanded.value = !isExpanded.value;
+};
+
 const getMobileControlClass = (): string => {
   return 'mobile-span-6';
 };
@@ -646,8 +848,8 @@ const getBucketCount = (itemId: string, bucket: CollectionInventoryBucket): numb
   return inventory.releaseWithDecorCount;
 };
 
-const getItemRecordTotal = (item: DecorItem): number => {
-  const inventory = getInventoryItem(item.id);
+const getItemRecordTotalById = (itemId: string): number => {
+  const inventory = getInventoryItem(itemId);
   return (
     inventory.seedlingCount +
     inventory.preDecorCount +
@@ -655,6 +857,72 @@ const getItemRecordTotal = (item: DecorItem): number => {
     inventory.releaseNoDecorCount +
     inventory.releaseWithDecorCount
   );
+};
+
+const getItemRecordTotal = (item: DecorItem): number => getItemRecordTotalById(item.id);
+
+const isMobileItemCollapsed = (itemId: string): boolean => collapsedMobileItems.value.has(itemId);
+
+const collapseMobileItem = (itemId: string) => {
+  if (collapsedMobileItems.value.has(itemId)) return;
+  collapsedMobileItems.value = new Set([...collapsedMobileItems.value, itemId]);
+};
+
+const expandMobileItem = (itemId: string) => {
+  if (!collapsedMobileItems.value.has(itemId)) return;
+  const next = new Set(collapsedMobileItems.value);
+  next.delete(itemId);
+  collapsedMobileItems.value = next;
+};
+
+const isMobileAutoCollapseEnabled = () =>
+  typeof window !== 'undefined' &&
+  window.matchMedia('(max-width: 640px)').matches;
+
+const disconnectMobileAutoCollapse = () => {
+  mobileAutoCollapseObserver?.disconnect();
+  mobileAutoCollapseObserver = null;
+};
+
+const setupMobileAutoCollapse = () => {
+  disconnectMobileAutoCollapse();
+
+  if (!isExpanded.value || !isMobileAutoCollapseEnabled()) return;
+
+  const root = panelEl.value;
+  if (!root) return;
+
+  const itemCells = root.querySelectorAll<HTMLElement>('[data-mobile-inventory-item-id]');
+  if (itemCells.length === 0) return;
+
+  mobileAutoCollapseObserver = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      const itemId = (entry.target as HTMLElement).dataset.mobileInventoryItemId;
+      if (!itemId || collapsedMobileItems.value.has(itemId)) return;
+
+      const isPastViewportTop = entry.boundingClientRect.bottom < 96;
+      if (!entry.isIntersecting && isPastViewportTop && getItemRecordTotalById(itemId) > 0) {
+        collapseMobileItem(itemId);
+      }
+    });
+  }, {
+    root: null,
+    rootMargin: '-88px 0px 0px 0px',
+    threshold: 0,
+  });
+
+  itemCells.forEach((cell) => mobileAutoCollapseObserver?.observe(cell));
+};
+
+const scheduleMobileAutoCollapse = () => {
+  if (typeof window === 'undefined') return;
+  if (mobileAutoCollapseFrame !== null) cancelAnimationFrame(mobileAutoCollapseFrame);
+
+  mobileAutoCollapseFrame = requestAnimationFrame(async () => {
+    mobileAutoCollapseFrame = null;
+    await nextTick();
+    setupMobileAutoCollapse();
+  });
 };
 
 const adjust = (itemId: string, bucket: CollectionInventoryBucket, delta: number) => {
@@ -697,6 +965,33 @@ const formatEvent = (event: CollectionEvent): string => {
 
   return event.note ?? event.type;
 };
+
+watch(isExpanded, (expanded) => {
+  showRecentEvents.value = false;
+
+  if (!expanded) {
+    disconnectMobileAutoCollapse();
+    return;
+  }
+
+  collapsedMobileItems.value = new Set();
+  scheduleMobileAutoCollapse();
+}, { flush: 'post' });
+
+watch(rows, () => {
+  if (isExpanded.value) scheduleMobileAutoCollapse();
+}, { flush: 'post' });
+
+onMounted(() => {
+  window.addEventListener('resize', scheduleMobileAutoCollapse, { passive: true });
+  if (isExpanded.value) scheduleMobileAutoCollapse();
+});
+
+onUnmounted(() => {
+  disconnectMobileAutoCollapse();
+  if (mobileAutoCollapseFrame !== null) cancelAnimationFrame(mobileAutoCollapseFrame);
+  window.removeEventListener('resize', scheduleMobileAutoCollapse);
+});
 </script>
 
 <style scoped>
@@ -818,6 +1113,8 @@ const formatEvent = (event: CollectionEvent): string => {
   display: grid;
   gap: 0.85rem;
   margin-top: 0.85rem;
+  transform-origin: top;
+  will-change: height, opacity, transform;
 }
 
 .rare-progress-panel {
@@ -936,6 +1233,8 @@ const formatEvent = (event: CollectionEvent): string => {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(10.5rem, 1fr));
   gap: 0.5rem;
+  transform-origin: top;
+  will-change: height, opacity, transform;
 }
 
 .rare-rule-card {
@@ -1278,9 +1577,54 @@ const formatEvent = (event: CollectionEvent): string => {
   display: none;
 }
 
+.inventory-mobile-collapsed-summary {
+  display: none;
+}
+
 .inventory-event-log {
   padding-top: 0.85rem;
   border-top: 1px solid rgba(148, 163, 184, 0.18);
+}
+
+.inventory-event-log-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  width: 100%;
+  min-height: 2.35rem;
+  padding: 0.42rem 0.55rem;
+  border: 1px solid rgba(20, 184, 166, 0.14);
+  border-radius: 0.72rem;
+  background: rgba(240, 253, 250, 0.52);
+  transition: background 160ms ease, border-color 160ms ease, transform 160ms ease;
+}
+
+.inventory-event-log-toggle:hover,
+.inventory-event-log-toggle:focus-visible {
+  border-color: rgba(20, 184, 166, 0.26);
+  background: rgba(240, 253, 250, 0.82);
+  outline: none;
+}
+
+.inventory-event-log-toggle:active {
+  transform: scale(0.995);
+}
+
+.inventory-event-log-summary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.26rem;
+  flex: 0 0 auto;
+  color: rgb(71 85 105);
+  font-size: 0.72rem;
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
+}
+
+.inventory-event-log-body {
+  transform-origin: top;
+  will-change: height, opacity, transform;
 }
 
 .inventory-event-list {
@@ -1326,6 +1670,19 @@ const formatEvent = (event: CollectionEvent): string => {
     grid-template-columns: minmax(0, 1fr);
   }
 
+  .inventory-item-cell {
+    transition:
+      border-color 180ms ease,
+      background 180ms ease,
+      box-shadow 180ms ease;
+  }
+
+  .inventory-item-cell-mobile-collapsed {
+    border-color: rgba(20, 184, 166, 0.22);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(240, 253, 250, 0.66));
+    box-shadow: 0 6px 14px rgba(15, 118, 110, 0.05);
+  }
+
   .inventory-item-title {
     align-items: flex-start;
     margin-bottom: 0.46rem;
@@ -1358,6 +1715,42 @@ const formatEvent = (event: CollectionEvent): string => {
     display: grid;
     grid-template-columns: repeat(6, minmax(0, 1fr));
     gap: 0.42rem;
+    transform-origin: top;
+  }
+
+  .inventory-mobile-collapsed-summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.6rem;
+    width: 100%;
+    min-height: 2.72rem;
+    padding: 0.5rem 0.58rem;
+    border: 1px solid rgba(20, 184, 166, 0.18);
+    border-radius: 0.76rem;
+    background: rgba(240, 253, 250, 0.78);
+    color: rgb(15 82 73);
+    font-size: 0.76rem;
+    font-weight: 900;
+    transform-origin: top;
+  }
+
+  .inventory-mobile-collapsed-summary span {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.34rem;
+    min-width: 0;
+  }
+
+  .inventory-mobile-collapsed-summary strong {
+    flex: 0 0 auto;
+    padding: 0.28rem 0.54rem;
+    border: 1px solid rgba(20, 184, 166, 0.26);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.88);
+    color: rgb(13 148 136);
+    font-size: 0.72rem;
+    font-weight: 950;
   }
 
   .inventory-mobile-control-card {
