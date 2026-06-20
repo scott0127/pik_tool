@@ -3702,16 +3702,16 @@
     },
     {
       "category": {
-        "id": "photo-studio",
-        "name": "照相館",
-        "nameEn": "Photo Studio",
+        "id": "photo_button_badge",
+        "name": "照片鈕扣徽章",
+        "nameEn": "photo_button_badge",
         "type": "special",
         "icon": "noto:camera-with-flash"
       },
       "variants": [
         {
           "id": "photo_button_badge",
-          "name": "照片徽章",
+          "name": "照片鈕扣徽章",
           "nameEn": "Photo Button Badge",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/1/1f/Decor_Red_Photo_Button_Badge.png/100px-Decor_Red_Photo_Button_Badge.png",
           "imageUrls": {

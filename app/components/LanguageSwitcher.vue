@@ -10,6 +10,8 @@
 
 <script setup lang="ts">
 const { locale, setLocale, locales } = useI18n();
+const PREFERRED_LOCALE_STORAGE_KEY = 'pikmin-preferred-locale';
+const I18N_COOKIE_KEY = 'i18n_redirected';
 
 const currentLocaleText = computed(() => {
   return locale.value === 'zh' ? '中' : 'EN';
@@ -21,8 +23,19 @@ const nextLocaleName = computed(() => {
   return formatting ? formatting.name : next;
 });
 
-const toggleLanguage = () => {
-  const next = locale.value === 'zh' ? 'en' : 'zh';
-  setLocale(next);
+const persistLocalePreference = (code: 'zh' | 'en') => {
+  if (!import.meta.client) return;
+  try {
+    localStorage.setItem(PREFERRED_LOCALE_STORAGE_KEY, code);
+  } catch {
+    // Some privacy modes can block localStorage; the runtime locale still changes.
+  }
+  document.cookie = `${I18N_COOKIE_KEY}=${code}; path=/; max-age=31536000; SameSite=Lax`;
+};
+
+const toggleLanguage = async () => {
+  const next: 'zh' | 'en' = locale.value === 'zh' ? 'en' : 'zh';
+  await setLocale(next);
+  persistLocalePreference(next);
 };
 </script>
