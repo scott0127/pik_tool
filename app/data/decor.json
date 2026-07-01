@@ -3570,9 +3570,9 @@
       },
       "variants": [
         {
-          "id": "tiny_instrument",
-          "name": "迷你樂器",
-          "nameEn": "Tiny Instrument",
+          "id": "tiny_instrument_Brass_Band",
+          "name": "銅管樂團",
+          "nameEn": "Brass Band",
           "imageUrl": "https://pikmin.wiki.gallery/images/thumb/1/19/Decor_Red_Tiny_Instrument.png/100px-Decor_Red_Tiny_Instrument.png",
           "imageUrls": {
             "red": "https://pikmin.wiki.gallery/images/thumb/1/19/Decor_Red_Tiny_Instrument.png/100px-Decor_Red_Tiny_Instrument.png",
@@ -3582,6 +3582,21 @@
             "purple": "https://pikmin.wiki.gallery/images/thumb/7/7d/Decor_Purple_Tiny_Instrument.png/100px-Decor_Purple_Tiny_Instrument.png",
             "rock": "https://pikmin.wiki.gallery/images/thumb/f/f5/Decor_Rock_Tiny_Instrument.png/100px-Decor_Rock_Tiny_Instrument.png",
             "winged": "https://pikmin.wiki.gallery/images/thumb/e/e0/Decor_Winged_Tiny_Instrument.png/100px-Decor_Winged_Tiny_Instrument.png"
+          }
+        },
+        {
+          "id": "tiny_instrument_Orchestra",
+          "name": "管弦樂團",
+          "nameEn": "Orchestra",
+          "imageUrl": "待補",
+          "imageUrls": {
+            "red": "待補",
+            "yellow": "待補",
+            "blue": "待補",
+            "white": "待補",
+            "purple": "待補",
+            "rock": "待補",
+            "winged": "待補"
           }
         }
       ],

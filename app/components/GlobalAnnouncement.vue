@@ -53,13 +53,23 @@
         <div v-show="currentTab === 'update'" class="flex-1">
           <ul class="announcement-copy announcement-list text-sm leading-relaxed">
             <li class="announcement-update-item announcement-update-item-feature">
+              <span class="announcement-update-date">7/1</span>
+              <span class="announcement-update-icon announcement-update-icon-emerald">
+                <Icon name="lucide:music" class="h-3.5 w-3.5" />
+              </span>
+              <span class="announcement-update-copy">
+                <span class="announcement-update-kicker">裝飾更新</span>
+                <span class="announcement-update-highlight">迷你樂器</span>
+              </span>
+            </li>
+            <li class="announcement-update-item">
               <span class="announcement-update-date">6/11</span>
               <span class="announcement-update-icon announcement-update-icon-emerald">
                 <Icon name="lucide:sprout" class="h-3.5 w-3.5" />
               </span>
               <span class="announcement-update-copy">
                 <span class="announcement-update-kicker">全新功能</span>
-                <span class="announcement-update-highlight">放生皮克敏的回憶</span>
+                <span>放生皮克敏的回憶</span>
               </span>
             </li>
             <li class="announcement-update-item">
