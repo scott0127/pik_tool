@@ -3573,30 +3573,31 @@
           "id": "tiny_instrument_Brass_Band",
           "name": "銅管樂團",
           "nameEn": "Brass Band",
-          "imageUrl": "https://pikmin.wiki.gallery/images/thumb/1/19/Decor_Red_Tiny_Instrument.png/100px-Decor_Red_Tiny_Instrument.png",
+          "imageUrl": "https://pikmin.wiki.gallery/images/thumb/8/8c/Decor_Red_Tiny_Instrument_Brass_Band.png/200px-Decor_Red_Tiny_Instrument_Brass_Band.png",
           "imageUrls": {
-            "red": "https://pikmin.wiki.gallery/images/thumb/1/19/Decor_Red_Tiny_Instrument.png/100px-Decor_Red_Tiny_Instrument.png",
-            "yellow": "https://pikmin.wiki.gallery/images/thumb/f/fa/Decor_Yellow_Tiny_Instrument.png/100px-Decor_Yellow_Tiny_Instrument.png",
-            "blue": "https://pikmin.wiki.gallery/images/thumb/4/47/Decor_Blue_Tiny_Instrument.png/100px-Decor_Blue_Tiny_Instrument.png",
-            "white": "https://pikmin.wiki.gallery/images/thumb/6/67/Decor_White_Tiny_Instrument.png/100px-Decor_White_Tiny_Instrument.png",
-            "purple": "https://pikmin.wiki.gallery/images/thumb/7/7d/Decor_Purple_Tiny_Instrument.png/100px-Decor_Purple_Tiny_Instrument.png",
-            "rock": "https://pikmin.wiki.gallery/images/thumb/f/f5/Decor_Rock_Tiny_Instrument.png/100px-Decor_Rock_Tiny_Instrument.png",
-            "winged": "https://pikmin.wiki.gallery/images/thumb/e/e0/Decor_Winged_Tiny_Instrument.png/100px-Decor_Winged_Tiny_Instrument.png"
+            "red": "https://pikmin.wiki.gallery/images/thumb/8/8c/Decor_Red_Tiny_Instrument_Brass_Band.png/200px-Decor_Red_Tiny_Instrument_Brass_Band.png",
+            "yellow": "https://pikmin.wiki.gallery/images/thumb/b/b5/Decor_Yellow_Tiny_Instrument_Brass_Band.png/200px-Decor_Yellow_Tiny_Instrument_Brass_Band.png",
+            "blue": "https://pikmin.wiki.gallery/images/thumb/f/fa/Decor_Blue_Tiny_Instrument_Brass_Band.png/200px-Decor_Blue_Tiny_Instrument_Brass_Band.png",
+            "white": "https://pikmin.wiki.gallery/images/thumb/d/d8/Decor_White_Tiny_Instrument_Brass_Band.png/200px-Decor_White_Tiny_Instrument_Brass_Band.png",
+            "purple": "https://pikmin.wiki.gallery/images/thumb/a/a3/Decor_Purple_Tiny_Instrument_Brass_Band.png/200px-Decor_Purple_Tiny_Instrument_Brass_Band.png",
+            "rock": "https://pikmin.wiki.gallery/images/thumb/0/01/Decor_Rock_Tiny_Instrument_Brass_Band.png/200px-Decor_Rock_Tiny_Instrument_Brass_Band.png",
+            "winged": "https://pikmin.wiki.gallery/images/e/e0/Decor_Winged_Tiny_Instrument_Brass_Band.png"
           }
         },
         {
           "id": "tiny_instrument_Orchestra",
           "name": "管弦樂團",
           "nameEn": "Orchestra",
-          "imageUrl": "待補",
+          "imageUrl": "https://pikmin.wiki.gallery/images/9/9f/Decor_Red_Tiny_Instrument_Orchestra.png",
           "imageUrls": {
-            "red": "待補",
-            "yellow": "待補",
-            "blue": "待補",
-            "white": "待補",
-            "purple": "待補",
-            "rock": "待補",
-            "winged": "待補"
+            "red": "https://pikmin.wiki.gallery/images/9/9f/Decor_Red_Tiny_Instrument_Orchestra.png",
+            "yellow": "https://pikmin.wiki.gallery/images/thumb/8/8f/Decor_Yellow_Tiny_Instrument_Orchestra.png/200px-Decor_Yellow_Tiny_Instrument_Orchestra.png",
+            "blue": "https://pikmin.wiki.gallery/images/thumb/a/a1/Decor_Blue_Tiny_Instrument_Orchestra.png/200px-Decor_Blue_Tiny_Instrument_Orchestra.png",
+            "white": "https://pikmin.wiki.gallery/images/5/57/Decor_White_Tiny_Instrument_Orchestra.png",
+            "purple": "https://pikmin.wiki.gallery/images/thumb/8/85/Decor_Purple_Tiny_Instrument_Orchestra.png/200px-Decor_Purple_Tiny_Instrument_Orchestra.png",
+            "rock": "https://pikmin.wiki.gallery/images/thumb/2/20/Decor_Rock_Tiny_Instrument_Orchestra.png/200px-Decor_Rock_Tiny_Instrument_Orchestra.png",
+            "winged": "https://pikmin.wiki.gallery/images/thumb/1/13/Decor_Winged_Tiny_Instrument_Orchestra.png/200px-Decor_Winged_Tiny_Instrument_Orchestra.png",
+            "ice": "https://pikmin.wiki.gallery/images/thumb/c/cf/Decor_Ice_Tiny_Instrument_Orchestra.png/200px-Decor_Ice_Tiny_Instrument_Orchestra.png"
           }
         }
       ],
@@ -3607,7 +3608,8 @@
         "white",
         "purple",
         "rock",
-        "winged"
+        "winged",
+        "ice"
       ]
     },
     {

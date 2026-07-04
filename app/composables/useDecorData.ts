@@ -193,6 +193,50 @@ export function useDecorData() {
     });
   };
 
+  // Get items filtered by category AND variant
+  const getItemsByCategoryAndVariant = (categoryId: string, variantId: string): DecorItem[] => {
+    return (itemsByCategory.get(categoryId) ?? []).filter(item => item.variantId === variantId);
+  };
+
+  // Get a flat list of all variant options (each variant is independent)
+  // Used by the hero settings searchable combobox
+  interface VariantOption {
+    value: string;           // "categoryId:variantId"
+    categoryId: string;
+    categoryName: string;
+    categoryNameEn: string;
+    categoryType: DecorCategoryType;
+    categoryIcon?: string;
+    variantId: string;
+    variantName: string;
+    variantNameEn: string;
+    imageUrl: string;
+    pikminCount: number;
+  }
+
+  const getAllVariantOptions = (): VariantOption[] => {
+    const options: VariantOption[] = [];
+    decorDefinitions.forEach((def) => {
+      def.variants.forEach((variant) => {
+        const items = getItemsByCategoryAndVariant(def.category.id, variant.id);
+        options.push({
+          value: `${def.category.id}:${variant.id}`,
+          categoryId: def.category.id,
+          categoryName: def.category.name,
+          categoryNameEn: def.category.nameEn,
+          categoryType: def.category.type,
+          categoryIcon: def.category.icon,
+          variantId: variant.id,
+          variantName: variant.name,
+          variantNameEn: variant.nameEn,
+          imageUrl: (variant as any).imageUrl || '',
+          pikminCount: items.length,
+        });
+      });
+    });
+    return options;
+  };
+
   return {
     getDecorDefinitions,
     getAllDecorItems,
@@ -205,5 +249,7 @@ export function useDecorData() {
     getAllCategories,
     getCategoriesByType,
     searchItems,
+    getItemsByCategoryAndVariant,
+    getAllVariantOptions,
   };
 }

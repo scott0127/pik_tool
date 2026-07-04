@@ -263,7 +263,7 @@ const { locale } = useI18n();
 const { getStats, isCollected } = useCollection();
 const { isAdmin } = useAuthStore();
 const { fetchHeroConfig, heroFeaturedConfig } = useSiteConfig();
-const { getItemsByCategory, getImageUrl, getCategory } = useDecorData();
+const { getItemsByCategory, getItemsByCategoryAndVariant, getImageUrl, getCategory, getVariant } = useDecorData();
 
 const showMissingModal = ref(false);
 const showSettingsModal = ref(false);
@@ -287,21 +287,60 @@ onMounted(async () => {
     initHeroMotion();
 });
 
-// Dynamic Categories
-const row1CategoryId = computed(() => heroFeaturedConfig.value?.row1 || 'reverse-valentine-sticker');
-const row2CategoryId = computed(() => heroFeaturedConfig.value?.row2 || '彩色粉末-世界節慶');
+// Dynamic Categories - parse categoryId:variantId format (backward compat: no ':' = category-only)
+const row1ConfigValue = computed(() => heroFeaturedConfig.value?.row1 || 'reverse-valentine-sticker:reverse-valentine-sticker');
+const row2ConfigValue = computed(() => heroFeaturedConfig.value?.row2 || '彩色粉末-世界節慶:彩色粉末-世界節慶');
 
-const row1CategoryName = computed(() => getCategory(row1CategoryId.value)?.name || '未知分類');
-const row2CategoryName = computed(() => getCategory(row2CategoryId.value)?.name || '未知分類');
+const parseConfigValue = (val: string) => {
+    if (val.includes(':')) {
+        const [catId, varId] = val.split(':');
+        return { categoryId: catId, variantId: varId };
+    }
+    return { categoryId: val, variantId: null };
+};
+
+const row1Parsed = computed(() => parseConfigValue(row1ConfigValue.value));
+const row2Parsed = computed(() => parseConfigValue(row2ConfigValue.value));
+
+// For backward compat in navigation links
+const row1CategoryId = computed(() => row1Parsed.value.categoryId);
+const row2CategoryId = computed(() => row2Parsed.value.categoryId);
+
+const row1CategoryName = computed(() => {
+    const cat = getCategory(row1Parsed.value.categoryId);
+    const catName = cat?.name || '未知分類';
+    if (row1Parsed.value.variantId) {
+        const variant = getVariant(row1Parsed.value.categoryId, row1Parsed.value.variantId);
+        if (variant && variant.name !== catName) {
+            return `${catName} › ${variant.name}`;
+        }
+    }
+    return catName;
+});
+const row2CategoryName = computed(() => {
+    const cat = getCategory(row2Parsed.value.categoryId);
+    const catName = cat?.name || '未知分類';
+    if (row2Parsed.value.variantId) {
+        const variant = getVariant(row2Parsed.value.categoryId, row2Parsed.value.variantId);
+        if (variant && variant.name !== catName) {
+            return `${catName} › ${variant.name}`;
+        }
+    }
+    return catName;
+});
 
 const typeToZh = (type: string) => {
     const map: Record<string, string> = { red: '紅色', yellow: '黃色', blue: '藍色', purple: '紫色', white: '白色', rock: '岩石', winged: '羽翅', ice: '冰水' };
     return map[type] || type;
 };
 
-// Dynamic Array of Row 1
+// Dynamic Array of Row 1 - variant-aware
 const valentineSpirits = computed(() => {
-    return getItemsByCategory(row1CategoryId.value).map(item => ({
+    const parsed = row1Parsed.value;
+    const items = parsed.variantId
+        ? getItemsByCategoryAndVariant(parsed.categoryId, parsed.variantId)
+        : getItemsByCategory(parsed.categoryId);
+    return items.map(item => ({
         type: item.pikminType,
         name: typeToZh(item.pikminType),
         image: getImageUrl(item.categoryId, item.variantId, item.pikminType) || '',
@@ -309,9 +348,13 @@ const valentineSpirits = computed(() => {
     }));
 });
 
-// Dynamic Array of Row 2
+// Dynamic Array of Row 2 - variant-aware
 const powderSpirits = computed(() => {
-    return getItemsByCategory(row2CategoryId.value).map(item => ({
+    const parsed = row2Parsed.value;
+    const items = parsed.variantId
+        ? getItemsByCategoryAndVariant(parsed.categoryId, parsed.variantId)
+        : getItemsByCategory(parsed.categoryId);
+    return items.map(item => ({
         type: item.pikminType,
         name: typeToZh(item.pikminType),
         image: getImageUrl(item.categoryId, item.variantId, item.pikminType) || '',

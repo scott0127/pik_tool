@@ -6,8 +6,8 @@ export const useSiteConfig = () => {
   const CONFIG_CACHE_TTL = 60 * 60 * 1000;
 
   const defaultConfig = {
-    row1: 'reverse-valentine-sticker',
-    row2: '彩色粉末-世界節慶'
+    row1: 'reverse-valentine-sticker:reverse-valentine-sticker',
+    row2: '彩色粉末-世界節慶:彩色粉末-世界節慶'
   };
 
   const readCache = () => {
