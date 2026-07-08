@@ -92,7 +92,8 @@
             "white": "https://pikmin.wiki.gallery/images/thumb/b/bf/Decor_White_Coffee_Cup.png/100px-Decor_White_Coffee_Cup.png",
             "purple": "https://pikmin.wiki.gallery/images/thumb/3/37/Decor_Purple_Coffee_Cup.png/99px-Decor_Purple_Coffee_Cup.png",
             "rock": "https://pikmin.wiki.gallery/images/thumb/1/1c/Decor_Rock_Coffee_Cup.png/97px-Decor_Rock_Coffee_Cup.png",
-            "winged": "https://pikmin.wiki.gallery/images/thumb/2/29/Decor_Winged_Coffee_Cup.png/100px-Decor_Winged_Coffee_Cup.png"
+            "winged": "https://pikmin.wiki.gallery/images/thumb/2/29/Decor_Winged_Coffee_Cup.png/100px-Decor_Winged_Coffee_Cup.png",
+            "ice": "https://pikmin.wiki.gallery/images/thumb/3/30/Decor_Ice_Coffee_Cup.png/200px-Decor_Ice_Coffee_Cup.png"
           }
         }
       ],
@@ -103,7 +104,8 @@
         "white",
         "purple",
         "rock",
-        "winged"
+        "winged",
+        "ice"
       ]
     },
     {

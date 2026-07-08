@@ -219,6 +219,13 @@ export function useDecorData() {
     decorDefinitions.forEach((def) => {
       def.variants.forEach((variant) => {
         const items = getItemsByCategoryAndVariant(def.category.id, variant.id);
+        // Prefer imageUrl, fallback to first entry in imageUrls dict
+        const variantAny = variant as any;
+        let resolvedImageUrl = variantAny.imageUrl || '';
+        if (!resolvedImageUrl && variantAny.imageUrls && typeof variantAny.imageUrls === 'object') {
+          const firstKey = Object.keys(variantAny.imageUrls)[0];
+          if (firstKey) resolvedImageUrl = variantAny.imageUrls[firstKey];
+        }
         options.push({
           value: `${def.category.id}:${variant.id}`,
           categoryId: def.category.id,
@@ -229,7 +236,7 @@ export function useDecorData() {
           variantId: variant.id,
           variantName: variant.name,
           variantNameEn: variant.nameEn,
-          imageUrl: (variant as any).imageUrl || '',
+          imageUrl: resolvedImageUrl,
           pikminCount: items.length,
         });
       });
