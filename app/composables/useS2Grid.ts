@@ -138,6 +138,7 @@ export function useS2Grid() {
     const result: S2CellData[] = [];
     const processed = new Set<string>();
     const queue: string[] = [];
+    let queueIndex = 0;
 
     // 動態調整 maxCells 基於縮放層級
     // Vue 渲染超過 2000 個 LPolygon 會發生嚴重卡頓與破圖 (Leaflet DOM Overload)
@@ -162,10 +163,10 @@ export function useS2Grid() {
       console.log(`[S2Grid] Generating grid from seed ${seedCellId} for bounds: ${south.toFixed(5)}N-${north.toFixed(5)}N`);
 
       // 2. BFS 擴展
-      while (queue.length > 0) {
+      while (queueIndex < queue.length) {
         if (result.length >= SAFETY_MAX_CELLS) break;
         
-        const currentId = queue.shift()!;
+        const currentId = queue[queueIndex++]!;
         const cellVertices = getCellVertices(currentId);
         
         // 檢查是否在視窗內

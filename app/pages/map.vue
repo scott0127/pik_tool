@@ -3,9 +3,9 @@
   <MapMaintenance v-if="MAINTENANCE_MODE" />
   
   <ClientOnly v-else>
-    <div class="relative h-screen w-full overflow-hidden">
+    <div class="map-page relative w-full overflow-hidden">
       <!-- 地圖容器 -->
-      <div id="map" class="w-full h-full rounded-3xl overflow-hidden shadow-2xl" style="min-height: 100vh;">
+      <div id="map" class="map-canvas w-full h-full overflow-hidden">
         <LMap
           ref="mapRef"
           :options="{ preferCanvas: true }"
@@ -219,6 +219,7 @@
                       :center-title="$t('map.cell_info.decor_types')"
                       :size="cellBadgeSize"
                       :max-display="3"
+                      :compact="mapZoom < 18"
                     />
                   </div>
                 </LIcon>
@@ -357,7 +358,7 @@
 
       <!-- [NEW] Scanner Prediction Panel -->
       <ScannerPanel 
-        v-if="isScannerMode && scannerPinLocation"
+        v-if="isScannerMode && scannerPinLocation && !showPanel && !showDecorSelector && !isSingleMode"
         :show="isScannerMode && scannerPinLocation !== null"
         :predicted-decors="scannerPredictedRules"
         :is-calculating="isScannerCalculating"
@@ -377,34 +378,32 @@
       <button
         v-if="!showPanel && !showDecorSelector"
         @click="showPanel = true"
-        class="absolute top-3 md:top-4 left-3 md:left-4 bg-white rounded-xl p-2.5 md:p-3 shadow-lg hover:shadow-xl active:scale-95 transition-all z-[1000] border border-gray-200"
+        class="map-floating-control map-filter-toggle absolute z-[1000]"
         :title="$t('map.panel.show')"
       >
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 md:h-6 md:w-6 text-emerald-600" viewBox="0 0 20 20" fill="currentColor">
-          <path d="M3 3a1 1 0 000 2h11a1 1 0 100-2H3zM3 7a1 1 0 000 2h5a1 1 0 000-2H3zM3 11a1 1 0 100 2h4a1 1 0 100-2H3zM13 16a1 1 0 102 0v-5.586l1.293 1.293a1 1 0 001.414-1.414l-3-3a1 1 0 00-1.414 0l-3 3a1 1 0 101.414 1.414L13 10.414V16z" />
-        </svg>
+        <Icon name="lucide:list-filter" class="h-5 w-5" />
+        <span class="hidden md:inline">{{ $t('map.panel.title') }}</span>
       </button>
 
       <!-- UI 控制按鈕組 (Mobile-Optimized) -->
-      <div class="absolute top-3 md:top-4 right-3 md:right-4 flex flex-row gap-2 z-[1002]">
-        <div class="flex h-10 bg-white rounded-xl shadow-lg border border-gray-200 p-1 gap-1">
+      <nav class="map-mode-switch absolute z-[1002]" aria-label="地圖顯示模式">
+        <div class="map-mode-switch-inner">
           <!-- 網格模式按鈕 -->
           <div class="relative group h-full">
             <button
               @click="viewMode = 'grid'"
+              :aria-pressed="isGridMode"
               :class="[
-                'flex items-center gap-1.5 px-3 h-full rounded-lg text-sm font-medium transition-all',
-                isGridMode ? 'bg-emerald-500 text-white shadow-sm' : 'text-gray-500 hover:bg-gray-50'
+                'map-mode-button',
+                isGridMode ? 'is-active' : ''
               ]"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM14 5a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM4 15a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1v-4zM14 15a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z" />
-              </svg>
+              <Icon name="lucide:grid-2x2" class="h-[18px] w-[18px]" />
               <span class="hidden md:inline">{{ $t('map.modes.grid') }}</span>
             </button>
             
             <!-- 網格模式 Tooltip -->
-             <div class="absolute right-0 top-full mt-2 w-64 bg-gray-900 text-white text-xs rounded-xl p-3 shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-[2000] pointer-events-none translate-y-2 group-hover:translate-y-0">
+             <div class="hidden md:block absolute right-0 top-full mt-2 w-64 bg-gray-900 text-white text-xs rounded-xl p-3 shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-[2000] pointer-events-none translate-y-2 group-hover:translate-y-0">
               <div class="font-bold mb-2 text-emerald-300">網格模式 (Grid Mode)</div>
               <div class="flex gap-3 mb-2">
                 <div class="w-16 h-16 bg-emerald-900/50 border border-emerald-500/30 rounded grid grid-cols-2 gap-px p-px">
@@ -426,19 +425,17 @@
           <div class="relative group h-full">
             <button
               @click="viewMode = 'pin'"
+              :aria-pressed="isPinMode"
               :class="[
-                'flex items-center gap-1.5 px-3 h-full rounded-lg text-sm font-medium transition-all',
-                isPinMode ? 'bg-blue-500 text-white shadow-sm' : 'text-gray-500 hover:bg-gray-50'
+                'map-mode-button',
+                isPinMode ? 'is-active' : ''
               ]"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-              </svg>
+              <Icon name="lucide:map-pin" class="h-[18px] w-[18px]" />
               <span class="hidden md:inline">{{ $t('map.modes.pin') }}</span>
             </button>
              <!-- 標記模式 Tooltip -->
-            <div class="absolute right-0 top-full mt-2 w-64 bg-gray-900 text-white text-xs rounded-xl p-3 shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-[2000] pointer-events-none translate-y-2 group-hover:translate-y-0">
+            <div class="hidden md:block absolute right-0 top-full mt-2 w-64 bg-gray-900 text-white text-xs rounded-xl p-3 shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-[2000] pointer-events-none translate-y-2 group-hover:translate-y-0">
               <div class="font-bold mb-2 text-blue-300">標記模式 (Pin Mode)</div>
               <div class="flex gap-3 mb-2">
                 <div class="w-16 h-16 bg-blue-900/50 border border-blue-500/30 rounded flex items-center justify-center">
@@ -460,10 +457,12 @@
           <div class="relative group h-full">
             <button
               @click="toggleSingleTypeCells"
-              class="flex items-center gap-1.5 px-3 h-full rounded-lg text-sm font-medium transition-all"
-              :class="isSingleMode ? 'bg-emerald-600 text-white shadow-sm' : 'text-gray-500 hover:bg-gray-50'"
+              class="map-mode-button"
+              :class="{ 'is-active': isSingleMode }"
+              :aria-pressed="isSingleMode"
             >
-              <span class="md:hidden font-bold text-xs">{{ $t('map.modes.pure') }}</span>
+              <Icon name="lucide:scan-search" class="hidden md:block h-[18px] w-[18px]" />
+              <span class="md:hidden text-xs">{{ $t('map.modes.pure') }}</span>
               <span class="hidden md:inline">{{ $t('map.modes.pure') }}</span>
             </button>
             
@@ -498,7 +497,7 @@
             </Transition>
           </div>
         </div>
-      </div>
+      </nav>
 
 
       
@@ -513,9 +512,9 @@
       >
         <div 
           v-if="isSingleMode && !showPureModeHint && showPureModeExplanation"
-          class="absolute top-20 md:top-24 left-1/2 -translate-x-1/2 z-[990] max-w-[65vw] md:max-w-md w-full"
+          class="map-pure-explanation absolute left-1/2 z-[990] w-full -translate-x-1/2"
         >
-          <div class="bg-white/90 backdrop-blur-sm rounded-xl p-3 shadow-lg border border-emerald-200 flex items-start gap-3">
+          <div class="map-pure-explanation-card flex items-start gap-3">
             <div class="bg-emerald-100 p-1.5 rounded-full shrink-0">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -577,7 +576,7 @@
       >
         <div 
           v-if="showSearchResult"
-          class="absolute top-28 md:top-32 left-1/2 -translate-x-1/2 bg-white rounded-xl px-4 py-2 shadow-lg z-[1000] border border-emerald-200"
+          class="map-result-toast absolute left-1/2 z-[1000] -translate-x-1/2"
         >
           <span class="text-sm text-emerald-600 font-medium inline-flex items-center gap-1.5">
             <Icon name="lucide:check-circle" class="w-4 h-4" /> 找到 {{ fetchedPoints.length }} 個飾品地點！
@@ -598,7 +597,7 @@
       >
         <div
           v-if="isSingleMode && (isSingleTypeCellsLoading || isSingleTypeCellsRendering)"
-          class="absolute top-16 left-1/2 -translate-x-1/2 bg-white rounded-full px-3 py-1.5 shadow-md z-[1000] border border-emerald-200 text-xs text-emerald-700 flex items-center gap-2"
+          class="map-loading-toast absolute left-1/2 z-[1000] flex -translate-x-1/2 items-center gap-2"
         >
           <svg class="animate-spin w-3.5 h-3.5 text-emerald-500" viewBox="0 0 24 24" fill="none"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" /><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
           <span>純種區載入中…</span>
@@ -617,7 +616,7 @@
       >
         <div
           v-if="showGridZoomWarning && isGridMode"
-          class="absolute bottom-20 left-1/2 -translate-x-1/2 bg-gray-900/90 text-white rounded-full px-4 py-2 shadow-xl z-[1000] backdrop-blur-sm border border-gray-700 flex items-center gap-2"
+          class="map-zoom-toast absolute bottom-20 left-1/2 z-[1000] flex -translate-x-1/2 items-center gap-2"
         >
           <Icon name="lucide:zoom-in" class="w-5 h-5 text-blue-400" />
           <div class="flex flex-col">
@@ -854,13 +853,14 @@ const isSingleMode = computed(() => viewMode.value === 'single');
 // S2 Grid L17 visibility: zoom >= 17 to prevent extreme lag from 4000+ polygons
 const canRenderGrid = computed(() => mapZoom.value >= 17);
 const badgeCells = computed(() => (isSingleMode.value ? singleTypeCellsInView.value : s2Cells.value));
-// Computed property for grid cells to ensure they only render in Grid Mode (not Single Mode residue)
-// Computed property for grid cells to ensure they render in both Grid and Single Mode (but not mixed inappropriately)
-const displayedGridCells = computed(() => {
-  if (isGridMode.value) return s2Cells.value;
-  if (isSingleMode.value) return singleTypeCellsInView.value;
-  return [];
-});
+// 純種格由下方專用 LPolygon layer 繪製；這裡只提供一般網格，
+// 避免同一批純種格在縮放後被 Leaflet 重複掛載兩次。
+const displayedGridCells = computed(() =>
+  isGridMode.value ? s2Cells.value : [],
+);
+const activePredictionCells = computed(() =>
+  isSingleMode.value ? singleTypeCellsInView.value : displayedGridCells.value,
+);
 const isModeTransitioning = ref(false);
 
 // Pure Mode Hint State
@@ -920,7 +920,7 @@ const fetchedPoints = shallowRef<POIPoint[]>([]);
 const calculateEffectiveRadarPrediction = (scannerLat: number, scannerLng: number, radius: number = 100): Set<string> => {
     const detectedDecors = new Set<string>();
 
-    displayedGridCells.value.forEach(cell => {
+    activePredictionCells.value.forEach(cell => {
         if (!cell.center) return;
         const distance = calculateDistance(scannerLat, scannerLng, cell.center.lat, cell.center.lng);
         if (distance > radius) return;
@@ -1498,7 +1498,8 @@ const handleSearch = async () => {
   if (abortController) {
     abortController.abort();
   }
-  abortController = new AbortController();
+  const requestController = new AbortController();
+  abortController = requestController;
   currentAttempt.value = 0;
   hasSearched.value = true;
 
@@ -1510,7 +1511,7 @@ const handleSearch = async () => {
     const points = await fetchPOIs(
       currentBounds, 
       selectedRules, 
-      abortController.signal
+      requestController.signal
     );
     
     debugMap('[Map] Received', points.length, 'points');
@@ -1536,8 +1537,10 @@ const handleSearch = async () => {
       console.error('[Map] Search failed:', err);
     }
   } finally {
-    abortController = null;
-    currentAttempt.value = 0;
+    if (abortController === requestController) {
+      abortController = null;
+      currentAttempt.value = 0;
+    }
     if (isSingleMode.value) {
       updateSingleTypeCellsInView();
     }
@@ -2006,4 +2009,253 @@ onUnmounted(() => {
 
 .size-xs .decor-icon-img { width: 14px; height: 14px; }
 .size-xs .decor-icon-emoji { font-size: 11px; }
+
+.map-page {
+  height: 100%;
+  min-height: 0;
+  isolation: isolate;
+  border-radius: 1rem;
+  background: rgb(226 235 232);
+  box-shadow: 0 12px 32px rgba(15, 23, 42, 0.08);
+}
+
+.map-canvas {
+  min-height: 100%;
+  border-radius: inherit;
+  background: rgb(226 235 232);
+}
+
+.map-floating-control,
+.map-mode-switch-inner {
+  border: 1px solid rgba(148, 163, 184, 0.28);
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow:
+    0 8px 22px rgba(15, 23, 42, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+.map-floating-control {
+  top: 0.75rem;
+  left: 0.75rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2.75rem;
+  height: 2.75rem;
+  gap: 0.45rem;
+  padding-inline: 0.75rem;
+  border-radius: 0.75rem;
+  color: rgb(15 118 110);
+  font-size: 0.78rem;
+  font-weight: 800;
+  transition:
+    color 160ms ease,
+    border-color 160ms ease,
+    background 160ms ease,
+    box-shadow 160ms ease,
+    transform 120ms ease;
+}
+
+.map-floating-control:hover,
+.map-floating-control:focus-visible {
+  border-color: rgba(13, 148, 136, 0.42);
+  background: rgb(255 255 255);
+  box-shadow: 0 10px 26px rgba(15, 118, 110, 0.13);
+  outline: none;
+}
+
+.map-floating-control:active {
+  transform: scale(0.97);
+}
+
+.map-mode-switch {
+  top: 0.75rem;
+  right: 0.75rem;
+}
+
+.map-mode-switch-inner {
+  display: flex;
+  height: 2.75rem;
+  gap: 0.2rem;
+  padding: 0.22rem;
+  border-radius: 0.8rem;
+}
+
+.map-mode-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  min-width: 2.4rem;
+  gap: 0.38rem;
+  padding-inline: 0.72rem;
+  border-radius: 0.58rem;
+  color: rgb(100 116 139);
+  font-size: 0.78rem;
+  font-weight: 760;
+  white-space: nowrap;
+  transition:
+    color 160ms ease,
+    background 160ms ease,
+    box-shadow 160ms ease,
+    transform 120ms ease;
+}
+
+.map-mode-button:hover,
+.map-mode-button:focus-visible {
+  background: rgb(241 245 249);
+  color: rgb(15 118 110);
+  outline: none;
+}
+
+.map-mode-button:active {
+  transform: scale(0.96);
+}
+
+.map-mode-button.is-active {
+  background: rgb(15 118 110);
+  color: white;
+  box-shadow: 0 4px 10px rgba(15, 118, 110, 0.22);
+}
+
+.map-pure-explanation {
+  top: 5rem;
+  max-width: min(28rem, calc(100vw - 2rem));
+}
+
+.map-pure-explanation-card {
+  padding: 0.82rem 0.9rem;
+  border: 1px solid rgba(13, 148, 136, 0.3);
+  border-radius: 0.82rem;
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: 0 10px 26px rgba(15, 23, 42, 0.11);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+.map-result-toast,
+.map-loading-toast {
+  top: 6.75rem;
+  max-width: calc(100vw - 2rem);
+  padding: 0.55rem 0.78rem;
+  border: 1px solid rgba(13, 148, 136, 0.28);
+  border-radius: 0.72rem;
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.09);
+  white-space: nowrap;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.map-zoom-toast {
+  max-width: calc(100vw - 2rem);
+  padding: 0.62rem 0.82rem;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 0.78rem;
+  background: rgba(15, 23, 42, 0.9);
+  color: white;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.2);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+:deep(.leaflet-container) {
+  background: rgb(226 235 232);
+  font-family: inherit;
+}
+
+:deep(.leaflet-control-zoom) {
+  overflow: hidden;
+  border: 1px solid rgba(148, 163, 184, 0.32);
+  border-radius: 0.72rem;
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.1);
+}
+
+:deep(.leaflet-control-zoom a) {
+  width: 2.25rem;
+  height: 2.25rem;
+  border-color: rgba(148, 163, 184, 0.2);
+  background: rgba(255, 255, 255, 0.94);
+  color: rgb(51 65 85);
+  line-height: 2.15rem;
+}
+
+:deep(.leaflet-control-zoom a:hover),
+:deep(.leaflet-control-zoom a:focus) {
+  background: rgb(240 253 250);
+  color: rgb(15 118 110);
+}
+
+:deep(.leaflet-control-attribution) {
+  border-radius: 0.38rem 0 0 0;
+  background: rgba(255, 255, 255, 0.76);
+  color: rgb(100 116 139);
+  font-size: 0.62rem;
+  backdrop-filter: blur(8px);
+}
+
+@media (max-width: 767px) {
+  .map-page {
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  .map-canvas {
+    border-radius: 0;
+  }
+
+  .map-mode-switch {
+    top: 0.7rem;
+    right: 0.7rem;
+  }
+
+  .map-mode-switch-inner {
+    height: 2.65rem;
+  }
+
+  .map-mode-button {
+    min-width: 2.35rem;
+    padding-inline: 0.58rem;
+  }
+
+  .map-floating-control {
+    top: 0.7rem;
+    left: 0.7rem;
+    width: 2.65rem;
+    min-width: 2.65rem;
+    height: 2.65rem;
+    padding: 0;
+  }
+
+  .map-pure-explanation {
+    top: 4.65rem;
+    max-width: calc(100vw - 1.5rem);
+  }
+
+  .map-pure-explanation-card {
+    max-height: 9.5rem;
+    overflow-y: auto;
+    padding: 0.72rem 0.78rem;
+  }
+
+  .map-result-toast,
+  .map-loading-toast {
+    top: 6.15rem;
+    font-size: 0.75rem;
+  }
+
+  .map-zoom-toast {
+    bottom: 1rem;
+    width: max-content;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .map-mode-button,
+  .map-floating-control {
+    transition-duration: 0.01ms;
+  }
+}
 </style>

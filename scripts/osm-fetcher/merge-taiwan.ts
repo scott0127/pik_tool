@@ -45,11 +45,25 @@ interface TileIndexEntry {
 }
 
 interface RegionIndex {
+  version: string;
   regionId: string;
   regionName: string;
+  generatedAt: string;
   bbox: BoundingBox;
   tileGridSize: number;
   tiles: TileIndexEntry[];
+  source: SourceManifest | null;
+}
+
+interface SourceManifest {
+  parserVersion: string;
+  parsedAt: string;
+  sourcePbf: {
+    fileName: string;
+    sizeBytes: number;
+    lastModifiedAt: string;
+  };
+  decorRuleSetSha256: string;
 }
 
 interface MergeStats {
@@ -76,6 +90,39 @@ const OUTPUT_DIR = process.env.OSM_OUTPUT_DIR || join(__dirname, `../../public/d
 const TILES_DIR = join(OUTPUT_DIR, 'tiles');
 const SINGLE_DIR = join(OUTPUT_DIR, 'single');
 const TMP_BUCKET_DIR = join(OUTPUT_DIR, '.tmp_tile_buckets');
+
+function readSourceManifest(): SourceManifest | null {
+  const statsPath = join(CHUNKS_DIR, 'parse-stats.json');
+  if (!existsSync(statsPath)) return null;
+
+  try {
+    const stats = JSON.parse(readFileSync(statsPath, 'utf-8'));
+    if (
+      !stats?.version ||
+      !stats?.generatedAt ||
+      !stats?.sourcePbf?.fileName ||
+      typeof stats?.sourcePbf?.sizeBytes !== 'number' ||
+      !stats?.sourcePbf?.lastModifiedAt ||
+      !stats?.decorRuleSetSha256
+    ) {
+      return null;
+    }
+
+    return {
+      parserVersion: String(stats.version),
+      parsedAt: String(stats.generatedAt),
+      sourcePbf: {
+        fileName: String(stats.sourcePbf.fileName),
+        sizeBytes: Number(stats.sourcePbf.sizeBytes),
+        lastModifiedAt: String(stats.sourcePbf.lastModifiedAt),
+      },
+      decorRuleSetSha256: String(stats.decorRuleSetSha256),
+    };
+  } catch (error) {
+    console.warn(`⚠️ 無法讀取 OSM 來源追蹤資訊: ${statsPath}`, error);
+    return null;
+  }
+}
 
 function splitBboxToGrid(bbox: BoundingBox, gridSize: number): BoundingBox[] {
   const { north, south, east, west } = bbox;
@@ -241,6 +288,8 @@ function writePerTypeSingleCells(cellTypes: Map<string, NullableDecor>, singleDi
 
 async function main() {
   const region = REGION;
+  const generatedAt = new Date().toISOString();
+  const sourceManifest = readSourceManifest();
   const tileBboxes = splitBboxToGrid(region.bbox, FRONTEND_GRID);
 
   console.log(`📦 Region: ${region.id}`);
@@ -297,6 +346,11 @@ async function main() {
     for (const feat of chunkFeatures) {
       stats.totalParsed++;
 
+      if (seenIds.has(feat.id)) {
+        stats.duplicateSkipped++;
+        continue;
+      }
+
       const tileBuckets = new Map<number, [number, number][]>();
 
       for (const pt of feat.pts) {
@@ -321,28 +375,18 @@ async function main() {
           tileBuckets.set(index, arr);
         }
         arr.push(pt);
-
-        const cellId = getCellId(lat, lon, S2_LEVEL);
-        updateCellType(cellTypes, cellId, feat.t);
       }
 
-      if (seenIds.has(feat.id)) {
-        // Wait! In parse-taiwan, features are grouped by ID before writing to chunk.
-        // But what if it appears in multiple chunks? Then seenIds would block it.
-        // But parse-taiwan puts the whole feature in ONE chunk (the chunk of its first point).
-        // So a feature ID is unique across chunks anyway!
-        // But let's skip the seenIds check for now or apply it per feature.
-      }
-      
       if (tileBuckets.size === 0) continue;
-      
-      if (seenIds.has(feat.id)) {
-        stats.duplicateSkipped++;
-        continue;
-      }
       seenIds.add(feat.id);
 
+      let acceptedPointCount = 0;
       for (const [index, pts] of tileBuckets.entries()) {
+        for (const [lat, lon] of pts) {
+          updateCellType(cellTypes, getCellId(lat, lon, S2_LEVEL), feat.t);
+          acceptedPointCount++;
+        }
+
         const partialFeat: CompressedFeature = {
           id: feat.id,
           t: feat.t,
@@ -354,7 +398,7 @@ async function main() {
 
       stats.totalDeduplicated++;
       acceptedInFile++;
-      stats.poiCountByType[feat.t] = (stats.poiCountByType[feat.t] || 0) + feat.pts.length;
+      stats.poiCountByType[feat.t] = (stats.poiCountByType[feat.t] || 0) + acceptedPointCount;
     }
 
     console.log(`  ${file}: +${chunkFeatures.length.toLocaleString()} parsed, +${acceptedInFile.toLocaleString()} accepted, total accepted ${stats.totalDeduplicated.toLocaleString()}`);
@@ -384,11 +428,14 @@ async function main() {
   }
 
   const index: RegionIndex = {
+    version: '3.0.0',
     regionId: region.id,
     regionName: region.name,
+    generatedAt,
     bbox: region.bbox,
     tileGridSize: FRONTEND_GRID,
     tiles: indexEntries,
+    source: sourceManifest,
   };
 
   writeFileSync(join(OUTPUT_DIR, 'index.json'), JSON.stringify(index), 'utf-8');
@@ -405,9 +452,10 @@ async function main() {
 
   const statsPath = join(OUTPUT_DIR, 'merge-stats.json');
   writeFileSync(statsPath, JSON.stringify({
-    version: '2.0.0',
+    version: '3.0.0',
     regionId: region.id,
-    generatedAt: new Date().toISOString(),
+    generatedAt,
+    source: sourceManifest,
     chunksDir: CHUNKS_DIR,
     outputDir: OUTPUT_DIR,
     frontendGrid: FRONTEND_GRID,

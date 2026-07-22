@@ -9,19 +9,15 @@
   >
     <div
       v-if="show"
-      class="fixed bottom-0 left-0 w-full z-[2000] p-4 md:bottom-6 md:left-1/2 md:-translate-x-1/2 md:w-auto md:min-w-[400px]"
+      class="scanner-panel-wrap fixed left-0 w-full z-[2000] p-4 md:left-1/2 md:-translate-x-1/2 md:w-auto md:min-w-[400px]"
     >
       <div 
-        class="bg-white/80 backdrop-blur-xl border border-white/40 shadow-[0_8px_32px_rgba(0,0,0,0.12)] rounded-3xl p-5 overflow-hidden relative"
+        class="scanner-panel-card p-5 overflow-hidden relative"
       >
-        <!-- Background decorative elements -->
-        <div class="absolute -top-20 -right-20 w-40 h-40 bg-blue-400 rounded-full blur-3xl opacity-20 pointer-events-none"></div>
-        <div class="absolute -bottom-20 -left-20 w-40 h-40 bg-emerald-400 rounded-full blur-3xl opacity-20 pointer-events-none"></div>
-
         <!-- Header -->
         <div class="flex items-center justify-between mb-4 relative z-10">
           <div class="flex items-center gap-2">
-            <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center">
+            <div class="scanner-panel-mark w-8 h-8 flex items-center justify-center">
               <Icon name="lucide:radar" class="w-4 h-4" />
             </div>
             <div>
@@ -32,7 +28,7 @@
           
           <button 
             @click="$emit('close')"
-            class="w-8 h-8 rounded-full bg-gray-100 text-gray-500 flex items-center justify-center hover:bg-gray-200 hover:text-gray-700 transition-colors active:scale-95"
+            class="scanner-panel-close w-8 h-8 flex items-center justify-center transition-colors active:scale-95"
           >
             <Icon name="lucide:x" class="h-4 w-4" />
           </button>
@@ -68,7 +64,7 @@
                   <div 
                     v-for="decor in displayedDecors" 
                     :key="decor.id"
-                    class="flex flex-col items-center justify-center w-[60px] h-[68px] bg-white rounded-2xl shadow-sm border border-gray-100 hover:shadow-md hover:-translate-y-1 transition-all"
+                    class="scanner-result-tile flex flex-col items-center justify-center w-[60px] h-[68px] transition-all"
                   >
                     <Icon v-if="decor.iconName" :name="decor.iconName" class="w-7 h-7 mb-1 drop-shadow-sm" />
                     <span v-else class="text-2xl mb-1 drop-shadow-sm">{{ decor.icon }}</span>
@@ -80,7 +76,7 @@
                 <button 
                   v-if="hasMore && !isExpanded" 
                   @click="isExpanded = true"
-                  class="flex flex-col items-center justify-center w-[60px] h-[68px] bg-gray-50 hover:bg-gray-100 rounded-2xl border border-gray-100 shadow-inner transition-colors active:scale-95"
+                  class="scanner-result-tile flex flex-col items-center justify-center w-[60px] h-[68px] transition-colors active:scale-95"
                 >
                   <span class="text-sm font-bold text-gray-400">+{{ overflowCount }}</span>
                 </button>
@@ -88,15 +84,15 @@
                 <button 
                   v-if="hasMore && isExpanded" 
                   @click="isExpanded = false"
-                  class="flex flex-col items-center justify-center w-[60px] h-[68px] bg-gray-50 hover:bg-gray-100 rounded-2xl border border-gray-100 shadow-inner transition-colors active:scale-95"
+                  class="scanner-result-tile flex flex-col items-center justify-center w-[60px] h-[68px] transition-colors active:scale-95"
                 >
                   <span class="text-xs font-bold text-gray-400 leading-tight">收合<br>顯示</span>
                 </button>
              </div>
 
-             <div class="bg-blue-50 border border-blue-100 rounded-xl p-2.5 flex items-start gap-2">
-                <Icon name="lucide:info" class="w-4 h-4 text-blue-500 mt-0.5 shrink-0" />
-                <p class="text-xs text-blue-700 leading-relaxed font-medium">
+             <div class="scanner-info-note p-2.5 flex items-start gap-2">
+                <Icon name="lucide:info" class="w-4 h-4 text-teal-600 mt-0.5 shrink-0" />
+                <p class="text-xs text-teal-800 leading-relaxed font-medium">
                   真實遊戲通常只會顯示最多 6 種圖示。使用雷達必定會出現在清單中顯示的其中一種飾品。
                 </p>
              </div>
@@ -136,3 +132,84 @@ const hasMore = computed(() => props.predictedDecors.length > MAX_DISPLAY);
 const overflowCount = computed(() => props.predictedDecors.length - MAX_DISPLAY);
 
 </script>
+
+<style scoped>
+.scanner-panel-wrap {
+  bottom: 0;
+  padding-bottom: max(1rem, env(safe-area-inset-bottom));
+}
+
+.scanner-panel-card {
+  border: 1px solid rgba(148, 163, 184, 0.26);
+  border-radius: 1rem;
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow:
+    0 18px 44px rgba(15, 23, 42, 0.16),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+.scanner-panel-mark {
+  border: 1px solid rgba(13, 148, 136, 0.2);
+  border-radius: 0.62rem;
+  background: rgb(240 253 250);
+  color: rgb(15 118 110);
+}
+
+.scanner-panel-close {
+  border-radius: 0.58rem;
+  background: rgb(248 250 252);
+  color: rgb(100 116 139);
+}
+
+.scanner-panel-close:hover,
+.scanner-panel-close:focus-visible {
+  background: rgb(241 245 249);
+  color: rgb(15 118 110);
+  outline: none;
+}
+
+.scanner-result-tile {
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  border-radius: 0.72rem;
+  background: rgb(255 255 255);
+  box-shadow: 0 3px 9px rgba(15, 23, 42, 0.045);
+}
+
+.scanner-result-tile:hover,
+.scanner-result-tile:focus-visible {
+  border-color: rgba(20, 184, 166, 0.34);
+  background: rgb(240 253 250);
+  box-shadow: 0 7px 16px rgba(15, 118, 110, 0.08);
+  outline: none;
+}
+
+.scanner-info-note {
+  border: 1px solid rgba(20, 184, 166, 0.2);
+  border-radius: 0.68rem;
+  background: rgb(240 253 250 / 0.72);
+}
+
+@media (min-width: 768px) {
+  .scanner-panel-wrap {
+    bottom: 1rem;
+  }
+}
+
+@media (max-width: 767px) {
+  .scanner-panel-wrap {
+    padding-inline: 0.7rem;
+  }
+
+  .scanner-panel-card {
+    padding: 0.9rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scanner-result-tile {
+    transition-duration: 0.01ms;
+  }
+}
+</style>

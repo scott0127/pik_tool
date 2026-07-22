@@ -10,17 +10,15 @@
     <div
       v-if="showPanel"
       :class="[
-        'absolute overflow-hidden flex flex-col z-[1000]',
-        'bg-white/90 backdrop-blur-2xl shadow-[0_8px_40px_rgba(0,0,0,0.12)]',
-        'border border-white/70',
+        'map-filter-sheet absolute overflow-hidden flex flex-col z-[1000]',
         isMobile 
-          ? 'left-0 right-0 bottom-0 max-h-[70vh] rounded-t-3xl' 
-          : 'top-4 left-4 bottom-4 w-80 rounded-2xl'
+          ? 'map-filter-sheet-mobile left-0 right-0 bottom-0'
+          : 'map-filter-sheet-desktop'
       ]"
     >
       <!-- 標題列 -->
       <div 
-        class="relative px-4 py-3 md:px-5 md:py-4 flex items-center justify-between touch-none shrink-0"
+        class="map-filter-header relative px-4 py-3 md:px-5 md:py-4 flex items-center justify-between touch-none shrink-0"
         @touchstart="handleTouchStart"
         @touchmove="handleTouchMove"
         @touchend="handleTouchEnd"
@@ -31,7 +29,7 @@
         ></div>
         
         <div class="flex items-center gap-3 mt-1 md:mt-0">
-          <div class="w-9 h-9 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-xl flex items-center justify-center shadow-md shadow-emerald-200/50">
+          <div class="map-filter-mark w-9 h-9 flex items-center justify-center">
             <Icon name="lucide:map" class="w-[18px] h-[18px] text-white" />
           </div>
           <div>
@@ -41,7 +39,7 @@
         </div>
         <button
           @click="$emit('update:showPanel', false)"
-          class="w-8 h-8 flex items-center justify-center hover:bg-gray-100 rounded-xl transition-colors cursor-pointer"
+          class="map-filter-close w-8 h-8 flex items-center justify-center transition-colors cursor-pointer"
           :title="isMobile ? $t('map.panel.close') : $t('map.panel.hide')"
         >
           <Icon :name="isMobile ? 'lucide:x' : 'lucide:chevron-left'" class="h-4 w-4 text-gray-400" />
@@ -51,11 +49,11 @@
       <!-- 統計 + 操作 -->
       <div class="px-4 pb-3 md:px-5 md:pb-4 shrink-0">
         <div class="flex gap-2 mb-3">
-          <div class="flex-1 bg-emerald-50/80 rounded-xl px-3 py-2 border border-emerald-100/60">
+          <div class="map-filter-stat flex-1 px-3 py-2">
             <div class="text-[10px] text-emerald-600/70 font-medium mb-0.5">{{ $t('map.stats.selected') }}</div>
             <div class="text-lg font-bold text-emerald-600 tabular-nums leading-tight">{{ selectedFilters.length }}</div>
           </div>
-          <div class="flex-1 bg-teal-50/80 rounded-xl px-3 py-2 border border-teal-100/60">
+          <div class="map-filter-stat map-filter-stat-found flex-1 px-3 py-2">
             <div class="text-[10px] text-teal-600/70 font-medium mb-0.5">{{ $t('map.stats.found') }}</div>
             <div class="text-lg font-bold text-teal-600 tabular-nums leading-tight">
               {{ fetchedPoints.length }}
@@ -64,7 +62,7 @@
           </div>
         </div>
         
-        <div v-if="selectedFilters.length > 10" class="mb-3 px-3 py-2 rounded-xl bg-amber-50/80 text-amber-700 text-xs flex items-center gap-2 border border-amber-200/50">
+        <div v-if="selectedFilters.length > 10" class="map-filter-warning mb-3 px-3 py-2 text-xs flex items-center gap-2">
           <Icon name="lucide:alert-triangle" class="w-3.5 h-3.5 shrink-0 text-amber-500" />
           <span class="font-medium">{{ $t('map.stats.warning') }}</span>
         </div>
@@ -72,13 +70,13 @@
         <div class="flex gap-2">
           <button
             @click="selectAll"
-            class="flex-1 px-3 py-2 bg-emerald-500 hover:bg-emerald-600 active:scale-[0.97] text-white rounded-xl text-xs font-semibold transition-all cursor-pointer shadow-sm shadow-emerald-200/50"
+            class="map-panel-action map-panel-action-primary flex-1 px-3 py-2 text-xs font-semibold cursor-pointer"
           >
             {{ $t('map.stats.select_all') }}
           </button>
           <button
             @click="clearAll"
-            class="flex-1 px-3 py-2 bg-gray-100 hover:bg-gray-200 active:scale-[0.97] text-gray-600 rounded-xl text-xs font-semibold transition-all cursor-pointer"
+            class="map-panel-action map-panel-action-secondary flex-1 px-3 py-2 text-xs font-semibold cursor-pointer"
           >
             {{ $t('map.stats.clear') }}
           </button>
@@ -90,7 +88,7 @@
       <!-- 篩選列表 -->
       <div 
         :class="[
-          'flex-1 overflow-y-auto min-h-0',
+          'map-filter-list flex-1 overflow-y-auto min-h-0',
           isMobile ? 'p-2.5 grid grid-cols-2 gap-1.5 content-start auto-rows-min' : 'p-3 space-y-0.5'
         ]"
       >
@@ -100,10 +98,10 @@
           v-for="rule in decorRules"
           :key="rule.id"
           :class="[
-            'decor-chip relative flex items-center gap-2.5 cursor-pointer overflow-hidden rounded-xl transition-all duration-200 active:scale-[0.97]',
+            'map-filter-chip decor-chip relative flex items-center gap-2.5 cursor-pointer overflow-hidden rounded-xl transition-all duration-200 active:scale-[0.97]',
             'px-2.5 py-2',
             selectedFilters.includes(rule.id) 
-              ? 'bg-gradient-to-r from-emerald-50 to-teal-50/60 border border-emerald-300/50 shadow-sm' 
+              ? 'is-selected bg-emerald-50 border border-emerald-300/50 shadow-sm'
               : 'bg-white/70 border border-gray-100',
           ]"
         >
@@ -146,10 +144,10 @@
           v-for="rule in decorRules"
           :key="rule.id"
           :class="[
-            'decor-item relative flex items-center cursor-pointer transition-all duration-200 overflow-hidden group',
+            'map-filter-item decor-item relative flex items-center cursor-pointer transition-all duration-200 overflow-hidden group',
             'gap-3 px-3 py-2.5 rounded-xl',
             selectedFilters.includes(rule.id) 
-              ? 'bg-emerald-50/90 ring-1 ring-emerald-300/60' 
+              ? 'is-selected bg-emerald-50/90 ring-1 ring-emerald-300/60'
               : 'hover:bg-gray-50/80',
           ]"
         >
@@ -276,5 +274,195 @@ const handleTouchEnd = () => {
 
 .decor-chip {
   -webkit-tap-highlight-color: transparent;
+}
+
+.map-filter-sheet {
+  border: 1px solid rgba(148, 163, 184, 0.26);
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow:
+    0 18px 46px rgba(15, 23, 42, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+.map-filter-sheet-desktop {
+  top: 0.75rem;
+  bottom: 0.75rem;
+  left: 0.75rem;
+  width: 20.5rem;
+  border-radius: 1rem;
+}
+
+.map-filter-sheet-mobile {
+  max-height: min(64dvh, 35rem);
+  padding-bottom: env(safe-area-inset-bottom);
+  border-width: 1px 0 0;
+  border-radius: 1.15rem 1.15rem 0 0;
+}
+
+.map-filter-header {
+  border-bottom: 1px solid rgba(148, 163, 184, 0.16);
+}
+
+.map-filter-mark {
+  flex: 0 0 auto;
+  border: 1px solid rgba(13, 148, 136, 0.22);
+  border-radius: 0.68rem;
+  background: rgb(15 118 110);
+  color: white;
+  box-shadow: 0 6px 14px rgba(15, 118, 110, 0.18);
+}
+
+.map-filter-close {
+  border-radius: 0.6rem;
+  color: rgb(100 116 139);
+}
+
+.map-filter-close:hover,
+.map-filter-close:focus-visible {
+  background: rgb(241 245 249);
+  color: rgb(15 118 110);
+  outline: none;
+}
+
+.map-filter-stat {
+  border: 1px solid rgba(20, 184, 166, 0.18);
+  border-radius: 0.72rem;
+  background: rgb(240 253 250 / 0.74);
+}
+
+.map-filter-stat-found {
+  border-color: rgba(148, 163, 184, 0.2);
+  background: rgb(248 250 252 / 0.86);
+}
+
+.map-filter-warning {
+  border: 1px solid rgba(245, 158, 11, 0.28);
+  border-radius: 0.68rem;
+  background: rgb(255 251 235);
+  color: rgb(161 98 7);
+  line-height: 1.45;
+}
+
+.map-panel-action {
+  min-height: 2.35rem;
+  border-radius: 0.66rem;
+  transition:
+    color 150ms ease,
+    border-color 150ms ease,
+    background 150ms ease,
+    box-shadow 150ms ease,
+    transform 120ms ease;
+}
+
+.map-panel-action:focus-visible {
+  outline: 2px solid rgba(20, 184, 166, 0.35);
+  outline-offset: 2px;
+}
+
+.map-panel-action:active {
+  transform: scale(0.98);
+}
+
+.map-panel-action-primary {
+  border: 1px solid rgb(15 118 110);
+  background: rgb(15 118 110);
+  color: white;
+  box-shadow: 0 5px 12px rgba(15, 118, 110, 0.15);
+}
+
+.map-panel-action-primary:hover {
+  background: rgb(13 148 136);
+}
+
+.map-panel-action-secondary {
+  border: 1px solid rgba(148, 163, 184, 0.24);
+  background: rgb(248 250 252);
+  color: rgb(71 85 105);
+}
+
+.map-panel-action-secondary:hover {
+  background: rgb(241 245 249);
+  color: rgb(15 23 42);
+}
+
+.map-filter-list {
+  overscroll-behavior: contain;
+}
+
+.map-filter-chip,
+.map-filter-item {
+  min-width: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.map-filter-chip {
+  min-height: 2.8rem;
+  border-radius: 0.72rem;
+  background: rgba(255, 255, 255, 0.76);
+}
+
+.map-filter-chip.is-selected {
+  border-color: rgba(20, 184, 166, 0.34);
+  background: rgb(240 253 250);
+  box-shadow: 0 2px 7px rgba(15, 118, 110, 0.06);
+}
+
+.map-filter-chip:hover,
+.map-filter-chip:focus-within,
+.map-filter-item:hover,
+.map-filter-item:focus-within {
+  border-color: rgba(20, 184, 166, 0.34);
+  outline: none;
+}
+
+.map-filter-chip > div:nth-of-type(1) {
+  opacity: 0.05 !important;
+}
+
+.map-filter-item {
+  min-height: 2.55rem;
+  border: 1px solid transparent;
+  border-radius: 0.66rem;
+}
+
+.map-filter-item.is-selected {
+  border-color: rgba(20, 184, 166, 0.24);
+  box-shadow: none;
+}
+
+.map-filter-item > div:first-child {
+  opacity: 0.16;
+}
+
+@media (max-width: 767px) {
+  .map-filter-header {
+    padding-top: 1.05rem;
+    padding-bottom: 0.72rem;
+  }
+
+  .map-filter-list {
+    gap: 0.4rem;
+    padding: 0.65rem;
+  }
+
+  .map-filter-chip {
+    min-height: 2.9rem;
+    padding: 0.48rem 0.62rem;
+  }
+
+  .map-filter-chip > svg {
+    width: 1.65rem;
+    height: 1.65rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .map-filter-chip,
+  .map-filter-item,
+  .map-panel-action {
+    transition-duration: 0.01ms;
+  }
 }
 </style>

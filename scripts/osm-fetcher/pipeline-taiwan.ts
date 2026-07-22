@@ -1,30 +1,75 @@
 /**
- * 台灣本島 OSM 資料一鍵抓取管線
+ * 台灣本島 OSM 資料一鍵重建管線
  *
- * 自動執行七步驟：
+ * 自動執行八步驟：
  *   1. 清除舊資料 (chunks + progress)
- *   2. 抓取全台灣 OSM POI 資料 (fetch-taiwan.ts)
+ *   2. 解析指定的台灣 OSM PBF 資料 (parse-taiwan.ts)
  *   3. 合併至前端目錄 (merge-taiwan.ts)
  *   4. 重建 S2 單一飾品格索引 (build-s2-singletons.ts)
  *   5. 拆分 S2 單一飾品格索引為前端實際使用的小檔
  *   6. 對拆分檔做差量編碼，並移除 public 內的大型中繼檔
- *   7. 驗證高雄巨蛋 POI (verify-kaohsiung-arena.ts)
+ *   7. 驗證區域、tile 分割與 S2 編碼 (verify-spatial-output.ts)
+ *   8. 驗證高雄巨蛋 POI (verify-kaohsiung-arena.ts)
  *
  * 使用方式：
- *   npx tsx scripts/osm-fetcher/pipeline-taiwan.ts
+ *   pnpm exec tsx scripts/osm-fetcher/pipeline-taiwan.ts --pbf "C:\path\taiwan-latest.osm.pbf"
  *
  * 可選參數：
- *   --limit N       每次最多抓取 N 個 chunk（方便分批執行）
- *   --skip-clean    跳過清除步驟（斷點續傳模式）
- *   --skip-fetch    跳過抓取步驟（僅重新合併與驗證）
+ *   --skip-parse    使用既有 chunks，僅重新合併、建索引與驗證
+ *   --skip-fetch    --skip-parse 的舊名稱，保留相容性
  */
 
-import { execSync, spawn } from 'child_process';
-import { existsSync, readdirSync, readFileSync, unlinkSync, writeFileSync } from 'fs';
-import { join, dirname } from 'path';
+import { spawn } from 'child_process';
+import {
+  existsSync,
+  readFileSync,
+  readdirSync,
+  renameSync,
+  rmSync,
+  unlinkSync,
+} from 'fs';
+import { join, dirname, resolve as resolvePath } from 'path';
 import { fileURLToPath } from 'url';
+import { createRequire } from 'module';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
+const require = createRequire(import.meta.url);
+const tsxCliPath = require.resolve('tsx/cli');
+const TOTAL_STEPS = 8;
+const REGION_OUTPUT_DIR = join(__dirname, '../../public/data/regions/taiwan_main_island');
+const REGION_BACKUP_DIR = join(__dirname, '../../public/data/regions/taiwan_main_island.pipeline-backup');
+
+function recoverInterruptedOutputTransaction() {
+  if (!existsSync(REGION_BACKUP_DIR)) return;
+
+  if (existsSync(REGION_OUTPUT_DIR)) {
+    rmSync(REGION_OUTPUT_DIR, { recursive: true, force: true });
+  }
+  renameSync(REGION_BACKUP_DIR, REGION_OUTPUT_DIR);
+  console.log('♻️ 已還原上次中斷前的正式 OSM 區域資料');
+}
+
+function beginOutputTransaction() {
+  recoverInterruptedOutputTransaction();
+  if (existsSync(REGION_OUTPUT_DIR)) {
+    renameSync(REGION_OUTPUT_DIR, REGION_BACKUP_DIR);
+  }
+}
+
+function commitOutputTransaction() {
+  if (existsSync(REGION_BACKUP_DIR)) {
+    rmSync(REGION_BACKUP_DIR, { recursive: true, force: true });
+  }
+}
+
+function rollbackOutputTransaction() {
+  if (existsSync(REGION_OUTPUT_DIR)) {
+    rmSync(REGION_OUTPUT_DIR, { recursive: true, force: true });
+  }
+  if (existsSync(REGION_BACKUP_DIR)) {
+    renameSync(REGION_BACKUP_DIR, REGION_OUTPUT_DIR);
+  }
+}
 
 function getArgValue(args: string[], key: string): string | undefined {
   const index = args.indexOf(key);
@@ -36,17 +81,57 @@ function hasFlag(args: string[], key: string): boolean {
   return args.includes(key);
 }
 
-function runStep(stepNum: number, name: string, command: string): Promise<void> {
+function assertCurrentChunkProvenance(chunksDir: string) {
+  const statsPath = join(chunksDir, 'parse-stats.json');
+  if (!existsSync(statsPath)) {
+    throw new Error(`--skip-parse 需要可追溯的 chunks，但找不到 ${statsPath}`);
+  }
+
+  const stats = JSON.parse(readFileSync(statsPath, 'utf-8')) as {
+    version?: string;
+    sourcePbf?: {
+      fileName?: string;
+      sizeBytes?: number;
+      lastModifiedAt?: string;
+    };
+    decorRuleSetSha256?: string;
+  };
+
+  if (!stats.version?.startsWith('3.')) {
+    throw new Error(`--skip-parse 不接受舊版 chunks（目前 ${stats.version || 'missing'}，需要 3.x）`);
+  }
+  if (
+    !stats.sourcePbf?.fileName
+    || typeof stats.sourcePbf.sizeBytes !== 'number'
+    || !stats.sourcePbf.lastModifiedAt
+    || !stats.decorRuleSetSha256
+  ) {
+    throw new Error('--skip-parse 的 chunks 缺少 PBF 或 parser 來源追蹤資訊，請重新解析 PBF');
+  }
+}
+
+function formatCommand(command: string, args: string[]): string {
+  return [command, ...args]
+    .map(value => /\s/.test(value) ? JSON.stringify(value) : value)
+    .join(' ');
+}
+
+function runStep(
+  stepNum: number,
+  name: string,
+  command: string,
+  args: string[],
+): Promise<void> {
   return new Promise((resolve, reject) => {
     console.log(`\n${'='.repeat(60)}`);
-    console.log(`📌 步驟 ${stepNum}/7: ${name}`);
+    console.log(`📌 步驟 ${stepNum}/${TOTAL_STEPS}: ${name}`);
     console.log(`${'='.repeat(60)}\n`);
-    console.log(`> ${command}\n`);
+    console.log(`> ${formatCommand(command, args)}\n`);
 
     const startTime = Date.now();
 
-    const child = spawn(command, {
-      shell: true,
+    const child = spawn(command, args, {
+      shell: false,
       stdio: 'inherit',
       cwd: join(__dirname, '../..'),
     });
@@ -68,34 +153,55 @@ function runStep(stepNum: number, name: string, command: string): Promise<void> 
   });
 }
 
+function runTsxStep(
+  stepNum: number,
+  name: string,
+  scriptPath: string,
+  args: string[] = [],
+): Promise<void> {
+  return runStep(stepNum, name, process.execPath, [tsxCliPath, scriptPath, ...args]);
+}
+
 async function main() {
   const args = process.argv.slice(2);
-  const limit = getArgValue(args, '--limit');
-  const skipClean = hasFlag(args, '--skip-clean');
-  const skipFetch = hasFlag(args, '--skip-fetch');
+  const skipParse = hasFlag(args, '--skip-parse') || hasFlag(args, '--skip-fetch');
+  const pbfArgument = getArgValue(args, '--pbf') || process.env.OSM_PBF_PATH;
+  const pbfPath = pbfArgument ? resolvePath(pbfArgument) : null;
 
   const chunksDir = join(__dirname, '../../app/data/regions/taiwan_chunks');
-  const progressFile = join(chunksDir, 'progress.json');
+
+  if (!skipParse && !pbfPath) {
+    throw new Error('缺少 PBF 來源。請使用 --pbf "C:\\path\\taiwan-latest.osm.pbf" 或設定 OSM_PBF_PATH。');
+  }
+  if (!skipParse && pbfPath && !existsSync(pbfPath)) {
+    throw new Error(`找不到 PBF 檔案: ${pbfPath}`);
+  }
+  if (skipParse) {
+    assertCurrentChunkProvenance(chunksDir);
+  }
 
   console.log(`\n🚀 台灣本島 OSM 資料管線啟動`);
   console.log(`⏰ 開始時間: ${new Date().toLocaleString('zh-TW')}`);
-  if (limit) console.log(`📊 限制模式: 最多 ${limit} 個 chunk`);
-  if (skipClean) console.log(`⏭️  跳過清除步驟`);
-  if (skipFetch) console.log(`⏭️  跳過抓取步驟`);
+  if (pbfPath) console.log(`📦 PBF 來源: ${pbfPath}`);
+  if (skipParse) console.log(`⏭️  使用既有 chunks，跳過 PBF 解析`);
 
   const startTime = Date.now();
 
   // ============ 步驟 1：清除舊資料 ============
-  if (!skipClean && !skipFetch) {
+  if (!skipParse) {
     console.log(`\n${'='.repeat(60)}`);
-    console.log(`📌 步驟 1/5: 清除舊資料`);
+    console.log(`📌 步驟 1/${TOTAL_STEPS}: 清除舊資料`);
     console.log(`${'='.repeat(60)}\n`);
 
     if (existsSync(chunksDir)) {
       const files = readdirSync(chunksDir);
       let removedCount = 0;
       for (const file of files) {
-        if (file.startsWith('chunk_') || file === 'progress.json') {
+        if (
+          file.startsWith('chunk_')
+          || file === 'progress.json'
+          || file === 'parse-stats.json'
+        ) {
           unlinkSync(join(chunksDir, file));
           removedCount++;
         }
@@ -107,54 +213,47 @@ async function main() {
 
     console.log(`\n✅ 步驟 1 完成\n`);
   } else {
-    console.log(`\n⏭️  步驟 1 已跳過（${skipClean ? '--skip-clean' : '--skip-fetch'} 模式）`);
+    console.log(`\n⏭️  步驟 1 已跳過（--skip-parse 模式）`);
   }
 
-  if (!skipFetch) {
-    const limitArg = limit ? ` --limit ${limit}` : '';
-    await runStep(2, '解析本地 OSM 資料', `npx tsx scripts/osm-fetcher/parse-taiwan.ts "C:\\Users\\scott\\Downloads\\taiwan-260615.osm.pbf"${limitArg}`);
-
-    // 如果有 limit，檢查是否全部完成
-    if (limit && existsSync(progressFile)) {
-      const progress = JSON.parse(readFileSync(progressFile, 'utf-8'));
-      const totalChunks = 15 * 15; // 225
-      if (progress.completed.length < totalChunks) {
-        console.log(`\n⚠️  注意：僅完成 ${progress.completed.length}/${totalChunks} 個 chunk`);
-        console.log(`   請再次執行管線以繼續抓取剩餘 chunk（使用 --skip-clean 保留進度）`);
-        console.log(`   npx tsx scripts/osm-fetcher/pipeline-taiwan.ts --skip-clean${limit ? ` --limit ${limit}` : ''}`);
-
-        const elapsed = ((Date.now() - startTime) / 1000 / 60).toFixed(1);
-        console.log(`\n⏱️  本次管線耗時: ${elapsed} 分鐘`);
-        return;
-      }
-    }
+  if (!skipParse) {
+    await runTsxStep(
+      2,
+      '解析本地 OSM 資料',
+      'scripts/osm-fetcher/parse-taiwan.ts',
+      [pbfPath!],
+    );
   } else {
-    console.log(`\n⏭️  步驟 2 已跳過（--skip-fetch 模式）`);
+    console.log(`\n⏭️  步驟 2 已跳過（--skip-parse 模式）`);
   }
 
-  // ============ 步驟 3：合併至前端目錄 ============
-  await runStep(3, '合併資料至前端 Tiles', 'npx tsx scripts/osm-fetcher/merge-taiwan.ts');
-
-  // ============ 步驟 4：重建 S2 索引 ============
-  await runStep(4, '重建 S2 單一飾品格索引', 'npx tsx scripts/osm-fetcher/build-s2-singletons.ts');
-
-  // ============ 步驟 5：拆分 S2 索引 ============
-  await runStep(5, '拆分 S2 單一飾品格索引', 'node scripts/split-single-cells.cjs');
-
-  // ============ 步驟 6：差量編碼並移除大型中繼檔 ============
-  await runStep(6, '壓縮 S2 單一飾品格小檔', 'node scripts/encode-s2-cells.cjs');
-
-  const singleIndexFile = join(__dirname, '../../public/data/regions/taiwan_main_island/s2_l17_single.json');
-  if (existsSync(singleIndexFile)) {
-    unlinkSync(singleIndexFile);
-    console.log(`🧹 已移除 public 中不給前端直接讀取的大型中繼檔: ${singleIndexFile}`);
-  }
-
-  // ============ 步驟 7：驗證 ============
+  beginOutputTransaction();
   try {
-    await runStep(7, '驗證高雄巨蛋 POI', 'npx tsx scripts/osm-fetcher/verify-kaohsiung-arena.ts');
-  } catch {
-    console.log(`⚠️  驗證未通過，但管線已完成。請手動檢查資料。`);
+    // ============ 步驟 3：合併至前端目錄 ============
+    await runTsxStep(3, '合併資料至前端 Tiles', 'scripts/osm-fetcher/merge-taiwan.ts');
+
+    // ============ 步驟 4：重建 S2 索引 ============
+    await runTsxStep(4, '重建 S2 單一飾品格索引', 'scripts/osm-fetcher/build-s2-singletons.ts');
+
+    // ============ 步驟 5：拆分 S2 索引 ============
+    await runStep(5, '拆分 S2 單一飾品格索引', process.execPath, ['scripts/split-single-cells.cjs']);
+
+    // ============ 步驟 6：差量編碼並移除大型中繼檔 ============
+    await runStep(6, '壓縮 S2 單一飾品格小檔', process.execPath, ['scripts/encode-s2-cells.cjs']);
+
+    const singleIndexFile = join(REGION_OUTPUT_DIR, 's2_l17_single.json');
+    if (existsSync(singleIndexFile)) {
+      unlinkSync(singleIndexFile);
+      console.log(`🧹 已移除 public 中不給前端直接讀取的大型中繼檔: ${singleIndexFile}`);
+    }
+
+    // ============ 步驟 7-8：驗證 ============
+    await runTsxStep(7, '驗證 OSM 空間輸出', 'scripts/osm-fetcher/verify-spatial-output.ts');
+    await runTsxStep(8, '驗證高雄巨蛋 POI', 'scripts/osm-fetcher/verify-kaohsiung-arena.ts');
+    commitOutputTransaction();
+  } catch (error) {
+    rollbackOutputTransaction();
+    throw error;
   }
 
   // ============ 完成報告 ============

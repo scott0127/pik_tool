@@ -77,18 +77,24 @@
     </Transition>
 
     <!-- Main Content -->
-    <div v-show="isAppReady || isStandalonePage" class="relative z-10">
+    <div
+      v-show="isAppReady || isStandalonePage"
+      :class="[
+        'relative z-10',
+        isMapPage ? 'flex h-dvh flex-col overflow-hidden' : '',
+      ]"
+    >
       <AppHeader v-if="!isStandalonePage" />
 
       <main :class="mainClass">
         <NuxtPage />
       </main>
 
-      <AppFooter v-if="!isStandalonePage" />
+      <AppFooter v-if="!isStandalonePage && !isMapPage" />
     </div>
 
     <!-- Global Components -->
-    <GlobalAnnouncement v-if="!isStandalonePage" />
+    <GlobalAnnouncement v-if="!isStandalonePage && !isMapPage" />
     <PwaInstallPrompt v-if="!isStandalonePage" />
     <Toast
       v-if="currentToast && isShowingToast"
@@ -122,10 +128,13 @@ const isCheckingVersion = useState('isCheckingVersion', () => true);
 const isAppReady = computed(() => !isInitializing.value && !isCheckingVersion.value);
 const route = useRoute();
 const isStandalonePage = computed(() => route.meta.standalone === true);
+const isMapPage = computed(() => route.path === '/map');
 let appInitStarted = false;
 const mainClass = computed(() => {
   if (isStandalonePage.value) return 'w-full px-0 py-0';
-  return route.path === '/map' ? 'w-full px-0 py-0' : 'max-w-7xl mx-auto px-4 py-6';
+  return isMapPage.value
+    ? 'w-full min-h-0 flex-1 px-0 py-0'
+    : 'max-w-7xl mx-auto px-4 py-6';
 });
 
 const { t, locale } = useI18n();

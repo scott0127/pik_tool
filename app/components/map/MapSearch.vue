@@ -2,20 +2,15 @@
   <div>
     <!-- 地點搜尋欄 -->
     <div 
-      class="absolute top-3 md:top-4 left-16 right-48 md:right-auto md:w-80 transition-all duration-300 z-[1001]"
-      :class="panelVisible ? 'md:left-[22rem]' : 'md:left-16'"
+      class="map-search-wrap absolute z-[1001]"
+      :class="{ 'is-panel-visible': panelVisible }"
     >
       <div class="relative">
         <!-- 搜尋輸入框 -->
-        <div class="bg-white rounded-xl shadow-lg border border-gray-200 flex items-center overflow-hidden h-10">
+        <div class="map-search-field flex items-center overflow-hidden">
           <div class="pl-3 md:pl-4 text-gray-400">
-            <svg v-if="!isSearching" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 md:h-5 md:w-5" viewBox="0 0 20 20" fill="currentColor">
-              <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
-            </svg>
-            <svg v-else class="animate-spin h-4 w-4 md:h-5 md:w-5" viewBox="0 0 24 24">
-              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none" />
-              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-            </svg>
+            <Icon v-if="!isSearching" name="lucide:search" class="h-4 w-4 md:h-[18px] md:w-[18px]" />
+            <Icon v-else name="lucide:loader-circle" class="h-4 w-4 animate-spin md:h-[18px] md:w-[18px]" />
           </div>
           <input
             v-model="searchQuery"
@@ -24,17 +19,15 @@
             @keydown="handleSearchKeydown"
             type="text"
             :placeholder="$t('map.search.placeholder')"
-            class="flex-1 px-3 h-full text-sm md:text-base outline-none"
+            class="map-search-input flex-1 px-3 h-full outline-none"
           />
           <button
             v-if="searchQuery"
             @click="clearSearch"
-            class="pr-3 md:pr-4 text-gray-400 hover:text-gray-600 transition-colors"
+            class="map-search-clear mr-1.5 flex h-8 w-8 items-center justify-center text-gray-400 transition-colors"
             :title="$t('map.search.clear')"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 md:h-5 md:w-5" viewBox="0 0 20 20" fill="currentColor">
-              <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
-            </svg>
+            <Icon name="lucide:x" class="h-4 w-4" />
           </button>
         </div>
 
@@ -49,7 +42,7 @@
         >
           <div
             v-if="showSearchResults && (searchResults.length > 0 || searchError)"
-            class="absolute top-full mt-2 w-full bg-white rounded-xl shadow-2xl border border-gray-200 overflow-hidden max-h-80 overflow-y-auto"
+            class="map-search-results absolute top-full mt-2 w-full overflow-hidden max-h-80 overflow-y-auto"
           >
             <!-- 錯誤訊息 -->
             <div v-if="searchError" class="p-3 text-sm text-red-600 flex items-center gap-2">
@@ -64,8 +57,8 @@
                 :key="result.place_id"
                 @click="selectSearchResult(result)"
                 :class="[
-                  'w-full text-left px-3 md:px-4 py-2 md:py-3 hover:bg-emerald-50 transition-colors border-b border-gray-100 last:border-b-0',
-                  selectedResultIndex === index ? 'bg-emerald-50' : ''
+                  'map-search-result w-full text-left px-3 md:px-4 py-2 md:py-3 transition-colors border-b border-gray-100 last:border-b-0',
+                  selectedResultIndex === index ? 'is-active' : ''
                 ]"
               >
                 <div class="font-medium text-gray-800 text-sm md:text-base mb-1 line-clamp-1">
@@ -82,22 +75,20 @@
     </div>
 
     <!-- Top-Center: "Search This Area" Floating Pill -->
-    <div class="absolute top-20 left-1/2 -translate-x-1/2 z-[1000]">
+    <div class="map-search-area absolute left-1/2 -translate-x-1/2 z-[1000]">
       <button
         v-if="!isLoading && canSearchArea && hasSelectedFilters && !isSingleMode"
         @click="$emit('search-area')"
-        class="flex items-center h-10 gap-2 px-4 rounded-full shadow-xl bg-white text-emerald-600 font-bold border border-emerald-100 hover:scale-105 active:scale-95 transition-all"
+        class="map-search-area-button flex items-center gap-2 px-4 font-bold transition-all"
       >
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-          <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
-        </svg>
+        <Icon name="lucide:search" class="h-4 w-4" />
         <span>{{ $t('map.search.search_area') }}</span>
       </button>
 
       <!-- Loading State Pill -->
       <div
         v-else-if="isLoading"
-        class="flex items-center h-10 gap-2 px-4 rounded-full shadow-xl bg-white text-emerald-600 font-bold border border-emerald-100"
+        class="map-search-area-button flex items-center gap-2 px-4 font-bold"
       >
          <svg class="animate-spin h-4 w-4" viewBox="0 0 24 24">
           <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none" />
@@ -223,3 +214,148 @@ if (typeof window !== 'undefined') {
   });
 }
 </script>
+
+<style scoped>
+.map-search-wrap {
+  top: 0.75rem;
+  right: 12.15rem;
+  left: 4rem;
+  transition:
+    left 220ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    width 220ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.map-search-field,
+.map-search-results,
+.map-search-area-button {
+  border: 1px solid rgba(148, 163, 184, 0.28);
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow:
+    0 8px 22px rgba(15, 23, 42, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+.map-search-field {
+  height: 2.75rem;
+  border-radius: 0.78rem;
+}
+
+.map-search-field:focus-within {
+  border-color: rgba(13, 148, 136, 0.5);
+  box-shadow:
+    0 9px 24px rgba(15, 118, 110, 0.12),
+    0 0 0 3px rgba(20, 184, 166, 0.12);
+}
+
+.map-search-input {
+  min-width: 0;
+  background: transparent;
+  color: rgb(30 41 59);
+  font-size: 0.86rem;
+  font-weight: 650;
+}
+
+.map-search-input::placeholder {
+  color: rgb(148 163 184);
+  font-weight: 600;
+}
+
+.map-search-clear {
+  flex: 0 0 auto;
+  border-radius: 0.55rem;
+}
+
+.map-search-clear:hover,
+.map-search-clear:focus-visible {
+  background: rgb(241 245 249);
+  color: rgb(15 118 110);
+  outline: none;
+}
+
+.map-search-results {
+  border-radius: 0.78rem;
+}
+
+.map-search-result {
+  line-height: 1.35;
+}
+
+.map-search-result:hover,
+.map-search-result:focus-visible,
+.map-search-result.is-active {
+  background: rgb(240 253 250);
+  outline: none;
+}
+
+.map-search-area {
+  top: 4.75rem;
+}
+
+.map-search-area-button {
+  height: 2.55rem;
+  border-color: rgba(20, 184, 166, 0.28);
+  border-radius: 0.74rem;
+  color: rgb(15 118 110);
+  font-size: 0.82rem;
+  white-space: nowrap;
+}
+
+.map-search-area-button:hover,
+.map-search-area-button:focus-visible {
+  border-color: rgba(13, 148, 136, 0.48);
+  background: rgb(240 253 250);
+  outline: none;
+}
+
+.map-search-area-button:active {
+  transform: scale(0.97);
+}
+
+@media (min-width: 768px) {
+  .map-search-wrap {
+    right: auto;
+    left: 4rem;
+    width: 20rem;
+  }
+
+  .map-search-wrap.is-panel-visible {
+    left: 22rem;
+  }
+}
+
+@media (max-width: 767px) {
+  .map-search-wrap {
+    top: 0.7rem;
+    right: 12.1rem;
+    left: 4rem;
+  }
+
+  .map-search-field {
+    height: 2.65rem;
+  }
+
+  .map-search-input {
+    padding-inline: 0.65rem;
+    font-size: 0.78rem;
+  }
+
+  .map-search-area {
+    top: 4.65rem;
+  }
+
+  .map-search-area-button {
+    height: 2.45rem;
+    padding-inline: 0.85rem;
+    font-size: 0.78rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .map-search-wrap,
+  .map-search-area-button {
+    transition-duration: 0.01ms;
+  }
+}
+</style>

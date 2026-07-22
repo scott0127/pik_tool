@@ -41,10 +41,22 @@ interface RegionData {
 }
 
 interface RegionIndex {
+  version?: string;
   regionId: string;
   regionName: string;
+  generatedAt?: string;
   bbox: { north: number; south: number; east: number; west: number };
   tileGridSize: number;
+  source?: {
+    parserVersion: string;
+    parsedAt: string;
+    sourcePbf: {
+      fileName: string;
+      sizeBytes: number;
+      lastModifiedAt: string;
+    };
+    decorRuleSetSha256: string;
+  } | null;
   tiles: Array<{
     id: string;
     bbox: { north: number; south: number; east: number; west: number };
@@ -70,19 +82,27 @@ interface RawTileData {
 }
 
 /** 支援的區域列表 */
-const SUPPORTED_REGIONS = ['taipei', 'taiwan_main_island'] as const;
+// 優先使用較新且覆蓋完整的全島資料；舊台北資料保留為載入失敗時的區域 fallback。
+const SUPPORTED_REGIONS = ['taiwan_main_island', 'taipei'] as const;
 type SupportedRegion = typeof SUPPORTED_REGIONS[number];
 
 /** 區域資料快取 */
-const regionCache = new Map<SupportedRegion, RegionData | null>();
+const regionCache = new Map<SupportedRegion, RegionData>();
 const loadingPromises = new Map<SupportedRegion, Promise<RegionData | null>>();
 
-const regionIndexCache = new Map<SupportedRegion, RegionIndex | null>();
+const regionIndexCache = new Map<SupportedRegion, RegionIndex>();
 const regionIndexPromises = new Map<SupportedRegion, Promise<RegionIndex | null>>();
 
 const tileCache = new Map<string, TileData>();
 const tileLoadingPromises = new Map<string, Promise<TileData | null>>();
 const MAX_TILE_CACHE = 24;
+
+function throwIfAborted(abortSignal?: AbortSignal) {
+  if (!abortSignal?.aborted) return;
+  const error = new Error('The operation was aborted');
+  error.name = 'AbortError';
+  throw error;
+}
 
 /**
  * 動態載入區域資料
@@ -113,13 +133,15 @@ async function loadRegionData(regionId: SupportedRegion): Promise<RegionData | n
       return regionData;
     } catch (err) {
       console.warn(`[LocalFirstPOI] 載入 ${regionId} 資料失敗:`, err);
-      regionCache.set(regionId, null);
       return null;
     }
   })();
 
-  loadingPromises.set(regionId, loadPromise);
-  return loadPromise;
+  const trackedPromise = loadPromise.finally(() => {
+    loadingPromises.delete(regionId);
+  });
+  loadingPromises.set(regionId, trackedPromise);
+  return trackedPromise;
 }
 
 /**
@@ -145,13 +167,16 @@ async function loadRegionIndex(regionId: SupportedRegion): Promise<RegionIndex |
       console.log(`[LocalFirstPOI] 載入 ${regionIndex.regionName} 索引成功，共 ${regionIndex.tiles.length} 個分片`);
       return regionIndex;
     } catch (err) {
-      regionIndexCache.set(regionId, null);
+      console.warn(`[LocalFirstPOI] 載入 ${regionId} 索引失敗:`, err);
       return null;
     }
   })();
 
-  regionIndexPromises.set(regionId, loadPromise);
-  return loadPromise;
+  const trackedPromise = loadPromise.finally(() => {
+    regionIndexPromises.delete(regionId);
+  });
+  regionIndexPromises.set(regionId, trackedPromise);
+  return trackedPromise;
 }
 
 function touchTileCache(key: string, data: TileData) {
@@ -169,8 +194,10 @@ function touchTileCache(key: string, data: TileData) {
 
 async function loadTile(regionId: SupportedRegion, tileFile: string): Promise<TileData | null> {
   const cacheKey = `${regionId}:${tileFile}`;
-  if (tileCache.has(cacheKey)) {
-    return tileCache.get(cacheKey)!;
+  const cachedTile = tileCache.get(cacheKey);
+  if (cachedTile) {
+    touchTileCache(cacheKey, cachedTile);
+    return cachedTile;
   }
 
   if (tileLoadingPromises.has(cacheKey)) {
@@ -192,7 +219,7 @@ async function loadTile(regionId: SupportedRegion, tileFile: string): Promise<Ti
             const pt = feat.pts[i];
             if (!pt) continue;
             expandedPois.push({
-              id: `${feat.id}-${i}`,
+              id: `${feat.id}:${tileFile}:${i}`,
               lat: pt[0],
               lon: pt[1],
               name: feat.n,
@@ -212,12 +239,16 @@ async function loadTile(regionId: SupportedRegion, tileFile: string): Promise<Ti
       touchTileCache(cacheKey, tileData);
       return tileData;
     } catch (err) {
+      console.warn(`[LocalFirstPOI] 載入分片 ${cacheKey} 失敗:`, err);
       return null;
     }
   })();
 
-  tileLoadingPromises.set(cacheKey, loadPromise);
-  return loadPromise;
+  const trackedPromise = loadPromise.finally(() => {
+    tileLoadingPromises.delete(cacheKey);
+  });
+  tileLoadingPromises.set(cacheKey, trackedPromise);
+  return trackedPromise;
 }
 
 /**
@@ -314,6 +345,7 @@ function filterTilePOIs(
 
 export function useLocalFirstPOI() {
   const overpassAPI = useOverpassAPI();
+  let activeFetchCount = 0;
   
   const isLoading = ref(false);
   const error = ref<string | null>(null);
@@ -331,52 +363,54 @@ export function useLocalFirstPOI() {
       return [];
     }
 
+    throwIfAborted(abortSignal);
+    activeFetchCount++;
     isLoading.value = true;
     error.value = null;
 
     try {
-      // 1. 檢查哪些區域與查詢範圍有交集
-      const intersectingRegions: SupportedRegion[] = [];
-      let fullyContained = false;
+      // 1. 找出可完整涵蓋查詢範圍的本地區域
+      let containingRegion: SupportedRegion | null = null;
 
       for (const regionId of SUPPORTED_REGIONS) {
+        throwIfAborted(abortSignal);
         const regionIndex = await loadRegionIndex(regionId);
         if (regionIndex) {
-          if (bboxIntersects(bounds, regionIndex.bbox)) {
-            intersectingRegions.push(regionId);
-            if (bboxFullyContained(bounds, regionIndex.bbox)) {
-              fullyContained = true;
-            }
+          if (bboxFullyContained(bounds, regionIndex.bbox)) {
+            containingRegion = regionId;
+            break;
           }
           continue;
         }
 
         const regionData = await loadRegionData(regionId);
-        if (regionData && bboxIntersects(bounds, regionData.bbox)) {
-          intersectingRegions.push(regionId);
-          if (bboxFullyContained(bounds, regionData.bbox)) {
-            fullyContained = true;
-          }
+        if (regionData && bboxFullyContained(bounds, regionData.bbox)) {
+          containingRegion = regionId;
+          break;
         }
       }
 
       // 2. 如果查詢範圍完全在某個區域內，直接使用本地資料
-      if (fullyContained && intersectingRegions.length > 0) {
-        const regionId = intersectingRegions[0];
-        if (!regionId) {
-          dataSource.value = 'api';
-          return await overpassAPI.fetchPOIs(bounds, selectedRules, abortSignal);
-        }
+      if (containingRegion) {
+        const regionId = containingRegion;
+        throwIfAborted(abortSignal);
         const regionIndex = regionIndexCache.get(regionId) || await loadRegionIndex(regionId);
         if (regionIndex) {
           const intersectingTiles = regionIndex.tiles.filter(tile => tile.poiCount > 0 && bboxIntersects(bounds, tile.bbox));
           const tileDataList = await Promise.all(
             intersectingTiles.map(tile => loadTile(regionId, tile.file))
           );
+          throwIfAborted(abortSignal);
+          if (tileDataList.some(tile => tile === null)) {
+            console.warn('[LocalFirstPOI] 本地分片載入不完整，改用 Overpass API 避免回傳部分結果');
+            dataSource.value = 'api';
+            return await overpassAPI.fetchPOIs(bounds, selectedRules, abortSignal);
+          }
           const localPoints = tileDataList
             .filter((tile): tile is TileData => Boolean(tile))
             .flatMap(tile => filterTilePOIs(tile, bounds, selectedRules));
 
+          throwIfAborted(abortSignal);
           dataSource.value = 'local';
           console.log(`[LocalFirstPOI] 使用分片 ${regionIndex.regionName} 資料，找到 ${localPoints.length} 個 POI`);
           return localPoints;
@@ -385,6 +419,7 @@ export function useLocalFirstPOI() {
         const regionData = regionCache.get(regionId);
         if (regionData) {
           const localPoints = filterLocalPOIs(regionData, bounds, selectedRules);
+          throwIfAborted(abortSignal);
           dataSource.value = 'local';
           console.log(`[LocalFirstPOI] 使用本地 ${regionData.regionName} 資料，找到 ${localPoints.length} 個 POI`);
           return localPoints;
@@ -393,6 +428,7 @@ export function useLocalFirstPOI() {
 
       // 3. 部分交集或無本地資料，fallback 到 API
       console.log(`[LocalFirstPOI] Fallback 到 Overpass API`);
+      throwIfAborted(abortSignal);
       dataSource.value = 'api';
       return await overpassAPI.fetchPOIs(bounds, selectedRules, abortSignal);
 
@@ -405,7 +441,8 @@ export function useLocalFirstPOI() {
       console.error('[LocalFirstPOI] 查詢失敗:', err);
       return [];
     } finally {
-      isLoading.value = false;
+      activeFetchCount = Math.max(0, activeFetchCount - 1);
+      isLoading.value = activeFetchCount > 0;
     }
   }
 

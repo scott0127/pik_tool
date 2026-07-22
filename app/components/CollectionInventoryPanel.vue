@@ -251,89 +251,85 @@
                   </div>
                 </div>
 
-                <Transition
-                  @before-enter="beforeSmoothEnter"
-                  @enter="smoothEnter"
-                  @after-enter="afterSmoothTransition"
-                  @enter-cancelled="afterSmoothTransition"
-                  @before-leave="beforeSmoothLeave"
-                  @leave="smoothLeave"
-                  @after-leave="afterSmoothTransition"
-                  @leave-cancelled="afterSmoothTransition"
-                >
-                  <button
-                    v-if="isMobileItemCollapsed(item.id)"
-                    type="button"
-                    class="inventory-mobile-collapsed-summary"
-                    :aria-label="`${labels.expandColor} ${t('pikmin_types.' + item.pikminType)}`"
-                    @click.stop="expandMobileItem(item.id)"
-                  >
-                    <span>
-                      <Icon name="lucide:panel-top-open" class="w-4 h-4" />
-                      {{ labels.autoCollapsed }}
-                    </span>
-                    <strong>{{ labels.expandColor }}</strong>
-                  </button>
-                </Transition>
-
-                <Transition
-                  @before-enter="beforeSmoothEnter"
-                  @enter="smoothEnter"
-                  @after-enter="afterSmoothTransition"
-                  @enter-cancelled="afterSmoothTransition"
-                  @before-leave="beforeSmoothLeave"
-                  @leave="smoothLeave"
-                  @after-leave="afterSmoothTransition"
-                  @leave-cancelled="afterSmoothTransition"
-                >
-                  <div v-if="!isMobileItemCollapsed(item.id)" class="inventory-mobile-control-grid">
+                <div class="inventory-mobile-state">
                   <div
-                    v-for="(control, controlIndex) in mobileControls"
-                    :key="control.id"
-                    class="inventory-mobile-control-card"
-                    :class="[
-                      `inventory-control-${control.tone}`,
-                      getMobileControlClass(),
-                      'mobile-strip-control',
-                    ]"
+                    class="inventory-mobile-reveal"
+                    :class="{ 'inventory-mobile-reveal-visible': isMobileItemCollapsed(item.id) }"
+                    :aria-hidden="!isMobileItemCollapsed(item.id)"
                   >
-                    <div class="inventory-mobile-control-head">
-                      <span class="inventory-control-icon">
-                        <Icon :name="control.icon" class="w-4 h-4" />
-                      </span>
-                      <span class="inventory-control-text">
-                        <span class="inventory-control-label" :title="control.label">
-                          {{ control.shortLabel || control.label }}
+                    <div class="inventory-mobile-reveal-content">
+                      <button
+                        type="button"
+                        class="inventory-mobile-collapsed-summary"
+                        :tabindex="isMobileItemCollapsed(item.id) ? 0 : -1"
+                        :aria-label="`${labels.expandColor} ${t('pikmin_types.' + item.pikminType)}`"
+                        @click.stop="expandMobileItem(item.id)"
+                      >
+                        <span>
+                          <Icon name="lucide:panel-top-open" class="w-4 h-4" />
+                          {{ labels.autoCollapsed }}
                         </span>
-                        <span v-if="control.scoreText" class="inventory-control-score">{{ control.scoreText }}</span>
-                      </span>
+                        <strong>{{ labels.expandColor }}</strong>
+                      </button>
                     </div>
+                  </div>
 
-                    <div class="inventory-control-stepper" :aria-label="control.label">
-                      <button
-                        type="button"
-                        class="inventory-stepper-hit inventory-stepper-minus"
-                        :aria-label="`${labels.decrease} ${control.label}`"
-                        :disabled="getBucketCount(item.id, control.id) === 0"
-                        @click.stop="adjust(item.id, control.id, -1)"
-                      >
-                        <Icon name="lucide:minus" class="w-4 h-4" />
-                      </button>
-                      <strong class="inventory-stepper-value">
-                        {{ getBucketCount(item.id, control.id) }}
-                      </strong>
-                      <button
-                        type="button"
-                        class="inventory-stepper-hit inventory-stepper-plus"
-                        :aria-label="`${labels.increase} ${control.label}`"
-                        @click.stop="adjust(item.id, control.id, 1)"
-                      >
-                        <Icon name="lucide:plus" class="w-4 h-4" />
-                      </button>
+                  <div
+                    class="inventory-mobile-reveal"
+                    :class="{ 'inventory-mobile-reveal-visible': !isMobileItemCollapsed(item.id) }"
+                    :aria-hidden="isMobileItemCollapsed(item.id)"
+                  >
+                    <div class="inventory-mobile-reveal-content">
+                      <div class="inventory-mobile-control-grid">
+                        <div
+                          v-for="control in mobileControls"
+                          :key="control.id"
+                          class="inventory-mobile-control-card"
+                          :class="[
+                            `inventory-control-${control.tone}`,
+                            getMobileControlClass(),
+                            'mobile-strip-control',
+                          ]"
+                        >
+                          <div class="inventory-mobile-control-head">
+                            <span class="inventory-control-icon">
+                              <Icon :name="control.icon" class="w-4 h-4" />
+                            </span>
+                            <span class="inventory-control-text">
+                              <span class="inventory-control-label" :title="control.label">
+                                {{ control.shortLabel || control.label }}
+                              </span>
+                              <span v-if="control.scoreText" class="inventory-control-score">{{ control.scoreText }}</span>
+                            </span>
+                          </div>
+
+                          <div class="inventory-control-stepper" :aria-label="control.label">
+                            <button
+                              type="button"
+                              class="inventory-stepper-hit inventory-stepper-minus"
+                              :aria-label="`${labels.decrease} ${control.label}`"
+                              :disabled="getBucketCount(item.id, control.id) === 0"
+                              @click.stop="adjust(item.id, control.id, -1)"
+                            >
+                              <Icon name="lucide:minus" class="w-4 h-4" />
+                            </button>
+                            <strong class="inventory-stepper-value">
+                              {{ getBucketCount(item.id, control.id) }}
+                            </strong>
+                            <button
+                              type="button"
+                              class="inventory-stepper-hit inventory-stepper-plus"
+                              :aria-label="`${labels.increase} ${control.label}`"
+                              @click.stop="adjust(item.id, control.id, 1)"
+                            >
+                              <Icon name="lucide:plus" class="w-4 h-4" />
+                            </button>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   </div>
-                  </div>
-                </Transition>
+                </div>
               </article>
             </div>
           </div>
@@ -435,6 +431,7 @@ const clearSmoothStyles = (element: HTMLElement) => {
   element.style.transform = '';
   element.style.transition = '';
   element.style.contain = '';
+  element.style.willChange = '';
 };
 
 const finishOnHeightTransition = (
@@ -465,6 +462,7 @@ const beforeSmoothEnter = (el: Element) => {
   element.style.opacity = '0';
   element.style.overflow = 'hidden';
   element.style.transform = 'translateY(-6px)';
+  element.style.willChange = 'height, opacity, transform';
 };
 
 const smoothEnter = (el: Element, done: () => void) => {
@@ -496,6 +494,7 @@ const beforeSmoothLeave = (el: Element) => {
   element.style.opacity = '1';
   element.style.overflow = 'hidden';
   element.style.transform = 'translateY(0)';
+  element.style.willChange = 'height, opacity, transform';
 };
 
 const smoothLeave = (el: Element, done: () => void) => {
@@ -863,11 +862,6 @@ const getItemRecordTotal = (item: DecorItem): number => getItemRecordTotalById(i
 
 const isMobileItemCollapsed = (itemId: string): boolean => collapsedMobileItems.value.has(itemId);
 
-const collapseMobileItem = (itemId: string) => {
-  if (collapsedMobileItems.value.has(itemId)) return;
-  collapsedMobileItems.value = new Set([...collapsedMobileItems.value, itemId]);
-};
-
 const expandMobileItem = (itemId: string) => {
   if (!collapsedMobileItems.value.has(itemId)) return;
   const next = new Set(collapsedMobileItems.value);
@@ -896,15 +890,23 @@ const setupMobileAutoCollapse = () => {
   if (itemCells.length === 0) return;
 
   mobileAutoCollapseObserver = new IntersectionObserver((entries) => {
+    const nextCollapsedItems = new Set(collapsedMobileItems.value);
+    let hasChanges = false;
+
     entries.forEach((entry) => {
       const itemId = (entry.target as HTMLElement).dataset.mobileInventoryItemId;
-      if (!itemId || collapsedMobileItems.value.has(itemId)) return;
+      if (!itemId || nextCollapsedItems.has(itemId)) return;
 
       const isPastViewportTop = entry.boundingClientRect.bottom < 96;
       if (!entry.isIntersecting && isPastViewportTop && getItemRecordTotalById(itemId) > 0) {
-        collapseMobileItem(itemId);
+        nextCollapsedItems.add(itemId);
+        hasChanges = true;
       }
     });
+
+    if (hasChanges) {
+      collapsedMobileItems.value = nextCollapsedItems;
+    }
   }, {
     root: null,
     rootMargin: '-88px 0px 0px 0px',
@@ -1114,7 +1116,6 @@ onUnmounted(() => {
   gap: 0.85rem;
   margin-top: 0.85rem;
   transform-origin: top;
-  will-change: height, opacity, transform;
 }
 
 .rare-progress-panel {
@@ -1234,7 +1235,6 @@ onUnmounted(() => {
   grid-template-columns: repeat(auto-fit, minmax(10.5rem, 1fr));
   gap: 0.5rem;
   transform-origin: top;
-  will-change: height, opacity, transform;
 }
 
 .rare-rule-card {
@@ -1577,6 +1577,11 @@ onUnmounted(() => {
   display: none;
 }
 
+.inventory-mobile-state,
+.inventory-mobile-reveal {
+  display: none;
+}
+
 .inventory-mobile-collapsed-summary {
   display: none;
 }
@@ -1624,7 +1629,6 @@ onUnmounted(() => {
 
 .inventory-event-log-body {
   transform-origin: top;
-  will-change: height, opacity, transform;
 }
 
 .inventory-event-list {
@@ -1709,6 +1713,42 @@ onUnmounted(() => {
   .inventory-control-stack,
   .inventory-release-panel {
     display: none;
+  }
+
+  .inventory-mobile-state {
+    display: grid;
+  }
+
+  .inventory-mobile-reveal {
+    display: grid;
+    grid-template-rows: 0fr;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transform: translateY(-4px);
+    transition:
+      grid-template-rows 280ms cubic-bezier(0.22, 1, 0.36, 1),
+      opacity 160ms ease,
+      transform 240ms cubic-bezier(0.22, 1, 0.36, 1),
+      visibility 0s linear 280ms;
+  }
+
+  .inventory-mobile-reveal-visible {
+    grid-template-rows: 1fr;
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: translateY(0);
+    transition:
+      grid-template-rows 280ms cubic-bezier(0.22, 1, 0.36, 1),
+      opacity 180ms ease 40ms,
+      transform 260ms cubic-bezier(0.22, 1, 0.36, 1),
+      visibility 0s linear;
+  }
+
+  .inventory-mobile-reveal-content {
+    min-height: 0;
+    overflow: hidden;
   }
 
   .inventory-mobile-control-grid {
@@ -1890,6 +1930,14 @@ onUnmounted(() => {
 
   .inventory-stepper-value {
     font-size: 0.9rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .inventory-mobile-reveal,
+  .inventory-mobile-reveal-visible {
+    transition: none;
+    transform: none;
   }
 }
 

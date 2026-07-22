@@ -10,17 +10,15 @@
     <div
       v-if="internalShowPanel"
       :class="[
-        'absolute overflow-hidden flex flex-col z-[1000]',
-        'bg-white/90 backdrop-blur-2xl shadow-[0_8px_40px_rgba(0,0,0,0.12)]',
-        'border border-white/70',
+        'pure-filter-sheet absolute overflow-hidden flex flex-col z-[1000]',
         isMobile 
-          ? 'left-0 right-0 bottom-0 max-h-[70vh] rounded-t-3xl' 
-          : 'top-4 left-4 bottom-4 w-72 rounded-2xl'
+          ? 'pure-filter-sheet-mobile left-0 right-0 bottom-0'
+          : 'pure-filter-sheet-desktop'
       ]"
     >
       <!-- 標題列 -->
       <div 
-        class="relative px-4 py-3 md:px-5 md:py-4 flex items-center justify-between touch-none shrink-0"
+        class="pure-filter-header relative px-4 py-3 md:px-5 md:py-4 flex items-center justify-between touch-none shrink-0"
         @touchstart="handleTouchStart"
         @touchmove="handleTouchMove"
         @touchend="handleTouchEnd"
@@ -28,7 +26,7 @@
         <div v-if="isMobile" class="absolute top-2 left-1/2 -translate-x-1/2 w-10 h-1 bg-gray-300/60 rounded-full"></div>
         
         <div class="flex items-center gap-3 mt-1 md:mt-0">
-          <div class="w-9 h-9 bg-gradient-to-br from-purple-400 to-fuchsia-500 rounded-xl flex items-center justify-center shadow-md shadow-purple-200/50">
+          <div class="pure-filter-mark w-9 h-9 flex items-center justify-center">
             <Icon name="lucide:gem" class="w-[18px] h-[18px] text-white" />
           </div>
           <div>
@@ -75,13 +73,13 @@
         <div class="flex gap-2">
           <button
             @click="selectPopular"
-            class="flex-1 px-3 py-2 bg-purple-500 hover:bg-purple-600 active:scale-[0.97] text-white rounded-xl text-xs font-semibold transition-all cursor-pointer shadow-sm shadow-purple-200/50"
+            class="pure-panel-action pure-panel-action-primary flex-1 px-3 py-2 text-xs font-semibold cursor-pointer"
           >
             熱門選擇
           </button>
           <button
             @click="clearAll"
-            class="flex-1 px-3 py-2 bg-gray-100 hover:bg-gray-200 active:scale-[0.97] text-gray-600 rounded-xl text-xs font-semibold transition-all cursor-pointer"
+            class="pure-panel-action pure-panel-action-secondary flex-1 px-3 py-2 text-xs font-semibold cursor-pointer"
           >
             清除全部
           </button>
@@ -103,10 +101,10 @@
           v-for="type in allTypes"
           :key="type.id"
           :class="[
-            'decor-chip relative flex items-center gap-2.5 cursor-pointer overflow-hidden rounded-xl transition-all duration-200 active:scale-[0.97]',
+            'pure-filter-chip decor-chip relative flex items-center gap-2.5 cursor-pointer overflow-hidden rounded-xl transition-all duration-200 active:scale-[0.97]',
             'px-2.5 py-2',
             selectedTypes.includes(type.id) 
-              ? 'bg-gradient-to-r from-purple-50 to-fuchsia-50/60 border border-purple-300/50 shadow-sm' 
+              ? 'is-selected bg-emerald-50 border border-emerald-300/50 shadow-sm'
               : 'bg-white/70 border border-gray-100',
           ]"
         >
@@ -154,10 +152,10 @@
           v-for="type in allTypes"
           :key="type.id"
           :class="[
-            'decor-item relative flex items-center cursor-pointer transition-all duration-200 overflow-hidden group',
+            'pure-filter-item decor-item relative flex items-center cursor-pointer transition-all duration-200 overflow-hidden group',
             'gap-3 px-3 py-2.5 rounded-xl',
             selectedTypes.includes(type.id) 
-              ? 'bg-purple-50/90 ring-1 ring-purple-300/60' 
+              ? 'is-selected bg-emerald-50/90 ring-1 ring-emerald-300/60'
               : 'hover:bg-gray-50/80',
           ]"
         >
@@ -215,7 +213,7 @@
     <button
       v-if="!internalShowPanel && isMobile"
       @click="internalShowPanel = true"
-      class="absolute top-28 left-4 z-[1000] bg-purple-500 hover:bg-purple-600 text-white rounded-2xl px-4 py-2.5 shadow-xl flex items-center gap-2 glow-effect cursor-pointer transition-colors"
+      class="pure-filter-reopen absolute z-[1000] flex items-center gap-2 cursor-pointer"
     >
       <Icon name="lucide:gem" class="w-4 h-4" />
       <span class="text-sm font-semibold">純種篩選器</span>
@@ -236,9 +234,9 @@
       class="fixed inset-0 bg-black/50 backdrop-blur-sm z-[2000] flex items-center justify-center p-4"
       @click.self="dismissTutorial"
     >
-      <div class="bg-white rounded-2xl p-6 max-w-sm w-full shadow-2xl">
+      <div class="pure-tutorial-card p-6 max-w-sm w-full">
         <div class="text-center mb-5">
-          <div class="w-14 h-14 mx-auto bg-gradient-to-br from-purple-400 to-fuchsia-500 rounded-2xl flex items-center justify-center mb-3 shadow-lg shadow-purple-200/50">
+          <div class="pure-tutorial-mark w-14 h-14 mx-auto flex items-center justify-center mb-3">
             <Icon name="lucide:target" class="w-7 h-7 text-white" />
           </div>
           <h3 class="font-bold text-lg text-gray-800">純種模式說明</h3>
@@ -259,7 +257,7 @@
         </div>
         <button 
           @click="dismissTutorial"
-          class="w-full py-3 bg-purple-500 hover:bg-purple-600 active:scale-[0.98] text-white font-bold rounded-xl transition-all cursor-pointer shadow-md shadow-purple-200/50"
+          class="pure-tutorial-action w-full py-3 text-white font-bold transition-all cursor-pointer"
         >
           我知道了！
         </button>
@@ -420,4 +418,188 @@ const allTypes = [
   100% { box-shadow: 0 0 0 0 rgba(168, 85, 247, 0); }
 }
 .glow-effect { animation: glow 2s infinite; }
+
+.pure-filter-sheet {
+  border: 1px solid rgba(148, 163, 184, 0.26);
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow:
+    0 18px 46px rgba(15, 23, 42, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+.pure-filter-sheet-desktop {
+  top: 0.75rem;
+  bottom: 0.75rem;
+  left: 0.75rem;
+  width: 20.5rem;
+  border-radius: 1rem;
+}
+
+.pure-filter-sheet-mobile {
+  max-height: min(64dvh, 35rem);
+  padding-bottom: env(safe-area-inset-bottom);
+  border-width: 1px 0 0;
+  border-radius: 1.15rem 1.15rem 0 0;
+}
+
+.pure-filter-header {
+  border-bottom: 1px solid rgba(148, 163, 184, 0.16);
+}
+
+.pure-filter-mark {
+  flex: 0 0 auto;
+  border: 1px solid rgba(13, 148, 136, 0.22);
+  border-radius: 0.68rem;
+  background: rgb(15 118 110);
+  color: white;
+  box-shadow: 0 6px 14px rgba(15, 118, 110, 0.18);
+}
+
+.pure-panel-action {
+  min-height: 2.35rem;
+  border-radius: 0.66rem;
+  transition:
+    color 150ms ease,
+    border-color 150ms ease,
+    background 150ms ease,
+    box-shadow 150ms ease,
+    transform 120ms ease;
+}
+
+.pure-panel-action:active {
+  transform: scale(0.98);
+}
+
+.pure-panel-action:focus-visible {
+  outline: 2px solid rgba(20, 184, 166, 0.35);
+  outline-offset: 2px;
+}
+
+.pure-panel-action-primary,
+.pure-tutorial-action {
+  border: 1px solid rgb(15 118 110);
+  background: rgb(15 118 110);
+  color: white;
+  box-shadow: 0 5px 12px rgba(15, 118, 110, 0.16);
+}
+
+.pure-panel-action-primary:hover,
+.pure-tutorial-action:hover {
+  background: rgb(13 148 136);
+}
+
+.pure-panel-action-secondary {
+  border: 1px solid rgba(148, 163, 184, 0.24);
+  background: rgb(248 250 252);
+  color: rgb(71 85 105);
+}
+
+.pure-panel-action-secondary:hover {
+  background: rgb(241 245 249);
+  color: rgb(15 23 42);
+}
+
+.pure-filter-chip {
+  min-width: 0;
+  min-height: 2.8rem;
+  border-radius: 0.72rem;
+  background: rgba(255, 255, 255, 0.76);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.pure-filter-chip.is-selected {
+  border-color: rgba(20, 184, 166, 0.34);
+  background: rgb(240 253 250);
+  box-shadow: 0 2px 7px rgba(15, 118, 110, 0.06);
+}
+
+.pure-filter-chip > div:nth-of-type(1) {
+  opacity: 0.05 !important;
+}
+
+.pure-filter-chip.is-selected span {
+  color: rgb(15 118 110);
+}
+
+.pure-filter-chip.is-selected > div:nth-last-child(2) {
+  background: rgb(15 118 110);
+}
+
+.pure-filter-item {
+  min-height: 2.55rem;
+  border: 1px solid transparent;
+  border-radius: 0.66rem;
+}
+
+.pure-filter-item.is-selected {
+  border-color: rgba(20, 184, 166, 0.24);
+  background: rgb(240 253 250);
+  box-shadow: none;
+}
+
+.pure-filter-reopen {
+  top: 4.7rem;
+  left: 0.7rem;
+  min-height: 2.55rem;
+  padding-inline: 0.82rem;
+  border: 1px solid rgba(13, 148, 136, 0.28);
+  border-radius: 0.72rem;
+  background: rgba(255, 255, 255, 0.94);
+  color: rgb(15 118 110);
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.1);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+.pure-filter-reopen:hover,
+.pure-filter-reopen:focus-visible {
+  border-color: rgba(13, 148, 136, 0.46);
+  background: rgb(240 253 250);
+  outline: none;
+}
+
+.pure-tutorial-card {
+  border: 1px solid rgba(148, 163, 184, 0.24);
+  border-radius: 1rem;
+  background: rgb(255 255 255);
+  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.22);
+}
+
+.pure-tutorial-mark {
+  border: 1px solid rgba(13, 148, 136, 0.22);
+  border-radius: 0.82rem;
+  background: rgb(15 118 110);
+  color: white;
+  box-shadow: 0 8px 18px rgba(15, 118, 110, 0.18);
+}
+
+.pure-tutorial-action {
+  border-radius: 0.72rem;
+}
+
+@media (max-width: 767px) {
+  .pure-filter-header {
+    padding-top: 1.05rem;
+    padding-bottom: 0.72rem;
+  }
+
+  .pure-filter-chip {
+    min-height: 2.9rem;
+    padding: 0.48rem 0.62rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .glow-effect {
+    animation: none;
+  }
+
+  .pure-filter-chip,
+  .pure-filter-item,
+  .pure-panel-action {
+    transition-duration: 0.01ms;
+  }
+}
 </style>

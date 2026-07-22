@@ -1,24 +1,28 @@
 <template>
-  <div class="min-h-screen py-8 px-4">
-    <!-- Background Decorations -->
-    <div class="fixed inset-0 pointer-events-none overflow-hidden -z-10">
-      <div class="absolute top-32 right-10 text-6xl opacity-10 animate-float">🤝</div>
-      <div class="absolute bottom-40 left-20 text-5xl opacity-10 animate-float" style="animation-delay: 1.5s;">🌸</div>
-    </div>
-
-    <div class="max-w-4xl mx-auto">
+  <div class="friends-page min-h-screen py-8 px-4">
+    <div class="friends-page-shell max-w-6xl mx-auto">
       <!-- Page Header -->
-      <header class="text-center mb-10 animate-slide-up">
-        <div class="inline-flex items-center justify-center w-20 h-20 rounded-3xl bg-gradient-to-br from-pink-400 to-rose-500 shadow-xl shadow-pink-200 mb-4">
-          <span class="text-4xl">🤝</span>
+      <header class="friends-page-header mb-8 animate-slide-up">
+        <div class="friends-page-heading">
+          <span class="friends-page-mark">
+            <Icon name="lucide:users-round" class="w-5 h-5" />
+          </span>
+          <div>
+            <h1 class="text-3xl font-extrabold text-slate-900">{{ $t('friends.title') }}</h1>
+            <p class="text-slate-500 mt-1">{{ $t('friends.subtitle') }}</p>
+          </div>
         </div>
-        <h1 class="text-3xl font-extrabold gradient-text mb-2">{{ $t('friends.title') }}</h1>
-        <p class="text-gray-500">{{ $t('friends.subtitle') }}</p>
+        <div class="friends-page-count" aria-live="polite">
+          <span>{{ $t('friends.total_players') }}</span>
+          <strong>{{ totalPostCount ?? '—' }}</strong>
+        </div>
       </header>
 
       <!-- Info Banner -->
-      <div class="glass rounded-2xl p-4 mb-6 animate-slide-up flex items-start gap-3" style="animation-delay: 0.05s;">
-        <span class="text-xl flex-shrink-0">💡</span>
+      <div class="friends-tips-panel p-4 mb-6 animate-slide-up flex items-start gap-3" style="animation-delay: 0.05s;">
+        <span class="friends-tips-icon">
+          <Icon name="lucide:lightbulb" class="w-4 h-4" />
+        </span>
         <div class="text-sm text-gray-600">
           <p class="font-medium text-gray-700 mb-1">{{ $t('friends.tips.title') }}</p>
           <ul class="space-y-1 text-gray-500">
@@ -30,18 +34,12 @@
       </div>
 
       <!-- Post Form (登入用戶) -->
-      <div v-if="user" class="glass rounded-3xl p-6 sm:p-8 mb-10 slide-up relative overflow-visible z-10">
-        <!-- Decorative Elements -->
-        <div class="absolute -top-6 -right-6 w-24 h-24 bg-gradient-to-br from-emerald-300 to-teal-400 rounded-full blur-2xl opacity-40 pointer-events-none float"></div>
-        <div class="absolute -bottom-10 -left-10 w-32 h-32 bg-gradient-to-tr from-yellow-200 to-orange-300 rounded-full blur-2xl opacity-30 pointer-events-none float-delayed"></div>
-        
+      <div v-if="user" class="friend-compose-panel glass rounded-3xl p-6 sm:p-8 mb-10 slide-up relative overflow-visible z-10">
         <div class="relative z-10">
-          <div class="flex items-center gap-3 mb-8">
-            <div class="flex items-center justify-center w-12 h-12 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-2xl shadow-lg shadow-emerald-200/50 transform -rotate-6">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
-              </svg>
-            </div>
+          <div class="friend-compose-heading flex items-center gap-3 mb-8">
+            <span class="friend-compose-icon">
+              <Icon name="lucide:user-round-plus" class="w-5 h-5" />
+            </span>
             <h2 class="text-2xl font-extrabold text-gray-800 tracking-tight">
               {{ $t('friends.form.title') }}
             </h2>
@@ -126,7 +124,7 @@
                   type="button"
                   @click="toggleIntent(intent.id)"
                   :disabled="!newPost.intents.includes(intent.id) && newPost.intents.length >= 2"
-                  class="relative overflow-hidden group p-3.5 rounded-2xl border-2 transition-all duration-300 flex flex-col items-center justify-center gap-1.5 min-h-[80px] cursor-pointer active:translate-y-1 active:shadow-inner"
+                  class="friend-intent-option relative overflow-hidden group p-3.5 rounded-2xl border-2 transition-all duration-300 flex flex-col items-center justify-center gap-1.5 min-h-[80px] cursor-pointer active:translate-y-1 active:shadow-inner"
                   :class="[
                     newPost.intents.includes(intent.id) 
                       ? `${intent.colorClass.replace(/bg-\w+-50/, 'bg-white').replace(/border-\w+-200/, 'border-[color:currentColor]').replace(/text-\w+-600/, intent.colorClass.match(/text-\w+-600/)?.[0] || 'text-gray-800')} shadow-md scale-[1.03]`
@@ -162,7 +160,7 @@
               <button 
                 type="button" 
                 @click="showAdvancedSettings = !showAdvancedSettings"
-                class="group flex items-center justify-between w-full p-4 rounded-2xl bg-white/70 backdrop-blur-md shadow-[0_2px_12px_rgba(0,0,0,0.03)] border border-gray-100/80 hover:bg-white hover:shadow-[0_4px_20px_rgba(0,0,0,0.06)] active:scale-[0.98] transition-all duration-400 ease-[cubic-bezier(0.25,1,0.5,1)]"
+                class="friend-advanced-toggle group flex items-center justify-between w-full p-4 rounded-2xl bg-white/70 backdrop-blur-md shadow-[0_2px_12px_rgba(0,0,0,0.03)] border border-gray-100/80 hover:bg-white hover:shadow-[0_4px_20px_rgba(0,0,0,0.06)] active:scale-[0.98] transition-all duration-400 ease-[cubic-bezier(0.25,1,0.5,1)]"
               >
                 <div class="flex items-center gap-3.5">
                   <div class="w-9 h-9 rounded-full flex items-center justify-center transition-colors duration-300" :class="showAdvancedSettings ? 'bg-emerald-500 text-white shadow-md shadow-emerald-500/20' : 'bg-emerald-50 text-emerald-500 group-hover:bg-emerald-100'">
@@ -202,7 +200,7 @@
                 </span>
               </div>
               
-              <div class="bg-gray-50/80 rounded-3xl p-4 sm:p-5 border border-gray-200/60 shadow-inner space-y-5">
+              <div class="friend-region-panel bg-gray-50/80 rounded-3xl p-4 sm:p-5 border border-gray-200/60 shadow-inner space-y-5">
                 <div v-for="group in FRIEND_REGIONS" :key="group.label" class="w-full">
                   <h4 class="text-xs font-black text-gray-400/80 mb-2.5 uppercase tracking-[0.2em] pl-1 flex items-center gap-2">
                     <span>{{ group.label }}</span>
@@ -215,7 +213,7 @@
                       type="button"
                       @click="toggleRegion(region)"
                       :disabled="!newPost.regions.includes(region) && newPost.regions.length >= 2"
-                      class="relative px-4 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 select-none active:scale-[0.92] flex-grow sm:flex-grow-0 text-center border-2 overflow-hidden group/btn"
+                      class="friend-region-option relative px-4 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 select-none active:scale-[0.92] flex-grow sm:flex-grow-0 text-center border-2 overflow-hidden group/btn"
                       :class="[
                         newPost.regions.includes(region) 
                           ? 'bg-emerald-500 border-emerald-400 text-white shadow-[0_4px_12px_rgba(16,185,129,0.3)] scale-[1.02] active:bg-emerald-600 active:shadow-inner' 
@@ -282,7 +280,7 @@
       </div>
 
       <!-- Login Prompt -->
-      <div v-else class="glass rounded-3xl p-8 mb-8 text-center animate-slide-up" style="animation-delay: 0.1s;">
+      <div v-else class="friend-login-panel glass rounded-3xl p-8 mb-8 text-center animate-slide-up" style="animation-delay: 0.1s;">
         <div class="w-16 h-16 mx-auto bg-gradient-to-br from-emerald-100 to-teal-100 rounded-full flex items-center justify-center mb-4">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-emerald-500" viewBox="0 0 20 20" fill="currentColor">
             <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd" />
@@ -301,32 +299,78 @@
       </div>
 
       <!-- Recommended Friends Section -->
-      <section v-if="recommendedPosts.length > 0" class="mb-10 animate-slide-up" style="animation-delay: 0.15s;">
-        <h2 class="text-xl font-bold text-gray-800 flex items-center gap-2 mb-4">
-          <span class="text-2xl">✨</span>
-          {{ $t('friends.rec_title') }}
-          <span class="text-xs font-normal text-gray-500 bg-gray-100 px-2 py-1 rounded-full border border-gray-200">
-            {{ $t('friends.rec_update') }}
-          </span>
-        </h2>
-        
-        <!-- Mobile Swipe Hint -->
-        <p class="text-[12px] font-bold text-emerald-500 mb-3 md:hidden flex items-center gap-1.5 animate-pulse ml-1 opacity-80">
-          <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
-          向右滑動卡片查看更多
-        </p>
+      <section
+        v-if="recommendedPosts.length > 0"
+        class="friend-showcase mb-10 animate-slide-up"
+        style="animation-delay: 0.15s;"
+        role="region"
+        :aria-label="$t('friends.carousel_label')"
+        aria-roledescription="carousel"
+        @mouseenter="setRecommendationInteraction(true)"
+        @mouseleave="setRecommendationInteraction(false)"
+        @focusin="setRecommendationInteraction(true)"
+        @focusout="handleRecommendationFocusOut"
+      >
+        <header class="friend-showcase-header">
+          <div class="friend-showcase-heading">
+            <span class="friend-showcase-mark">
+              <Icon name="lucide:sparkles" class="w-4 h-4" />
+            </span>
+            <div>
+              <h2>{{ $t('friends.rec_title') }}</h2>
+              <p>{{ $t('friends.rec_update') }}</p>
+            </div>
+          </div>
+          <div class="friend-carousel-controls">
+            <button
+              type="button"
+              class="friend-carousel-control"
+              :aria-label="$t('friends.carousel_prev')"
+              :title="$t('friends.carousel_prev')"
+              @click="scrollRecommendation(-1)"
+            >
+              <Icon name="lucide:chevron-left" class="w-4 h-4" />
+            </button>
+            <button
+              type="button"
+              class="friend-carousel-control"
+              :class="{ 'is-active': recommendationAutoplay }"
+              :aria-label="recommendationAutoplay ? $t('friends.carousel_pause') : $t('friends.carousel_play')"
+              :title="recommendationAutoplay ? $t('friends.carousel_pause') : $t('friends.carousel_play')"
+              @click="toggleRecommendationAutoplay"
+            >
+              <Icon :name="recommendationAutoplay ? 'lucide:pause' : 'lucide:play'" class="w-3.5 h-3.5" />
+            </button>
+            <button
+              type="button"
+              class="friend-carousel-control"
+              :aria-label="$t('friends.carousel_next')"
+              :title="$t('friends.carousel_next')"
+              @click="scrollRecommendation(1)"
+            >
+              <Icon name="lucide:chevron-right" class="w-4 h-4" />
+            </button>
+          </div>
+        </header>
 
-        <div class="flex overflow-x-auto snap-x snap-mandatory gap-3 sm:gap-4 pb-4 px-1 -mx-1 scrollbar-hide py-2">
-          <div
-            v-for="post in recommendedPosts"
+        <div
+          ref="recommendationTrack"
+          class="friend-carousel-track scrollbar-hide"
+          aria-live="off"
+          @scroll.passive="handleRecommendationScroll"
+          @touchstart.passive="pauseRecommendationForTouch"
+        >
+          <article
+            v-for="(post, index) in recommendedPosts"
             :key="`rec-${post.id}`"
-            class="snap-start shrink-0 w-[240px] relative overflow-hidden bg-white/80 backdrop-blur-xl rounded-[24px] p-3.5 shadow-[0_8px_30px_rgb(0,0,0,0.06)] border border-white/80 hover:-translate-y-1 hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)] transition-all duration-300 group flex flex-col"
+            class="friend-recommendation-card group"
+            :class="{ 'is-current': activeRecommendationIndex === index }"
           >
             <!-- Header: Avatar + User Info -->
             <div class="flex items-center gap-2.5 mb-3">
               <div class="relative shrink-0">
-                <div class="w-10 h-10 rounded-full overflow-hidden bg-gradient-to-tr from-emerald-50 to-teal-50 p-0.5 shadow-sm border border-emerald-100/50 group-hover:shadow-md transition-shadow duration-300">
-                  <img :src="getPikminAvatar(post.username)" :alt="post.username" class="w-full h-full object-contain bg-white rounded-full group-hover:scale-110 group-hover:-rotate-6 transition-transform duration-500" loading="lazy" />
+                <div class="friend-recommendation-avatar">
+                  <img :src="getPikminAvatar(post.username)" :alt="post.username" class="w-full h-full object-contain bg-white group-hover:scale-105 transition-transform duration-300" loading="lazy" />
                 </div>
                 <div class="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-emerald-400 rounded-full border-[2px] border-white shadow-sm"></div>
               </div>
@@ -337,18 +381,17 @@
             </div>
 
             <!-- Friend Code Box (iOS style inset) -->
-            <div 
+            <button
+              type="button"
               @click="copyCode(post.friend_code)"
-              class="bg-gray-50/90 rounded-[14px] p-2 mb-3 flex items-center justify-between cursor-pointer active:scale-95 transition-transform group/code shadow-[inset_0_2px_4px_rgba(0,0,0,0.02)] border border-gray-200/50"
+              class="friend-recommendation-code group/code"
               :title="$t('friends.copy_tooltip')"
             >
               <span class="font-mono text-[12px] font-extrabold text-emerald-600 tracking-wider pl-1.5 flex-1 text-center group-hover/code:scale-105 transition-transform origin-left">
                 {{ formatDisplayCode(post.friend_code) }}
               </span>
-              <div class="w-6 h-6 rounded-full bg-white shadow-sm flex items-center justify-center text-emerald-400 group-hover/code:text-emerald-600 group-hover/code:shadow transition-all shrink-0 group-hover/code:rotate-12">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 20 20" fill="currentColor"><path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" /><path d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z" /></svg>
-              </div>
-            </div>
+              <Icon name="lucide:copy" class="w-3.5 h-3.5 shrink-0" />
+            </button>
 
             <!-- Tags Section -->
             <div class="flex-1 flex flex-col gap-2 mb-3">
@@ -371,8 +414,7 @@
             </div>
 
             <!-- Message (iOS style bubble) -->
-            <div v-if="post.message" class="bg-emerald-50/60 rounded-[14px] p-2.5 mb-3 border border-emerald-100/50 relative group-hover:bg-emerald-100/50 transition-colors">
-              <div class="absolute -top-1 left-4 w-2 h-2 bg-emerald-50/60 rotate-45 border-l border-t border-emerald-100/50 group-hover:bg-emerald-100/50 transition-colors"></div>
+            <div v-if="post.message" class="friend-recommendation-message">
               <p class="text-[11px] text-gray-600 font-bold leading-relaxed line-clamp-2 relative z-10" :title="post.message">{{ post.message }}</p>
             </div>
             
@@ -381,24 +423,37 @@
             <!-- Action Button -->
             <button
               @click="copyCode(post.friend_code)"
-              class="w-full bg-emerald-500 hover:bg-emerald-600 text-white rounded-[14px] py-2.5 text-[12px] font-extrabold transition-all duration-300 shadow-[0_4px_12px_rgba(16,185,129,0.25)] active:scale-95 flex items-center justify-center gap-1.5 mt-auto group/btn"
+              class="friend-recommendation-action group/btn"
             >
-              <span class="group-hover/btn:scale-110 transition-transform">加為好友</span>
+              <span class="group-hover/btn:scale-110 transition-transform">{{ $t('friends.add_friend') }}</span>
+              <Icon name="lucide:arrow-up-right" class="w-3.5 h-3.5" />
             </button>
-          </div>
+          </article>
         </div>
+
+        <footer class="friend-carousel-footer">
+          <div class="friend-carousel-dots" aria-hidden="true">
+            <span
+              v-for="(_, index) in recommendedPosts"
+              :key="`rec-dot-${index}`"
+              class="friend-carousel-dot"
+              :class="{ 'is-active': activeRecommendationIndex === index }"
+            />
+          </div>
+          <span class="friend-carousel-position">
+            {{ activeRecommendationIndex + 1 }} / {{ recommendedPosts.length }}
+          </span>
+        </footer>
       </section>
 
       <!-- Posts Section -->
-      <section class="animate-slide-up" style="animation-delay: 0.2s;">
+      <section class="friend-directory animate-slide-up" style="animation-delay: 0.2s;">
         <div class="flex items-center justify-between mb-6">
           <h2 class="text-xl font-bold text-gray-800 flex items-center gap-3">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-emerald-500" viewBox="0 0 20 20" fill="currentColor">
-              <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z" />
-            </svg>
+            <Icon name="lucide:contact-round" class="h-5 w-5 text-emerald-600" />
             {{ $t('friends.all_players') }}
-            <span class="px-3 py-1 bg-emerald-100 text-emerald-700 rounded-full text-sm font-semibold">
-              {{ posts.length }}
+            <span class="friend-directory-count">
+              {{ filteredPostCount ?? '—' }}
             </span>
           </h2>
           
@@ -406,21 +461,19 @@
           <button
             @click="() => fetchPosts()"
             :disabled="loading"
-            class="p-2 rounded-xl hover:bg-white/60 transition-colors text-gray-500 hover:text-emerald-600"
+            class="friend-directory-refresh"
             :title="$t('friends.refresh')"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" :class="{ 'animate-spin': loading }" viewBox="0 0 20 20" fill="currentColor">
-              <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd" />
-            </svg>
+            <Icon name="lucide:refresh-cw" class="h-4 w-4" :class="{ 'animate-spin': loading }" />
           </button>
         </div>
 
         <!-- Filter Bar -->
-        <div class="mb-6 bg-white/50 backdrop-blur-md rounded-2xl p-4 border border-gray-100 shadow-sm flex flex-col gap-4">
+        <div class="friend-filter-panel mb-6 p-4 flex flex-col gap-4">
           <!-- Intents Filter -->
           <div>
             <div class="flex items-center gap-2 text-sm font-semibold text-gray-600 mb-2">
-              <span class="text-xl">🎯</span> 目的篩選：
+              <Icon name="lucide:target" class="w-4 h-4 text-emerald-600" /> 目的篩選：
             </div>
             <div class="flex flex-wrap gap-2">
               <button
@@ -448,7 +501,7 @@
           <!-- Regions Filter -->
           <div>
             <div class="flex items-center gap-2 text-sm font-semibold text-gray-600 mb-2">
-              <span class="text-xl">🌍</span> 地區篩選：
+              <Icon name="lucide:map-pinned" class="w-4 h-4 text-emerald-600" /> 地區篩選：
             </div>
             <!-- 第一層：大分區 -->
             <div class="flex flex-wrap gap-2">
@@ -516,19 +569,19 @@
         </div>
 
         <!-- Posts Grid -->
-        <div v-else class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+        <div v-else class="friend-directory-grid">
           <div
             v-for="(post, index) in posts"
             :key="post.id"
-            class="bg-white/80 backdrop-blur-xl rounded-[28px] p-5 shadow-[0_8px_30px_rgb(0,0,0,0.05)] border border-white/80 hover:-translate-y-1 hover:shadow-[0_8px_30px_rgb(0,0,0,0.1)] transition-all duration-300 animate-pop-in flex flex-col"
+            class="friend-directory-card animate-pop-in"
             :style="{ animationDelay: `${index * 0.05}s` }"
           >
             <!-- User Header -->
             <div class="flex items-center justify-between mb-4">
               <div class="flex items-center gap-3.5">
                 <div class="relative shrink-0">
-                  <div class="w-14 h-14 rounded-full bg-gradient-to-tr from-emerald-50 to-teal-50 p-0.5 shadow-sm border border-emerald-100/50">
-                    <img :src="getPikminAvatar(post.username)" :alt="post.username" class="w-full h-full object-contain bg-white rounded-full" loading="lazy" />
+                  <div class="friend-directory-avatar">
+                    <img :src="getPikminAvatar(post.username)" :alt="post.username" class="w-full h-full object-contain bg-white" loading="lazy" />
                   </div>
                 </div>
                 <div>
@@ -538,14 +591,15 @@
               </div>
               
               <!-- Friend Code Compact Badge -->
-              <div 
+              <button
+                type="button"
                 @click="copyCode(post.friend_code)"
-                class="bg-emerald-50/80 text-emerald-600 px-3 py-1.5 rounded-[12px] font-mono text-[13px] font-extrabold tracking-widest shadow-[inset_0_2px_4px_rgba(0,0,0,0.02)] border border-emerald-200/50 cursor-pointer active:scale-95 transition-transform flex items-center gap-1.5 group shrink-0"
+                class="friend-directory-code group"
                 :title="$t('friends.copy_code')"
               >
                  {{ formatDisplayCode(post.friend_code) }}
-                 <svg class="w-4 h-4 text-emerald-400 group-hover:text-emerald-600 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
-              </div>
+                 <Icon name="lucide:copy" class="w-3.5 h-3.5" />
+              </button>
             </div>
             
             <!-- Tags Row -->
@@ -559,13 +613,14 @@
                 <span class="text-[14px] leading-none drop-shadow-sm">{{ getIntentIcon(intentId) }}</span>
                 <span>{{ getIntentLabel(intentId) }}</span>
               </span>
-              <span v-for="region in getPostRegions(post.regions)" :key="`${post.id}-region-${region}`" class="px-2.5 py-1 bg-gray-100/80 text-gray-500 rounded-xl text-xs font-extrabold shadow-sm border border-black/5">
-                📍 {{ region.split(' ')[0] }}
+              <span v-for="region in getPostRegions(post.regions)" :key="`${post.id}-region-${region}`" class="friend-directory-region">
+                <Icon name="lucide:map-pin" class="w-3 h-3" />
+                {{ region.split(' ')[0] }}
               </span>
             </div>
             
             <!-- Message Bubble -->
-            <p v-if="post.message" class="bg-gray-50/80 text-gray-600 text-[13px] font-bold leading-relaxed rounded-2xl p-3.5 border border-gray-100/50 shadow-[inset_0_2px_4px_rgba(0,0,0,0.02)]">
+            <p v-if="post.message" class="friend-directory-message">
               {{ post.message }}
             </p>
             <div v-else class="flex-1"></div>
@@ -658,6 +713,8 @@ const {
 } = useFriendPostHelpers();
 
 const posts = ref<FriendPost[]>([]);
+const totalPostCount = ref<number | null>(null);
+const filteredPostCount = ref<number | null>(null);
 const loading = ref(false); // 預設不載入，等待 onMounted
 const error = ref<string | null>(null);
 const submitting = ref(false);
@@ -670,11 +727,12 @@ const loadingMore = ref(false);
 const POSTS_PER_PAGE = 20;
 
 // --- Friends Cache (reduce Supabase egress) ---
-const FRIENDS_CACHE_KEY = 'pikmin-friends-cache-v1';
+const FRIENDS_CACHE_KEY = 'pikmin-friends-cache-v2';
 const FRIENDS_CACHE_TTL = 2 * 60 * 1000; // 2 minutes
 
 interface FriendsCache {
   data: FriendPost[];
+  count: number;
   filterSig: string;
   ts: number;
 }
@@ -688,7 +746,7 @@ const buildFilterSignature = (): string => {
   return parts.join('|') || '__all__';
 };
 
-const readFriendsCache = (sig: string): FriendPost[] | null => {
+const readFriendsCache = (sig: string): FriendsCache | null => {
   if (!import.meta.client) return null;
   try {
     const raw = sessionStorage.getItem(FRIENDS_CACHE_KEY);
@@ -696,14 +754,15 @@ const readFriendsCache = (sig: string): FriendPost[] | null => {
     const cache: FriendsCache = JSON.parse(raw);
     if (cache.filterSig !== sig) return null;
     if (Date.now() - cache.ts > FRIENDS_CACHE_TTL) return null;
-    return cache.data;
+    if (!Number.isFinite(cache.count)) return null;
+    return cache;
   } catch { return null; }
 };
 
-const writeFriendsCache = (data: FriendPost[], sig: string) => {
+const writeFriendsCache = (data: FriendPost[], count: number, sig: string) => {
   if (!import.meta.client) return;
   try {
-    const cache: FriendsCache = { data, filterSig: sig, ts: Date.now() };
+    const cache: FriendsCache = { data, count, filterSig: sig, ts: Date.now() };
     sessionStorage.setItem(FRIENDS_CACHE_KEY, JSON.stringify(cache));
   } catch { /* noop */ }
 };
@@ -761,7 +820,13 @@ const formatFriendCode = (e: Event) => {
 
 // Load posts on mount
 onMounted(async () => {
-  await fetchPosts();
+  if (import.meta.client) {
+    reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    recommendationAutoplay.value = !reducedMotionQuery.matches;
+    reducedMotionQuery.addEventListener('change', handleReducedMotionChange);
+  }
+
+  await Promise.all([fetchPosts(), fetchTotalPostCount()]);
   
   // Pre-fill username from user metadata
   if (user.value) {
@@ -770,6 +835,19 @@ onMounted(async () => {
     newPost.value.username = metadata?.username || metadata?.name || email.split('@')[0] || '';
   }
 });
+
+const fetchTotalPostCount = async () => {
+  try {
+    const { count, error: countError } = await supabase
+      .from('friend_posts')
+      .select('id', { count: 'exact', head: true });
+
+    if (countError) throw countError;
+    totalPostCount.value = count ?? 0;
+  } catch (countError) {
+    console.error('[Friends] Failed to fetch total count:', countError);
+  }
+};
 
 const fetchPosts = async (isLoadMore = false) => {
   if (isLoadMore) {
@@ -786,9 +864,10 @@ const fetchPosts = async (isLoadMore = false) => {
       const sig = buildFilterSignature();
       const cached = readFriendsCache(sig);
       if (cached) {
-        posts.value = cached;
-        hasMorePosts.value = cached.length === POSTS_PER_PAGE;
-        if (import.meta.dev) console.debug('[Friends] Using cached data:', cached.length, 'posts');
+        posts.value = cached.data;
+        filteredPostCount.value = cached.count;
+        hasMorePosts.value = cached.data.length < cached.count;
+        if (import.meta.dev) console.debug('[Friends] Using cached data:', cached.data.length, 'posts');
         loading.value = false;
         return;
       }
@@ -796,7 +875,9 @@ const fetchPosts = async (isLoadMore = false) => {
 
     let query = supabase
       .from('friend_posts')
-      .select('id,user_id,username,friend_code,message,regions,created_at')
+      .select('id,user_id,username,friend_code,message,regions,created_at', {
+        count: 'exact',
+      })
       .order('created_at', { ascending: false })
       .range(currentOffset.value, currentOffset.value + POSTS_PER_PAGE - 1);
       
@@ -817,22 +898,25 @@ const fetchPosts = async (isLoadMore = false) => {
       query = query.overlaps('regions', targetTags);
     }
 
-    const { data, error: err } = await query;
+    const { data, error: err, count } = await query;
 
     if (err) throw err;
     
     if (data) {
-      hasMorePosts.value = data.length === POSTS_PER_PAGE;
+      const resultCount = count ?? data.length;
+      filteredPostCount.value = resultCount;
+      hasMorePosts.value = currentOffset.value + data.length < resultCount;
       
       if (isLoadMore) {
         posts.value.push(...data);
       } else {
         posts.value = data;
         // Save to cache (first page only)
-        writeFriendsCache(data, buildFilterSignature());
+        writeFriendsCache(data, resultCount, buildFilterSignature());
       }
     } else {
       hasMorePosts.value = false;
+      filteredPostCount.value = count ?? 0;
       if (!isLoadMore) posts.value = [];
     }
   } catch (e: any) {
@@ -919,7 +1003,7 @@ const submitPost = async () => {
     newPost.value.intents = [];
     newPost.value.postcardInput = '';
     invalidateFriendsCache();
-    await fetchPosts();
+    await Promise.all([fetchPosts(), fetchTotalPostCount()]);
   } catch (e: any) {
     console.error('Failed to submit post:', e);
     alert(`發布失敗：${e.message || '請稍後再試'}`);
@@ -940,7 +1024,7 @@ const deletePost = async (postId: string) => {
     
     if (error) throw error;
     invalidateFriendsCache();
-    await fetchPosts();
+    await Promise.all([fetchPosts(), fetchTotalPostCount()]);
   } catch (e) {
     console.error('Failed to delete post:', e);
   }
@@ -980,7 +1064,14 @@ const formatDate = (dateStr: string) => {
 // --- Recommendation Logic ---
 const recommendedPosts = ref<FriendPost[]>([]);
 const recommendationQueue = ref<FriendPost[]>([]);
+const recommendationTrack = ref<HTMLElement | null>(null);
+const activeRecommendationIndex = ref(0);
+const recommendationAutoplay = ref(true);
+const recommendationInteractionPaused = ref(false);
 let recommendTimer: ReturnType<typeof setInterval> | null = null;
+let recommendationResumeTimer: ReturnType<typeof setTimeout> | null = null;
+let recommendationScrollFrame: number | null = null;
+let reducedMotionQuery: MediaQueryList | null = null;
 let filterFetchTimer: ReturnType<typeof setTimeout> | null = null;
 let copyToastTimer: ReturnType<typeof setTimeout> | null = null;
 
@@ -999,13 +1090,21 @@ const shuffleArray = <T>(array: T[]): T[] => {
   return newArr;
 };
 
+const resetRecommendationPosition = () => {
+  activeRecommendationIndex.value = 0;
+  nextTick(() => {
+    recommendationTrack.value?.scrollTo({ left: 0, behavior: 'auto' });
+  });
+};
+
 const refreshRecommendations = () => {
   // 過濾出有自我介紹(message)的玩家
   const eligiblePosts = posts.value.filter(p => p.message && p.message.trim() !== '');
 
-  // 不論有沒有篩選，少於或等於10個直接全秀(打亂排列)，不輪播
+  // 少量資料保留完整名單；較多資料則沿用批次佇列，避免重複曝光同一批玩家。
   if (eligiblePosts.length <= 10) {
     recommendedPosts.value = shuffleArray(eligiblePosts);
+    resetRecommendationPosition();
     return;
   }
 
@@ -1038,23 +1137,152 @@ const refreshRecommendations = () => {
   }
 
   recommendedPosts.value = nextBatch;
+  resetRecommendationPosition();
+};
+
+const stopRecommendationTimer = () => {
+  if (!recommendTimer) return;
+  clearInterval(recommendTimer);
+  recommendTimer = null;
+};
+
+const getRecommendationCards = () => {
+  if (!recommendationTrack.value) return [];
+  return Array.from(
+    recommendationTrack.value.querySelectorAll<HTMLElement>('.friend-recommendation-card'),
+  );
+};
+
+const scrollRecommendationTo = (index: number, behavior: ScrollBehavior = 'smooth') => {
+  const track = recommendationTrack.value;
+  const cards = getRecommendationCards();
+  if (!track || cards.length === 0) return;
+
+  const safeIndex = Math.min(Math.max(index, 0), cards.length - 1);
+  const card = cards[safeIndex];
+  if (!card) return;
+
+  activeRecommendationIndex.value = safeIndex;
+  track.scrollTo({ left: card.offsetLeft, behavior });
+};
+
+const scrollRecommendation = (direction: -1 | 1) => {
+  const maxIndex = recommendedPosts.value.length - 1;
+  if (maxIndex < 1) return;
+
+  const requestedIndex = activeRecommendationIndex.value + direction;
+  if (requestedIndex > maxIndex) {
+    const eligibleCount = posts.value.filter(
+      post => post.message && post.message.trim() !== '',
+    ).length;
+    if (eligibleCount > recommendedPosts.value.length) {
+      refreshRecommendations();
+      return;
+    }
+  }
+
+  const targetIndex = requestedIndex < 0
+    ? maxIndex
+    : requestedIndex > maxIndex
+      ? 0
+      : requestedIndex;
+  scrollRecommendationTo(targetIndex);
+};
+
+const handleRecommendationScroll = () => {
+  if (recommendationScrollFrame !== null) {
+    cancelAnimationFrame(recommendationScrollFrame);
+  }
+
+  recommendationScrollFrame = requestAnimationFrame(() => {
+    recommendationScrollFrame = null;
+    const track = recommendationTrack.value;
+    const cards = getRecommendationCards();
+    if (!track || cards.length === 0) return;
+
+    let closestIndex = 0;
+    let closestDistance = Number.POSITIVE_INFINITY;
+    cards.forEach((card, index) => {
+      const distance = Math.abs(card.offsetLeft - track.scrollLeft);
+      if (distance < closestDistance) {
+        closestDistance = distance;
+        closestIndex = index;
+      }
+    });
+    activeRecommendationIndex.value = closestIndex;
+  });
 };
 
 const startRecommendationTimer = () => {
-  if (recommendTimer) clearInterval(recommendTimer);
-  // 首次執行
-  refreshRecommendations();
-  // 每 10 秒刷新
-  recommendTimer = setInterval(refreshRecommendations, 10000);
+  stopRecommendationTimer();
+  if (
+    !recommendationAutoplay.value
+    || recommendationInteractionPaused.value
+    || recommendedPosts.value.length <= 1
+  ) return;
+
+  recommendTimer = setInterval(() => {
+    if (document.visibilityState === 'visible') {
+      scrollRecommendation(1);
+    }
+  }, 10000);
+};
+
+const setRecommendationInteraction = (paused: boolean) => {
+  recommendationInteractionPaused.value = paused;
+  if (paused) {
+    stopRecommendationTimer();
+  } else {
+    startRecommendationTimer();
+  }
+};
+
+const handleRecommendationFocusOut = (event: FocusEvent) => {
+  const section = event.currentTarget as HTMLElement;
+  const nextTarget = event.relatedTarget as Node | null;
+  if (nextTarget && section.contains(nextTarget)) return;
+  setRecommendationInteraction(false);
+};
+
+const pauseRecommendationForTouch = () => {
+  setRecommendationInteraction(true);
+  if (recommendationResumeTimer) clearTimeout(recommendationResumeTimer);
+  recommendationResumeTimer = setTimeout(() => {
+    recommendationResumeTimer = null;
+    setRecommendationInteraction(false);
+  }, 8000);
+};
+
+const toggleRecommendationAutoplay = () => {
+  recommendationAutoplay.value = !recommendationAutoplay.value;
+  if (recommendationAutoplay.value) {
+    startRecommendationTimer();
+  } else {
+    stopRecommendationTimer();
+  }
+};
+
+const handleReducedMotionChange = (event: MediaQueryListEvent) => {
+  recommendationAutoplay.value = !event.matches;
+  if (event.matches) {
+    stopRecommendationTimer();
+  } else {
+    startRecommendationTimer();
+  }
 };
 
 // 監聽 posts 變更，重新建立 Queue
 watch(posts, (newPosts) => {
   if (newPosts.length > 0) {
     // 推薦系統應該基於全部使用者，所以如果目前沒有篩選條件，就更新推薦
-    if (selectedCategories.value.length === 0 && selectedRegionFilters.value.length === 0) {
+    if (
+      selectedCategories.value.length === 0
+      && selectedRegionFilters.value.length === 0
+      && selectedIntentFilters.value.length === 0
+    ) {
       const eligiblePosts = newPosts.filter(p => p.message && p.message.trim() !== '');
       recommendationQueue.value = shuffleArray(eligiblePosts);
+      refreshRecommendations();
       startRecommendationTimer();
     }
   }
@@ -1119,10 +1347,17 @@ watch([selectedRegionFilters, selectedCategories, selectedIntentFilters], () => 
 }, { deep: true });
 
 onUnmounted(() => {
-  if (recommendTimer) {
-    clearInterval(recommendTimer);
-    recommendTimer = null;
+  stopRecommendationTimer();
+  if (recommendationResumeTimer) {
+    clearTimeout(recommendationResumeTimer);
+    recommendationResumeTimer = null;
   }
+  if (recommendationScrollFrame !== null) {
+    cancelAnimationFrame(recommendationScrollFrame);
+    recommendationScrollFrame = null;
+  }
+  reducedMotionQuery?.removeEventListener('change', handleReducedMotionChange);
+  reducedMotionQuery = null;
   if (filterFetchTimer) {
     clearTimeout(filterFetchTimer);
     filterFetchTimer = null;
@@ -1133,3 +1368,737 @@ onUnmounted(() => {
   }
 });
 </script>
+
+<style scoped>
+.friends-page {
+  color: rgb(30 41 59);
+}
+
+.friends-page-shell {
+  width: 100%;
+}
+
+.friends-page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding: 0.25rem 0.15rem;
+}
+
+.friends-page-heading {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  min-width: 0;
+}
+
+.friends-page-heading h1 {
+  letter-spacing: 0;
+  line-height: 1.15;
+}
+
+.friends-page-heading p {
+  max-width: 34rem;
+  line-height: 1.55;
+}
+
+.friends-page-mark,
+.friend-compose-icon,
+.friend-showcase-mark,
+.friends-tips-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  color: rgb(15 118 110);
+  background: rgb(240 253 250);
+  border: 1px solid rgba(20, 184, 166, 0.2);
+}
+
+.friends-page-mark {
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 0.75rem;
+  color: white;
+  background: rgb(15 118 110);
+  box-shadow: 0 8px 20px rgba(15, 118, 110, 0.16);
+}
+
+.friends-page-count {
+  display: grid;
+  grid-template-columns: auto auto;
+  align-items: baseline;
+  gap: 0.55rem;
+  padding: 0.58rem 0.72rem;
+  border: 1px solid rgba(148, 163, 184, 0.24);
+  border-radius: 0.75rem;
+  background: rgba(255, 255, 255, 0.78);
+  color: rgb(100 116 139);
+  font-size: 0.72rem;
+  font-weight: 750;
+  white-space: nowrap;
+}
+
+.friends-page-count strong {
+  color: rgb(15 118 110);
+  font-size: 1rem;
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
+}
+
+.friends-tips-panel {
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  border-radius: 0.8rem;
+  background: rgba(248, 250, 252, 0.72);
+  box-shadow: 0 5px 16px rgba(15, 23, 42, 0.035);
+}
+
+.friends-tips-panel p,
+.friends-tips-panel li {
+  line-height: 1.55;
+}
+
+.friends-tips-panel li + li {
+  margin-top: 0.18rem;
+}
+
+.friends-tips-icon {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 0.62rem;
+}
+
+.friend-compose-panel,
+.friend-login-panel {
+  border: 1px solid rgba(148, 163, 184, 0.24);
+  border-radius: 1rem;
+  background: rgba(255, 255, 255, 0.86);
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.065);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+.friend-compose-icon {
+  width: 2.55rem;
+  height: 2.55rem;
+  border-radius: 0.72rem;
+}
+
+.friend-compose-heading h2 {
+  letter-spacing: 0;
+}
+
+.friend-intent-option,
+.friend-advanced-toggle,
+.friend-region-panel,
+.friend-region-option {
+  border-radius: 0.72rem;
+}
+
+.friend-intent-option {
+  min-height: 4.6rem;
+}
+
+.friend-intent-option > span:last-child,
+.friend-region-option {
+  line-height: 1.3;
+}
+
+.friend-advanced-toggle {
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+.friend-region-panel {
+  background: rgb(248 250 252 / 0.78);
+  box-shadow: none;
+}
+
+.friend-showcase {
+  padding-block: 1rem;
+  border-top: 1px solid rgba(148, 163, 184, 0.22);
+  border-bottom: 1px solid rgba(148, 163, 184, 0.22);
+}
+
+.friend-showcase-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.85rem;
+}
+
+.friend-showcase-heading {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  min-width: 0;
+}
+
+.friend-showcase-mark {
+  width: 2.2rem;
+  height: 2.2rem;
+  border-radius: 0.68rem;
+}
+
+.friend-showcase-heading h2 {
+  color: rgb(30 41 59);
+  font-size: 1rem;
+  font-weight: 900;
+  letter-spacing: 0;
+  line-height: 1.3;
+}
+
+.friend-showcase-heading p {
+  margin-top: 0.12rem;
+  color: rgb(100 116 139);
+  font-size: 0.7rem;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.friend-carousel-controls {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.38rem;
+}
+
+.friend-carousel-control {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  flex: 0 0 auto;
+  border: 1px solid rgba(148, 163, 184, 0.28);
+  border-radius: 0.62rem;
+  background: rgba(255, 255, 255, 0.9);
+  color: rgb(71 85 105);
+  transition:
+    color 160ms ease,
+    border-color 160ms ease,
+    background 160ms ease,
+    transform 160ms ease;
+}
+
+.friend-carousel-control:hover,
+.friend-carousel-control:focus-visible,
+.friend-carousel-control.is-active {
+  border-color: rgba(20, 184, 166, 0.42);
+  background: rgb(240 253 250);
+  color: rgb(15 118 110);
+  outline: none;
+}
+
+.friend-carousel-control:active {
+  transform: scale(0.96);
+}
+
+.friend-carousel-track {
+  position: relative;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: clamp(15.5rem, 28vw, 18rem);
+  gap: 0.7rem;
+  overflow-x: auto;
+  padding: 0.25rem 0.1rem 0.6rem;
+  scroll-behavior: smooth;
+  scroll-padding-inline: 0.1rem;
+  scroll-snap-type: x mandatory;
+  overscroll-behavior-inline: contain;
+}
+
+.friend-recommendation-card {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 19.25rem;
+  padding: 0.85rem;
+  overflow: hidden;
+  scroll-snap-align: start;
+  border: 1px solid rgba(148, 163, 184, 0.24);
+  border-radius: 0.78rem;
+  background: rgba(255, 255, 255, 0.88);
+  box-shadow: 0 3px 12px rgba(15, 23, 42, 0.045);
+  transition:
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    transform 180ms ease;
+}
+
+.friend-recommendation-card:hover,
+.friend-recommendation-card:focus-within,
+.friend-recommendation-card.is-current {
+  border-color: rgba(20, 184, 166, 0.38);
+  box-shadow: 0 8px 22px rgba(15, 118, 110, 0.085);
+}
+
+.friend-recommendation-card:hover {
+  transform: translateY(-1px);
+}
+
+.friend-recommendation-card:active {
+  transform: scale(0.995);
+}
+
+.friend-recommendation-card h3 {
+  line-height: 1.35;
+}
+
+.friend-recommendation-avatar,
+.friend-directory-avatar {
+  overflow: hidden;
+  border: 1px solid rgba(20, 184, 166, 0.18);
+  background: rgb(248 250 252);
+}
+
+.friend-recommendation-avatar {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 0.68rem;
+}
+
+.friend-recommendation-code {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  gap: 0.5rem;
+  margin-bottom: 0.72rem;
+  padding: 0.5rem 0.62rem;
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  border-radius: 0.62rem;
+  background: rgb(248 250 252);
+  color: rgb(15 118 110);
+  transition:
+    border-color 160ms ease,
+    background 160ms ease;
+}
+
+.friend-recommendation-code:hover,
+.friend-recommendation-code:focus-visible {
+  border-color: rgba(20, 184, 166, 0.4);
+  background: rgb(240 253 250);
+  outline: none;
+}
+
+.friend-recommendation-code span,
+.friend-directory-code {
+  letter-spacing: 0;
+}
+
+.friend-recommendation-message {
+  margin-bottom: 0.72rem;
+  padding: 0.65rem 0.7rem;
+  border-left: 2px solid rgb(45 212 191);
+  background: rgb(248 250 252);
+  line-height: 1.55;
+}
+
+.friend-recommendation-action {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  gap: 0.35rem;
+  margin-top: auto;
+  padding: 0.62rem 0.7rem;
+  border-radius: 0.62rem;
+  background: rgb(15 118 110);
+  color: white;
+  font-size: 0.75rem;
+  font-weight: 850;
+  box-shadow: 0 5px 12px rgba(15, 118, 110, 0.16);
+  transition:
+    background 160ms ease,
+    transform 160ms ease;
+}
+
+.friend-recommendation-action:hover,
+.friend-recommendation-action:focus-visible {
+  background: rgb(13 148 136);
+  outline: none;
+}
+
+.friend-recommendation-action:active {
+  transform: scale(0.98);
+}
+
+.friend-carousel-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  min-height: 1.25rem;
+  margin-top: 0.2rem;
+}
+
+.friend-carousel-dots {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  min-width: 0;
+}
+
+.friend-carousel-dot {
+  width: 0.45rem;
+  height: 0.45rem;
+  flex: 0 0 auto;
+  border-radius: 999px;
+  background: rgb(203 213 225);
+  transition:
+    width 180ms ease,
+    background 180ms ease;
+}
+
+.friend-carousel-dot.is-active {
+  width: 1.15rem;
+  background: rgb(15 118 110);
+}
+
+.friend-carousel-position {
+  color: rgb(100 116 139);
+  font-size: 0.68rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.friend-directory-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.8rem;
+  padding: 0.24rem 0.45rem;
+  border: 1px solid rgba(20, 184, 166, 0.2);
+  border-radius: 0.55rem;
+  background: rgb(240 253 250);
+  color: rgb(15 118 110);
+  font-size: 0.75rem;
+  font-weight: 850;
+  font-variant-numeric: tabular-nums;
+}
+
+.friend-directory-refresh {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.35rem;
+  height: 2.35rem;
+  border: 1px solid rgba(148, 163, 184, 0.24);
+  border-radius: 0.65rem;
+  background: rgba(255, 255, 255, 0.8);
+  color: rgb(100 116 139);
+  transition:
+    color 160ms ease,
+    border-color 160ms ease,
+    background 160ms ease;
+}
+
+.friend-directory-refresh:hover,
+.friend-directory-refresh:focus-visible {
+  border-color: rgba(20, 184, 166, 0.38);
+  background: rgb(240 253 250);
+  color: rgb(15 118 110);
+  outline: none;
+}
+
+.friend-filter-panel {
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  border-radius: 0.8rem;
+  background: rgba(255, 255, 255, 0.72);
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.035);
+}
+
+.friend-filter-panel > div {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.friend-filter-panel > div > div:first-child {
+  margin-bottom: 0;
+  line-height: 1.45;
+}
+
+.friend-filter-panel button {
+  min-height: 2.15rem;
+  border-radius: 0.68rem;
+  line-height: 1.25;
+  white-space: nowrap;
+  transition:
+    color 160ms ease,
+    border-color 160ms ease,
+    background 160ms ease,
+    box-shadow 160ms ease,
+    transform 120ms ease;
+}
+
+.friend-filter-panel button:hover,
+.friend-filter-panel button:focus-visible {
+  transform: translateY(-1px);
+  outline: none;
+}
+
+.friend-filter-panel button:active {
+  transform: scale(0.97);
+}
+
+.friend-directory-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.85rem;
+}
+
+.friend-directory-card {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding: 1rem;
+  border: 1px solid rgba(148, 163, 184, 0.24);
+  border-radius: 0.78rem;
+  background: rgba(255, 255, 255, 0.86);
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.04);
+  transition:
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    transform 180ms ease;
+}
+
+.friend-directory-card:hover,
+.friend-directory-card:focus-within {
+  transform: translateY(-1px);
+  border-color: rgba(20, 184, 166, 0.34);
+  box-shadow: 0 9px 22px rgba(15, 118, 110, 0.07);
+}
+
+.friend-directory-card > .flex:first-child > .flex {
+  min-width: 0;
+}
+
+.friend-directory-card > .flex:first-child > .flex > div:last-child {
+  min-width: 0;
+}
+
+.friend-directory-card h3 {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.friend-directory-avatar {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 0.75rem;
+}
+
+.friend-directory-code {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.38rem;
+  flex: 0 0 auto;
+  padding: 0.44rem 0.55rem;
+  border: 1px solid rgba(20, 184, 166, 0.2);
+  border-radius: 0.58rem;
+  background: rgb(240 253 250);
+  color: rgb(15 118 110);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.72rem;
+  font-weight: 850;
+  transition:
+    border-color 160ms ease,
+    background 160ms ease;
+}
+
+.friend-directory-code:hover,
+.friend-directory-code:focus-visible {
+  border-color: rgba(15, 118, 110, 0.42);
+  background: rgb(204 251 241);
+  outline: none;
+}
+
+.friend-directory-region {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.3rem 0.48rem;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-radius: 0.52rem;
+  background: rgb(248 250 252);
+  color: rgb(100 116 139);
+  font-size: 0.7rem;
+  font-weight: 800;
+}
+
+.friend-directory-message {
+  padding: 0.72rem 0.8rem;
+  border-left: 2px solid rgb(45 212 191);
+  background: rgb(248 250 252);
+  color: rgb(71 85 105);
+  font-size: 0.78rem;
+  font-weight: 700;
+  line-height: 1.62;
+}
+
+@media (max-width: 767px) {
+  .friends-page {
+    padding-inline: 0.85rem;
+  }
+
+  .friends-page-header {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+
+  .friends-page-heading {
+    align-items: flex-start;
+    gap: 0.72rem;
+  }
+
+  .friends-page-mark {
+    width: 2.55rem;
+    height: 2.55rem;
+  }
+
+  .friends-page-heading h1 {
+    font-size: 1.65rem;
+  }
+
+  .friends-page-heading p {
+    font-size: 0.82rem;
+    line-height: 1.5;
+  }
+
+  .friends-page-count {
+    grid-template-columns: 1fr;
+    justify-items: center;
+    gap: 0.08rem;
+    min-width: 4.55rem;
+    padding: 0.52rem 0.58rem;
+  }
+
+  .friends-page-count span {
+    font-size: 0.66rem;
+  }
+
+  .friends-page-count strong {
+    font-size: 1.08rem;
+  }
+
+  .friends-tips-panel {
+    padding: 0.85rem;
+  }
+
+  .friend-compose-panel {
+    padding: 1rem;
+  }
+
+  .friend-compose-heading {
+    margin-bottom: 1.3rem;
+  }
+
+  .friend-compose-heading h2 {
+    font-size: 1.25rem;
+  }
+
+  .friend-showcase-header {
+    align-items: flex-start;
+  }
+
+  .friend-carousel-track {
+    grid-auto-columns: min(82vw, 17rem);
+    gap: 0.6rem;
+  }
+
+  .friend-recommendation-card {
+    min-height: 18.5rem;
+  }
+
+  .friend-directory-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .friend-directory-card {
+    padding: 0.9rem;
+  }
+
+  .friend-directory-card > .flex:first-child {
+    gap: 0.55rem;
+  }
+
+  .friend-directory-avatar {
+    width: 2.65rem;
+    height: 2.65rem;
+  }
+
+  .friend-directory-code {
+    padding: 0.4rem 0.45rem;
+    font-size: 0.66rem;
+  }
+
+  .friend-filter-panel {
+    gap: 0.9rem;
+    padding: 0.85rem;
+  }
+
+  .friend-filter-panel > div {
+    gap: 0.48rem;
+  }
+
+  .friend-filter-panel .flex.flex-wrap {
+    gap: 0.42rem;
+  }
+
+  .friend-filter-panel button {
+    min-height: 2.05rem;
+    padding: 0.42rem 0.72rem;
+    font-size: 0.78rem;
+  }
+}
+
+@media (max-width: 390px) {
+  .friends-page {
+    padding-inline: 0.72rem;
+  }
+
+  .friend-carousel-controls {
+    gap: 0.25rem;
+  }
+
+  .friend-carousel-control {
+    width: 2.1rem;
+    height: 2.1rem;
+  }
+
+  .friend-directory-code {
+    font-size: 0.62rem;
+  }
+
+  .friends-page-heading h1 {
+    font-size: 1.5rem;
+  }
+
+  .friends-page-heading p {
+    font-size: 0.77rem;
+  }
+
+  .friends-page-count {
+    min-width: 4.25rem;
+    padding-inline: 0.45rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .friend-carousel-track {
+    scroll-behavior: auto;
+  }
+
+  .friend-recommendation-card,
+  .friend-directory-card,
+  .friend-carousel-control,
+  .friend-carousel-dot {
+    transition-duration: 0.01ms;
+  }
+}
+</style>

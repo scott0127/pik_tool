@@ -7,7 +7,7 @@
  *   { cells: [{ cellId: "3765..." }, { cellId: "3765..." }] }
  * 
  * 新格式:
- *   { encoding: "delta", base: "3765...", deltas: [0, 1, 5, ...] }
+ *   { encoding: "delta", base: "3765...", deltas: [0, 1, "9007199254740992", ...] }
  * 
  * 使用方式: node scripts/encode-s2-cells.cjs
  */
@@ -20,6 +20,12 @@ const SINGLE_DIR = path.join(__dirname, '..', 'public', 'data', 'regions', 'taiw
 let totalFiles = 0;
 let totalCells = 0;
 let totalBytesSaved = 0;
+let failedFiles = 0;
+
+function toLosslessJsonInteger(value) {
+    const asNumber = Number(value);
+    return Number.isSafeInteger(asNumber) ? asNumber : value.toString();
+}
 
 /**
  * 將 cells 陣列轉換為差量編碼
@@ -42,7 +48,7 @@ function encodeCells(cells) {
 
     for (const id of ids) {
         const delta = id - prev;
-        deltas.push(Number(delta)); // 差量通常很小，可用 Number
+        deltas.push(toLosslessJsonInteger(delta));
         prev = id;
     }
 
@@ -122,6 +128,7 @@ function processFile(filePath) {
         // 驗證
         if (!verifyEncoding(data.cells, encoded)) {
             console.error(`  [ERROR] ${fileName} - 編碼驗證失敗！`);
+            failedFiles++;
             return;
         }
 
@@ -149,6 +156,7 @@ function processFile(filePath) {
 
     } catch (err) {
         console.error(`  [ERROR] ${filePath}: ${err.message}`);
+        failedFiles++;
     }
 }
 
@@ -173,4 +181,9 @@ console.log('\n=== 統計結果 ===');
 console.log(`處理檔案數: ${totalFiles}`);
 console.log(`處理 Cell 數: ${totalCells.toLocaleString()}`);
 console.log(`總節省空間: ${(totalBytesSaved / 1024).toFixed(1)} KB (${(totalBytesSaved / 1024 / 1024).toFixed(2)} MB)`);
+console.log(`失敗檔案數: ${failedFiles}`);
 console.log('================\n');
+
+if (failedFiles > 0) {
+    process.exitCode = 1;
+}

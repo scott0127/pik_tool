@@ -1,8 +1,8 @@
 <template>
-  <div class="space-y-6 pb-8 relative">
+  <div class="collection-page space-y-6 pb-8 relative">
     <!-- Decorative floating elements -->
     <div
-      class="absolute top-0 left-0 w-full h-[400px] overflow-hidden pointer-events-none -z-10"
+      class="collection-page-ambient absolute top-0 left-0 w-full h-[400px] overflow-hidden pointer-events-none -z-10"
     >
       <div class="deco-leaf deco-leaf-1">
         <Icon name="lucide:leaf" class="w-6 h-6 text-emerald-300/30" />
@@ -23,24 +23,24 @@
 
     <!-- -->
     <div
-      class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
+      class="collection-page-header flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
     >
       <div>
         <h1
-          class="text-3xl font-extrabold text-gray-800 flex items-center gap-3"
+          class="collection-page-title text-3xl font-extrabold text-gray-800 flex items-center gap-3"
         >
           <span
-            class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center shadow-lg shadow-emerald-200"
+            class="collection-page-title-icon w-10 h-10 flex items-center justify-center"
           >
             <Icon name="lucide:book-open" class="w-5 h-5 text-white" />
           </span>
-          <span class="text-gradient">{{ $t("collection.title") }}</span>
+          <span>{{ $t("collection.title") }}</span>
         </h1>
-        <p class="text-slate-700 font-semibold mt-1">{{ $t("collection.subtitle") }}</p>
+        <p class="collection-page-subtitle text-slate-700 font-semibold mt-1">{{ $t("collection.subtitle") }}</p>
       </div>
 
       <!-- Quick stats -->
-      <div class="bg-white/70 backdrop-blur-md border border-white/70 shadow-md flex items-center gap-4 rounded-2xl px-4 py-2">
+      <div class="collection-overview flex items-center gap-4 px-4 py-2">
         <div class="text-right">
           <p class="text-xs text-gray-500">
             {{ $t("collection.stats.showing") }}
@@ -61,10 +61,10 @@
 
     <!-- Filters Section -->
     <div
-      class="card relative rounded-3xl p-5 md:p-6 mb-6 z-10 transition-all duration-300"
+      class="collection-filter-panel card relative rounded-3xl p-5 md:p-6 mb-6 z-10 transition-all duration-300"
     >
       <!-- Background gradients wrapper (clipped) -->
-      <div class="absolute inset-0 overflow-hidden rounded-3xl pointer-events-none -z-10">
+      <div class="collection-filter-ambient absolute inset-0 overflow-hidden rounded-3xl pointer-events-none -z-10">
         <div
           class="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-emerald-100/40 to-teal-50/40 rounded-full blur-3xl translate-x-1/3 -translate-y-1/3"
         ></div>
@@ -363,7 +363,7 @@
       </div>
 
       <div class="capture-dashboard-grid rare-dashboard-grid">
-        <article class="rare-recommendation-panel">
+        <article class="rare-recommendation-panel rare-recommendation-panel-primary">
           <div class="rare-recommendation-panel-head">
             <span>{{ captureDashboardLabels.realCloseTitle }}</span>
             <small>{{ captureDashboardLabels.realCloseDesc }}</small>
@@ -398,7 +398,7 @@
           </div>
         </article>
 
-        <article class="rare-recommendation-panel">
+        <article class="rare-recommendation-panel rare-recommendation-panel-virtual">
           <div class="rare-recommendation-panel-head">
             <span>{{ captureDashboardLabels.virtualCloseTitle }}</span>
             <small>{{ captureDashboardLabels.virtualCloseDesc }}</small>
@@ -433,7 +433,7 @@
           </div>
         </article>
 
-        <article class="rare-recommendation-panel">
+        <article class="rare-recommendation-panel rare-recommendation-panel-unlock">
           <div class="rare-recommendation-panel-head">
             <span>{{ captureDashboardLabels.unlockCloseTitle }}</span>
             <small>{{ captureDashboardLabels.unlockCloseDesc }}</small>
@@ -844,7 +844,10 @@
             <!-- Collapsible content -->
             <div
               class="collection-category-content-wrapper"
-              :class="{ 'is-open': isCategoryExpanded(def.category.id) }"
+              :class="{
+                'is-open': isCategoryExpanded(def.category.id),
+                'is-animating': isCategoryAnimating(def.category.id),
+              }"
             >
               <div class="collection-category-content-inner mt-4">
                 <CollectionInventoryPanel :category-id="def.category.id" />
@@ -982,7 +985,10 @@
             <!-- Collapsible content -->
             <div
               class="collection-category-content-wrapper"
-              :class="{ 'is-open': isCategoryExpanded(def.category.id) }"
+              :class="{
+                'is-open': isCategoryExpanded(def.category.id),
+                'is-animating': isCategoryAnimating(def.category.id),
+              }"
             >
               <div class="collection-category-content-inner mt-4">
                 <DecorGrid
@@ -1062,6 +1068,8 @@ watch(isFilterExpanded, (expanded) => {
 
 // UX: Accordion - track collapsed categories (default all expanded)
 const collapsedCategories = ref<Set<string>>(new Set());
+const animatingCategories = ref<Set<string>>(new Set());
+const categoryAnimationTimers = new Map<string, number>();
 let categoryBulkFrame: number | null = null;
 let scrollFrame: number | null = null;
 
@@ -1155,8 +1163,33 @@ const cancelCategoryBulkToggle = () => {
   }
 };
 
+const markCategoriesAnimating = (categoryIds: string[]) => {
+  const nextAnimating = new Set(animatingCategories.value);
+
+  for (const categoryId of categoryIds) {
+    const currentTimer = categoryAnimationTimers.get(categoryId);
+    if (currentTimer !== undefined) {
+      window.clearTimeout(currentTimer);
+    }
+
+    nextAnimating.add(categoryId);
+    const timer = window.setTimeout(() => {
+      categoryAnimationTimers.delete(categoryId);
+      if (!animatingCategories.value.has(categoryId)) return;
+
+      const remaining = new Set(animatingCategories.value);
+      remaining.delete(categoryId);
+      animatingCategories.value = remaining;
+    }, 380);
+    categoryAnimationTimers.set(categoryId, timer);
+  }
+
+  animatingCategories.value = nextAnimating;
+};
+
 const toggleCategory = (categoryId: string) => {
   cancelCategoryBulkToggle();
+  markCategoriesAnimating([categoryId]);
   requestAnimationFrame(() => {
     const newSet = new Set(collapsedCategories.value);
     if (newSet.has(categoryId)) {
@@ -1171,6 +1204,9 @@ const toggleCategory = (categoryId: string) => {
 const isCategoryExpanded = (categoryId: string) =>
   !collapsedCategories.value.has(categoryId);
 
+const isCategoryAnimating = (categoryId: string) =>
+  animatingCategories.value.has(categoryId);
+
 const updateCategoriesInBatches = (categoryIds: string[], expand: boolean) => {
   cancelCategoryBulkToggle();
 
@@ -1180,9 +1216,14 @@ const updateCategoriesInBatches = (categoryIds: string[], expand: boolean) => {
 
   const runBatch = () => {
     const end = Math.min(index + batchSize, categoryIds.length);
+    const changedIds: string[] = [];
     for (; index < end; index += 1) {
       const id = categoryIds[index];
       if (!id) continue;
+      const isExpanded = !nextSet.has(id);
+      if (isExpanded !== expand) {
+        changedIds.push(id);
+      }
       if (expand) {
         nextSet.delete(id);
       } else {
@@ -1190,6 +1231,9 @@ const updateCategoriesInBatches = (categoryIds: string[], expand: boolean) => {
       }
     }
 
+    if (changedIds.length > 0) {
+      markCategoriesAnimating(changedIds);
+    }
     collapsedCategories.value = new Set(nextSet);
 
     if (index < categoryIds.length) {
@@ -1331,6 +1375,10 @@ onMounted(() => {
 
 onUnmounted(() => {
   cancelCategoryBulkToggle();
+  for (const timer of categoryAnimationTimers.values()) {
+    window.clearTimeout(timer);
+  }
+  categoryAnimationTimers.clear();
   if (scrollFrame !== null) cancelAnimationFrame(scrollFrame);
   window.removeEventListener("scroll", handleScroll);
   window.removeEventListener("beforeunload", handleBeforeUnload);
@@ -2608,9 +2656,12 @@ const handleCollectAll = (categoryId: string, categoryName: string) => {
 .collection-category-content-wrapper {
   display: grid;
   grid-template-rows: 0fr;
-  will-change: grid-template-rows;
   transition: grid-template-rows 320ms cubic-bezier(0.25, 1, 0.5, 1);
   overflow: hidden;
+}
+
+.collection-category-content-wrapper.is-animating {
+  will-change: grid-template-rows;
 }
 
 .collection-category-content-wrapper.is-open {
@@ -2622,13 +2673,289 @@ const handleCollectAll = (categoryId: string, categoryName: string) => {
   overflow: hidden;
   opacity: 0;
   transform: translateY(-8px);
-  will-change: transform, opacity;
   transition: opacity 240ms ease, transform 320ms cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.collection-category-content-wrapper.is-animating .collection-category-content-inner {
+  will-change: transform, opacity;
 }
 
 .collection-category-content-wrapper.is-open .collection-category-content-inner {
   opacity: 1;
   transform: translateY(0);
+}
+
+/* Collection visual hierarchy */
+.collection-page {
+  --collection-ink: rgb(15 23 42);
+  --collection-muted: rgb(100 116 139);
+  --collection-line: rgba(148, 163, 184, 0.24);
+}
+
+.collection-page-ambient {
+  opacity: 0.48;
+}
+
+.collection-page-header {
+  padding: 0.2rem 0.15rem;
+}
+
+.collection-page-title {
+  color: var(--collection-ink);
+  letter-spacing: 0;
+}
+
+.collection-page-title-icon {
+  flex: 0 0 auto;
+  border: 1px solid rgba(15, 118, 110, 0.18);
+  border-radius: 0.75rem;
+  background: rgb(15 118 110);
+  box-shadow: 0 8px 18px rgba(15, 118, 110, 0.18);
+}
+
+.collection-page-subtitle {
+  margin-left: 3.25rem;
+  color: var(--collection-muted);
+  font-size: 0.88rem;
+  font-weight: 650;
+}
+
+.collection-overview {
+  min-width: 13.5rem;
+  border: 1px solid var(--collection-line);
+  border-radius: 0.88rem;
+  background: rgba(255, 255, 255, 0.78);
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.05);
+}
+
+.collection-overview p:first-child {
+  color: var(--collection-muted);
+  font-weight: 700;
+}
+
+.collection-overview p:last-child {
+  color: rgb(15 118 110);
+  font-variant-numeric: tabular-nums;
+}
+
+.collection-filter-panel {
+  overflow: visible;
+  border: 1px solid var(--collection-line);
+  border-radius: 1rem;
+  background: rgba(255, 255, 255, 0.78);
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.055);
+}
+
+.collection-filter-ambient {
+  display: none;
+}
+
+.capture-dashboard {
+  padding: 0;
+  border-color: var(--collection-line);
+  border-radius: 1rem;
+  background: rgba(255, 255, 255, 0.84);
+  box-shadow: 0 10px 28px rgba(15, 23, 42, 0.06);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+.capture-dashboard-header {
+  margin: 0;
+  padding: 0.92rem 1rem;
+  border-bottom: 1px solid var(--collection-line);
+}
+
+.capture-dashboard-icon {
+  border-radius: 0.7rem;
+  background: rgb(240 253 250);
+}
+
+.capture-dashboard-grid {
+  grid-template-columns: minmax(0, 1.18fr) minmax(18rem, 0.82fr);
+  grid-template-areas:
+    "primary virtual"
+    "primary unlock";
+  gap: 0;
+}
+
+.rare-recommendation-panel {
+  gap: 0.62rem;
+  padding: 0.9rem 1rem 1rem;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+.rare-recommendation-panel-primary {
+  grid-area: primary;
+  border-right: 1px solid var(--collection-line);
+  background: rgba(240, 253, 250, 0.22);
+}
+
+.rare-recommendation-panel-virtual {
+  grid-area: virtual;
+  border-bottom: 1px solid var(--collection-line);
+  background: rgba(255, 251, 235, 0.28);
+}
+
+.rare-recommendation-panel-unlock {
+  grid-area: unlock;
+  background: rgba(248, 250, 252, 0.42);
+}
+
+.rare-recommendation-panel-head {
+  padding-inline: 0.1rem;
+}
+
+.capture-recommendation {
+  min-height: 4rem;
+  border-color: var(--collection-line);
+  border-radius: 0.78rem;
+  background: rgb(255 255 255);
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.035);
+}
+
+.capture-recommendation:hover,
+.capture-recommendation:focus-visible {
+  transform: translateY(-1px);
+  background: rgb(248 253 251);
+  box-shadow: 0 8px 18px rgba(15, 118, 110, 0.08);
+}
+
+.capture-recommendation-icon {
+  border-radius: 0.72rem;
+}
+
+.rare-analysis-panel {
+  gap: 0.78rem;
+  margin: 0;
+  padding: 0.95rem 1rem 1rem;
+  border: 0;
+  border-top: 1px solid var(--collection-line);
+  border-radius: 0;
+  background: rgb(248 250 252 / 0.72);
+}
+
+.rare-analysis-stat,
+.rare-analysis-action {
+  border-color: var(--collection-line);
+  border-radius: 0.7rem;
+  background: rgb(255 255 255 / 0.86);
+}
+
+@media (max-width: 768px) {
+  .collection-page-header {
+    padding-inline: 0.15rem;
+  }
+
+  .collection-page-subtitle {
+    margin-left: 0;
+  }
+
+  .collection-overview {
+    width: 100%;
+    min-width: 0;
+    justify-content: flex-end;
+  }
+
+  .collection-filter-panel {
+    border-radius: 0.9rem;
+  }
+
+  .capture-dashboard-grid {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      "primary"
+      "virtual"
+      "unlock";
+  }
+
+  .capture-dashboard-header {
+    align-items: flex-start;
+    gap: 0.7rem;
+    padding: 0.9rem 0.85rem;
+  }
+
+  .capture-dashboard-heading {
+    align-items: flex-start;
+  }
+
+  .capture-dashboard-heading p {
+    margin-top: 0.22rem;
+    line-height: 1.5;
+  }
+
+  .capture-dashboard-badge {
+    margin-top: 0.05rem;
+    white-space: nowrap;
+  }
+
+  .rare-recommendation-panel {
+    gap: 0.7rem;
+    padding: 0.82rem 0.8rem 0.9rem;
+  }
+
+  .rare-recommendation-panel-head {
+    gap: 0.7rem;
+    padding-inline: 0.12rem;
+  }
+
+  .rare-recommendation-panel-head span {
+    line-height: 1.35;
+  }
+
+  .rare-recommendation-panel-head small {
+    line-height: 1.35;
+  }
+
+  .capture-recommendation-list {
+    gap: 0.58rem;
+  }
+
+  .capture-recommendation {
+    min-height: 4.35rem;
+    row-gap: 0.38rem;
+    padding: 0.66rem 0.68rem 0.92rem;
+  }
+
+  .capture-recommendation-copy {
+    gap: 0.16rem;
+  }
+
+  .capture-recommendation-copy strong {
+    line-height: 1.3;
+  }
+
+  .capture-recommendation-copy span,
+  .capture-recommendation-hint {
+    line-height: 1.38;
+  }
+
+  .capture-recommendation-hint {
+    padding-top: 0.02rem;
+  }
+
+  .capture-recommendation-progress {
+    right: 0.68rem;
+    bottom: 0.42rem;
+    left: 0.68rem;
+  }
+
+  .rare-recommendation-panel-primary {
+    border-right: 0;
+    border-bottom: 1px solid var(--collection-line);
+  }
+
+  .rare-recommendation-panel-virtual {
+    border-bottom: 1px solid var(--collection-line);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .collection-page-ambient {
+    display: none;
+  }
 }
 </style>
 

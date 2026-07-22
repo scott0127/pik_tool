@@ -4,79 +4,42 @@
     :style="markerStyle"
     :title="titleText"
   >
-    <div class="absolute left-1/2 top-1/2 h-2.5 w-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white/90 bg-emerald-400/90 shadow-[0_2px_9px_rgba(6,78,59,0.35)]" />
-    <div class="absolute left-1/2 top-1/2 h-7 w-px -translate-x-1/2 -translate-y-[103%] bg-gradient-to-t from-emerald-400/45 to-transparent" />
+    <div class="decor-badge-anchor" />
+    <div class="decor-badge-stem" />
 
     <div
-      class="decor-badge-shell absolute left-1/2 top-1/2 flex w-[124px] -translate-x-1/2 -translate-y-[82%] items-center gap-1.5 overflow-hidden rounded-[20px] border p-1.5"
-      :class="markerClass"
+      class="decor-badge-shell absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-[88%] items-center"
+      :class="[markerClass, { 'is-compact': compact }]"
     >
       <div
-        class="decor-badge-count relative flex h-10 w-10 shrink-0 items-center justify-center rounded-[15px] border-2"
+        class="decor-badge-count relative flex shrink-0 items-center justify-center border-2"
         :class="countClass"
       >
-        <div class="absolute -top-1 -right-0.5 h-3 w-4 rotate-[-18deg] rounded-[100%_0] bg-emerald-300/90 shadow-sm" />
-        <span class="relative text-[24px] font-black leading-none text-emerald-950 drop-shadow-[0_1px_0_rgba(255,255,255,0.9)]">{{ count }}</span>
+        <span>{{ count }}</span>
       </div>
 
-      <div class="relative min-w-0 flex-1">
-        <div class="mb-1 flex items-center gap-1">
-          <span
-            class="decor-badge-pill inline-flex min-w-[30px] shrink-0 items-center justify-center whitespace-nowrap rounded-full border px-1.5 py-[2px] text-[10px] font-black leading-none tracking-normal"
-            :class="statusClass"
-          >
-            {{ statusLabel }}
-          </span>
-          <span
-            v-if="overflowCount > 0"
-            class="decor-badge-pill inline-flex shrink-0 items-center justify-center whitespace-nowrap rounded-full border border-white/80 px-1.5 py-[2px] text-[10px] font-black leading-none text-emerald-950"
-          >
-            +{{ overflowCount }}
-          </span>
-        </div>
-
-        <div class="flex items-center gap-1">
+      <div class="decor-badge-content relative min-w-0 flex-1">
+        <div class="decor-badge-icons flex items-center">
           <div
             v-for="item in iconItems"
             :key="item.id"
-            class="decor-badge-icon flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-white/80"
+            class="decor-badge-icon flex shrink-0 items-center justify-center"
             :title="item.name || item.id"
           >
             <Icon
               v-if="item.iconName"
               :name="item.iconName"
-              class="h-3.5 w-3.5"
+              class="h-4 w-4"
             />
-            <span v-else class="text-[10px] leading-none">{{ item.icon || "?" }}</span>
+            <span v-else class="text-[11px] leading-none">{{ item.icon || "?" }}</span>
           </div>
         </div>
 
-        <div
-          class="relative mt-1 h-3 max-w-[66px] overflow-hidden whitespace-nowrap text-[10px] font-black leading-none tracking-normal text-emerald-950"
-          :title="carouselTitle"
-        >
-          <span v-if="carouselLabels.length <= 1" class="block truncate">
-            {{ carouselLabels[0] || summaryLabel }}
-          </span>
-          <span
-            v-else
-            class="decor-name-track block"
-            :style="{
-              animationDuration: carouselDuration,
-              animationTimingFunction: carouselTiming,
-              '--label-count': carouselLabels.length,
-            }"
-          >
-            <span
-              v-for="(label, index) in carouselLabels"
-              :key="`${label}-${index}`"
-              class="block h-3 truncate"
-            >
-              {{ label }}
-            </span>
-          </span>
-        </div>
+        <span class="decor-badge-label block truncate">{{ summaryLabel }}</span>
       </div>
+
+      <span class="decor-badge-state" :class="statusClass">{{ statusLabel }}</span>
+      <span v-if="addedCount > 0" class="decor-badge-report">+{{ addedCount }}</span>
     </div>
   </div>
 </template>
@@ -102,6 +65,7 @@ const props = withDefaults(
     size?: number;
     maxDisplay?: number;
     singleLabel?: string;
+    compact?: boolean;
   }>(),
   {
     items: () => [],
@@ -112,12 +76,12 @@ const props = withDefaults(
     size: 104,
     maxDisplay: 3,
     singleLabel: "純種",
+    compact: false,
   },
 );
 
 const safeItems = computed(() => props.items || []);
 const iconItems = computed(() => safeItems.value.slice(0, Math.min(props.maxDisplay, 3)));
-const overflowCount = computed(() => Math.max(0, props.count - iconItems.value.length));
 
 const markerStyle = computed(() => ({
   width: `${props.size}px`,
@@ -132,10 +96,10 @@ const statusLabel = computed(() => {
 });
 
 const statusClass = computed(() => {
-  if (props.isReported) return "border-violet-100/90 text-violet-950";
-  if (props.count <= 1) return "border-emerald-100/90 text-emerald-950";
-  if (props.count <= 3) return "border-amber-100/90 text-amber-950";
-  return "border-rose-100/90 text-rose-950";
+  if (props.isReported) return "is-reported border-sky-100/90 text-sky-800";
+  if (props.count <= 1) return "is-pure border-emerald-100/90 text-emerald-800";
+  if (props.count <= 3) return "is-mixed border-amber-100/90 text-amber-800";
+  return "is-complex border-violet-100/90 text-violet-800";
 });
 
 const markerClass = computed(() => {
@@ -163,20 +127,6 @@ const summaryLabel = computed(() => {
   return names[0];
 });
 
-const carouselLabels = computed(() => {
-  const labels = safeItems.value
-    .map((item) => item.name || item.id)
-    .filter((name): name is string => Boolean(name));
-
-  if (labels.length > 0) return labels.slice(0, 6);
-  return [summaryLabel.value];
-});
-
-const carouselDuration = computed(() => `${Math.max(carouselLabels.value.length, 1) * 1.7}s`);
-const carouselTiming = computed(() => `steps(${Math.max(carouselLabels.value.length - 1, 1)}, end)`);
-
-const carouselTitle = computed(() => carouselLabels.value.join(" / "));
-
 const titleText = computed(() => {
   const names = safeItems.value.map((item) => item.name || item.id).join(" / ");
   return names ? `${statusLabel.value}: ${names}` : statusLabel.value;
@@ -184,14 +134,49 @@ const titleText = computed(() => {
 </script>
 
 <style scoped>
+.decor-badge-anchor {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0.58rem;
+  height: 0.58rem;
+  border: 2px solid rgba(255, 255, 255, 0.96);
+  border-radius: 999px;
+  background: rgb(20 184 166);
+  box-shadow: 0 2px 9px rgba(15, 118, 110, 0.34);
+  transform: translate(-50%, -50%);
+}
+
+.decor-badge-stem {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 1px;
+  height: 1.35rem;
+  background: linear-gradient(to top, rgba(20, 184, 166, 0.5), transparent);
+  transform: translate(-50%, -103%);
+}
+
 .decor-badge-shell {
-  background: rgba(255, 255, 255, 0.84);
-  border-color: rgb(255 255 255 / 0.78);
+  width: 6.7rem;
+  min-height: 3rem;
+  gap: 0.38rem;
+  padding: 0.35rem 0.38rem;
+  overflow: visible;
+  border-width: 1px;
+  border-radius: 0.85rem;
+  background: rgba(255, 255, 255, 0.96);
   box-shadow:
-    0 10px 20px rgb(6 78 59 / 0.14),
-    0 1px 8px rgb(255 255 255 / 0.72) inset;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+    0 8px 18px rgba(15, 23, 42, 0.18),
+    0 1px 0 rgba(255, 255, 255, 0.94) inset;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transform-origin: 50% 100%;
+  transition:
+    width 160ms ease,
+    min-height 160ms ease,
+    padding 160ms ease,
+    border-radius 160ms ease;
 }
 
 .decor-badge-shell::after {
@@ -199,28 +184,28 @@ const titleText = computed(() => {
   inset: 1px;
   pointer-events: none;
   content: "";
-  border-radius: 19px;
-  border: 1px solid rgb(255 255 255 / 0.42);
-}
-
-.decor-badge-count,
-.decor-badge-pill,
-.decor-badge-icon {
-  background: rgba(255, 255, 255, 0.86);
-  box-shadow:
-    0 1px 7px rgb(255 255 255 / 0.7) inset,
-    0 3px 8px rgb(6 78 59 / 0.1);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.56);
+  border-radius: 0.78rem;
 }
 
 .decor-badge-count {
-  background: rgba(236, 253, 245, 0.92);
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 0.68rem;
+  background: rgb(240 253 250);
+  color: rgb(6 78 59);
   box-shadow:
-    0 7px 14px rgb(6 78 59 / 0.14),
-    0 1px 10px rgb(255 255 255 / 0.84) inset;
-  backdrop-filter: blur(9px);
-  -webkit-backdrop-filter: blur(9px);
+    0 4px 10px rgba(15, 118, 110, 0.13),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+.decor-badge-count > span {
+  position: relative;
+  font-size: 1.35rem;
+  font-weight: 900;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.9);
 }
 
 .decor-badge-count::after {
@@ -228,33 +213,129 @@ const titleText = computed(() => {
   inset: 1px;
   pointer-events: none;
   content: "";
-  border-radius: 14px;
-  border: 1px solid rgb(255 255 255 / 0.42);
+  border: 1px solid rgba(255, 255, 255, 0.58);
+  border-radius: 0.6rem;
 }
 
-.decor-name-track {
-  animation-name: decor-name-track;
-  animation-iteration-count: infinite;
+.decor-badge-content {
+  display: grid;
+  align-content: center;
+  gap: 0.18rem;
 }
 
-@keyframes decor-name-track {
-  0% {
-    transform: translateY(0);
-  }
+.decor-badge-icons {
+  gap: 0.18rem;
+}
 
-  100% {
-    transform: translateY(calc((1 - var(--label-count)) * 0.75rem));
-  }
+.decor-badge-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  border-radius: 0.42rem;
+  background: rgb(248 250 252);
+}
+
+.decor-badge-label {
+  max-width: 3.45rem;
+  color: rgb(51 65 85);
+  font-size: 0.58rem;
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: 0;
+}
+
+.decor-badge-state,
+.decor-badge-report {
+  position: absolute;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 1.05rem;
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  border-radius: 0.38rem;
+  background: rgb(255 255 255);
+  box-shadow: 0 3px 8px rgba(15, 23, 42, 0.14);
+  font-size: 0.52rem;
+  font-weight: 900;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.decor-badge-state {
+  top: -0.48rem;
+  right: 0.38rem;
+  padding-inline: 0.36rem;
+}
+
+.decor-badge-report {
+  right: -0.3rem;
+  bottom: -0.28rem;
+  min-width: 1.05rem;
+  padding-inline: 0.24rem;
+  color: rgb(124 58 237);
+}
+
+.decor-badge-shell.is-compact {
+  width: 2.75rem;
+  min-height: 2.75rem;
+  justify-content: center;
+  gap: 0;
+  padding: 0.2rem;
+  border-radius: 0.82rem;
+}
+
+.decor-badge-shell.is-compact::after {
+  border-radius: 0.74rem;
+}
+
+.decor-badge-shell.is-compact .decor-badge-content,
+.decor-badge-shell.is-compact .decor-badge-report {
+  display: none;
+}
+
+.decor-badge-shell.is-compact .decor-badge-count {
+  width: 2.18rem;
+  height: 2.18rem;
+}
+
+.decor-badge-shell.is-compact .decor-badge-count > span {
+  font-size: 1.02rem;
+}
+
+.decor-badge-shell.is-compact .decor-badge-state {
+  top: -0.19rem;
+  right: -0.19rem;
+  width: 0.68rem;
+  min-width: 0.68rem;
+  height: 0.68rem;
+  padding: 0;
+  border: 2px solid #fff;
+  border-radius: 999px;
+  background: currentColor;
+  box-shadow: 0 0.12rem 0.3rem rgba(15, 23, 42, 0.16);
+  font-size: 0;
+}
+
+.decor-badge-shell.is-compact .decor-badge-state.is-reported {
+  color: #0284c7;
+}
+
+.decor-badge-shell.is-compact .decor-badge-state.is-pure {
+  color: #059669;
+}
+
+.decor-badge-shell.is-compact .decor-badge-state.is-mixed {
+  color: #d97706;
+}
+
+.decor-badge-shell.is-compact .decor-badge-state.is-complex {
+  color: #7c3aed;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .decor-name-track {
-    transform: none;
-    animation: none;
-  }
-
-  .decor-name-track > span:not(:first-child) {
-    display: none;
+  .decor-badge-shell {
+    transition-duration: 0.01ms;
   }
 }
 </style>

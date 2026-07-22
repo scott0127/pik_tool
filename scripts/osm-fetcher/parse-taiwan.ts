@@ -1,5 +1,6 @@
 import fs from 'fs';
-import { join, dirname } from 'path';
+import { createHash } from 'crypto';
+import { join, dirname, basename, resolve as resolvePath } from 'path';
 import { fileURLToPath } from 'url';
 import parse from 'osm-pbf-parser';
 import through from 'through2';
@@ -153,6 +154,9 @@ const DECOR_RULES: DecorRule[] = [
   { id: 'stadium', name: '體育館', icon: '🏟️', tags: ['leisure=stadium', 'leisure=sports_centre', 'building=stadium'] },
   { id: 'shrine', name: '神社', icon: '⛩️', tags: ['amenity=place_of_worship'] },
 ];
+const DECOR_RULESET_SHA256 = createHash('sha256')
+  .update(JSON.stringify(DECOR_RULES))
+  .digest('hex');
 
 const STATUS_FILE = join(__dirname, 'dashboard-local-status.json');
 const REGION_ID = process.env.OSM_REGION_ID || 'taiwan_main_island';
@@ -869,15 +873,17 @@ function cleanChunkDir(outputDir: string) {
 }
 
 async function main() {
-  const pbfPath = process.env.OSM_PBF_PATH || process.argv[2];
-  if (!pbfPath) {
-    console.error('❌ 請提供 PBF 路徑：OSM_PBF_PATH="C:\\path\\taiwan-latest.osm.pbf" npx tsx scripts/osm-fetcher/parse-taiwan.ts');
+  const pbfArgument = process.env.OSM_PBF_PATH || process.argv[2];
+  if (!pbfArgument) {
+    console.error('❌ 請提供 PBF 路徑：OSM_PBF_PATH="C:\\path\\taiwan-latest.osm.pbf" pnpm exec tsx scripts/osm-fetcher/parse-taiwan.ts');
     process.exit(1);
   }
+  const pbfPath = resolvePath(pbfArgument);
   if (!fs.existsSync(pbfPath)) {
     console.error(`❌ 找不到 PBF 檔案: ${pbfPath}`);
     process.exit(1);
   }
+  const pbfFileStats = fs.statSync(pbfPath);
 
   const region = REGION;
   const gridSize = Number(process.env.OSM_CHUNK_GRID || 15);
@@ -932,10 +938,16 @@ async function main() {
 
   const statsPath = join(outputDir, 'parse-stats.json');
   fs.writeFileSync(statsPath, JSON.stringify({
-    version: '2.0.0',
+    version: '3.0.0',
     regionId: region.id,
     generatedAt: new Date().toISOString(),
     pbfPath,
+    sourcePbf: {
+      fileName: basename(pbfPath),
+      sizeBytes: pbfFileStats.size,
+      lastModifiedAt: pbfFileStats.mtime.toISOString(),
+    },
+    decorRuleSetSha256: DECOR_RULESET_SHA256,
     chunkGridSize: gridSize,
     s2Level: S2_LEVEL,
     sampleStepDeg: BASE_SAMPLE_STEP_DEG,
