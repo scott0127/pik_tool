@@ -1,7 +1,8 @@
 import { cp, mkdir } from 'node:fs/promises';
 import { relative, resolve, sep } from 'node:path';
 
-const sourceDirectory = resolve('.output/public');
+// Cloudflare Pages exposes CF_PAGES=1 and its Nuxt preset writes to dist.
+const sourceDirectory = resolve(process.env.CF_PAGES ? 'dist' : '.output/public');
 const outputDirectory = resolve('.output/pages-public');
 const excludedAsset = 'data/regions/taiwan_main_island/single/forest.json';
 
