@@ -6,6 +6,8 @@
     "prebuild": "node scripts/write-version.mjs",
     "build": "nuxt build",
     "build:static": "nuxt generate",
+    "build:cloudflare-pages": "pnpm run build:static && node scripts/prepare-cloudflare-pages.mjs",
+    "data:split-forest": "node scripts/split-forest-data.mjs",
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",

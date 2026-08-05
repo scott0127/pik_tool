@@ -1242,6 +1242,27 @@ const decodeCellIds = (data: any): string[] => {
   return [];
 };
 
+// Cloudflare Pages limits individual static assets to 25 MiB. Forest data is
+// therefore stored as two delta-encoded files; every other type remains one file.
+const getSingleTypeDataUrls = (type: string): string[] => {
+  const basePath = '/data/regions/taiwan_main_island/single';
+  return type === 'forest'
+    ? [`${basePath}/forest-1.json`, `${basePath}/forest-2.json`]
+    : [`${basePath}/${type}.json`];
+};
+
+const loadSingleTypeFiles = async (type: string): Promise<any[]> => {
+  const files = await Promise.all(
+    getSingleTypeDataUrls(type).map(url =>
+      fetch(url)
+        .then(res => res.ok ? res.json() : null)
+        .catch(() => null)
+    )
+  );
+
+  return files.some(file => file === null) ? [] : files;
+};
+
 // 載入選定類型的純種格資料
 const loadSingleTypeCells = async (types: string[]) => {
   if (types.length === 0) return;
@@ -1251,33 +1272,29 @@ const loadSingleTypeCells = async (types: string[]) => {
   try {
     // 並行載入所有選定類型
     const responses = await Promise.all(
-      types.map(type => 
-        fetch(`/data/regions/taiwan_main_island/single/${type}.json`)
-          .then(res => res.ok ? res.json() : null)
-          .catch(() => null)
-      )
+      types.map(async type => ({ type, files: await loadSingleTypeFiles(type) }))
     );
     
     // 合併所有格子
     const allCells: any[] = [];
     const jpOnlyDecors = new Set(decorRules.filter(r => r.region === 'JP').map(r => r.id));
     
-    responses.forEach((data, idx) => {
-      if (!data) return;
-      const decorType = types[idx];
+    responses.forEach(({ type: decorType, files }) => {
       if (!decorType) return;
       
       // 跳過日本限定飾品
       if (jpOnlyDecors.has(decorType)) return;
       
-      // 解碼 cell IDs（支援差量編碼和舊格式）
-      const cellIds = decodeCellIds(data);
-      
-      cellIds.forEach((cellId: string) => {
-        allCells.push({
-          cellId: cellId,
-          decorType: decorType,
-          center: getCellCenter(cellId)
+      files.forEach(data => {
+        // 解碼 cell IDs（支援差量編碼和舊格式）
+        const cellIds = decodeCellIds(data);
+
+        cellIds.forEach((cellId: string) => {
+          allCells.push({
+            cellId: cellId,
+            decorType: decorType,
+            center: getCellCenter(cellId)
+          });
         });
       });
     });
@@ -1393,29 +1410,23 @@ const loadNewPureTypes = async (types: string[]) => {
       
       // 並行載入所有需要的類型
       const responses = await Promise.all(
-        typesToLoad.map(type => 
-          fetch(`/data/regions/taiwan_main_island/single/${type}.json`)
-            .then(res => res.ok ? res.json() : null)
-            .catch(() => null)
-        )
+        typesToLoad.map(async type => ({ type, files: await loadSingleTypeFiles(type) }))
       );
       
       // 存入快取
-      responses.forEach((data, idx) => {
-        if (!data) return;
-        const decorType = typesToLoad[idx];
+      responses.forEach(({ type: decorType, files }) => {
         if (!decorType) return;
         
         // 跳過日本限定飾品
         if (jpOnlyDecors.has(decorType)) return;
         
-        // 解碼 cell IDs（支援差量編碼和舊格式）
-        const cellIds = decodeCellIds(data);
-        const cells = cellIds.map((cellId: string) => ({
-          cellId: cellId,
-          decorType: decorType,
-          center: getCellCenter(cellId)
-        }));
+        const cells = files.flatMap(data =>
+          decodeCellIds(data).map((cellId: string) => ({
+            cellId: cellId,
+            decorType: decorType,
+            center: getCellCenter(cellId)
+          }))
+        );
         
         pureTypeCellsCache.value.set(decorType, cells);
       });
