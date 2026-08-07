@@ -16,8 +16,8 @@ type QueuedResult = { data?: unknown; error: PgError | null };
 
 const mocks = vi.hoisted(() => ({
   userId: { value: 'user-1' as string | null },
-  cloud: { value: null as any },
-  selectError: { value: null as any },
+  cloud: { value: null as CloudRow | null },
+  selectError: { value: null as PgError | null },
   // 依序回應的 queue；空的時候走預設行為
   selectQueue: { value: [] as any[] },
   upsertQueue: { value: [] as any[] },
@@ -140,6 +140,7 @@ afterEach(() => {
 
 /** saveToCloud 失敗時會 retry 並 sleep，所以要一邊推進 timer 一邊等 */
 const settle = async <T>(promise: Promise<T>): Promise<T> => {
+  promise.catch(() => {}); // 避免推進 timer 時變成 unhandled rejection
   await vi.advanceTimersByTimeAsync(30000);
   return promise;
 };

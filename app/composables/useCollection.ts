@@ -153,7 +153,7 @@ export function useCollection() {
   }));
 
   // Sync status
-  const isSyncing = useState('collection-syncing', () => false);
+  const isSyncing = useState<boolean>('collection-syncing', () => false);
   const lastSyncTime = useState<string | null>('collection-last-sync', () => null);
 
   // Debounced upload UI state
