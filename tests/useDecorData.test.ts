@@ -340,4 +340,48 @@ describe('decor.json 與型別常數的一致性', () => {
       expect(new Set(ids).size).toBe(ids.length);
     });
   });
+
+  it('category id 不應重複', () => {
+    const categoryIds = definitions.map(def => def.category.id);
+    expect(new Set(categoryIds).size).toBe(categoryIds.length);
+  });
+
+  it('2025-ornament 的 availablePikminTypes 應包含 ice', () => {
+    const ornament = decorData.definitions.find((d: any) => d.category.id === '2025-ornament');
+    expect(ornament).toBeTruthy();
+    expect((ornament as any).availablePikminTypes).toContain('ice');
+  });
+});
+
+describe('imageUrls 與 availablePikminTypes 的落差', () => {
+  // 兩邊對不上時實際生效的是 imageUrls。
+  // 加 exception 前先確認遊戲內是否真有該組合，正解通常是補 availablePikminTypes。
+  const KNOWN_OVERFLOWS = new Set<string>([]);
+
+  const findOverflows = (): string[] => {
+    const overflows: string[] = [];
+
+    decorData.definitions.forEach((def: any) => {
+      const availableTypes = new Set(def.availablePikminTypes || PIKMIN_TYPES);
+      def.variants.forEach((variant: any) => {
+        if (!variant.imageUrls) return;
+        const extras = Object.keys(variant.imageUrls).filter(c => !availableTypes.has(c));
+        if (extras.length > 0) {
+          overflows.push(`${def.category.id}/${variant.id}: 多出 [${extras.join(', ')}]`);
+        }
+      });
+    });
+
+    return overflows;
+  };
+
+  it('imageUrls 的顏色不應超過 availablePikminTypes（已知例外除外）', () => {
+    expect(findOverflows().filter(e => !KNOWN_OVERFLOWS.has(e))).toEqual([]);
+  });
+
+  // 讓 allowlist 自己過期：資料修好後變紅，提醒移除 exception
+  it('已知例外清單不應含有已經修好的項目', () => {
+    const actual = new Set(findOverflows());
+    expect([...KNOWN_OVERFLOWS].filter(e => !actual.has(e))).toEqual([]);
+  });
 });

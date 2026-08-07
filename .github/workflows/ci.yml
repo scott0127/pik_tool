@@ -1,0 +1,41 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # public/data is ~237MB and this job never reads it; blob:none fetches
+          # blobs on demand so the checkout stays small.
+          filter: blob:none
+
+      # Reads the pinned version from package.json packageManager
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      # postinstall runs `nuxt prepare`, which generates .nuxt/ for vue-tsc
+      - run: pnpm install --frozen-lockfile
+
+      - name: Unit tests
+        run: pnpm test
+
+      - name: Type check
+        # 11 pre-existing errors in HeroSection.vue and HeroSettingsModal.vue.
+        # Drop continue-on-error once those are fixed so this gates too.
+        continue-on-error: true
+        run: pnpm typecheck
