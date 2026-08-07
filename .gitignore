@@ -47,3 +47,6 @@ scripts/osm-fetcher/dashboard*-status.json
 scripts/osm-fetcher/archive/
 scripts/osm-fetcher/scratch/
 app/data/regions/
+
+# Local AI/Codex attachments
+.codex-remote-attachments/
