@@ -12,5 +12,12 @@ export default defineConfig({
     alias: {
       '~': resolve(__dirname, './app'),
     },
+    coverage: {
+      provider: 'v8',
+      reporter: ['text', 'html'],
+      // 只算 composables 與 scripts；page/component 動輒 2000+ 行會沖爛分母
+      include: ['app/composables/**', 'app/constants/**', 'scripts/osm-fetcher/**'],
+      exclude: ['**/*.d.ts', '**/*.html'],
+    },
   },
 });

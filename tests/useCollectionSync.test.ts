@@ -12,54 +12,11 @@
  */
 import { describe, it, expect, beforeEach } from 'vitest';
 import decorData from '~/data/decor.json';
+import { useDecorData } from '~/composables/useDecorData';
+import { PIKMIN_TYPES, type DecorItem } from '~/types/decor';
 
-// =====================================================
-// 共用常數與型別
-// =====================================================
-const PIKMIN_TYPES = ['red', 'yellow', 'blue', 'white', 'purple', 'rock', 'winged', 'ice'] as const;
-type PikminType = typeof PIKMIN_TYPES[number];
-
-interface DecorItem {
-  id: string;
-  categoryId: string;
-  variantId: string;
-  pikminType: PikminType;
-}
-
-// =====================================================
-// 模擬 useDecorData.ts 的 getAllDecorItems 邏輯
-// =====================================================
-function getAllDecorItems(): DecorItem[] {
-  const definitions = decorData.definitions;
-  const items: DecorItem[] = [];
-
-  definitions.forEach((def: any) => {
-    const availableTypes = def.availablePikminTypes || PIKMIN_TYPES;
-
-    def.variants.forEach((variant: any) => {
-      const variantImageUrls = variant.imageUrls;
-      let typesToGenerate: PikminType[];
-
-      if (variantImageUrls && typeof variantImageUrls === 'object') {
-        const availableTypesInVariant = new Set(Object.keys(variantImageUrls) as PikminType[]);
-        typesToGenerate = PIKMIN_TYPES.filter(type => availableTypesInVariant.has(type));
-      } else {
-        typesToGenerate = availableTypes as PikminType[];
-      }
-
-      typesToGenerate.forEach(pikminType => {
-        items.push({
-          id: `${def.category.id}_${variant.id}_${pikminType}`,
-          categoryId: def.category.id,
-          variantId: variant.id,
-          pikminType: pikminType,
-        });
-      });
-    });
-  });
-
-  return items;
-}
+// 用正式實作，不要在測試裡複製一份（複製品不會因為 app/ 壞掉而變紅）
+const { getAllDecorItems } = useDecorData();
 
 // =====================================================
 // 模擬修復後的 useCollection 核心邏輯
@@ -139,7 +96,8 @@ let allItems: DecorItem[];
 let validIds: Set<string>;
 
 beforeEach(() => {
-  allItems = getAllDecorItems();
+  // 回傳的是共用快取陣列，複製一份避免測試互相污染
+  allItems = [...getAllDecorItems()];
   validIds = getValidItemIds();
 });
 
@@ -147,13 +105,24 @@ beforeEach(() => {
 // 1. 基礎功能測試
 // =========================================================================
 describe('1. 基礎功能', () => {
-  it('decor.json 應有 98 個分類', () => {
-    expect(decorData.definitions.length).toBe(98);
+  // 驗證 invariant 而非寫死數量，否則 decor.json 一更新就得改測試
+  it('每個 category id 應唯一', () => {
+    const categoryIds = decorData.definitions.map((def: any) => def.category.id);
+    expect(new Set(categoryIds).size).toBe(categoryIds.length);
+  });
+
+  it('每個 definition 都應至少生成一個 DecorItem（沒有分類被靜默丟掉）', () => {
+    const categoryIdsWithItems = new Set(allItems.map(item => item.categoryId));
+    const missing = decorData.definitions
+      .map((def: any) => def.category.id)
+      .filter((id: string) => !categoryIdsWithItems.has(id));
+
+    expect(missing).toEqual([]);
+    expect(categoryIdsWithItems.size).toBe(decorData.definitions.length);
   });
 
   it('getAllDecorItems() 應生成正確數量的 DecorItem', () => {
     expect(allItems.length).toBeGreaterThan(800);
-    console.log(`總 DecorItem: ${allItems.length}`);
   });
 
   it('所有 ID 應唯一', () => {
@@ -189,8 +158,11 @@ describe('2. decor.json 資料一致性', () => {
     expect((ornament as any).availablePikminTypes).toContain('ice');
   });
 
-  it('所有有 imageUrls 的 variant，其顏色不應超過 availablePikminTypes + ice', () => {
-    // 只檢查 imageUrls 有「多出」的情況（不檢查少的，因為少的是正常的圖片缺失）
+  // 兩邊對不上時實際生效的是 imageUrls（useDecorData 的 imageUrls 分支）。
+  // 加 exception 前先確認遊戲內是否真有該組合，正解通常是補 availablePikminTypes。
+  const KNOWN_IMAGE_URL_OVERFLOWS = new Set<string>([]);
+
+  const findImageUrlOverflows = (): string[] => {
     const overflows: string[] = [];
 
     decorData.definitions.forEach((def: any) => {
@@ -206,11 +178,23 @@ describe('2. decor.json 資料一致性', () => {
       });
     });
 
-    if (overflows.length > 0) {
-      console.warn('imageUrls 多出的顏色:', overflows);
-    }
-    // 修復後不應有 overflow
-    expect(overflows.length).toBe(0);
+    return overflows;
+  };
+
+  it('imageUrls 的顏色不應超過 availablePikminTypes（已知例外除外）', () => {
+    const unexpected = findImageUrlOverflows().filter(
+      entry => !KNOWN_IMAGE_URL_OVERFLOWS.has(entry),
+    );
+
+    expect(unexpected).toEqual([]);
+  });
+
+  // 讓 allowlist 自己過期：資料修好後變紅，提醒移除 exception
+  it('已知例外清單不應含有已經修好的項目', () => {
+    const actual = new Set(findImageUrlOverflows());
+    const stale = [...KNOWN_IMAGE_URL_OVERFLOWS].filter(entry => !actual.has(entry));
+
+    expect(stale).toEqual([]);
   });
 
   it('getStats().total 應等於 getAllDecorItems().length', () => {

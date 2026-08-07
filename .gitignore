@@ -41,6 +41,9 @@ output/
 tmp/
 --port/
 
+# Test artifacts
+coverage/
+
 # OSM Pipeline and Data
 *.osm.pbf
 scripts/osm-fetcher/dashboard*-status.json

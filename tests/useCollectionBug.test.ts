@@ -10,51 +10,11 @@
  */
 import { describe, it, expect, beforeEach } from 'vitest';
 import decorData from '~/data/decor.json';
+import { useDecorData } from '~/composables/useDecorData';
+import { PIKMIN_TYPES, type DecorItem } from '~/types/decor';
 
-// =====================================================
-// Helper：模擬 useDecorData 的 getAllDecorItems 邏輯
-// =====================================================
-const PIKMIN_TYPES = ['red', 'yellow', 'blue', 'white', 'purple', 'rock', 'winged', 'ice'] as const;
-type PikminType = typeof PIKMIN_TYPES[number];
-
-interface DecorItem {
-  id: string;
-  categoryId: string;
-  variantId: string;
-  pikminType: PikminType;
-}
-
-function getAllDecorItems(): DecorItem[] {
-  const definitions = decorData.definitions;
-  const items: DecorItem[] = [];
-
-  definitions.forEach((def: any) => {
-    const availableTypes = def.availablePikminTypes || PIKMIN_TYPES;
-
-    def.variants.forEach((variant: any) => {
-      const variantImageUrls = variant.imageUrls;
-      let typesToGenerate: PikminType[];
-
-      if (variantImageUrls && typeof variantImageUrls === 'object') {
-        const availableTypesInVariant = new Set(Object.keys(variantImageUrls) as PikminType[]);
-        typesToGenerate = PIKMIN_TYPES.filter(type => availableTypesInVariant.has(type));
-      } else {
-        typesToGenerate = availableTypes as PikminType[];
-      }
-
-      typesToGenerate.forEach(pikminType => {
-        items.push({
-          id: `${def.category.id}_${variant.id}_${pikminType}`,
-          categoryId: def.category.id,
-          variantId: variant.id,
-          pikminType: pikminType,
-        });
-      });
-    });
-  });
-
-  return items;
-}
+// 用正式實作，不要在測試裡複製一份
+const { getAllDecorItems } = useDecorData();
 
 // =====================================================
 // Helper：模擬 useCollection 的 mergeCollections 邏輯（當前有 Bug 的版本）
@@ -112,68 +72,15 @@ describe('Bug 複現：飾品蒐集數量異常跳動', () => {
   describe('基礎驗證：DecorItem 生成', () => {
     it('應該能從 decor.json 生成 DecorItems', () => {
       expect(allItems.length).toBeGreaterThan(0);
-      console.log(`[INFO] 總 DecorItem 數量: ${allItems.length}`);
     });
 
     it('所有 DecorItem ID 應該是唯一的', () => {
       const ids = allItems.map(item => item.id);
-      const uniqueIds = new Set(ids);
-      const duplicates = ids.filter((id, index) => ids.indexOf(id) !== index);
-      
-      if (duplicates.length > 0) {
-        console.warn('[WARNING] 發現重複 ID:', duplicates);
-      }
-      
-      expect(uniqueIds.size).toBe(ids.length);
+      expect(new Set(ids).size).toBe(ids.length);
     });
   });
 
-  // ----- Bug 1：imageUrls vs availablePikminTypes 不一致 -----
-  describe('Bug 檢測：imageUrls vs availablePikminTypes 不一致', () => {
-    it('檢查所有 variant 的 imageUrls 顏色數量是否超過 availablePikminTypes', () => {
-      const inconsistencies: Array<{
-        category: string;
-        variant: string;
-        imageUrlsCount: number;
-        availableTypesCount: number;
-        extraColors: string[];
-      }> = [];
-
-      decorData.definitions.forEach((def: any) => {
-        const availableTypes = new Set(def.availablePikminTypes || PIKMIN_TYPES);
-
-        def.variants.forEach((variant: any) => {
-          if (variant.imageUrls && typeof variant.imageUrls === 'object') {
-            const imageUrlColors = Object.keys(variant.imageUrls);
-            const extraColors = imageUrlColors.filter(color => !availableTypes.has(color));
-
-            if (extraColors.length > 0) {
-              inconsistencies.push({
-                category: def.category.id,
-                variant: variant.id,
-                imageUrlsCount: imageUrlColors.length,
-                availableTypesCount: availableTypes.size,
-                extraColors,
-              });
-            }
-          }
-        });
-      });
-
-      if (inconsistencies.length > 0) {
-        console.warn('[BUG FOUND] imageUrls 有比 availablePikminTypes 更多的顏色:');
-        inconsistencies.forEach(inc => {
-          console.warn(`  ${inc.category}/${inc.variant}: imageUrls 有 ${inc.imageUrlsCount} 色, availablePikminTypes 有 ${inc.availableTypesCount} 色, 多出: [${inc.extraColors.join(', ')}]`);
-        });
-      }
-
-      // 記錄但不強制失敗 — 這是資料品質問題
-      console.log(`[RESULT] 不一致的 variant 數量: ${inconsistencies.length}`);
-      // 如果有不一致，每個不一致的 variant 都會多生成 extraColors.length 個 DecorItem
-      const totalExtraItems = inconsistencies.reduce((sum, inc) => sum + inc.extraColors.length, 0);
-      console.log(`[RESULT] 因不一致而多出的 DecorItem 數量: ${totalExtraItems}`);
-    });
-  });
+  // imageUrls vs availablePikminTypes 的一致性改由 useCollectionSync.test.ts 斷言
 
   // ----- Bug 2：UNION Merge 引入幽靈 ID -----
   describe('Bug 複現：UNION merge 引入幽靈 ID', () => {
@@ -198,7 +105,6 @@ describe('Bug 複現：飾品蒐集數量異常跳動', () => {
       const merged = mergeCollections_buggy(local, cloud);
 
       const mergedCount = countCollected(merged);
-      console.log(`[BUG REPRODUCED] Local: 103, Cloud 有 4 個幽靈 ID, Merged: ${mergedCount}`);
 
       // ⚠️ Bug 展現：merge 後變成 107，多了 4 個！
       expect(mergedCount).toBe(107);
@@ -231,8 +137,6 @@ describe('Bug 複現：飾品蒐集數量異常跳動', () => {
       // 但是 Object.keys(collected).filter(k => collected[k]).length 會是 107
       expect(countCollected(collected)).toBe(107);
 
-      console.log(`[INFO] getStats() 計算結果: ${statsCollected} (正確)`);
-      console.log(`[INFO] Object.keys 計算結果: ${countCollected(collected)} (包含幽靈)`);
     });
 
     it('collection.vue 的 collectedCount 也遍歷 filteredItems（來自 getAllDecorItems），所以理論上幽靈 ID 不會影響', () => {
@@ -246,9 +150,6 @@ describe('Bug 複現：飾品蒐集數量異常跳動', () => {
 
       // 如果使用者看到數字從 103 → 107，問題出在 getAllDecorItems() 返回的列表變了
       // 也就是 decor.json 被更新了（SW 快取失效後重新載入新版）
-      console.log('[ANALYSIS] 如果 collectedCount 用的是 filteredItems.filter(isCollected)');
-      console.log('[ANALYSIS] 那麼幽靈 ID 不會被計入');
-      console.log('[ANALYSIS] 數字跳動的原因必定是 decor.json 改變 或 合併引入了「有效但使用者沒手動標記」的 ID');
       expect(true).toBe(true); // 記錄分析結果
     });
   });
@@ -276,7 +177,6 @@ describe('Bug 複現：飾品蒐集數量異常跳動', () => {
       const merged = mergeCollections_buggy(tabA, tabB);
       const mergedCount = countCollected(merged);
 
-      console.log(`[BUG REPRODUCED] Tab A: 103, Tab B: 103, Merged: ${mergedCount}`);
       expect(mergedCount).toBe(107); // UNION 導致 103 + 4 = 107
     });
 
@@ -295,7 +195,6 @@ describe('Bug 複現：飾品蒐集數量異常跳動', () => {
       const mergedFixed = mergeCollections_fixed(tabA, tabB);
       expect(countCollected(mergedFixed)).toBe(107);
 
-      console.log('[INFO] 多分頁問題的修復需要更複雜的策略（如 last-write-wins 或向量單調時鐘）');
     });
   });
 
@@ -320,7 +219,6 @@ describe('Bug 複現：飾品蒐集數量異常跳動', () => {
       // Fixed version: 103 — 幽靈 ID 被過濾掉了！
       expect(countCollected(mergeCollections_fixed(local, cloud))).toBe(103);
 
-      console.log('[FIX VERIFIED] 修復後的 merge 成功排除了幽靈 ID');
     });
   });
 
@@ -348,13 +246,8 @@ describe('Bug 複現：飾品蒐集數量異常跳動', () => {
         categoryMap.set(def.category.id, categoryItemCount);
       });
 
-      console.log(`\n[REPORT] 總分類數: ${decorData.definitions.length}`);
-      console.log(`[REPORT] 總 variant 數（種類）: ${totalVariants}`);
-      console.log(`[REPORT] 總 DecorItem 數（含顏色）: ${allItems.length}`);
-      console.log(`[REPORT] 各分類項目數量:`);
       
       for (const [catId, count] of categoryMap) {
-        console.log(`  ${catId}: ${count} items`);
       }
 
       expect(categoryMap.size).toBe(decorData.definitions.length);

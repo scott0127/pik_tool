@@ -12,6 +12,10 @@
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "render:build": "pnpm run build:static",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage --coverage.reportOnFailure",
+    "typecheck": "nuxt prepare && vue-tsc -b --noEmit",
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
@@ -54,6 +58,7 @@
     "@supabase/supabase-js": "^2.106.0",
     "@types/three": "^0.184.1",
     "@types/through2": "^2.0.41",
+    "@vitest/coverage-v8": "4.1.6",
     "@vue/compiler-sfc": "^3.5.34",
     "dotenv": "^17.4.2",
     "eslint": "^9.39.4",
