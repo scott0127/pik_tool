@@ -82,6 +82,7 @@ beforeEach(() => {
   mocks.calls.value = [];
   mocks.payloads.value = [];
   localStorage.clear();
+  sessionStorage.clear();
 });
 
 afterEach(() => {
@@ -208,11 +209,28 @@ describe('useGeocoding', () => {
 });
 
 describe('useSiteConfig', () => {
-  it('讀取失敗時不應該丟例外', async () => {
+  it('讀取成功時會把設定寫進 state', async () => {
+    const { useSiteConfig } = await import('~/composables/useSiteConfig');
+    mocks.selectRows.value = { value: { row1: 'a:a', row2: 'b:b' } } as any;
+
+    const c = useSiteConfig();
+    await c.fetchHeroConfig();
+
+    expect(c.heroFeaturedConfig.value).toEqual({ row1: 'a:a', row2: 'b:b' });
+  });
+
+  // 只斷言「沒有丟例外」不夠：把 fallback 改成 null 也一樣會通過，
+  // 而那會讓首頁 hero 在讀取失敗時整塊空掉。
+  it('讀取失敗時要退回預設值，不能留 null', async () => {
     const { useSiteConfig } = await import('~/composables/useSiteConfig');
     mocks.selectError.value = { code: '42501', message: 'denied' };
 
-    await expect(useSiteConfig().fetchHeroConfig()).resolves.not.toThrow();
+    const c = useSiteConfig();
+    await expect(c.fetchHeroConfig()).resolves.not.toThrow();
+
+    expect(c.heroFeaturedConfig.value).not.toBeNull();
+    expect(c.heroFeaturedConfig.value).toHaveProperty('row1');
+    expect(c.heroFeaturedConfig.value).toHaveProperty('row2');
   });
 
   it('fetchHeroConfig 會查詢資料庫', async () => {
@@ -247,5 +265,16 @@ describe('usePageViews', () => {
   it('getPageViews 不應該丟例外', async () => {
     const { usePageViews } = await import('~/composables/usePageViews');
     await expect(usePageViews().getPageViews()).resolves.not.toThrow();
+  });
+
+  // 這個 session 去重分支是為了省 egress 的；沒有這個測試的話整段刪掉也不會變紅
+  it('同一個 session 內只會 increment 一次', async () => {
+    const { usePageViews } = await import('~/composables/usePageViews');
+    const p = usePageViews();
+
+    await p.incrementPageViews();
+    await p.incrementPageViews();
+
+    expect(mocks.calls.value.filter(c => c === 'rpc')).toHaveLength(1);
   });
 });

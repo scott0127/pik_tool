@@ -5,6 +5,10 @@ on:
   push:
     branches: [main]
 
+# 這個 job 只需要讀 repo；不給預設的寬鬆權限
+permissions:
+  contents: read
+
 concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
