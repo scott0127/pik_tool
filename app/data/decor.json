@@ -203,6 +203,22 @@
       },
       "variants": [
         {
+          "id": "toothbrush_rare",
+          "name": "稀有牙刷",
+          "nameEn": "Toothbrush (Rare)",
+          "imageUrl": "https://pikmin.wiki.gallery/images/3/32/Decor_Red_Toothbrush_%28Rare%29.png",
+          "imageUrls": {
+            "red": "https://pikmin.wiki.gallery/images/3/32/Decor_Red_Toothbrush_%28Rare%29.png",
+            "yellow": "https://pikmin.wiki.gallery/images/9/9b/Decor_Yellow_Toothbrush_%28Rare%29.png",
+            "blue": "https://pikmin.wiki.gallery/images/9/96/Decor_Blue_Toothbrush_%28Rare%29.png",
+            "white": "https://pikmin.wiki.gallery/images/a/a4/Decor_White_Toothbrush_%28Rare%29.png",
+            "purple": "https://pikmin.wiki.gallery/images/a/af/Decor_Purple_Toothbrush_%28Rare%29.png",
+            "rock": "https://pikmin.wiki.gallery/images/2/21/Decor_Rock_Toothbrush_%28Rare%29.png",
+            "winged": "https://pikmin.wiki.gallery/images/7/77/Decor_Winged_Toothbrush_%28Rare%29.png",
+            "ice": "https://pikmin.wiki.gallery/images/thumb/6/6b/Decor_Ice_Toothbrush_%28Rare%29.png/172px-Decor_Ice_Toothbrush_%28Rare%29.png"
+          }
+        },
+        {
           "id": "toothbrush",
           "name": "牙刷",
           "nameEn": "Toothbrush",
@@ -214,7 +230,8 @@
             "white": "https://pikmin.wiki.gallery/images/thumb/a/a4/Decor_White_Toothbrush.png/100px-Decor_White_Toothbrush.png",
             "purple": "https://pikmin.wiki.gallery/images/thumb/a/a5/Decor_Purple_Toothbrush.png/95px-Decor_Purple_Toothbrush.png",
             "rock": "https://pikmin.wiki.gallery/images/thumb/3/3d/Decor_Rock_Toothbrush.png/100px-Decor_Rock_Toothbrush.png",
-            "winged": "https://pikmin.wiki.gallery/images/thumb/9/93/Decor_Winged_Toothbrush.png/100px-Decor_Winged_Toothbrush.png"
+            "winged": "https://pikmin.wiki.gallery/images/thumb/9/93/Decor_Winged_Toothbrush.png/100px-Decor_Winged_Toothbrush.png",
+            "ice": "https://pikmin.wiki.gallery/images/thumb/a/ad/Decor_Ice_Toothbrush.png/200px-Decor_Ice_Toothbrush.png"
           }
         }
       ],
@@ -225,7 +242,8 @@
         "white",
         "purple",
         "rock",
-        "winged"
+        "winged",
+        "ice"
       ]
     },
     {
@@ -459,6 +477,22 @@
             "rock": "https://pikmin.wiki.gallery/images/thumb/8/88/Decor_Rock_Toy_Airplane.png/100px-Decor_Rock_Toy_Airplane.png",
             "winged": "https://pikmin.wiki.gallery/images/thumb/f/fd/Decor_Winged_Toy_Airplane.png/100px-Decor_Winged_Toy_Airplane.png"
           }
+        },
+        {
+          "id": "luggage_tag",
+          "name": "行李吊牌",
+          "nameEn": "Luggage Tag",
+          "imageUrl": "https://pikmin.wiki.gallery/images/1/1e/Decor_Red_Luggage_Tag.png",
+          "imageUrls": {
+            "red": "https://pikmin.wiki.gallery/images/1/1e/Decor_Red_Luggage_Tag.png",
+            "yellow": "https://pikmin.wiki.gallery/images/6/66/Decor_Yellow_Luggage_Tag.png",
+            "blue": "https://pikmin.wiki.gallery/images/5/53/Decor_Blue_Luggage_Tag.png",
+            "white": "https://pikmin.wiki.gallery/images/9/91/Decor_White_Luggage_Tag.png",
+            "purple": "https://pikmin.wiki.gallery/images/e/eb/Decor_Purple_Luggage_Tag.png",
+            "rock": "https://pikmin.wiki.gallery/images/e/ec/Decor_Rock_Luggage_Tag.png",
+            "winged": "https://pikmin.wiki.gallery/images/8/8f/Decor_Winged_Luggage_Tag.png",
+            "ice": "https://pikmin.wiki.gallery/images/thumb/5/5b/Decor_Ice_Luggage_Tag.png/192px-Decor_Ice_Luggage_Tag.png"
+          }
         }
       ],
       "availablePikminTypes": [
@@ -468,7 +502,8 @@
         "white",
         "purple",
         "rock",
-        "winged"
+        "winged",
+        "ice"
       ]
     },
     {
@@ -507,16 +542,24 @@
             "white": "https://pikmin.wiki.gallery/images/thumb/b/be/Decor_White_Ticket.png/100px-Decor_White_Ticket.png",
             "purple": "https://pikmin.wiki.gallery/images/thumb/f/f9/Decor_Purple_Ticket.png/90px-Decor_Purple_Ticket.png",
             "rock": "https://pikmin.wiki.gallery/images/thumb/4/42/Decor_Rock_Ticket.png/100px-Decor_Rock_Ticket.png",
-            "winged": "https://pikmin.wiki.gallery/images/thumb/d/dc/Decor_Winged_Ticket.png/100px-Decor_Winged_Ticket.png"
+            "winged": "https://pikmin.wiki.gallery/images/thumb/d/dc/Decor_Winged_Ticket.png/100px-Decor_Winged_Ticket.png",
+            "ice": "https://pikmin.wiki.gallery/images/thumb/0/00/Decor_Ice_Ticket.png/200px-Decor_Ice_Ticket.png"
           }
         },
         {
           "id": "gold_ticket",
-          "name": "金車票",
-          "nameEn": "Gold Ticket",
-          "imageUrl": "https://pikmin.wiki.gallery/images/thumb/7/7a/Decor_Red_Gold_Ticket.png/100px-Decor_Red_Gold_Ticket.png",
+          "name": "稀有車票",
+          "nameEn": "Ticket (Rare)",
+          "imageUrl": "https://pikmin.wiki.gallery/images/8/83/Decor_Red_Ticket_%28Rare%29.png",
           "imageUrls": {
-            "red": "https://pikmin.wiki.gallery/images/thumb/7/7a/Decor_Red_Gold_Ticket.png/100px-Decor_Red_Gold_Ticket.png"
+            "red": "https://pikmin.wiki.gallery/images/8/83/Decor_Red_Ticket_%28Rare%29.png",
+            "yellow": "https://pikmin.wiki.gallery/images/4/4b/Decor_Yellow_Ticket_%28Rare%29.png",
+            "blue": "https://pikmin.wiki.gallery/images/e/e2/Decor_Blue_Ticket_%28Rare%29.png",
+            "white": "https://pikmin.wiki.gallery/images/3/33/Decor_White_Ticket_%28Rare%29.png",
+            "purple": "https://pikmin.wiki.gallery/images/thumb/9/96/Decor_Purple_Ticket_%28Rare%29.png/179px-Decor_Purple_Ticket_%28Rare%29.png",
+            "rock": "https://pikmin.wiki.gallery/images/thumb/d/d4/Decor_Rock_Ticket_%28Rare%29.png/200px-Decor_Rock_Ticket_%28Rare%29.png",
+            "winged": "https://pikmin.wiki.gallery/images/9/99/Decor_Winged_Ticket_%28Rare%29.png",
+            "ice": "https://pikmin.wiki.gallery/images/thumb/3/3d/Decor_Ice_Ticket_%28Rare%29.png/200px-Decor_Ice_Ticket_%28Rare%29.png"
           }
         }
       ],
@@ -527,7 +570,8 @@
         "white",
         "purple",
         "rock",
-        "winged"
+        "winged",
+        "ice"
       ]
     },
     {
@@ -751,7 +795,8 @@
             "white": "https://pikmin.wiki.gallery/images/thumb/5/5b/Decor_White_Baguette.png/100px-Decor_White_Baguette.png",
             "purple": "https://pikmin.wiki.gallery/images/thumb/f/f9/Decor_Purple_Baguette.png/100px-Decor_Purple_Baguette.png",
             "rock": "https://pikmin.wiki.gallery/images/thumb/a/a2/Decor_Rock_Baguette.png/100px-Decor_Rock_Baguette.png",
-            "winged": "https://pikmin.wiki.gallery/images/thumb/2/20/Decor_Winged_Baguette.png/100px-Decor_Winged_Baguette.png"
+            "winged": "https://pikmin.wiki.gallery/images/thumb/2/20/Decor_Winged_Baguette.png/100px-Decor_Winged_Baguette.png",
+            "ice": "https://pikmin.wiki.gallery/images/thumb/d/d2/Decor_Ice_Baguette.png/200px-Decor_Ice_Baguette.png"
           }
         }
       ],
@@ -762,7 +807,8 @@
         "white",
         "purple",
         "rock",
-        "winged"
+        "winged",
+        "ice"
       ]
     },
     {
@@ -1151,6 +1197,22 @@
       },
       "variants": [
         {
+          "id": "ball_keychain_rare",
+          "name": "稀有球形鑰匙圈",
+          "nameEn": "Ball Keychain (Rare)",
+          "imageUrl": "https://pikmin.wiki.gallery/images/0/0d/Decor_Red_Ball_Keychain_%28Rare%29.png",
+          "imageUrls": {
+            "red": "https://pikmin.wiki.gallery/images/0/0d/Decor_Red_Ball_Keychain_%28Rare%29.png",
+            "yellow": "https://pikmin.wiki.gallery/images/f/f9/Decor_Yellow_Ball_Keychain_%28Rare%29.png",
+            "blue": "https://pikmin.wiki.gallery/images/8/89/Decor_Blue_Ball_Keychain_%28Rare%29.png",
+            "white": "https://pikmin.wiki.gallery/images/6/61/Decor_White_Ball_Keychain_%28Rare%29.png",
+            "purple": "https://pikmin.wiki.gallery/images/f/fa/Decor_Purple_Ball_Keychain_%28Rare%29.png",
+            "rock": "https://pikmin.wiki.gallery/images/b/b1/Decor_Rock_Ball_Keychain_%28Rare%29.png",
+            "winged": "https://pikmin.wiki.gallery/images/f/f4/Decor_Winged_Ball_Keychain_%28Rare%29.png",
+            "ice": "https://pikmin.wiki.gallery/images/thumb/e/ef/Decor_Ice_Ball_Keychain_%28Rare%29.png/144px-Decor_Ice_Ball_Keychain_%28Rare%29.png"
+          }
+        },
+        {
           "id": "ball_keychain",
           "name": "球形鑰匙圈",
           "nameEn": "Ball Keychain",
@@ -1162,7 +1224,8 @@
             "white": "https://pikmin.wiki.gallery/images/thumb/a/a8/Decor_White_Ball_Keychain.png/100px-Decor_White_Ball_Keychain.png",
             "purple": "https://pikmin.wiki.gallery/images/thumb/3/31/Decor_Purple_Ball_Keychain.png/100px-Decor_Purple_Ball_Keychain.png",
             "rock": "https://pikmin.wiki.gallery/images/thumb/6/6e/Decor_Rock_Ball_Keychain.png/93px-Decor_Rock_Ball_Keychain.png",
-            "winged": "https://pikmin.wiki.gallery/images/thumb/4/44/Decor_Winged_Ball_Keychain.png/100px-Decor_Winged_Ball_Keychain.png"
+            "winged": "https://pikmin.wiki.gallery/images/thumb/4/44/Decor_Winged_Ball_Keychain.png/100px-Decor_Winged_Ball_Keychain.png",
+            "ice": "https://pikmin.wiki.gallery/images/thumb/9/9c/Decor_Ice_Ball_Keychain.png/144px-Decor_Ice_Ball_Keychain.png"
           }
         }
       ],
@@ -1173,7 +1236,8 @@
         "white",
         "purple",
         "rock",
-        "winged"
+        "winged",
+        "ice"
       ]
     },
     {
@@ -3666,11 +3730,12 @@
           "imageUrls": {
             "red": "https://pikmin.wiki.gallery/images/thumb/7/7f/Decor_Red_Shaved_Ice.png/100px-Decor_Red_Shaved_Ice.png",
             "yellow": "https://pikmin.wiki.gallery/images/thumb/6/6b/Decor_Yellow_Shaved_Ice.png/100px-Decor_Yellow_Shaved_Ice.png",
-            "blue": "https://pikmin.wiki.gallery/images/thumb/a/ab/Decor_Blue_Shaved_Ice.png/100px-Decor_Blue_Shaved_Ice.png",
+            "blue": "https://pikmin.wiki.gallery/images/thumb/a/ab/Decor_Blue_Shaved_Ice.png/200px-Decor_Blue_Shaved_Ice.png",
             "white": "https://pikmin.wiki.gallery/images/thumb/a/aa/Decor_White_Shaved_Ice.png/69px-Decor_White_Shaved_Ice.png",
             "purple": "https://pikmin.wiki.gallery/images/thumb/8/8e/Decor_Purple_Shaved_Ice.png/100px-Decor_Purple_Shaved_Ice.png",
             "rock": "https://pikmin.wiki.gallery/images/thumb/0/01/Decor_Rock_Shaved_Ice.png/100px-Decor_Rock_Shaved_Ice.png",
-            "winged": "https://pikmin.wiki.gallery/images/thumb/1/1f/Decor_Winged_Shaved_Ice.png/91px-Decor_Winged_Shaved_Ice.png"
+            "winged": "https://pikmin.wiki.gallery/images/thumb/1/1f/Decor_Winged_Shaved_Ice.png/91px-Decor_Winged_Shaved_Ice.png",
+            "ice": "https://pikmin.wiki.gallery/images/5/55/Decor_Ice_Shaved_Ice.png"
           }
         }
       ],
@@ -3681,7 +3746,8 @@
         "white",
         "purple",
         "rock",
-        "winged"
+        "winged",
+        "ice"
       ]
     },
     {
@@ -4189,4 +4255,4 @@
       ]
     }
   ]
-}
+}
