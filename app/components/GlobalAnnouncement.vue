@@ -53,23 +53,33 @@
         <div v-show="currentTab === 'update'" class="flex-1">
           <ul class="announcement-copy announcement-list text-sm leading-relaxed">
             <li class="announcement-update-item announcement-update-item-feature">
-              <span class="announcement-update-date">7/1</span>
+              <span class="announcement-update-date">9月</span>
               <span class="announcement-update-icon announcement-update-icon-emerald">
-                <Icon name="lucide:music" class="h-3.5 w-3.5" />
+                <Icon name="lucide:calendar" class="h-3.5 w-3.5" />
               </span>
               <span class="announcement-update-copy">
-                <span class="announcement-update-kicker">裝飾更新</span>
-                <span class="announcement-update-highlight">迷你樂器</span>
+                <span class="announcement-update-kicker">9月活動</span>
+                <span class="announcement-update-highlight">香腸・月餅・秋季貼紙</span>
               </span>
             </li>
             <li class="announcement-update-item">
-              <span class="announcement-update-date">6/11</span>
+              <span class="announcement-update-date">9/1</span>
               <span class="announcement-update-icon announcement-update-icon-emerald">
-                <Icon name="lucide:sprout" class="h-3.5 w-3.5" />
+                <Icon name="lucide:info" class="h-3.5 w-3.5" />
               </span>
               <span class="announcement-update-copy">
-                <span class="announcement-update-kicker">全新功能</span>
-                <span>放生皮克敏的回憶</span>
+                <span class="announcement-update-kicker">待更新</span>
+                <span>香腸飾品將在資料來源有圖片後更新</span>
+              </span>
+            </li>
+            <li class="announcement-update-item">
+              <span class="announcement-update-date">8月</span>
+              <span class="announcement-update-icon announcement-update-icon-emerald">
+                <Icon name="lucide:sparkles" class="h-3.5 w-3.5" />
+              </span>
+              <span class="announcement-update-copy">
+                <span class="announcement-update-kicker">裝飾更新</span>
+                <span class="announcement-update-highlight">峇里島雕刻</span>
               </span>
             </li>
             <li class="announcement-update-item">
@@ -89,24 +99,25 @@
                 <span>專屬「加到主畫面」按鈕</span>
               </span>
             </li>
-            <li class="announcement-update-item">
-              <span class="announcement-update-date">好友</span>
-              <span class="announcement-update-icon announcement-update-flags">
-                <Icon name="circle-flags:tw" class="h-3.5 w-3.5" />
-                <Icon name="circle-flags:us" class="h-3.5 w-3.5" />
-                <Icon name="circle-flags:jp" class="h-3.5 w-3.5" />
-              </span>
-              <span class="announcement-update-copy">
-                <span class="announcement-update-kicker">區域設定</span>
-                <span>設定出沒區域，尋找外國/漂亮明信片</span>
-              </span>
-            </li>
           </ul>
         </div>
 
-        <!-- LINE 散步趣活動 -->
-        <div v-show="currentTab === 'event'" class="flex-1">
-          <div class="flex gap-3 items-center">
+        <!-- 9月皮克敏活動 -->
+        <div v-show="currentTab === 'event'" class="flex-1 space-y-3">
+          <div class="announcement-copy text-sm space-y-2">
+            <p class="font-medium text-green-600">🌾 皮克敏9月活動</p>
+            <p class="text-xs">活動時間：<span class="font-bold">2026/9/1 – 9/30</span></p>
+            <p class="text-xs font-medium">🌱 本月金色花苗飾品：</p>
+            <div class="flex flex-wrap gap-1.5">
+              <span class="text-xs glass-control px-2 py-0.5 rounded-full font-bold">🌭 香腸</span>
+              <span class="text-xs glass-control px-2 py-0.5 rounded-full font-bold">🥮 月餅</span>
+              <span class="text-xs glass-control px-2 py-0.5 rounded-full font-bold">🍂 秋季貼紙</span>
+            </div>
+            <p class="text-[11px] text-amber-600 mt-1">⚠️ 香腸飾品將在資料來源有圖片後更新至圖鑑</p>
+          </div>
+
+          <!-- LINE 散步趣活動 -->
+          <div class="flex gap-3 items-center pt-2 border-t border-gray-200/50">
             <!-- QR Code -->
             <img 
               src="/260108172000.png" 

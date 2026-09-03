@@ -4150,6 +4150,43 @@
       "availablePikminTypes": [
         "yellow"
       ]
+    },
+    {
+      "category": {
+        "id": "balinese-carving",
+        "name": "峇里島雕刻",
+        "nameEn": "Balinese Carving",
+        "type": "special",
+        "icon": "noto:statue-of-liberty"
+      },
+      "variants": [
+        {
+          "id": "balinese_carving",
+          "name": "峇里島雕刻",
+          "nameEn": "Balinese Carving",
+          "imageUrl": "https://pikmin.wiki.gallery/images/thumb/b/b2/Decor_Red_Balinese_Carving.png/200px-Decor_Red_Balinese_Carving.png",
+          "imageUrls": {
+            "red": "https://pikmin.wiki.gallery/images/thumb/b/b2/Decor_Red_Balinese_Carving.png/200px-Decor_Red_Balinese_Carving.png",
+            "yellow": "https://pikmin.wiki.gallery/images/thumb/b/b8/Decor_Yellow_Balinese_Carving.png/200px-Decor_Yellow_Balinese_Carving.png",
+            "blue": "https://pikmin.wiki.gallery/images/5/55/Decor_Blue_Balinese_Carving.png",
+            "white": "https://pikmin.wiki.gallery/images/c/c3/Decor_White_Balinese_Carving.png",
+            "purple": "https://pikmin.wiki.gallery/images/thumb/f/f5/Decor_Purple_Balinese_Carving.png/200px-Decor_Purple_Balinese_Carving.png",
+            "rock": "https://pikmin.wiki.gallery/images/thumb/2/2e/Decor_Rock_Balinese_Carving.png/166px-Decor_Rock_Balinese_Carving.png",
+            "winged": "https://pikmin.wiki.gallery/images/thumb/1/18/Decor_Winged_Balinese_Carving.png/162px-Decor_Winged_Balinese_Carving.png",
+            "ice": "https://pikmin.wiki.gallery/images/thumb/f/fc/Decor_Ice_Balinese_Carving.png/200px-Decor_Ice_Balinese_Carving.png"
+          }
+        }
+      ],
+      "availablePikminTypes": [
+        "red",
+        "yellow",
+        "blue",
+        "white",
+        "purple",
+        "rock",
+        "winged",
+        "ice"
+      ]
     }
   ]
-}
+}
