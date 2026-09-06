@@ -362,7 +362,10 @@
         </span>
       </div>
 
-      <div class="capture-dashboard-grid rare-dashboard-grid">
+      <div
+        class="capture-dashboard-grid rare-dashboard-grid"
+        :class="{ 'is-score-empty': rareLevelUpRecommendations.length === 0 && rareVirtualRecommendations.length === 0 }"
+      >
         <article class="rare-recommendation-panel rare-recommendation-panel-primary">
           <div class="rare-recommendation-panel-head">
             <span>{{ captureDashboardLabels.realCloseTitle }}</span>
@@ -2949,6 +2952,41 @@ const handleCollectAll = (categoryId: string, categoryName: string) => {
 
   .rare-recommendation-panel-virtual {
     border-bottom: 1px solid var(--collection-line);
+  }
+}
+
+@media (min-width: 1024px) {
+  .collection-filter-panel {
+    padding: 1rem 1.25rem;
+  }
+
+  .capture-dashboard-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-areas: "primary virtual unlock";
+    align-items: start;
+  }
+
+  .rare-recommendation-panel {
+    min-width: 0;
+    align-self: stretch;
+  }
+
+  .rare-recommendation-panel-virtual {
+    border-bottom: 0;
+    border-right: 1px solid var(--collection-line);
+  }
+
+  .capture-dashboard-grid.is-score-empty {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-areas: "primary virtual" "unlock unlock";
+  }
+
+  .is-score-empty .rare-recommendation-panel-unlock {
+    border-top: 1px solid var(--collection-line);
+  }
+
+  .is-score-empty .rare-recommendation-panel-unlock .capture-recommendation-list {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 

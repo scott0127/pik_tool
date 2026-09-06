@@ -10,7 +10,7 @@
       <div class="app-header-inner max-w-8xl mx-auto px-4 py-3">
         <div class="flex items-center justify-between">
           <!-- Logo and Title -->
-          <NuxtLink to="/" class="flex items-center gap-3 group">
+          <NuxtLink to="/" class="app-header-brand flex items-center gap-3 group">
             <div class="relative">
               <div class="app-header-logo w-12 h-12 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-2xl flex items-center justify-center shadow-lg group-hover:shadow-xl group-hover:scale-110 transition-all duration-300">
                 <span class="app-header-logo-mark text-2xl">🌱</span>
@@ -27,11 +27,13 @@
           </NuxtLink>
 
           <!-- Desktop Navigation -->
-          <nav class="hidden md:flex items-center gap-1 bg-white/50 rounded-2xl p-1">
+          <nav class="app-desktop-nav hidden md:flex items-center gap-1 bg-white/50 rounded-2xl p-1">
             <NuxtLink 
               v-for="link in navLinks" 
               :key="link.to"
               :to="link.to"
+              :aria-label="link.name"
+              :title="link.name"
               class="nav-item"
               :class="[
                 $route.path === link.to ? 'nav-item-active' : 'nav-item-inactive'
@@ -67,7 +69,7 @@
             </button>
 
             <!-- Progress Ring (Desktop) -->
-            <div class="hidden sm:flex items-center gap-3 bg-white/50 rounded-2xl px-4 py-2">
+            <div class="app-header-progress hidden sm:flex items-center gap-3 bg-white/50 rounded-2xl px-4 py-2">
               <div class="relative w-10 h-10">
                 <svg class="w-10 h-10 progress-ring" viewBox="0 0 36 36">
                   <circle
@@ -130,7 +132,8 @@
               class="app-feedback-button hidden md:flex items-center gap-2 px-4 h-10 rounded-xl bg-gradient-to-r from-violet-500 to-purple-600 hover:from-violet-600 hover:to-purple-700 !text-white transition-all hover:shadow-lg group overflow-hidden"
               :title="$t('header.feedback')"
             >
-              <div class="hidden 2xl:block w-24 overflow-hidden">
+              <Icon name="lucide:message-square" class="text-lg shrink-0" />
+              <div class="app-feedback-label hidden 2xl:block w-24 overflow-hidden">
                 <span class="inline-block whitespace-nowrap animate-marquee text-sm font-semibold">
                   {{ $t('header.feedback') }}&nbsp;&nbsp;&nbsp;&nbsp;{{ $t('header.feedback') }}&nbsp;&nbsp;&nbsp;&nbsp;
                 </span>
@@ -885,5 +888,121 @@ onUnmounted(() => {
   color: #fff !important;
   paint-order: normal !important;
   text-shadow: none !important;
+}
+
+@media (min-width: 768px) {
+  .app-header-inner {
+    max-width: 1440px;
+    padding: 0.85rem 1.5rem;
+  }
+
+  .app-header-inner > div {
+    gap: 1.25rem;
+  }
+
+  .app-header-brand {
+    flex: 0 1 17rem;
+    min-width: 0;
+  }
+
+  .app-header-brand > .relative,
+  .app-header-actions,
+  .app-desktop-nav {
+    flex-shrink: 0;
+  }
+
+  .app-header-title {
+    font-size: 1rem;
+    line-height: 1.4;
+    text-wrap: balance;
+  }
+
+  .app-desktop-nav .nav-item {
+    gap: 0.4rem;
+    padding: 0.65rem 0.8rem;
+    white-space: nowrap;
+    font-size: 0.9rem;
+  }
+
+  .app-desktop-nav .nav-item:focus-visible {
+    outline: 2px solid #047857;
+    outline-offset: 3px;
+  }
+
+  .app-header-actions {
+    gap: 0.5rem;
+  }
+
+  .app-header-actions > button,
+  .app-header-actions > a {
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+
+  .app-header-progress {
+    padding: 0.35rem 0.65rem;
+    gap: 0.5rem;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .app-feedback-button {
+    display: flex !important;
+    width: 2.5rem;
+    padding-inline: 0;
+    justify-content: center;
+  }
+
+  .app-feedback-label {
+    display: none;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1279px) {
+  .app-header-progress {
+    display: none;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1100px) {
+  .app-header-inner {
+    padding-inline: 1rem;
+  }
+
+  .app-header-inner > div {
+    gap: 0.75rem;
+  }
+
+  .app-desktop-nav .nav-item > span:not(.iconify) {
+    display: none;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1439px) {
+  .app-header-actions > button > .text-sm,
+  .app-header-actions > a > .text-sm {
+    display: none;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  .app-header-inner > div {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .app-desktop-nav {
+    grid-column: 1 / -1;
+    order: 3;
+    justify-content: space-between;
+  }
+
+  .app-desktop-nav .nav-item {
+    flex: 1;
+    justify-content: center;
+  }
+
+  .app-desktop-nav .nav-item > span:not(.iconify) {
+    display: inline;
+  }
 }
 </style>

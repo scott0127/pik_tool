@@ -15,7 +15,7 @@
     </div>
 
     <!-- Left Content: Title & Text (Floats forward slightly) -->
-    <div class="relative z-10 flex-1 text-center md:text-left transition-transform duration-200 ease-out" :style="textStyle">
+    <div class="home-hero-copy relative z-10 flex-1 text-center md:text-left transition-transform duration-200 ease-out" :style="textStyle">
       <div class="hero-motion-item inline-flex items-center gap-2.5 px-5 py-2 rounded-full bg-white/45 backdrop-blur-md border border-white/80 text-[#0a5c43] text-xs font-display font-bold uppercase tracking-[0.08em] mb-6 shadow-[0_2px_8px_rgba(0,0,0,0.04)] hover:scale-105 transition-transform cursor-default">
         <span class="w-2.5 h-2.5 rounded-full bg-[#00be83]"></span>
         {{ $t('hero.badge') }}
@@ -116,7 +116,7 @@
     </div>
 
     <!-- Right Content: Floating 3D Stats Core -->
-    <div class="relative z-20 w-auto perspective-1000">
+    <div class="home-hero-progress relative z-20 w-auto perspective-1000">
         <div
             class="relative w-72 h-72 md:w-96 md:h-96 transition-transform duration-100 ease-out preserve-3d cursor-pointer"
             :style="cardStyle"
@@ -421,10 +421,8 @@ const initHeroMotion = () => {
                 scrollTrigger: {
                     trigger: '.home-hero-stack',
                     start: 'top 18%',
-                    end: '+=760',
+                    end: 'bottom 18%',
                     scrub: 0.85,
-                    pin: true,
-                    anticipatePin: 1,
                 },
             });
 
@@ -584,6 +582,44 @@ const textStyle = computed(() => ({
 
 .home-hero-stack {
     max-width: 38rem;
+}
+
+@media (min-width: 768px) {
+    .home-hero-section {
+        display: grid;
+        grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+        gap: 2rem;
+        padding: 2rem;
+    }
+
+    .home-hero-copy {
+        min-width: 0;
+    }
+
+    .home-hero-title {
+        font-size: clamp(2.6rem, 4.5vw, 4rem);
+        line-height: 1.12;
+        margin-bottom: 1.25rem;
+    }
+
+    .home-hero-subtitle {
+        font-size: 1.05rem;
+        margin-bottom: 1.75rem;
+    }
+
+    .home-hero-stack {
+        margin-top: 0;
+    }
+
+    .home-hero-progress {
+        justify-self: center;
+        min-width: 0;
+    }
+
+    .home-hero-progress > div {
+        width: clamp(16rem, 28vw, 24rem);
+        height: clamp(16rem, 28vw, 24rem);
+    }
 }
 
 .pikmin-stage-card {

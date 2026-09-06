@@ -18,7 +18,7 @@
     </div>
 
     <!-- List: Expedition Style -->
-    <div v-else class="flex-1 flex flex-col gap-3 overflow-y-auto pr-2 custom-scrollbar">
+    <div v-else class="near-complete-list flex-1 flex flex-col gap-3 overflow-y-auto pr-2 custom-scrollbar">
       <div
         v-for="(cat, index) in categories.slice(0, 4)"
         :key="cat.id"
@@ -89,6 +89,21 @@ const getPikminColorClass = (index: number) => {
 </script>
 
 <style scoped>
+@media (min-width: 768px) {
+  .near-complete-list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    overflow: visible;
+    padding: 0;
+  }
+}
+
+@media (min-width: 1200px) {
+  .near-complete-list {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
 .custom-scrollbar::-webkit-scrollbar {
   width: 4px;
 }

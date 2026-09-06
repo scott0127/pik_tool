@@ -34,6 +34,27 @@
 </script>
 
 <style scoped>
+@media (min-width: 768px) {
+    .home-bento-grid {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 1.5rem;
+        padding-block: 0 1rem;
+    }
+
+    .home-bento-cell {
+        min-width: 0;
+        grid-column: 1 / -1;
+        grid-row: auto;
+    }
+
+    .home-bento-cell:nth-child(2) {
+        padding: 1.25rem 1.5rem;
+        border: 1px solid rgba(255, 255, 255, 0.8);
+        border-radius: 1.5rem;
+        background: rgba(255, 255, 255, 0.4);
+    }
+}
+
 @media (max-width: 767px) {
     .home-bento-grid {
         width: min(100%, 43rem);
