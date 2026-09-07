@@ -52,6 +52,9 @@ const createEmptyStatus = (): ReportStatus => ({
 });
 
 const enqueueCellIds = (cellIds: string[]) => {
+    // 這層 fetchedCellIds 過濾與 flush 時的過濾重複，單獨拿掉不會有測試變紅。
+    // 但不是死碼：少了它，已查過的 id 會佔用 MAX_PENDING_CELL_IDS 名額，
+    // 讓下面的 oldest-first 淘汰把真正還沒查的 cell 擠掉。
     const freshIds = cellIds.filter(id => id && !fetchedCellIds.has(id));
 
     for (const id of freshIds) {

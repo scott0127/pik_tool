@@ -4,6 +4,7 @@
 .nuxt
 .nitro
 .cache
+.nuxtrc
 dist
 
 # Node dependencies
@@ -32,6 +33,7 @@ supabase/migration_*.sql
 # Ignore agent directory
 .agent/
 .agents/
+.claude/
 
 # Local scratch workspace
 scratch/
@@ -40,6 +42,9 @@ scratch/
 output/
 tmp/
 --port/
+
+# Test artifacts
+coverage/
 
 # OSM Pipeline and Data
 *.osm.pbf
