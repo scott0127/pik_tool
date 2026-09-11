@@ -1,5 +1,5 @@
 <template>
-  <div class="collection-page space-y-6 pb-8 relative">
+  <div ref="collectionPage" class="collection-page space-y-6 pb-8 relative" :style="collectionMotionStyle" @click="respondToControl">
     <!-- Decorative floating elements -->
     <div
       class="collection-page-ambient absolute top-0 left-0 w-full h-[400px] overflow-hidden pointer-events-none -z-10"
@@ -98,6 +98,7 @@
         </div>
         <button
           @click="isFilterExpanded = true"
+          :aria-expanded="isFilterExpanded"
           class="collection-soft-button relative flex items-center gap-2 px-4 py-2.5 text-emerald-800 rounded-xl text-sm font-bold transition-all"
         >
           <Icon name="lucide:sliders-horizontal" class="w-4 h-4" />
@@ -106,13 +107,11 @@
           }}</span>
           <Icon name="lucide:chevron-down" class="w-4 h-4" />
           
-          <ClientOnly>
-            <ThreeFilterHint />
-          </ClientOnly>
         </button>
       </div>
 
       <!-- Expanded: full filter panel -->
+      <Transition :css="false" @enter="enterPanel" @leave="leavePanel" @enter-cancelled="cancelPanel" @leave-cancelled="cancelPanel">
       <div v-if="isFilterExpanded" class="hidden md:block space-y-6">
         <!-- Collapse toggle header -->
         <div class="flex items-center justify-between">
@@ -219,14 +218,7 @@
           </div>
         </div>
 
-        <Transition
-          enter-active-class="transition duration-300 ease-out"
-          enter-from-class="opacity-0 -translate-y-4 scale-95"
-          enter-to-class="opacity-100 translate-y-0 scale-100"
-          leave-active-class="transition duration-200 ease-in"
-          leave-from-class="opacity-100 translate-y-0 scale-100"
-          leave-to-class="opacity-0 -translate-y-4 scale-95"
-        >
+        <Transition :css="false" @enter="enterPanel" @leave="leavePanel" @enter-cancelled="cancelPanel" @leave-cancelled="cancelPanel">
           <div
             v-if="hasActiveFilters"
             class="bg-emerald-50/70 border border-emerald-100/80 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between rounded-2xl p-4 gap-4"
@@ -340,6 +332,7 @@
           </div>
         </Transition>
       </div>
+      </Transition>
     </div>
 
     <section
@@ -392,7 +385,7 @@
               </span>
               <span class="capture-recommendation-hint">{{ recommendation.realActionHint }}</span>
               <span class="capture-recommendation-progress" :aria-label="recommendation.progressText">
-                <span :style="{ width: recommendation.levelProgressPercent + '%' }" />
+                <span :style="{ transform: `scaleX(${recommendation.levelProgressPercent / 100})` }" />
               </span>
             </button>
             <p v-if="rareLevelUpRecommendations.length === 0" class="rare-recommendation-empty">
@@ -427,7 +420,7 @@
               </span>
               <span class="capture-recommendation-hint">{{ recommendation.virtualActionHint }}</span>
               <span class="capture-recommendation-progress" :aria-label="recommendation.virtualProgressText">
-                <span :style="{ width: recommendation.virtualProgressPercent + '%' }" />
+                <span :style="{ transform: `scaleX(${recommendation.virtualProgressPercent / 100})` }" />
               </span>
             </button>
             <p v-if="rareVirtualRecommendations.length === 0" class="rare-recommendation-empty">
@@ -471,7 +464,7 @@
                 </span>
               </span>
               <span class="capture-recommendation-progress" :aria-label="recommendation.regularProgressText">
-                <span :style="{ width: recommendation.regularPercent + '%' }" />
+                <span :style="{ transform: `scaleX(${recommendation.regularPercent / 100})` }" />
               </span>
             </button>
             <p v-if="rareUnlockRecommendations.length === 0" class="rare-recommendation-empty">
@@ -539,29 +532,24 @@
     <!-- ===== Mobile Navigation Drawer (Bottom Sheet with Three.js) ===== -->
     <ClientOnly>
       <Teleport to="body">
-        <Transition
-          enter-active-class="transition-[transform,opacity] duration-360 ease-[cubic-bezier(0.32,0.72,0,1)]"
-          enter-from-class="opacity-0 translate-y-full"
-          enter-to-class="opacity-100 translate-y-0"
-          leave-active-class="transition-[transform,opacity] duration-280 ease-[cubic-bezier(0.32,0.72,0,1)]"
-          leave-from-class="opacity-100 translate-y-0"
-          leave-to-class="opacity-0 translate-y-full"
-        >
+        <Transition :css="false" @enter="enterPanel" @leave="leavePanel" @enter-cancelled="cancelPanel" @leave-cancelled="cancelPanel">
           <div
             v-if="isFilterExpanded"
-            class="md:hidden fixed inset-0 z-[100] flex flex-col justify-end pointer-events-none"
+            class="collection-filter-overlay md:hidden fixed inset-0 z-[100] flex flex-col justify-end pointer-events-none"
+            :style="collectionMotionStyle"
+            @click="respondToControl"
+            @keydown.esc="isFilterExpanded = false"
           >
-            <!-- Backdrop with Three.js -->
+            <!-- The backdrop fades independently from the sheet. -->
             <div
-              class="absolute inset-0 bg-gray-900/60 pointer-events-auto transition-opacity"
+              class="collection-filter-backdrop absolute inset-0 bg-gray-900/60 pointer-events-auto"
               @click="isFilterExpanded = false"
             >
-              <ThreeSporeBackdrop v-if="!isMobile" class="opacity-80" />
             </div>
 
             <!-- Bottom Sheet Content -->
             <div
-              class="bg-white/95 border border-white/70 shadow-2xl relative w-full max-h-[85vh] rounded-t-[2.5rem] pointer-events-auto flex flex-col overflow-hidden"
+              class="collection-filter-sheet bg-white/95 border border-white/70 shadow-2xl relative w-full max-h-[85vh] rounded-t-[2.5rem] pointer-events-auto flex flex-col overflow-hidden"
             >
               <!-- Notch -->
               <div
@@ -706,7 +694,7 @@
     </ClientOnly>
 
     <!-- Results Section -->
-    <div>
+    <div class="collection-results">
       <!-- Category Grouped View (when no filters) -->
       <template v-if="!hasActiveFilters">
         <!-- Regular Categories Section -->
@@ -825,14 +813,14 @@
                   class="h-1.5 w-full bg-gray-200 rounded-full mt-1 overflow-hidden"
                 >
                   <div
-                    class="h-full rounded-full transition-all duration-500"
+                    class="collection-progress-fill h-full rounded-full"
                     :class="
                       getCategoryProgressPercent(def.category.id) === 100
                         ? 'bg-gradient-to-r from-amber-400 to-yellow-300'
                         : 'bg-gradient-to-r from-emerald-400 to-teal-400'
                     "
                     :style="{
-                      width: getCategoryProgressPercent(def.category.id) + '%',
+                      transform: `scaleX(${getCategoryProgressPercent(def.category.id) / 100})`,
                     }"
                   ></div>
                 </div>
@@ -966,14 +954,14 @@
                   class="h-1.5 w-full bg-gray-200 rounded-full mt-1 overflow-hidden"
                 >
                   <div
-                    class="h-full rounded-full transition-all duration-500"
+                    class="collection-progress-fill h-full rounded-full"
                     :class="
                       getCategoryProgressPercent(def.category.id) === 100
                         ? 'bg-gradient-to-r from-amber-400 to-yellow-300'
                         : 'bg-gradient-to-r from-purple-400 to-fuchsia-400'
                     "
                     :style="{
-                      width: getCategoryProgressPercent(def.category.id) + '%',
+                      transform: `scaleX(${getCategoryProgressPercent(def.category.id) / 100})`,
                     }"
                   ></div>
                 </div>
@@ -1031,10 +1019,12 @@ import {
   type DecorItem,
 } from "~/types/decor";
 import type { CollectionCategoryFilter } from "~/composables/useCollectionFilters";
-import { gsap } from "gsap";
+import { collectionMotion, collectionMotionStyle, collectionMotionEnabled } from "~/utils/collectionMotion";
 import { useParallax } from "~/composables/useParallax";
 
 const route = useRoute();
+const collectionPage = ref<HTMLElement | null>(null);
+const { enterPanel, leavePanel, cancelPanel, refreshResults, respondToControl, revealCategory } = useCollectionMotion(collectionPage);
 const { t, locale } = useI18n();
 const {
   collectionState,
@@ -1064,7 +1054,7 @@ const selectedRareAnalysisCategoryId = ref<string | null>(null);
 // UX: Collapsible filter panel (default collapsed)
 const isFilterExpanded = ref(false);
 
-const { isMobile, isAmbientPaused } = useParallax();
+const { isAmbientPaused } = useParallax();
 watch(isFilterExpanded, (expanded) => {
   isAmbientPaused.value = expanded;
 });
@@ -1170,6 +1160,11 @@ const markCategoriesAnimating = (categoryIds: string[]) => {
   const nextAnimating = new Set(animatingCategories.value);
 
   for (const categoryId of categoryIds) {
+    const category = document.getElementById(`cat-${categoryId}`);
+    const header = category?.querySelector('.collection-category-header');
+    if (!header || !collectionMotionEnabled()) continue;
+    const bounds = header.getBoundingClientRect();
+    if (bounds.bottom < 0 || bounds.top > window.innerHeight) continue;
     const currentTimer = categoryAnimationTimers.get(categoryId);
     if (currentTimer !== undefined) {
       window.clearTimeout(currentTimer);
@@ -1183,7 +1178,7 @@ const markCategoriesAnimating = (categoryIds: string[]) => {
       const remaining = new Set(animatingCategories.value);
       remaining.delete(categoryId);
       animatingCategories.value = remaining;
-    }, 380);
+    }, collectionMotion.settle * 1000);
     categoryAnimationTimers.set(categoryId, timer);
   }
 
@@ -1201,6 +1196,10 @@ const toggleCategory = (categoryId: string) => {
       newSet.add(categoryId);
     }
     collapsedCategories.value = newSet;
+    if (!newSet.has(categoryId) && animatingCategories.value.has(categoryId)) {
+      const category = document.getElementById(`cat-${categoryId}`);
+      if (category) revealCategory(category);
+    }
   });
 };
 
@@ -1377,6 +1376,7 @@ onMounted(() => {
 });
 
 onUnmounted(() => {
+  isAmbientPaused.value = false;
   cancelCategoryBulkToggle();
   for (const timer of categoryAnimationTimers.values()) {
     window.clearTimeout(timer);
@@ -1469,6 +1469,8 @@ const {
   getItemsByCategoryType,
   searchItems,
 });
+
+watch([searchQuery, selectedCategoryType, selectedPikminType, collectionFilter, isLimitedMode, selectedCategoryId], refreshResults, { flush: 'post' });
 
 const getItemsForCategory = (categoryId: string): DecorItem[] => {
   return getItemsByCategory(categoryId);
@@ -2157,10 +2159,11 @@ const handleCollectAll = (categoryId: string, categoryName: string) => {
 .capture-recommendation-progress span {
   display: block;
   height: 100%;
-  min-width: 0.25rem;
+  width: 100%;
+  transform-origin: left center;
   border-radius: inherit;
   background: linear-gradient(90deg, rgb(20 184 166), rgb(16 185 129));
-  transition: width 260ms ease;
+  transition: transform var(--collection-motion-enter) var(--collection-motion-ease);
 }
 
 .rare-analysis-panel {
@@ -2659,12 +2662,11 @@ const handleCollectAll = (categoryId: string, categoryName: string) => {
 .collection-category-content-wrapper {
   display: grid;
   grid-template-rows: 0fr;
-  transition: grid-template-rows 320ms cubic-bezier(0.25, 1, 0.5, 1);
   overflow: hidden;
 }
 
 .collection-category-content-wrapper.is-animating {
-  will-change: grid-template-rows;
+  transition: grid-template-rows var(--collection-motion-enter) var(--collection-motion-ease);
 }
 
 .collection-category-content-wrapper.is-open {
@@ -2674,18 +2676,41 @@ const handleCollectAll = (categoryId: string, categoryName: string) => {
 .collection-category-content-inner {
   min-height: 0;
   overflow: hidden;
-  opacity: 0;
-  transform: translateY(-8px);
-  transition: opacity 240ms ease, transform 320ms cubic-bezier(0.25, 1, 0.5, 1);
 }
 
-.collection-category-content-wrapper.is-animating .collection-category-content-inner {
-  will-change: transform, opacity;
+.collection-page-ambient .deco-leaf {
+  animation: none;
 }
 
-.collection-category-content-wrapper.is-open .collection-category-content-inner {
-  opacity: 1;
-  transform: translateY(0);
+.collection-progress-fill {
+  width: 100%;
+  transform-origin: left center;
+  transition: transform var(--collection-motion-enter) var(--collection-motion-ease);
+}
+
+.collection-page :deep(button),
+.collection-filter-overlay :deep(button),
+.collection-category-header {
+  transition-duration: var(--collection-motion-fast);
+  transition-timing-function: var(--collection-motion-ease);
+}
+
+.collection-page :deep(.category-tag),
+.collection-page :deep(.filter-chip),
+.collection-page :deep(.pikmin-filter-btn),
+.collection-filter-overlay :deep(.category-tag),
+.collection-filter-overlay :deep(.filter-chip),
+.collection-filter-overlay :deep(.pikmin-filter-btn) {
+  transition-property: background-color, border-color, color, box-shadow;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .collection-page :deep(*),
+  .collection-filter-overlay :deep(*) {
+    animation: none !important;
+    transition-duration: 0s !important;
+    scroll-behavior: auto !important;
+  }
 }
 
 /* Collection visual hierarchy */

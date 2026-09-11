@@ -14,13 +14,12 @@
           class="decor-grid-row overflow-visible"
         >
           <DecorCard
-            v-for="(item, index) in group.items"
+            v-for="item in group.items"
             :key="item.id"
           :item-id="item.id"
           :category-id="item.categoryId"
           :variant-id="item.variantId"
           :pikmin-type="item.pikminType"
-          :animation-delay="Math.min(groupIndex * 86 + index * 52, 680)"
             class="decor-grid-card w-full sm:w-[calc(12.5%-0.72rem)] sm:min-w-[100px] sm:max-w-[138px]"
             @toggle="$emit('toggle', $event)"
           />
@@ -223,14 +222,8 @@ const syncObservedGroups = async () => {
 
   visibilityObserver.disconnect();
 
-  // Pre-warm the first few groups when mounting to prevent visible placeholders in viewport
-  const next = new Set(visibleGroupKeys.value);
-  groupedItems.value.slice(0, viewportWidth.value < 640 ? 4 : 3).forEach(group => {
-    next.add(group.key);
-  });
-  visibleGroupKeys.value = next;
-  scheduleImagePreload([...next]);
-
+  // The observer warms nearby groups. Pre-warming every DecorGrid here mounts
+  // nearly the entire catalog because each category has its own grid instance.
   root.querySelectorAll<HTMLElement>('[data-group-key]').forEach((el) => {
     visibilityObserver?.observe(el);
   });
