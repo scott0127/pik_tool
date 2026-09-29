@@ -223,9 +223,18 @@
         }
     },
     "released": {
-        "title": "Released Pikmin",
+        "title": "Pikmin Manor",
         "subtitle": "Thank you for the journey together",
         "add_record": "Add Record",
+        "manor": {
+            "eyebrow": "A little place for the journeys we shared",
+            "intro": "Every Pikmin who returned to the wild has a small corner here.",
+            "count": "journeys remembered",
+            "section_label": "Manor journal",
+            "section_title": "Footprints left behind",
+            "record": "companion",
+            "find_record": "View {name}'s release record"
+        },
         "empty": {
             "title": "No Released Records",
             "desc": "Keep track of Pikmin you've released back to the wild here."

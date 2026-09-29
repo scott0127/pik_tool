@@ -1,60 +1,93 @@
 <template>
-  <div class="min-h-screen pt-20 pb-24 lg:pt-24 lg:pb-8 relative">
-    <!-- Background Decor (Matches app style) -->
-    <div class="fixed inset-0 pointer-events-none -z-10 hidden overflow-hidden md:block">
-      <div class="absolute top-[-10%] right-[-5%] w-[500px] h-[500px] bg-emerald-400/20 rounded-full blur-3xl opacity-50 mix-blend-multiply"></div>
-      <div class="absolute bottom-[-10%] left-[-10%] w-[600px] h-[600px] bg-teal-300/20 rounded-full blur-3xl opacity-50 mix-blend-multiply"></div>
-    </div>
-
-    <div class="max-w-4xl mx-auto px-4 sm:px-6 relative z-10">
-      <!-- Header -->
-      <div class="released-hero mb-8 flex flex-col sm:flex-row items-center gap-6 sm:gap-8 text-center sm:text-left gsap-stagger">
-        <div class="w-48 h-48 sm:w-56 sm:h-56 shrink-0 relative flex items-center justify-center">
-          <div class="absolute inset-0 w-full h-full" style="mask-image: radial-gradient(circle closest-side, black 50%, transparent 100%); -webkit-mask-image: radial-gradient(circle closest-side, black 50%, transparent 100%);">
-            <img src="/images/red_pikmin_leaving.png" alt="Red Pikmin leaving" class="w-full h-full object-cover transform hover:scale-105 transition-transform duration-1000 opacity-90 mix-blend-multiply" />
+  <div class="released-page min-h-screen pt-20 pb-24 lg:pt-24">
+    <main class="released-shell mx-auto max-w-6xl px-4 sm:px-6">
+      <header class="manor-hero gsap-stagger">
+        <div class="manor-hero-copy">
+          <span class="manor-eyebrow">{{ $t('released.manor.eyebrow') }}</span>
+          <h1 class="released-hero-title">{{ $t('released.title') }}</h1>
+          <p class="released-hero-subtitle">{{ $t('released.subtitle') }}</p>
+          <p class="manor-intro">{{ $t('released.manor.intro') }}</p>
+          <div class="manor-hero-actions">
+            <button type="button" class="manor-add-button" @click="openModal()">
+              <Icon name="lucide:plus" class="h-5 w-5" />
+              {{ $t('released.add_record') }}
+            </button>
+            <div class="manor-count" :aria-label="$t('released.stats.total', { count: filteredRecords.length })">
+              <strong>{{ filteredRecords.length }}</strong>
+              <span>{{ $t('released.manor.count') }}</span>
+            </div>
           </div>
         </div>
-        <div class="released-hero-copy">
-          <h1 class="released-hero-title text-4xl sm:text-5xl font-extrabold mb-3">
-            {{ $t('released.title') }}
-          </h1>
-          <p class="released-hero-subtitle font-bold text-lg max-w-md">{{ $t('released.subtitle') }}</p>
+
+        <div class="manor-scene">
+          <div class="manor-sun" aria-hidden="true" />
+          <div class="manor-cloud manor-cloud-one" aria-hidden="true" />
+          <div class="manor-cloud manor-cloud-two" aria-hidden="true" />
+          <div class="manor-hill manor-hill-back" aria-hidden="true" />
+          <div class="manor-hill manor-hill-middle" aria-hidden="true" />
+          <div class="manor-house" aria-hidden="true">
+            <div class="manor-house-roof" />
+            <div class="manor-house-body">
+              <span class="manor-house-window manor-house-window-left" />
+              <span class="manor-house-window manor-house-window-right" />
+              <span class="manor-house-door" />
+            </div>
+          </div>
+          <div class="manor-tree manor-tree-left" aria-hidden="true"><span /><span /><span /></div>
+          <div class="manor-tree manor-tree-right" aria-hidden="true"><span /><span /><span /></div>
+          <div class="manor-hill manor-hill-front" aria-hidden="true" />
+          <div class="manor-path" aria-hidden="true" />
+          <div class="manor-flowers manor-flowers-left" aria-hidden="true" />
+          <div class="manor-flowers manor-flowers-right" aria-hidden="true" />
+          <button
+            v-for="(record, index) in filteredRecords.slice(0, 5)"
+            :key="record.id"
+            type="button"
+            class="manor-guest"
+            :class="'manor-guest-' + index"
+            :aria-label="$t('released.manor.find_record', { name: record.nickname || getDecorName(record.decorItemId) })"
+            @click="scrollToRecord(record.id)"
+          >
+            <img :src="getRecordImageUrl(record.decorItemId) || ''" :alt="record.nickname || getDecorName(record.decorItemId)" loading="lazy" />
+            <span>{{ record.nickname || getDecorName(record.decorItemId) }}</span>
+          </button>
         </div>
-      </div>
+      </header>
 
-      <!-- Action Bar -->
-      <div class="flex items-center justify-center mb-8 bg-white/70 backdrop-blur-xl p-4 rounded-2xl shadow-sm border border-white/60 gsap-stagger">
-        <button
-          @click="openModal()"
-          class="w-full px-6 py-2.5 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-white rounded-xl font-medium shadow-md shadow-emerald-500/20 hover:shadow-lg hover:shadow-emerald-500/30 transition-all duration-300 transform hover:-translate-y-0.5 flex items-center justify-center"
-        >
-          {{ $t('released.add_record') }}
-        </button>
-      </div>
+      <section class="manor-ledger" aria-labelledby="manor-ledger-title">
+        <div class="manor-ledger-heading gsap-stagger">
+          <div>
+            <span class="manor-section-label">{{ $t('released.manor.section_label') }}</span>
+            <h2 id="manor-ledger-title">{{ $t('released.manor.section_title') }}</h2>
+          </div>
+          <p>{{ $t('released.stats.total', { count: filteredRecords.length }) }}</p>
+        </div>
 
-      <!-- Stats / Counter -->
-      <div v-if="getRecordCount() > 0" class="mb-4 text-sm text-gray-600 font-bold tracking-wide gsap-stagger">
-        {{ $t('released.stats.total', { count: filteredRecords.length }) }}
-      </div>
-
-      <!-- Records List -->
-      <div v-if="filteredRecords.length > 0" class="released-record-list mt-8">
-        <div
-          v-for="record in filteredRecords"
+      <div v-if="filteredRecords.length > 0" class="released-record-list">
+        <article
+          v-for="(record, index) in filteredRecords"
           :key="record.id"
+          :id="'released-record-' + record.id"
           class="released-record-row gsap-card group"
         >
           <div class="released-record-image">
+            <div class="plot-hill plot-hill-back" aria-hidden="true" />
+            <div class="plot-hill plot-hill-front" aria-hidden="true" />
+            <div class="plot-fence" aria-hidden="true" />
             <img
               :src="getRecordImageUrl(record.decorItemId) || ''"
-              alt="Decor"
+              :alt="record.nickname || getDecorName(record.decorItemId)"
               loading="lazy"
-              class="relative z-10 h-full w-full object-contain drop-shadow-xl transition-transform duration-500 group-hover:scale-110"
+              class="plot-pikmin"
               @error="(e) => { (e.target as HTMLImageElement).style.display = 'none'; }"
             >
+            <div class="plot-ground" aria-hidden="true" />
+            <span class="plot-flower plot-flower-left" aria-hidden="true" />
+            <span class="plot-flower plot-flower-right" aria-hidden="true" />
           </div>
 
           <div class="released-record-content">
+            <span class="released-record-number">{{ String(index + 1).padStart(2, '0') }} / {{ $t('released.manor.record') }}</span>
             <div class="released-record-header">
               <div class="released-record-heading">
                 <h3
@@ -79,16 +112,20 @@
 
               <div class="released-record-actions">
                 <button
+                  type="button"
                   @click.stop="editRecord(record)"
-                  class="released-record-action text-emerald-700 hover:bg-emerald-100"
+                  class="released-record-action"
                   :title="$t('released.card.edit')"
+                  :aria-label="$t('released.card.edit')"
                 >
                   <Icon name="lucide:edit-2" class="h-4 w-4" />
                 </button>
                 <button
+                  type="button"
                   @click.stop="confirmDelete(record)"
-                  class="released-record-action text-red-600 hover:bg-red-100"
+                  class="released-record-action released-record-action-delete"
                   :title="$t('released.card.delete')"
+                  :aria-label="$t('released.card.delete')"
                 >
                   <Icon name="lucide:trash-2" class="h-4 w-4" />
                 </button>
@@ -123,22 +160,20 @@
               <p class="line-clamp-2">{{ record.note }}</p>
             </div>
           </div>
+        </article>
+      </div>
+
+        <div v-else class="released-empty-state gsap-stagger">
+          <div class="empty-sprout" aria-hidden="true"><span /><span /></div>
+          <h3>{{ $t('released.empty.title') }}</h3>
+          <p>{{ $t('released.empty.desc') }}</p>
+          <button type="button" class="manor-add-button" @click="openModal()">
+            <Icon name="lucide:plus" class="h-5 w-5" />
+            {{ $t('released.add_record') }}
+          </button>
         </div>
-      </div>
-
-      <!-- Empty State -->
-      <div v-else-if="getRecordCount() === 0" class="released-empty-state gsap-stagger">
-        <h3 class="text-2xl font-extrabold mb-2">{{ $t('released.empty.title') }}</h3>
-        <p class="font-bold max-w-sm mb-6">{{ $t('released.empty.desc') }}</p>
-        <button
-          @click="openModal()"
-          class="px-7 py-3 bg-white border border-emerald-300 text-emerald-700 rounded-xl font-extrabold hover:bg-emerald-50 transition-colors shadow-lg shadow-emerald-900/10"
-        >
-          {{ $t('released.add_record') }}
-        </button>
-      </div>
-
-    </div>
+      </section>
+    </main>
 
     <!-- Sync Status -->
     <div v-if="authStore.isAuthenticated.value" class="fixed bottom-4 sm:bottom-8 left-1/2 -translate-x-1/2 z-40 pointer-events-none transition-all duration-500" :class="syncStatus === 'idle' ? 'opacity-0 translate-y-4' : 'opacity-100 translate-y-0'">
@@ -363,7 +398,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, onMounted, onBeforeUnmount, nextTick } from 'vue';
+import { ref, computed, watch, onMounted, nextTick } from 'vue';
 import { gsap } from 'gsap';
 import type { DecorItem, ReleasedPikmin } from '~/types/decor';
 import { PIKMIN_TYPE_COLORS } from '~/types/decor';
@@ -372,12 +407,10 @@ const { t } = useI18n();
 const authStore = useAuthStore();
 const { showToast } = useToast();
 const { 
-  releasedState, 
   syncStatus, 
   syncCountdown, 
   syncConflict,
   getRecords, 
-  getRecordCount, 
   addRecord, 
   updateRecord, 
   deleteRecord, 
@@ -393,72 +426,6 @@ useHead({
   title: () => t('released.title') + ' | ' + t('app.title'),
 });
 
-let releasedImageShineContext: ReturnType<typeof gsap.context> | null = null;
-
-function setupReleasedImageShimmer() {
-  releasedImageShineContext?.revert();
-  releasedImageShineContext = null;
-
-  if (typeof window === 'undefined' || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-    return;
-  }
-
-  const targets = gsap.utils.toArray<HTMLElement>('.released-record-image');
-  if (!targets.length) return;
-
-  releasedImageShineContext = gsap.context(() => {
-    targets.forEach((target, index) => {
-      gsap.set(target, {
-        '--shine-x': '-135%',
-        '--image-glow-alpha': 0.18,
-        '--image-glass-alpha': 0.28,
-        '--image-gradient-x': '0%',
-        '--image-depth-alpha': 0.18,
-        '--image-lift-y': '0px',
-      });
-
-      gsap.to(target, {
-        '--image-depth-alpha': 0.62,
-        '--image-lift-y': '-3px',
-        scale: 1.018,
-        duration: 3.8 + (index % 2) * 0.45,
-        ease: 'sine.inOut',
-        repeat: -1,
-        yoyo: true,
-        delay: index * 0.12,
-      });
-
-      const timeline = gsap.timeline({
-        repeat: -1,
-        repeatDelay: 3.9 + (index % 3) * 0.55,
-        delay: index * 0.18,
-      });
-
-      timeline
-        .to(target, {
-          '--image-glow-alpha': 0.48,
-          '--image-glass-alpha': 0.58,
-          '--image-gradient-x': '100%',
-          duration: 0.72,
-          ease: 'sine.out',
-        }, 0)
-        .to(target, {
-          '--shine-x': '135%',
-          duration: 1.28,
-          ease: 'power2.inOut',
-        }, 0.08)
-        .to(target, {
-          '--image-glow-alpha': 0.2,
-          '--image-glass-alpha': 0.32,
-          '--image-gradient-x': '0%',
-          duration: 1.15,
-          ease: 'sine.inOut',
-        }, 0.72)
-        .set(target, { '--shine-x': '-135%' });
-    });
-  });
-}
-
 onMounted(async () => {
   loadFromLocal();
   if (authStore.isAuthenticated.value) {
@@ -467,6 +434,7 @@ onMounted(async () => {
 
   // GSAP Initial Stagger Animation
   nextTick(() => {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     gsap.fromTo('.gsap-stagger', 
       { y: 20, opacity: 0 }, 
       { y: 0, opacity: 1, duration: 0.8, stagger: 0.1, ease: 'power3.out', delay: 0.1 }
@@ -477,12 +445,7 @@ onMounted(async () => {
       { y: 0, opacity: 1, scale: 1, duration: 0.6, stagger: 0.05, ease: 'power2.out', delay: 0.3 }
     );
 
-    setupReleasedImageShimmer();
   });
-});
-
-onBeforeUnmount(() => {
-  releasedImageShineContext?.revert();
 });
 
 watch(() => authStore.isAuthenticated.value, async (isAuth, wasAuth) => {
@@ -551,11 +514,12 @@ const onDetailsLeave = (el: Element, done: () => void) => {
 
 const filteredRecords = computed(() => getRecords());
 
-watch(
-  () => filteredRecords.value.map(record => record.id).join('|'),
-  () => nextTick(setupReleasedImageShimmer),
-  { flush: 'post' }
-);
+function scrollToRecord(id: string) {
+  document.getElementById('released-record-' + id)?.scrollIntoView({
+    behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
+    block: 'center',
+  });
+}
 
 // --- Modal & Form State ---
 const showModal = ref(false);
@@ -745,637 +709,4 @@ function getReleasedDateParts(dateText: string) {
 }
 </script>
 
-<style scoped>
-.released-hero-copy {
-  position: relative;
-  isolation: isolate;
-  padding: 0.65rem 0.9rem;
-}
-
-.released-hero-copy::before {
-  position: absolute;
-  inset: -0.55rem -1rem;
-  z-index: -1;
-  content: "";
-  border-radius: 999px;
-  background:
-    radial-gradient(ellipse at 50% 42%, rgba(255, 255, 255, 0.78), rgba(255, 255, 255, 0.36) 46%, transparent 78%);
-  filter: blur(10px);
-  opacity: 0.96;
-  pointer-events: none;
-}
-
-.released-hero-title {
-  color: #065f46;
-  paint-order: stroke fill;
-  text-shadow: none;
-}
-
-.released-hero-subtitle {
-  color: rgba(30, 41, 59, 0.94);
-  paint-order: stroke fill;
-  text-shadow: none;
-}
-
-.released-details-section {
-  transform-origin: top center;
-  will-change: height, opacity, transform;
-}
-
-.released-empty-state {
-  position: relative;
-  isolation: isolate;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  margin: 2rem auto 0;
-  max-width: 34rem;
-  padding: 2rem 1.25rem;
-  text-align: center;
-}
-
-.released-empty-state::before {
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  content: "";
-  border: 1px solid rgba(255, 255, 255, 0.76);
-  border-radius: 2rem;
-  background:
-    radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.86), transparent 52%),
-    linear-gradient(135deg, rgba(255, 255, 255, 0.58), rgba(236, 253, 245, 0.34)),
-    rgba(255, 255, 255, 0.32);
-  box-shadow:
-    0 18px 42px rgba(6, 78, 59, 0.18),
-    0 1px 12px rgba(255, 255, 255, 0.84) inset;
-  backdrop-filter: blur(4px) saturate(1.12);
-  -webkit-backdrop-filter: blur(4px) saturate(1.12);
-}
-
-.released-empty-state h3 {
-  color: rgb(15, 23, 42);
-  paint-order: stroke fill;
-  text-shadow: none;
-}
-
-.released-empty-state p {
-  color: rgba(51, 65, 85, 0.96);
-  line-height: 1.7;
-  paint-order: stroke fill;
-  text-shadow: none;
-}
-
-.released-record-list {
-  display: grid;
-  gap: 1.25rem;
-  width: 100%;
-  max-width: 100%;
-}
-
-.released-record-row {
-  position: relative;
-  isolation: isolate;
-  display: grid;
-  grid-template-columns: 7.2rem minmax(0, 1fr);
-  align-items: center;
-  gap: 1.2rem;
-  box-sizing: border-box;
-  width: 100%;
-  max-width: 100%;
-  overflow: visible;
-  min-height: 9.25rem;
-  padding: 0.95rem;
-  border: 1px solid rgba(255, 255, 255, 0.78);
-  border-radius: 2rem;
-  background:
-    linear-gradient(135deg, rgba(255, 255, 255, 0.76), rgba(236, 253, 245, 0.58)),
-    rgba(255, 255, 255, 0.58);
-  box-shadow:
-    0 16px 34px rgba(15, 23, 42, 0.12),
-    0 1px 12px rgba(255, 255, 255, 0.76) inset;
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-  cursor: pointer;
-}
-
-.released-record-row:hover {
-  transform: translateY(-2px);
-  border-color: rgba(110, 231, 183, 0.78);
-  box-shadow:
-    0 18px 36px rgba(6, 95, 70, 0.14),
-    0 1px 12px rgba(255, 255, 255, 0.86) inset;
-}
-
-.released-record-row::before,
-.released-record-row::after {
-  display: none;
-}
-
-.released-record-row::before {
-  top: -9px;
-  left: 8.55rem;
-  box-shadow: inset 0 -3px 4px rgba(0, 0, 0, 0.04);
-}
-
-.released-record-row::after {
-  bottom: -9px;
-  left: 8.55rem;
-  box-shadow: inset 0 3px 4px rgba(0, 0, 0, 0.04);
-}
-
-.released-record-image,
-.released-record-content {
-  z-index: 1;
-}
-
-.released-record-image {
-  --image-glass-alpha: 0.28;
-  --image-glow-alpha: 0.18;
-  --image-gradient-x: 0%;
-  --image-depth-alpha: 0.18;
-  --image-lift-y: 0px;
-  --shine-x: -135%;
-  position: relative;
-  align-self: center;
-  display: grid;
-  width: 7.2rem;
-  min-width: 7.2rem;
-  min-height: 7.6rem;
-  place-items: center;
-  overflow: hidden;
-  padding: 0.55rem;
-  border-radius: 1.6rem;
-  background:
-    linear-gradient(180deg, rgba(232, 245, 233, 0.98), rgba(165, 214, 167, 0.82)),
-    #c8e6c9;
-  border: 1px solid rgba(255, 255, 255, 0.84);
-  box-shadow:
-    0 14px 24px rgba(6, 78, 59, 0.14),
-    0 1px 12px rgba(255, 255, 255, 0.8) inset,
-    0 -10px 18px rgba(6, 95, 70, 0.08) inset;
-  transform: translateY(var(--image-lift-y));
-  transform-origin: center;
-  will-change: transform, box-shadow, background-position;
-  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-}
-
-.released-record-image :deep(img) {
-  width: auto !important;
-  height: auto !important;
-  max-width: 86%;
-  max-height: 84%;
-  object-fit: contain;
-  object-position: center;
-}
-
-.released-record-row:hover .released-record-image {
-  transform: scale(1.02) translateY(-4px);
-  box-shadow:
-    0 18px 30px rgba(6, 78, 59, 0.16),
-    0 1px 14px rgba(255, 255, 255, 0.86) inset,
-    0 -12px 20px rgba(6, 95, 70, 0.09) inset;
-}
-
-.released-record-image::before {
-  display: none;
-}
-
-/* Shimmer overlay */
-.released-record-image::after {
-  position: absolute;
-  top: -38%;
-  left: var(--shine-x, -78%);
-  display: block;
-  width: 86%;
-  height: 180%;
-  content: "";
-  background: linear-gradient(105deg, transparent 20%, rgba(255, 255, 255, 0.6) 50%, transparent 80%);
-  filter: blur(6px);
-  opacity: calc(0.2 + var(--image-glow-alpha) * 0.7);
-  pointer-events: none;
-  transform: rotate(16deg);
-  z-index: 11;
-}
-
-.released-record-content {
-  display: flex;
-  flex-direction: column;
-  gap: 0.45rem;
-  min-width: 0;
-  border-left: 1px solid rgba(255, 255, 255, 0.58);
-  padding-left: 1.1rem;
-  margin-left: -0.5rem;
-}
-
-.released-record-header {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  align-items: start;
-  gap: 0.8rem;
-}
-
-.released-record-heading {
-  min-width: 0;
-}
-
-.released-record-title {
-  max-width: 100%;
-  color: #1e293b;
-  overflow: hidden;
-  font-size: 1.15rem;
-  font-weight: 700;
-  line-height: 1.2;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.released-record-category-row {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  min-width: 0;
-  max-width: 100%;
-  margin-top: 0.25rem;
-}
-
-.released-record-type-dot {
-  flex: 0 0 auto;
-  width: 0.55rem;
-  height: 0.55rem;
-  border: 1px solid rgba(255, 255, 255, 0.8);
-  border-radius: 999px;
-  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.12);
-}
-
-.released-record-category {
-  display: block;
-  min-width: 0;
-  overflow: hidden;
-  color: #0f766e;
-  font-size: 0.8rem;
-  font-weight: 600;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.released-record-actions {
-  display: flex;
-  flex: 0 0 auto;
-  gap: 0.4rem;
-}
-
-.released-record-action {
-  display: grid;
-  width: 1.85rem;
-  height: 1.85rem;
-  place-items: center;
-  border: 1px solid rgba(139, 92, 26, 0.15);
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.7);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
-  transition: all 0.2s ease;
-  color: #64748b;
-}
-
-.released-record-action:hover {
-  transform: translateY(-1px);
-  background: #ffffff;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
-  border-color: rgba(16, 185, 129, 0.2);
-}
-
-.released-record-action.text-emerald-700:hover {
-  color: #059669;
-}
-
-.released-record-action.text-red-600:hover {
-  color: #dc2626;
-  background: #fef2f2;
-  border-color: #fca5a5;
-}
-
-/* 4. Typewriter label meta info with staples */
-.released-record-meta {
-  display: flex;
-  flex-wrap: nowrap;
-  gap: 0.45rem;
-  min-width: 0;
-  width: 100%;
-}
-
-.released-record-chip {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  min-width: 0;
-  max-width: 100%;
-  gap: 0.25rem;
-  padding: 0.25rem 0.55rem;
-  color: #1f2937;
-  font-size: 0.72rem;
-  font-weight: 600;
-  border: 1px solid rgba(255, 255, 255, 0.82);
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.82);
-  box-shadow: 0 6px 14px rgba(15, 23, 42, 0.06);
-}
-
-.released-record-chip::before {
-  display: none;
-}
-
-.released-record-chip :deep(svg) {
-  color: #047857;
-}
-
-.released-record-chip-text {
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-/* 5. Circular Travel Postmark Date Stamp (Desktop only) */
-.released-record-date-art {
-  display: none;
-}
-
-.released-record-note {
-  position: relative;
-  display: flex;
-  align-items: flex-start;
-  gap: 0.35rem;
-  align-self: start;
-  width: 100%;
-  min-width: 0;
-  margin-top: 0.25rem;
-  padding: 0.5rem 0.7rem;
-  color: #334155;
-  font-size: 0.78rem;
-  font-weight: 500;
-  line-height: 1.4;
-  border: 1px solid rgba(255, 255, 255, 0.8);
-  border-radius: 1.2rem;
-  background: rgba(255, 255, 255, 0.56);
-  box-shadow: 0 8px 16px rgba(15, 23, 42, 0.06);
-  transform: none;
-  transition: all 0.3s ease;
-}
-
-.released-record-row:hover .released-record-note {
-  transform: translateY(-1px);
-  box-shadow: 0 10px 18px rgba(15, 23, 42, 0.08);
-}
-
-.released-record-note p {
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.released-record-note-mark {
-  margin-top: -0.1rem;
-  color: #059669;
-  font-size: 1.1rem;
-  font-weight: 700;
-  line-height: 1;
-}
-
-@media (max-width: 639px) {
-  .released-record-row {
-    grid-template-columns: 5.95rem minmax(0, 1fr);
-    gap: 0.9rem;
-    min-height: 10.15rem;
-    padding: 0.75rem;
-    border-radius: 1.7rem;
-  }
-
-  .released-record-row::before {
-    top: -9px;
-    left: 6.7rem;
-  }
-
-  .released-record-row::after {
-    bottom: -9px;
-    left: 6.7rem;
-  }
-
-  .released-record-image {
-    width: 5.95rem;
-    min-width: 5.95rem;
-    height: 7.8rem;
-    min-height: 6.1rem;
-    padding: 0.45rem;
-    border-radius: 1.35rem;
-  }
-
-  .released-record-content {
-    min-height: 7.8rem;
-    justify-content: center;
-    gap: 0.42rem;
-    padding-left: 0.8rem;
-    margin-left: -0.4rem;
-  }
-
-  .released-record-header {
-    gap: 0.45rem;
-  }
-
-  .released-record-title {
-    font-size: 1.08rem;
-  }
-
-  .released-record-category-row {
-    margin-top: 0.18rem;
-  }
-
-  .released-record-meta {
-    gap: 0.38rem;
-  }
-
-  .released-record-chip {
-    flex: 1 1 0;
-    padding: 0.24rem 0.48rem;
-  }
-
-  .released-record-chip:first-child {
-    flex: 0 0 auto;
-  }
-
-  .released-record-note {
-    margin-top: 0;
-    padding: 0.42rem 0.6rem;
-  }
-}
-
-@media (min-width: 640px) {
-  .released-hero-copy {
-    padding: 0.5rem 0.25rem;
-  }
-
-  .released-record-list {
-    gap: 1.5rem;
-  }
-
-  .released-record-row {
-    grid-template-columns: 8.5rem minmax(0, 1fr);
-    gap: 1.8rem;
-    min-height: auto;
-    padding: 1.35rem;
-    border-radius: 2rem;
-  }
-
-  .released-record-row::before {
-    top: -9px;
-    left: 10.5rem;
-  }
-
-  .released-record-row::after {
-    bottom: -9px;
-    left: 10.5rem;
-  }
-
-  .released-record-image {
-    width: 100%;
-    min-width: 0;
-    min-height: 9rem;
-    padding: 0.6rem;
-  }
-
-  .released-record-content {
-    align-self: center;
-    gap: 0.6rem;
-    padding-left: 1.5rem;
-    margin-left: -0.75rem;
-  }
-
-  .released-record-title {
-    font-size: 1.45rem;
-    font-weight: 800;
-    letter-spacing: -0.01em;
-  }
-
-  .released-record-category {
-    font-size: 0.875rem;
-  }
-
-  .released-record-category-row {
-    margin-top: 0.3rem;
-    gap: 0.45rem;
-  }
-
-  .released-record-type-dot {
-    width: 0.6rem;
-    height: 0.6rem;
-  }
-
-  .released-record-action {
-    width: 2.25rem;
-    height: 2.25rem;
-  }
-
-  .released-record-meta {
-    gap: 0.55rem;
-    padding-right: 5rem; /* Leaves layout space for postmark stamp */
-  }
-
-  .released-record-chip {
-    gap: 0.35rem;
-    padding: 0.3rem 0.65rem;
-    font-size: 0.82rem;
-  }
-
-  .released-record-chip::before {
-    left: 5px;
-    height: 9px;
-  }
-
-  /* Circular Postmark Date Stamp implementation */
-  .released-record-date-art {
-    position: absolute;
-    bottom: 0.8rem;
-    right: 1.25rem;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    width: 4.2rem;
-    height: 4.2rem;
-    border: 2px dashed rgba(5, 150, 105, 0.45);
-    border-radius: 50%;
-    transform: rotate(-10deg);
-    color: rgba(5, 150, 105, 0.7);
-    font-family: "Courier New", Courier, monospace;
-    line-height: 1;
-    pointer-events: none;
-    z-index: 2;
-    background: transparent;
-  }
-
-  .released-record-date-left {
-    display: flex;
-    align-items: baseline;
-    gap: 0.15rem;
-    color: inherit;
-  }
-
-  .released-record-date-month {
-    font-family: inherit;
-    font-size: 0.55rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    margin: 0;
-  }
-
-  .released-record-date-day {
-    font-size: 1.1rem;
-    font-weight: 800;
-    margin: 0;
-  }
-
-  .released-record-date-divider {
-    width: 2.8rem;
-    height: 1px;
-    background: rgba(5, 150, 105, 0.35);
-    margin: 0.15rem 0;
-    display: block;
-  }
-
-  .released-record-date-right {
-    display: flex;
-    align-items: center;
-    gap: 0.2rem;
-    font-size: 0.55rem;
-    font-weight: 700;
-  }
-
-  .released-record-note {
-    min-height: auto;
-    padding: 0.6rem 0.85rem;
-    padding-right: 5rem; /* Prevents text overlapping the stamp */
-    gap: 0.45rem;
-    font-size: 0.85rem;
-    border-radius: 4px;
-  }
-
-  .released-record-note-mark {
-    margin-top: -0.15rem;
-    font-size: 1.2rem;
-  }
-}
-
-.custom-scrollbar::-webkit-scrollbar {
-  width: 6px;
-}
-.custom-scrollbar::-webkit-scrollbar-track {
-  background: transparent;
-}
-.custom-scrollbar::-webkit-scrollbar-thumb {
-  background-color: rgba(156, 163, 175, 0.5);
-  border-radius: 10px;
-}
-
-</style>
+<style scoped src="../assets/css/released-manor.css"></style>

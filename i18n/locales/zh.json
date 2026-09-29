@@ -223,9 +223,18 @@
         }
     },
     "released": {
-        "title": "放生的皮克敏",
+        "title": "放生莊園",
         "subtitle": "謝謝你陪伴我的旅程",
         "add_record": "新增記錄",
+        "manor": {
+            "eyebrow": "一座收藏旅途回憶的小莊園",
+            "intro": "每一位回到野外的皮克敏，都在這裡留下自己的小小角落。",
+            "count": "位旅伴的足跡",
+            "section_label": "莊園紀事",
+            "section_title": "留下的足跡",
+            "record": "旅伴檔案",
+            "find_record": "查看{name}的放生記錄"
+        },
         "empty": {
             "title": "目前沒有放生記錄",
             "desc": "你可以在這裡記錄所有被放生回歸大自然的皮克敏。"
