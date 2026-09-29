@@ -4253,6 +4253,43 @@
         "winged",
         "ice"
       ]
+    },
+    {
+      "category": {
+        "id": "wurst",
+        "name": "香腸",
+        "nameEn": "Wurst",
+        "type": "special",
+        "icon": "noto:hot-dog"
+      },
+      "variants": [
+        {
+          "id": "wurst",
+          "name": "香腸",
+          "nameEn": "Wurst",
+          "imageUrl": "https://pikmin.wiki.gallery/images/thumb/7/70/Decor_Red_Wurst.png/200px-Decor_Red_Wurst.png",
+          "imageUrls": {
+            "red": "https://pikmin.wiki.gallery/images/thumb/7/70/Decor_Red_Wurst.png/200px-Decor_Red_Wurst.png",
+            "yellow": "https://pikmin.wiki.gallery/images/1/1a/Decor_Yellow_Wurst.png",
+            "blue": "https://pikmin.wiki.gallery/images/thumb/1/13/Decor_Blue_Wurst.png/200px-Decor_Blue_Wurst.png",
+            "white": "https://pikmin.wiki.gallery/images/5/5d/Decor_White_Wurst.png",
+            "purple": "https://pikmin.wiki.gallery/images/thumb/7/7b/Decor_Purple_Wurst.png/200px-Decor_Purple_Wurst.png",
+            "rock": "https://pikmin.wiki.gallery/images/thumb/f/fc/Decor_Rock_Wurst.png/200px-Decor_Rock_Wurst.png",
+            "winged": "https://pikmin.wiki.gallery/images/thumb/9/98/Decor_Winged_Wurst.png/200px-Decor_Winged_Wurst.png",
+            "ice": "https://pikmin.wiki.gallery/images/thumb/b/b5/Decor_Ice_Wurst.png/200px-Decor_Ice_Wurst.png"
+          }
+        }
+      ],
+      "availablePikminTypes": [
+        "red",
+        "yellow",
+        "blue",
+        "white",
+        "purple",
+        "rock",
+        "winged",
+        "ice"
+      ]
     }
   ]
 }

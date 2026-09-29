@@ -53,6 +53,16 @@
         <div v-show="currentTab === 'update'" class="flex-1">
           <ul class="announcement-copy announcement-list text-sm leading-relaxed">
             <li class="announcement-update-item announcement-update-item-feature">
+              <span class="announcement-update-date">9/30</span>
+              <span class="announcement-update-icon announcement-update-icon-emerald">
+                <Icon name="lucide:sparkles" class="h-3.5 w-3.5" />
+              </span>
+              <span class="announcement-update-copy">
+                <span class="announcement-update-kicker">圖鑑更新</span>
+                <span class="announcement-update-highlight">香腸 8 款上線，峇里島雕刻圖片確認</span>
+              </span>
+            </li>
+            <li class="announcement-update-item announcement-update-item-feature">
               <span class="announcement-update-date">9月</span>
               <span class="announcement-update-icon announcement-update-icon-emerald">
                 <Icon name="lucide:calendar" class="h-3.5 w-3.5" />
@@ -60,16 +70,6 @@
               <span class="announcement-update-copy">
                 <span class="announcement-update-kicker">9月活動</span>
                 <span class="announcement-update-highlight">香腸・月餅・秋季貼紙</span>
-              </span>
-            </li>
-            <li class="announcement-update-item">
-              <span class="announcement-update-date">9/1</span>
-              <span class="announcement-update-icon announcement-update-icon-emerald">
-                <Icon name="lucide:info" class="h-3.5 w-3.5" />
-              </span>
-              <span class="announcement-update-copy">
-                <span class="announcement-update-kicker">待更新</span>
-                <span>香腸飾品將在資料來源有圖片後更新</span>
               </span>
             </li>
             <li class="announcement-update-item">
@@ -113,7 +113,6 @@
               <span class="text-xs glass-control px-2 py-0.5 rounded-full font-bold">🥮 月餅</span>
               <span class="text-xs glass-control px-2 py-0.5 rounded-full font-bold">🍂 秋季貼紙</span>
             </div>
-            <p class="text-[11px] text-amber-600 mt-1">⚠️ 香腸飾品將在資料來源有圖片後更新至圖鑑</p>
           </div>
 
           <!-- LINE 散步趣活動 -->
