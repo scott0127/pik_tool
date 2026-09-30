@@ -171,8 +171,12 @@
         "day_ago": "{n} 天前"
     },
     "friends": {
-        "title": "好友交流區",
-        "subtitle": "分享您的 Pikmin Bloom 好友代碼，結交新朋友！",
+        "title": "好友招募板",
+        "subtitle": "找到一起打菇、交換明信片與散步的旅伴。",
+        "board_eyebrow": "PIKMIN BLOOM / FRIEND BOARD",
+        "open_compose": "發布招募",
+        "close_compose": "收起表單",
+        "friend_code_label": "好友代碼",
         "tips": {
             "title": "使用提示",
             "row1": "好友代碼可在 Pikmin Bloom App 的個人頁面找到",
@@ -233,7 +237,11 @@
             "section_label": "莊園紀事",
             "section_title": "留下的足跡",
             "record": "旅伴檔案",
-            "find_record": "查看{name}的放生記錄"
+            "find_record": "查看{name}的放生記錄",
+            "inside": "屋內 {count} 位",
+            "open_house": "查看屋內的 {count} 位旅伴",
+            "house_title": "屋裡的旅伴",
+            "close_house": "關閉屋內名單"
         },
         "empty": {
             "title": "目前沒有放生記錄",

@@ -1,45 +1,42 @@
 <template>
-  <div class="friends-page min-h-screen py-8 px-4">
+  <div ref="friendsPage" class="friends-page min-h-screen py-8 px-4">
     <div class="friends-page-shell max-w-6xl mx-auto">
-      <!-- Page Header -->
-      <header class="friends-page-header mb-8 animate-slide-up">
+      <header class="friends-page-header mb-7">
         <div class="friends-page-heading">
-          <span class="friends-page-mark">
-            <Icon name="lucide:users-round" class="w-5 h-5" />
-          </span>
           <div>
+            <span class="friends-eyebrow">{{ $t('friends.board_eyebrow') }}</span>
             <h1 class="text-3xl font-extrabold text-slate-900">{{ $t('friends.title') }}</h1>
             <p class="text-slate-500 mt-1">{{ $t('friends.subtitle') }}</p>
+            <button v-if="user" type="button" class="friends-compose-trigger" :aria-expanded="showComposer" @click="toggleComposer">
+              <span>{{ showComposer ? $t('friends.close_compose') : $t('friends.open_compose') }}</span>
+              <span aria-hidden="true">{{ showComposer ? '−' : '+' }}</span>
+            </button>
+            <NuxtLink v-else to="/auth" class="friends-compose-trigger">
+              <span>{{ $t('friends.open_compose') }}</span><span aria-hidden="true">↗</span>
+            </NuxtLink>
           </div>
         </div>
-        <div class="friends-page-count" aria-live="polite">
-          <span>{{ $t('friends.total_players') }}</span>
-          <strong>{{ totalPostCount ?? '—' }}</strong>
+        <div class="friends-hero-side">
+          <div class="friends-page-count" aria-live="polite">
+            <strong>{{ totalPostCount ?? '—' }}</strong>
+            <span>{{ $t('friends.total_players') }}</span>
+          </div>
         </div>
       </header>
 
-      <!-- Info Banner -->
-      <div class="friends-tips-panel p-4 mb-6 animate-slide-up flex items-start gap-3" style="animation-delay: 0.05s;">
-        <span class="friends-tips-icon">
-          <Icon name="lucide:lightbulb" class="w-4 h-4" />
-        </span>
-        <div class="text-sm text-gray-600">
-          <p class="font-medium text-gray-700 mb-1">{{ $t('friends.tips.title') }}</p>
-          <ul class="space-y-1 text-gray-500">
-            <li>• {{ $t('friends.tips.row1') }}</li>
-            <li>• {{ $t('friends.tips.row2') }}</li>
-            <li>• {{ $t('friends.tips.row3') }}</li>
-          </ul>
-        </div>
-      </div>
+      <details class="friends-tips-panel mb-6">
+        <summary>{{ $t('friends.tips.title') }} <span aria-hidden="true">＋</span></summary>
+        <ul>
+          <li>{{ $t('friends.tips.row1') }}</li>
+          <li>{{ $t('friends.tips.row2') }}</li>
+          <li>{{ $t('friends.tips.row3') }}</li>
+        </ul>
+      </details>
 
-      <!-- Post Form (登入用戶) -->
-      <div v-if="user" class="friend-compose-panel glass rounded-3xl p-6 sm:p-8 mb-10 slide-up relative overflow-visible z-10">
+      <div v-if="user && showComposer" ref="composePanel" class="friend-compose-panel glass rounded-3xl p-6 sm:p-8 mb-10 relative overflow-visible z-10">
         <div class="relative z-10">
           <div class="friend-compose-heading flex items-center gap-3 mb-8">
-            <span class="friend-compose-icon">
-              <Icon name="lucide:user-round-plus" class="w-5 h-5" />
-            </span>
+            <span class="friend-compose-index">01 / POST</span>
             <h2 class="text-2xl font-extrabold text-gray-800 tracking-tight">
               {{ $t('friends.form.title') }}
             </h2>
@@ -125,16 +122,13 @@
                   @click="toggleIntent(intent.id)"
                   :disabled="!newPost.intents.includes(intent.id) && newPost.intents.length >= 2"
                   class="friend-intent-option relative overflow-hidden group p-3.5 rounded-2xl border-2 transition-all duration-300 flex flex-col items-center justify-center gap-1.5 min-h-[80px] cursor-pointer active:translate-y-1 active:shadow-inner"
-                  :class="[
-                    newPost.intents.includes(intent.id) 
-                      ? `${intent.colorClass.replace(/bg-\w+-50/, 'bg-white').replace(/border-\w+-200/, 'border-[color:currentColor]').replace(/text-\w+-600/, intent.colorClass.match(/text-\w+-600/)?.[0] || 'text-gray-800')} shadow-md scale-[1.03]`
-                      : 'bg-white/80 border-transparent text-gray-500 hover:bg-white hover:border-gray-200 hover:shadow-md disabled:opacity-50 hover:-translate-y-1'
-                  ]"
+                  :class="{ 'is-selected': newPost.intents.includes(intent.id) }"
+                  :aria-pressed="newPost.intents.includes(intent.id)"
                 >
                   <!-- Active Background Glow -->
                   <div v-if="newPost.intents.includes(intent.id)" class="absolute inset-0 opacity-10 bg-currentColor"></div>
                   
-                  <span class="text-2xl transition-transform duration-300 group-hover:scale-125 group-active:scale-95 z-10 drop-shadow-sm">{{ intent.icon }}</span>
+                  <span class="friend-intent-index">{{ String(FRIEND_INTENTS.indexOf(intent) + 1).padStart(2, '0') }}</span>
                   <span class="text-sm font-extrabold tracking-wide z-10">{{ intent.label }}</span>
                 </button>
               </div>
@@ -142,7 +136,7 @@
               <!-- Custom Postcard Input -->
               <div v-if="newPost.intents.includes('postcard')" class="mt-3 slide-up">
                 <div class="bg-blue-50 border-2 border-blue-200 p-3 rounded-2xl flex flex-col sm:flex-row items-center gap-3 shadow-inner">
-                  <span class="text-[15px] font-extrabold text-blue-800 flex-shrink-0 whitespace-nowrap px-2">我想要 👉</span>
+                  <span class="text-[15px] font-extrabold text-blue-800 flex-shrink-0 whitespace-nowrap px-2">我想要</span>
                   <input 
                     v-model="newPost.postcardInput" 
                     type="text" 
@@ -150,7 +144,7 @@
                     placeholder="台北、火車、郵局..." 
                     maxlength="10"
                   />
-                  <span class="text-[15px] font-extrabold text-blue-800 flex-shrink-0 whitespace-nowrap px-2">明信片 💌</span>
+                  <span class="text-[15px] font-extrabold text-blue-800 flex-shrink-0 whitespace-nowrap px-2">明信片</span>
                 </div>
               </div>
             </div>
@@ -214,11 +208,8 @@
                       @click="toggleRegion(region)"
                       :disabled="!newPost.regions.includes(region) && newPost.regions.length >= 2"
                       class="friend-region-option relative px-4 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 select-none active:scale-[0.92] flex-grow sm:flex-grow-0 text-center border-2 overflow-hidden group/btn"
-                      :class="[
-                        newPost.regions.includes(region) 
-                          ? 'bg-emerald-500 border-emerald-400 text-white shadow-[0_4px_12px_rgba(16,185,129,0.3)] scale-[1.02] active:bg-emerald-600 active:shadow-inner' 
-                          : 'bg-white border-transparent text-gray-600 hover:bg-gray-50 hover:border-gray-200 hover:shadow-md shadow-sm disabled:opacity-40 disabled:hover:scale-100 disabled:hover:shadow-none active:bg-gray-100'
-                      ]"
+                      :class="{ 'is-selected': newPost.regions.includes(region) }"
+                      :aria-pressed="newPost.regions.includes(region)"
                     >
                       <!-- Sublet click ripple/glow effect overlay -->
                       <div v-show="newPost.regions.includes(region)" class="absolute inset-0 bg-white opacity-0 group-active/btn:opacity-20 transition-opacity"></div>
@@ -280,29 +271,21 @@
       </div>
 
       <!-- Login Prompt -->
-      <div v-else class="friend-login-panel glass rounded-3xl p-8 mb-8 text-center animate-slide-up" style="animation-delay: 0.1s;">
-        <div class="w-16 h-16 mx-auto bg-gradient-to-br from-emerald-100 to-teal-100 rounded-full flex items-center justify-center mb-4">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-emerald-500" viewBox="0 0 20 20" fill="currentColor">
-            <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd" />
-          </svg>
-        </div>
-        <p class="text-gray-600 mb-4">{{ $t('friends.login_prompt') }}</p>
+      <div v-else-if="!user" class="friend-login-panel mb-8">
+        <p>{{ $t('friends.login_prompt') }}</p>
         <NuxtLink
           to="/auth"
-          class="btn-primary inline-flex items-center gap-2"
+          class="friend-login-action"
         >
           <span>{{ $t('auth.login') }}</span>
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-            <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd" />
-          </svg>
+          <span aria-hidden="true">↗</span>
         </NuxtLink>
       </div>
 
       <!-- Recommended Friends Section -->
       <section
         v-if="recommendedPosts.length > 0"
-        class="friend-showcase mb-10 animate-slide-up"
-        style="animation-delay: 0.15s;"
+        class="friend-showcase mb-10"
         role="region"
         :aria-label="$t('friends.carousel_label')"
         aria-roledescription="carousel"
@@ -313,9 +296,7 @@
       >
         <header class="friend-showcase-header">
           <div class="friend-showcase-heading">
-            <span class="friend-showcase-mark">
-              <Icon name="lucide:sparkles" class="w-4 h-4" />
-            </span>
+            <span class="friend-section-index">01</span>
             <div>
               <h2>{{ $t('friends.rec_title') }}</h2>
               <p>{{ $t('friends.rec_update') }}</p>
@@ -372,7 +353,6 @@
                 <div class="friend-recommendation-avatar">
                   <img :src="getPikminAvatar(post.username)" :alt="post.username" class="w-full h-full object-contain bg-white group-hover:scale-105 transition-transform duration-300" loading="lazy" />
                 </div>
-                <div class="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-emerald-400 rounded-full border-[2px] border-white shadow-sm"></div>
               </div>
               <div class="flex-1 min-w-0">
                 <h3 class="font-extrabold text-gray-900 text-[14px] truncate leading-tight transition-colors duration-300 group-hover:text-emerald-600">{{ post.username }}</h3>
@@ -387,10 +367,11 @@
               class="friend-recommendation-code group/code"
               :title="$t('friends.copy_tooltip')"
             >
-              <span class="font-mono text-[12px] font-extrabold text-emerald-600 tracking-wider pl-1.5 flex-1 text-center group-hover/code:scale-105 transition-transform origin-left">
+              <span class="friend-code-label">{{ $t('friends.friend_code_label') }}</span>
+              <span class="friend-code-value">
                 {{ formatDisplayCode(post.friend_code) }}
               </span>
-              <Icon name="lucide:copy" class="w-3.5 h-3.5 shrink-0" />
+              <span class="friend-code-copy">{{ $t('friends.copy_btn') }} ↗</span>
             </button>
 
             <!-- Tags Section -->
@@ -399,15 +380,13 @@
                 <span 
                   v-for="intentId in getPostIntents(post.regions)" 
                   :key="`rec-${post.id}-intent-${intentId}`" 
-                  class="px-2 py-0.5 rounded-lg text-[10px] font-extrabold flex items-center gap-1 shadow-sm border border-black/5 transition-transform hover:scale-105 cursor-default"
-                  :class="getIntentColor(intentId)"
+                  class="friend-intent-tag"
                 >
-                  <span class="text-[12px] leading-none drop-shadow-sm">{{ getIntentIcon(intentId) }}</span>
-                  <span class="leading-none">{{ getIntentLabel(intentId) }}</span>
+                  {{ getIntentLabel(intentId) }}
                 </span>
               </div>
               <div v-if="getPostRegions(post.regions).length > 0" class="flex flex-wrap gap-1">
-                <span v-for="region in getPostRegions(post.regions)" :key="`rec-${post.id}-region-${region}`" class="px-2 py-0.5 bg-gray-100 text-gray-500 border border-gray-200/50 rounded-lg text-[10px] font-extrabold shadow-sm transition-transform hover:scale-105 cursor-default">
+                <span v-for="region in getPostRegions(post.regions)" :key="`rec-${post.id}-region-${region}`" class="friend-region-tag">
                   {{ region.split(' ')[0] }}
                 </span>
               </div>
@@ -426,7 +405,7 @@
               class="friend-recommendation-action group/btn"
             >
               <span class="group-hover/btn:scale-110 transition-transform">{{ $t('friends.add_friend') }}</span>
-              <Icon name="lucide:arrow-up-right" class="w-3.5 h-3.5" />
+              <span aria-hidden="true">↗</span>
             </button>
           </article>
         </div>
@@ -447,10 +426,10 @@
       </section>
 
       <!-- Posts Section -->
-      <section class="friend-directory animate-slide-up" style="animation-delay: 0.2s;">
+      <section class="friend-directory">
         <div class="flex items-center justify-between mb-6">
           <h2 class="text-xl font-bold text-gray-800 flex items-center gap-3">
-            <Icon name="lucide:contact-round" class="h-5 w-5 text-emerald-600" />
+            <span class="friend-section-index">02</span>
             {{ $t('friends.all_players') }}
             <span class="friend-directory-count">
               {{ filteredPostCount ?? '—' }}
@@ -473,7 +452,7 @@
           <!-- Intents Filter -->
           <div>
             <div class="flex items-center gap-2 text-sm font-semibold text-gray-600 mb-2">
-              <Icon name="lucide:target" class="w-4 h-4 text-emerald-600" /> 目的篩選：
+              <span class="friend-filter-index">A</span> 目的篩選
             </div>
             <div class="flex flex-wrap gap-2">
               <button
@@ -490,7 +469,6 @@
                 class="px-3 py-1.5 rounded-full text-sm font-medium transition-colors border flex items-center gap-1"
                 :class="selectedIntentFilters.includes(intent.id) ? 'bg-emerald-50 border-emerald-300 text-emerald-700 shadow-sm' : 'bg-white text-gray-600 border-gray-200 hover:bg-emerald-50 hover:text-emerald-600 hover:border-emerald-200'"
               >
-                <span>{{ intent.icon }}</span>
                 <span>{{ intent.label }}</span>
               </button>
             </div>
@@ -501,7 +479,7 @@
           <!-- Regions Filter -->
           <div>
             <div class="flex items-center gap-2 text-sm font-semibold text-gray-600 mb-2">
-              <Icon name="lucide:map-pinned" class="w-4 h-4 text-emerald-600" /> 地區篩選：
+              <span class="friend-filter-index">B</span> 地區篩選
             </div>
             <!-- 第一層：大分區 -->
             <div class="flex flex-wrap gap-2">
@@ -561,9 +539,7 @@
 
         <!-- Empty State -->
         <div v-else-if="posts.length === 0" class="glass rounded-3xl p-12 text-center">
-          <div class="w-20 h-20 mx-auto bg-gradient-to-br from-emerald-100 to-teal-100 rounded-full flex items-center justify-center mb-4">
-            <span class="text-4xl">🌱</span>
-          </div>
+          <div class="friend-empty-ornament" aria-hidden="true">＋</div>
           <p class="text-gray-500">{{ $t('friends.empty_title') }}</p>
           <p class="text-emerald-600 font-medium mt-1">{{ $t('friends.empty_desc') }}</p>
         </div>
@@ -571,10 +547,9 @@
         <!-- Posts Grid -->
         <div v-else class="friend-directory-grid">
           <div
-            v-for="(post, index) in posts"
+            v-for="post in posts"
             :key="post.id"
-            class="friend-directory-card animate-pop-in"
-            :style="{ animationDelay: `${index * 0.05}s` }"
+            class="friend-directory-card"
           >
             <!-- User Header -->
             <div class="flex items-center justify-between mb-4">
@@ -590,31 +565,29 @@
                 </div>
               </div>
               
-              <!-- Friend Code Compact Badge -->
-              <button
-                type="button"
-                @click="copyCode(post.friend_code)"
-                class="friend-directory-code group"
-                :title="$t('friends.copy_code')"
-              >
-                 {{ formatDisplayCode(post.friend_code) }}
-                 <Icon name="lucide:copy" class="w-3.5 h-3.5" />
-              </button>
             </div>
+
+            <button
+              type="button"
+              @click="copyCode(post.friend_code)"
+              class="friend-directory-code"
+              :title="$t('friends.copy_code')"
+            >
+              <span class="friend-code-label">{{ $t('friends.friend_code_label') }}</span>
+              <span class="friend-code-value">{{ formatDisplayCode(post.friend_code) }}</span>
+              <span class="friend-code-copy">{{ $t('friends.copy_btn') }} ↗</span>
+            </button>
             
             <!-- Tags Row -->
             <div class="flex flex-wrap gap-2 mb-4 pl-1">
               <span 
                 v-for="intentId in getPostIntents(post.regions)" 
                 :key="`${post.id}-intent-${intentId}`" 
-                class="px-2.5 py-1 rounded-xl text-xs font-extrabold flex items-center gap-1.5 shadow-sm border border-black/5"
-                :class="getIntentColor(intentId)"
+                class="friend-intent-tag"
               >
-                <span class="text-[14px] leading-none drop-shadow-sm">{{ getIntentIcon(intentId) }}</span>
                 <span>{{ getIntentLabel(intentId) }}</span>
               </span>
               <span v-for="region in getPostRegions(post.regions)" :key="`${post.id}-region-${region}`" class="friend-directory-region">
-                <Icon name="lucide:map-pin" class="w-3 h-3" />
                 {{ region.split(' ')[0] }}
               </span>
             </div>
@@ -685,6 +658,7 @@
 </template>
 
 <script setup lang="ts">
+import { gsap } from 'gsap';
 
 interface FriendPost {
   id: string;
@@ -706,11 +680,25 @@ const {
   formatDisplayCode,
   getPostRegions,
   getPostIntents,
-  getIntentIcon,
   getIntentLabel,
-  getIntentColor,
   getOptionsForCategory,
 } = useFriendPostHelpers();
+
+const friendsPage = ref<HTMLElement | null>(null);
+const composePanel = ref<HTMLElement | null>(null);
+const showComposer = ref(false);
+let motionContext: gsap.Context | null = null;
+let cardObserver: IntersectionObserver | null = null;
+
+const toggleComposer = async () => {
+  showComposer.value = !showComposer.value;
+  if (!showComposer.value) return;
+  await nextTick();
+  composePanel.value?.scrollIntoView({ behavior: reducedMotionQuery?.matches ? 'auto' : 'smooth', block: 'start' });
+  if (!reducedMotionQuery?.matches && composePanel.value && motionContext) {
+    motionContext.add(() => gsap.fromTo(composePanel.value, { y: 18, opacity: 0 }, { y: 0, opacity: 1, duration: 0.48, ease: 'power2.out', clearProps: 'transform,opacity' }));
+  }
+};
 
 const posts = ref<FriendPost[]>([]);
 const totalPostCount = ref<number | null>(null);
@@ -824,6 +812,22 @@ onMounted(async () => {
     reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
     recommendationAutoplay.value = !reducedMotionQuery.matches;
     reducedMotionQuery.addEventListener('change', handleReducedMotionChange);
+    if (friendsPage.value && !reducedMotionQuery.matches) {
+      motionContext = gsap.context(() => {
+        gsap.fromTo('.friends-page-header, .friends-tips-panel',
+          { y: 20, opacity: 0 },
+          { y: 0, opacity: 1, duration: 0.62, stagger: 0.09, ease: 'power2.out', clearProps: 'transform,opacity' });
+      }, friendsPage.value);
+      cardObserver = new IntersectionObserver((entries) => {
+        const entering = entries.filter(entry => entry.isIntersecting).map(entry => entry.target as HTMLElement);
+        entering.forEach(card => cardObserver?.unobserve(card));
+        if (entering.length && !reducedMotionQuery?.matches) {
+          motionContext?.add(() => gsap.fromTo(entering,
+            { y: 18, opacity: 0 },
+            { y: 0, opacity: 1, duration: 0.5, stagger: 0.045, ease: 'power2.out', clearProps: 'transform,opacity' }));
+        }
+      }, { threshold: 0.08, rootMargin: '0px 0px 70px 0px' });
+    }
   }
 
   await Promise.all([fetchPosts(), fetchTotalPostCount()]);
@@ -835,6 +839,11 @@ onMounted(async () => {
     newPost.value.username = metadata?.username || metadata?.name || email.split('@')[0] || '';
   }
 });
+
+watch(() => posts.value.map(post => post.id).join('|'), async () => {
+  await nextTick();
+  friendsPage.value?.querySelectorAll<HTMLElement>('.friend-directory-card').forEach(card => cardObserver?.observe(card));
+}, { flush: 'post' });
 
 const fetchTotalPostCount = async () => {
   try {
@@ -1004,6 +1013,7 @@ const submitPost = async () => {
     newPost.value.postcardInput = '';
     invalidateFriendsCache();
     await Promise.all([fetchPosts(), fetchTotalPostCount()]);
+    showComposer.value = false;
   } catch (e: any) {
     console.error('Failed to submit post:', e);
     alert(`發布失敗：${e.message || '請稍後再試'}`);
@@ -1347,6 +1357,8 @@ watch([selectedRegionFilters, selectedCategories, selectedIntentFilters], () => 
 }, { deep: true });
 
 onUnmounted(() => {
+  cardObserver?.disconnect();
+  motionContext?.revert();
   stopRecommendationTimer();
   if (recommendationResumeTimer) {
     clearTimeout(recommendationResumeTimer);
@@ -2100,5 +2112,456 @@ onUnmounted(() => {
   .friend-carousel-dot {
     transition-duration: 0.01ms;
   }
+}
+
+/* Friend board: quiet editorial surfaces put the code and invitation first. */
+.friends-page {
+  min-height: 100vh;
+  background: linear-gradient(180deg, #edf5ee 0, #f5f6f0 31rem, #f8f8f4 100%);
+  color: #18372f;
+}
+
+.friends-page-shell {
+  max-width: 72rem;
+}
+
+.friends-page-header {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  align-items: flex-end;
+  min-height: 19rem;
+  padding: clamp(1.5rem, 4vw, 3rem);
+  overflow: hidden;
+  border: 1px solid #173f35;
+  border-radius: 1.5rem;
+  background: #123c33;
+  box-shadow: 0 22px 55px rgb(21 54 43 / 13%);
+}
+
+.friends-page-header::before,
+.friends-page-header::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  border: 1px solid rgb(222 242 213 / 14%);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.friends-page-header::before {
+  width: 34rem;
+  height: 34rem;
+  top: -23rem;
+  right: 4rem;
+  box-shadow: 0 0 0 5rem rgb(222 242 213 / 4%), 0 0 0 10rem rgb(222 242 213 / 3%);
+}
+
+.friends-page-header::after {
+  width: 19rem;
+  height: 19rem;
+  right: -9rem;
+  bottom: -12rem;
+}
+
+.friends-page-heading {
+  position: relative;
+  z-index: 1;
+}
+
+.friends-eyebrow,
+.friend-compose-index,
+.friend-section-index,
+.friend-filter-index,
+.friend-code-label {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.12em;
+}
+
+.friends-eyebrow {
+  display: inline-block;
+  margin-bottom: 1rem;
+  color: #b5d6ad;
+  font-size: 0.7rem;
+  font-weight: 800;
+}
+
+.friends-page-heading h1 {
+  max-width: 12ch;
+  color: #f7f9ee;
+  font-size: clamp(2.4rem, 5vw, 4.25rem);
+  font-weight: 900;
+  letter-spacing: -0.045em;
+  line-height: 1.07;
+}
+
+.friends-page-heading p {
+  max-width: 30rem;
+  margin-top: 1.1rem;
+  color: #c5d8cc;
+  font-size: 0.97rem;
+}
+
+.friends-hero-side {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 1.25rem;
+  margin-left: auto;
+}
+
+.friends-page-count {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #bdd1c4;
+  box-shadow: none;
+}
+
+.friends-page-count strong {
+  color: #eef8df;
+  font-size: clamp(2.3rem, 4vw, 3.9rem);
+  font-weight: 800;
+  line-height: 1;
+}
+
+.friends-page-count span {
+  margin-top: 0.35rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.friends-compose-trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+  min-width: 10.5rem;
+  min-height: 3rem;
+  margin-top: 1.5rem;
+  padding: 0.7rem 1rem;
+  border-radius: 0.5rem;
+  background: #d9ef9e;
+  color: #173c2b;
+  font-size: 0.88rem;
+  font-weight: 900;
+  transition: background 180ms ease, transform 180ms ease;
+}
+
+.friends-compose-trigger:hover,
+.friends-compose-trigger:focus-visible {
+  background: #effabf;
+  transform: translateY(-2px);
+  outline: 2px solid #f2f7d6;
+  outline-offset: 3px;
+}
+
+.friends-compose-trigger span:last-child {
+  font-size: 1.25rem;
+  line-height: 1;
+}
+
+.friends-tips-panel {
+  padding: 0;
+  border: 1px solid #dbe7db;
+  border-radius: 0.75rem;
+  background: #f9fbf6;
+  box-shadow: none;
+}
+
+.friends-tips-panel summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  min-height: 3rem;
+  padding: 0.75rem 1rem;
+  color: #38574c;
+  font-size: 0.8rem;
+  font-weight: 800;
+  cursor: pointer;
+  list-style: none;
+}
+
+.friends-tips-panel summary::-webkit-details-marker { display: none; }
+.friends-tips-panel[open] summary span { transform: rotate(45deg); }
+.friends-tips-panel summary span { transition: transform 160ms ease; }
+.friends-tips-panel ul {
+  display: grid;
+  gap: 0.35rem;
+  padding: 0 1rem 1rem;
+  color: #52685e;
+  font-size: 0.83rem;
+}
+.friends-tips-panel li::before { content: "— "; color: #4c8774; }
+
+.friend-login-panel {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  border: 1px solid #d8e7d9;
+  border-radius: 0.75rem;
+  background: #ffffffbd;
+  color: #38574c;
+  font-size: 0.87rem;
+  font-weight: 700;
+}
+
+.friend-login-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.8rem;
+  flex: 0 0 auto;
+  color: #17664e;
+  font-weight: 900;
+}
+.friend-login-action:hover { text-decoration: underline; }
+
+.friend-compose-panel {
+  border-color: #cbded1;
+  border-radius: 1rem;
+  background: #fffefb;
+  box-shadow: 0 16px 35px rgb(29 61 45 / 7%);
+}
+
+.friend-compose-heading {
+  display: flex;
+  align-items: baseline;
+  gap: 1rem;
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid #e1e9de;
+}
+
+.friend-compose-index { color: #6a9a75; font-size: 0.69rem; font-weight: 800; }
+.friend-compose-heading h2 { color: #193f32; }
+.friend-compose-panel label .w-2 { display: none; }
+.friend-compose-panel .group > .relative > .absolute.inset-y-0 { display: none; }
+.friend-compose-panel .input-field { padding-left: 1rem; }
+
+.friend-intent-option {
+  min-height: 4.2rem;
+  border: 1px solid #dce6dc;
+  border-radius: 0.6rem;
+  background: #fafbf6;
+  color: #456054;
+  box-shadow: none;
+}
+.friend-intent-option:hover { border-color: #7ca58e; background: #f4f8ed; }
+.friend-intent-option.is-selected {
+  border-color: #277a59;
+  background: #e9f5e7;
+  color: #18543c;
+  box-shadow: inset 0 0 0 1px #277a59;
+  transform: none;
+}
+.friend-intent-option:disabled { opacity: 0.45; }
+.friend-intent-index { color: #60826c; font-size: 0.68rem; font-weight: 800; }
+.friend-region-panel { border-color: #e0e8dd; background: #f7f9f3; }
+.friend-region-option { border: 1px solid #dfe8dd; background: #fff; color: #456054; box-shadow: none; }
+.friend-region-option.is-selected { border-color: #277a59; background: #e7f2e5; color: #18543c; box-shadow: none; transform: none; }
+.friend-region-option:disabled { opacity: 0.45; }
+
+.friend-showcase {
+  padding-block: 0;
+  border: 0;
+}
+.friend-showcase-header,
+.friend-directory > .flex:first-child {
+  padding-bottom: 0.85rem;
+  border-bottom: 1px solid #cdded0;
+}
+.friend-section-index {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  flex: 0 0 auto;
+  border: 1px solid #97b4a0;
+  border-radius: 50%;
+  color: #2f7053;
+  font-size: 0.72rem;
+  font-weight: 900;
+}
+.friend-showcase-heading h2,
+.friend-directory h2 {
+  color: #194334;
+  font-size: 1.25rem;
+  font-weight: 900;
+}
+.friend-showcase-heading p { margin-top: 0.2rem; color: #71887b; font-size: 0.73rem; }
+.friend-directory-count { border: 0; background: transparent; color: #448462; font-size: 0.9rem; }
+.friend-carousel-track { grid-auto-columns: clamp(16.5rem, 29vw, 19.5rem); gap: 1rem; padding-block: 0.65rem 0.85rem; }
+
+.friend-recommendation-card,
+.friend-directory-card {
+  border: 1px solid #d8e4d8;
+  border-radius: 0.85rem;
+  background: #fffefb;
+  box-shadow: 0 7px 20px rgb(37 65 46 / 5%);
+}
+.friend-recommendation-card { min-height: 19.5rem; padding: 1.15rem; }
+.friend-directory-card { padding: 1.4rem; }
+.friend-recommendation-card:hover,
+.friend-recommendation-card:focus-within,
+.friend-recommendation-card.is-current,
+.friend-directory-card:hover,
+.friend-directory-card:focus-within {
+  border-color: #a9c4ad;
+  box-shadow: 0 14px 32px rgb(35 79 53 / 10%);
+}
+.friend-recommendation-avatar,
+.friend-directory-avatar {
+  border: 1px solid #d8e4d5;
+  border-radius: 0.55rem;
+  background: #eff5e9;
+}
+.friend-recommendation-card h3,
+.friend-directory-card h3 { color: #173b30; font-size: 1rem; }
+.friend-recommendation-card > .flex:first-child p,
+.friend-directory-card > .flex:first-child p { color: #71887b; }
+
+.friend-recommendation-code,
+.friend-directory-code {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.25rem 0.65rem;
+  width: 100%;
+  margin-bottom: 0.85rem;
+  padding: 0.8rem 0.9rem;
+  border: 1px solid #285944;
+  border-radius: 0.55rem;
+  background: #214f3e;
+  color: #f3f8e9;
+  text-align: left;
+}
+.friend-recommendation-code:hover,
+.friend-recommendation-code:focus-visible,
+.friend-directory-code:hover,
+.friend-directory-code:focus-visible {
+  border-color: #35775b;
+  background: #2a624b;
+  color: #fff;
+}
+.friend-code-label {
+  grid-column: 1 / -1;
+  color: #b9d2bc;
+  font-size: 0.61rem;
+  font-weight: 800;
+}
+.friend-code-value {
+  min-width: 0;
+  color: #f7f9ed;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: clamp(0.86rem, 1.6vw, 1.15rem);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+}
+.friend-code-copy {
+  color: #d7e9bd;
+  font-size: 0.7rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+.friend-recommendation-code .friend-code-value { font-size: 0.92rem; }
+.friend-intent-tag,
+.friend-region-tag,
+.friend-directory-region {
+  display: inline-flex;
+  align-items: center;
+  min-height: 1.6rem;
+  padding: 0.2rem 0.55rem;
+  border: 1px solid #c7ddca;
+  border-radius: 0.3rem;
+  background: #ecf5e9;
+  color: #286448;
+  font-size: 0.7rem;
+  font-weight: 800;
+  line-height: 1.35;
+}
+.friend-region-tag,
+.friend-directory-region { border-color: #e0e8de; background: #f6f8f3; color: #61776a; }
+.friend-directory-card > .flex.flex-wrap { margin-top: 0.2rem; padding-left: 0; }
+.friend-recommendation-message,
+.friend-directory-message {
+  padding: 0.7rem 0;
+  border: 0;
+  border-top: 1px solid #e0e9de;
+  background: transparent;
+  color: #375247;
+  font-size: 0.85rem;
+  font-weight: 500;
+  line-height: 1.7;
+}
+.friend-recommendation-message p { color: #375247; font-size: 0.8rem; font-weight: 500; }
+.friend-recommendation-action { border-radius: 0.45rem; background: #dcedab; color: #1e4a34; box-shadow: none; }
+.friend-recommendation-action:hover,
+.friend-recommendation-action:focus-visible { background: #cfe88d; }
+
+.friend-filter-panel {
+  border-color: #d7e4d8;
+  border-radius: 0.85rem;
+  background: #fffefbd9;
+  box-shadow: none;
+}
+.friend-filter-index { color: #438667; font-size: 0.75rem; font-weight: 900; }
+.friend-filter-panel button { border-radius: 0.4rem; box-shadow: none; }
+.friend-filter-panel .flex.items-center.text-sm { color: #2d5440; }
+.friend-directory-grid { gap: 1rem; }
+.friend-empty-ornament {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 4rem;
+  height: 4rem;
+  margin: 0 auto 1rem;
+  border: 1px solid #b9d3b5;
+  border-radius: 50%;
+  color: #4e8c64;
+  font-size: 2.3rem;
+  font-weight: 200;
+}
+
+@media (max-width: 767px) {
+  .friends-page-header { align-items: flex-start; min-height: 18rem; }
+  .friends-page-heading h1 { font-size: clamp(2.3rem, 9vw, 3.3rem); }
+  .friends-page-heading p { font-size: 0.86rem; }
+  .friends-hero-side { align-self: stretch; align-items: flex-end; }
+  .friends-page-count { min-width: 0; align-items: flex-end; }
+  .friends-page-count strong { font-size: 2.3rem; }
+  .friends-page-count span { font-size: 0.64rem; }
+  .friends-compose-trigger { min-width: 8.5rem; gap: 0.5rem; }
+  .friend-login-panel { align-items: flex-start; font-size: 0.8rem; }
+  .friend-directory-card { padding: 1.1rem; }
+  .friend-code-value { font-size: 1.05rem; }
+  .friend-recommendation-card { padding: 1rem; }
+}
+
+@media (max-width: 520px) {
+  .friends-page-header { display: block; min-height: 0; padding: 1.5rem; }
+  .friends-hero-side { flex-direction: row; align-items: flex-end; justify-content: space-between; margin: 1.25rem 0 0; }
+  .friends-page-count { align-items: flex-start; }
+  .friends-compose-trigger { min-height: 2.8rem; }
+  .friend-carousel-track { grid-auto-columns: min(84vw, 18rem); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .friends-compose-trigger,
+  .friend-intent-option,
+  .friend-region-option { transition-duration: 0.01ms; }
 }
 </style>

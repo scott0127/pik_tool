@@ -171,8 +171,12 @@
         "day_ago": "{n}d ago"
     },
     "friends": {
-        "title": "Friend Exchange",
-        "subtitle": "Share your Pikmin Bloom friend code and make new friends!",
+        "title": "Friend Board",
+        "subtitle": "Find companions for mushrooms, postcards, and walks.",
+        "board_eyebrow": "PIKMIN BLOOM / FRIEND BOARD",
+        "open_compose": "Post an invite",
+        "close_compose": "Close form",
+        "friend_code_label": "Friend code",
         "tips": {
             "title": "Tips",
             "row1": "Find your friend code in the Pikmin Bloom app profile.",
@@ -233,7 +237,11 @@
             "section_label": "Manor journal",
             "section_title": "Footprints left behind",
             "record": "companion",
-            "find_record": "View {name}'s release record"
+            "find_record": "View {name}'s release record",
+            "inside": "{count} inside",
+            "open_house": "View {count} companions inside the house",
+            "house_title": "Inside the house",
+            "close_house": "Close house list"
         },
         "empty": {
             "title": "No Released Records",

@@ -144,6 +144,8 @@
 
 .manor-add-button:focus-visible,
 .manor-guest:focus-visible,
+.manor-house:focus-visible,
+.manor-house-panel button:focus-visible,
 .released-record-action:focus-visible {
   outline: 3px solid #245fba;
   outline-offset: 3px;
@@ -261,13 +263,20 @@
 
 .manor-house {
   position: absolute;
-  z-index: 4;
+  z-index: 7;
   right: 17%;
   bottom: 34%;
   width: 14.2rem;
   height: 12.2rem;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
   filter: drop-shadow(9px 12px 0 rgba(49, 89, 57, 0.2));
 }
+
+.manor-house:disabled { cursor: default; }
+.manor-house:not(:disabled):hover .manor-house-roof { translate: 0 -3px; }
 
 .manor-house-roof {
   position: absolute;
@@ -279,6 +288,7 @@
   clip-path: polygon(50% 0, 100% 88%, 96% 100%, 4% 100%, 0 88%);
   background: repeating-linear-gradient(0deg, #a95247 0 12px, #b96250 12px 15px);
   box-shadow: 0 -8px 0 #e5b580 inset;
+  transition: translate 180ms ease;
 }
 
 .manor-house-body {
@@ -339,6 +349,84 @@
   background: #fbe7a7;
   content: "";
 }
+
+.manor-house-sign {
+  position: absolute;
+  top: 5.8rem;
+  left: 50%;
+  z-index: 4;
+  min-width: 5rem;
+  padding: 0.32rem 0.55rem;
+  border: 1px solid #bd9d70;
+  border-radius: 0.2rem;
+  background: #fff8de;
+  box-shadow: 2px 4px 0 #a98761;
+  color: #4e6648;
+  font-size: 0.72rem;
+  font-weight: 950;
+  white-space: nowrap;
+  transform: translateX(-50%) rotate(-3deg);
+}
+
+.manor-house-panel {
+  position: absolute;
+  top: 24%;
+  right: 2.5%;
+  z-index: 20;
+  width: min(14.5rem, 52%);
+  max-height: 13rem;
+  overflow-y: auto;
+  padding: 0.7rem;
+  border: 2px solid #fff8e7;
+  border-radius: 0.8rem;
+  background: #fff9e7;
+  box-shadow: 0 6px 0 #cab895, 0 13px 18px rgba(56, 76, 43, 0.27);
+}
+
+.manor-house-panel-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.1rem 0.1rem 0.4rem;
+  border-bottom: 1px dashed #c4c7a2;
+  color: #315741;
+  font-size: 0.85rem;
+}
+
+.manor-house-panel-heading button {
+  display: grid;
+  width: 2.4rem;
+  height: 2.4rem;
+  flex: none;
+  place-items: center;
+  border-radius: 0.4rem;
+  color: #5a6a50;
+}
+
+.manor-house-resident {
+  display: flex;
+  width: 100%;
+  min-height: 2.75rem;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.2rem 0.35rem;
+  border-radius: 0.35rem;
+  color: #315741;
+  font-size: 0.78rem;
+  font-weight: 850;
+  text-align: left;
+}
+
+.manor-house-resident:hover,
+.manor-house-panel-heading button:hover { background: #eef2d9; }
+.manor-house-resident img { width: 1.8rem; height: 2.1rem; flex: none; object-fit: contain; }
+.manor-house-resident span { min-width: 0; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.manor-house-panel-enter-active,
+.manor-house-panel-leave-active { transition: opacity 180ms ease, transform 180ms ease; }
+.manor-house-panel-enter-from,
+.manor-house-panel-leave-to { opacity: 0; transform: translateY(-0.45rem) scale(0.96); }
 
 .manor-tree {
   position: absolute;
@@ -452,11 +540,19 @@
   white-space: nowrap;
 }
 
-.manor-guest-0 { left: 53%; bottom: 8%; }
-.manor-guest-1 { left: 64%; bottom: 12%; transform: scale(0.88); }
-.manor-guest-2 { left: 74%; bottom: 7%; transform: scale(1.04); }
-.manor-guest-3 { left: 84%; bottom: 13%; transform: scale(0.83); }
-.manor-guest-4 { left: 45%; bottom: 6%; transform: scale(0.72); }
+.manor-guest-0 { left: 53%; bottom: 8%; --house-shift-x: 9rem; --house-shift-y: -7rem; }
+.manor-guest-1 { left: 64%; bottom: 12%; transform: scale(0.88); --house-shift-x: 5rem; --house-shift-y: -6rem; }
+.manor-guest-2 { left: 74%; bottom: 7%; transform: scale(1.04); --house-shift-x: 0; --house-shift-y: -7rem; }
+.manor-guest-3 { left: 84%; bottom: 13%; transform: scale(0.83); --house-shift-x: -5rem; --house-shift-y: -6rem; }
+
+.manor-guest-enter-active,
+.manor-guest-leave-active { transition: opacity 850ms ease, translate 850ms ease, scale 850ms ease; }
+.manor-guest-enter-from,
+.manor-guest-leave-to {
+  opacity: 0;
+  translate: var(--house-shift-x) var(--house-shift-y);
+  scale: 0.42;
+}
 
 .manor-ledger {
   padding: 5.5rem 0 1rem;
@@ -884,7 +980,6 @@
   .manor-scene::before { width: 68%; }
   .manor-house { right: 12%; }
   .manor-guest-0 { left: 56%; }
-  .manor-guest-4 { left: 49%; }
   .released-record-list { grid-template-columns: 1fr; max-width: 43rem; margin-inline: auto; }
   .released-record-row { min-height: 15rem; }
 }
@@ -907,6 +1002,7 @@
   .manor-cloud-one { top: 0.6rem; left: 4%; transform: scale(0.5); }
   .manor-cloud-two { display: none; }
   .manor-house { right: 26%; bottom: 35%; transform: scale(0.7); transform-origin: bottom center; }
+  .manor-house-panel { top: 19%; right: 4%; width: min(13rem, 57%); }
   .manor-tree-left { right: 74%; bottom: 25%; transform: scale(0.58); }
   .manor-tree-right { right: 7%; bottom: 27%; transform: scale(0.68); }
   .manor-hill-back { right: -37%; width: 150%; }
@@ -916,11 +1012,10 @@
   .manor-guest { width: 4.1rem; }
   .manor-guest img { width: 3.8rem; height: 4.8rem; }
   .manor-guest span { max-width: 4.5rem; font-size: 0.5rem; }
-  .manor-guest-0 { left: 8%; bottom: 8%; }
-  .manor-guest-1 { left: 28%; bottom: 16%; }
-  .manor-guest-2 { left: 49%; bottom: 6%; }
-  .manor-guest-3 { left: 72%; bottom: 15%; }
-  .manor-guest-4 { left: 79%; bottom: 2%; }
+  .manor-guest-0 { left: 8%; bottom: 8%; --house-shift-x: 8rem; --house-shift-y: -6rem; }
+  .manor-guest-1 { left: 28%; bottom: 16%; --house-shift-x: 4rem; --house-shift-y: -5rem; }
+  .manor-guest-2 { left: 49%; bottom: 6%; --house-shift-x: 0; --house-shift-y: -6rem; }
+  .manor-guest-3 { left: 72%; bottom: 15%; --house-shift-x: -4rem; --house-shift-y: -5rem; }
   .manor-ledger { padding-top: 4.25rem; }
   .manor-ledger-heading { align-items: start; flex-direction: column; gap: 0.3rem; margin-bottom: 1.25rem; }
   .manor-ledger-heading p { padding: 0; font-size: 0.78rem; }
@@ -948,6 +1043,11 @@
 
 @media (prefers-reduced-motion: reduce) {
   .manor-add-button,
+  .manor-house-roof,
+  .manor-house-panel-enter-active,
+  .manor-house-panel-leave-active,
+  .manor-guest-enter-active,
+  .manor-guest-leave-active,
   .manor-guest img,
   .released-record-row,
   .plot-pikmin,

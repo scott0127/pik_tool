@@ -25,32 +25,66 @@
           <div class="manor-cloud manor-cloud-two" aria-hidden="true" />
           <div class="manor-hill manor-hill-back" aria-hidden="true" />
           <div class="manor-hill manor-hill-middle" aria-hidden="true" />
-          <div class="manor-house" aria-hidden="true">
-            <div class="manor-house-roof" />
-            <div class="manor-house-body">
+          <button
+            type="button"
+            class="manor-house"
+            :disabled="indoorRecords.length === 0"
+            :aria-label="$t('released.manor.open_house', { count: indoorRecords.length })"
+            :aria-expanded="isHouseOpen"
+            aria-controls="manor-house-list"
+            @click="isHouseOpen = !isHouseOpen"
+          >
+            <div class="manor-house-roof" aria-hidden="true" />
+            <div class="manor-house-body" aria-hidden="true">
               <span class="manor-house-window manor-house-window-left" />
               <span class="manor-house-window manor-house-window-right" />
               <span class="manor-house-door" />
             </div>
-          </div>
+            <span v-if="indoorRecords.length" class="manor-house-sign">
+              {{ $t('released.manor.inside', { count: indoorRecords.length }) }}
+            </span>
+          </button>
           <div class="manor-tree manor-tree-left" aria-hidden="true"><span /><span /><span /></div>
           <div class="manor-tree manor-tree-right" aria-hidden="true"><span /><span /><span /></div>
           <div class="manor-hill manor-hill-front" aria-hidden="true" />
           <div class="manor-path" aria-hidden="true" />
           <div class="manor-flowers manor-flowers-left" aria-hidden="true" />
           <div class="manor-flowers manor-flowers-right" aria-hidden="true" />
-          <button
-            v-for="(record, index) in filteredRecords.slice(0, 5)"
-            :key="record.id"
-            type="button"
-            class="manor-guest"
-            :class="'manor-guest-' + index"
-            :aria-label="$t('released.manor.find_record', { name: record.nickname || getDecorName(record.decorItemId) })"
-            @click="scrollToRecord(record.id)"
-          >
-            <img :src="getRecordImageUrl(record.decorItemId) || ''" :alt="record.nickname || getDecorName(record.decorItemId)" loading="lazy" />
-            <span>{{ record.nickname || getDecorName(record.decorItemId) }}</span>
-          </button>
+          <TransitionGroup name="manor-guest">
+            <button
+              v-for="(record, index) in outdoorRecords"
+              :key="record.id"
+              type="button"
+              class="manor-guest"
+              :class="'manor-guest-' + index"
+              :aria-label="$t('released.manor.find_record', { name: record.nickname || getDecorName(record.decorItemId) })"
+              @click="scrollToRecord(record.id)"
+            >
+              <img :src="getRecordImageUrl(record.decorItemId) || ''" :alt="record.nickname || getDecorName(record.decorItemId)" loading="lazy" />
+              <span>{{ record.nickname || getDecorName(record.decorItemId) }}</span>
+            </button>
+          </TransitionGroup>
+          <Transition name="manor-house-panel">
+            <div v-if="isHouseOpen && indoorRecords.length" id="manor-house-list" class="manor-house-panel">
+              <div class="manor-house-panel-heading">
+                <strong>{{ $t('released.manor.house_title') }}</strong>
+                <button type="button" :aria-label="$t('released.manor.close_house')" @click="isHouseOpen = false">
+                  <Icon name="lucide:x" class="h-4 w-4" />
+                </button>
+              </div>
+              <button
+                v-for="record in indoorRecords"
+                :key="record.id"
+                type="button"
+                class="manor-house-resident"
+                @click="scrollToRecord(record.id)"
+              >
+                <img :src="getRecordImageUrl(record.decorItemId) || ''" alt="" loading="lazy" />
+                <span>{{ record.nickname || getDecorName(record.decorItemId) }}</span>
+                <Icon name="lucide:arrow-up-right" class="h-3.5 w-3.5" />
+              </button>
+            </div>
+          </Transition>
         </div>
       </header>
 
@@ -398,7 +432,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, onMounted, nextTick } from 'vue';
+import { ref, computed, watch, onMounted, onBeforeUnmount, nextTick } from 'vue';
 import { gsap } from 'gsap';
 import type { DecorItem, ReleasedPikmin } from '~/types/decor';
 import { PIKMIN_TYPE_COLORS } from '~/types/decor';
@@ -431,6 +465,9 @@ onMounted(async () => {
   if (authStore.isAuthenticated.value) {
     await loadFromCloud();
   }
+  if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    manorRotationTimer = setInterval(rotateOutdoorGuests, 12000);
+  }
 
   // GSAP Initial Stagger Animation
   nextTick(() => {
@@ -446,6 +483,10 @@ onMounted(async () => {
     );
 
   });
+});
+
+onBeforeUnmount(() => {
+  if (manorRotationTimer) clearInterval(manorRotationTimer);
 });
 
 watch(() => authStore.isAuthenticated.value, async (isAuth, wasAuth) => {
@@ -513,8 +554,49 @@ const onDetailsLeave = (el: Element, done: () => void) => {
 };
 
 const filteredRecords = computed(() => getRecords());
+const MAX_OUTDOOR_GUESTS = 4;
+const outdoorIds = ref<string[]>([]);
+const isHouseOpen = ref(false);
+let indoorQueue: string[] = [];
+let rotationSlot = 0;
+let manorRotationTimer: ReturnType<typeof setInterval> | null = null;
+
+const outdoorRecords = computed(() =>
+  outdoorIds.value
+    .map(id => filteredRecords.value.find(record => record.id === id))
+    .filter((record): record is ReleasedPikmin => Boolean(record))
+);
+const indoorRecords = computed(() =>
+  filteredRecords.value.filter(record => !outdoorIds.value.includes(record.id))
+);
+
+watch(
+  () => filteredRecords.value.map(record => record.id).join('|'),
+  () => {
+    const ids = filteredRecords.value.map(record => record.id);
+    outdoorIds.value = ids.slice(0, MAX_OUTDOOR_GUESTS);
+    indoorQueue = ids.slice(MAX_OUTDOOR_GUESTS);
+    rotationSlot = 0;
+    isHouseOpen.value = false;
+  },
+  { immediate: true }
+);
+
+function rotateOutdoorGuests() {
+  if (!indoorQueue.length || isHouseOpen.value) return;
+  const nextIds = [...outdoorIds.value];
+  const outgoing = nextIds[rotationSlot];
+  if (!outgoing) return;
+  const incoming = indoorQueue.shift();
+  if (!incoming) return;
+  nextIds[rotationSlot] = incoming;
+  indoorQueue.push(outgoing);
+  outdoorIds.value = nextIds;
+  rotationSlot = (rotationSlot + 1) % nextIds.length;
+}
 
 function scrollToRecord(id: string) {
+  isHouseOpen.value = false;
   document.getElementById('released-record-' + id)?.scrollIntoView({
     behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
     block: 'center',
