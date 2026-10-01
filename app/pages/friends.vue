@@ -773,6 +773,17 @@ const refreshDirectoryMotion = () => {
   if (!motionEnabled() || !friendsPage.value) return;
   const cards = Array.from(friendsPage.value.querySelectorAll<HTMLElement>('.friend-directory-card'));
   directoryMotionContext = gsap.context(() => {
+    const media = gsap.matchMedia();
+    media.add('(max-width: 767px)', () => {
+      cards.forEach(card => {
+        // Touch reading: settle once, then keep text and hit targets upright.
+        gsap.fromTo(card, { y: 12 }, {
+          y: 0, duration: 0.35, ease: 'power2.out', clearProps: 'transform',
+          scrollTrigger: { trigger: card.parentElement, start: 'top 96%', once: true },
+        });
+      });
+    });
+    media.add('(min-width: 768px)', () => {
     cards.forEach((card, index) => {
       // The static slot measures the scroll range; its paper card moves inside it.
       // Keep the middle of the journey still so codes and messages can be read.
@@ -789,6 +800,8 @@ const refreshDirectoryMotion = () => {
         .to(card, { y: 0, rotationX: 0, rotation: 0, scale: 1, duration: 0.54 })
         .to(card, { y: -14, rotationX: -4, scale: 0.97, duration: 0.18 });
     });
+    });
+    return () => media.revert();
   }, friendsPage.value);
   ScrollTrigger.refresh();
 };
@@ -3047,8 +3060,11 @@ onUnmounted(() => {
   transform: rotate(3deg); box-shadow: 0 2px 0 rgb(74 97 58 / 9%);
 }
 @media (max-width: 767px) {
-  .friend-directory-grid { grid-template-columns: minmax(0, 1fr); gap: 1.6rem; }
-  .friend-directory-card { padding: 1.1rem; }
+  .friend-directory-grid { grid-template-columns: minmax(0, 1fr); gap: 1.15rem; perspective: none; }
+  .friend-directory-slot { perspective: none; }
+  .friend-directory-card { position: relative; padding: 1.1rem; }
+  .friend-paper-tab { top: .95rem; right: 1rem; width: 1.65rem; height: 1.3rem; transform: none; border: 0; border-radius: .3rem; background: #f0f2e6; }
+  .friend-directory-card > .flex:first-child { padding-right: 2rem; }
   .friend-directory-message { font-size: 0.9rem; line-height: 1.75; }
   .friend-showcase { margin-bottom: 3rem; }
   .friend-paper-scene { inset-inline: -0.6rem; }

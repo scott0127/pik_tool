@@ -190,19 +190,11 @@
         </Transition>
 
         <!-- Mobile Menu -->
-        <Transition
-          enter-active-class="transition duration-300 ease-out"
-          enter-from-class="opacity-0 -translate-y-4"
-          enter-to-class="opacity-100 translate-y-0"
-          leave-active-class="transition duration-200 ease-in"
-          leave-from-class="opacity-100 translate-y-0"
-          leave-to-class="opacity-0 -translate-y-4"
-        >
+        <Transition name="mobile-menu">
           <div
             v-if="showMobileMenu"
-            :key="mobileMenuRenderKey"
             id="mobile-navigation-panel"
-            class="mobile-menu-panel md:hidden mt-4 space-y-4"
+            class="mobile-menu-panel md:hidden space-y-4"
             @keydown.esc.stop="closeMobileMenu"
           >
             <!-- Mobile Progress -->
@@ -273,7 +265,6 @@
                 ]"
               >
                 <Icon
-                  :key="`${mobileMenuRenderKey}-${link.to}-icon`"
                   :name="link.icon"
                   class="mobile-nav-icon text-3xl mb-1"
                   :style="{ animationDelay: `${80 + index * 70}ms` }"
@@ -542,7 +533,6 @@ const activateSupport = (kind: typeof supportKinds[number]) => {
 };
 const showMobileMenu = ref(false);
 const menuButton = ref<HTMLButtonElement | null>(null);
-const mobileMenuRenderKey = ref(0);
 const showSearch = ref(false);
 const searchQuery = ref('');
 const showCoffeeModal = ref(false);
@@ -642,9 +632,6 @@ const navLinks = computed(() => [
 const isLoggingOut = ref(false);
 
 const toggleMobileMenu = () => {
-  if (!showMobileMenu.value) {
-    mobileMenuRenderKey.value += 1;
-  }
   showMobileMenu.value = !showMobileMenu.value;
 };
 
@@ -777,22 +764,31 @@ onUnmounted(() => {
   .app-menu-caption { font-size: 10px; font-weight: 700; line-height: 1; letter-spacing: 0.08em; }
 
   .mobile-menu-shell-open {
-    background:
-      radial-gradient(circle at 20% 0%, rgba(255, 255, 255, 0.86), transparent 34%),
-      linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(237, 255, 242, 0.76));
+    background: #f5fcf8;
+  }
+
+  /* A stable opaque surface avoids swapping blur compositors on every toggle. */
+  header > .glass {
+    background: #f5fcf8;
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
   }
 
   .mobile-menu-panel {
-    max-height: calc(100vh - 100px - env(safe-area-inset-top, 0px));
-    max-height: calc(100dvh - 100px - env(safe-area-inset-top, 0px));
+    position: absolute;
+    top: 100%; left: 0; right: 0;
+    max-height: calc(100dvh - 88px - env(safe-area-inset-top, 0px));
     overflow-y: auto; overscroll-behavior: contain;
-    padding-bottom: max(8px, env(safe-area-inset-bottom, 0px));
+    padding: 12px 16px max(20px, env(safe-area-inset-bottom, 0px));
+    background: #f5fcf8;
+    border-bottom: 1px solid #d9e9df;
+    box-shadow: 0 14px 24px #173e3220;
     contain: layout paint;
     isolation: isolate;
-    will-change: transform, opacity;
   }
+  .mobile-menu-enter-active, .mobile-menu-leave-active { transition: transform 220ms cubic-bezier(.2,.8,.2,1); }
+  .mobile-menu-enter-from, .mobile-menu-leave-to { transform: translateY(-8px); }
+  :global(html.mobile-menu-open) { overflow: hidden; }
 
   .mobile-menu-panel .mobile-nav-link {
     min-width: 0;
@@ -966,6 +962,7 @@ onUnmounted(() => {
   .app-mobile-menu-button { width: 44px; height: 46px; }
 }
 @media (prefers-reduced-motion: reduce) {
+  .mobile-menu-enter-active, .mobile-menu-leave-active { transition: none; }
   .app-menu-strokes > span, .app-mobile-menu-button { transition: none; }
   .mobile-menu-panel .mobile-nav-link, .mobile-menu-panel .mobile-nav-icon { animation: none; }
 }

@@ -2215,7 +2215,7 @@ const handleCollectAll = (categoryId: string, categoryName: string) => {
 .collection-collect-button:active { transform: translateY(2px); box-shadow: 0 1px 0 #078966; }
 .collection-category-content-inner { padding: .2rem .1rem .6rem; }
 @media (max-width: 767px) {
-  .collection-page { margin-inline: -.25rem; }
+  .collection-page { margin-inline: 0; }
   .collection-section-card { flex-wrap: wrap; gap: .7rem; }
   .collection-section-card > .flex-1 { flex-basis: calc(100% - 60px); }
   .collection-section-actions { width: 100%; justify-content: flex-end; padding-top: .1rem; }

@@ -569,8 +569,8 @@ const { searchLocation, isSearching, searchError } = useGeocoding();
 const { fetchReportsForCells, submitReport, isReported, isReportedNotPure, getAddedDecors, getRemovedDecors, cellReportsVersion } = useCellReports();
 const REPORT_FETCH_MIN_ZOOM = 17;
 let reportFetchTimer: ReturnType<typeof setTimeout> | null = null;
-let visibilityFrameId: number | null = null;
-let isMapPageMounted = false;
+let mapResizeFrame: number | null = null;
+let mapResizeObserver: ResizeObserver | null = null;
 const debugMap = (...args: unknown[]) => {
   if (import.meta.dev) console.debug(...args);
 };
@@ -731,7 +731,6 @@ const confirmReport = async (cellId: string) => {
 };
 
 onMounted(() => {
-  isMapPageMounted = true;
   window.addEventListener('resize', updateWindowWidth);
 });
 
@@ -1095,6 +1094,20 @@ const onPopupClose = () => { isInfoPopupOpen.value = false; };
 const onMapReady = (map: any) => {
   // 不使用 ref 儲存 Leaflet 地圖實例！
   leafletMap = map;
+  // Leaflet listens to window resize, but menu/layout/visibility changes can
+  // resize its container without that event. Observe the actual map surface.
+  mapResizeObserver?.disconnect();
+  mapResizeObserver = new ResizeObserver(() => {
+    if (mapResizeFrame !== null) cancelAnimationFrame(mapResizeFrame);
+    mapResizeFrame = requestAnimationFrame(() => {
+      mapResizeFrame = null;
+      const container = map.getContainer();
+      if (leafletMap !== map || !container.clientWidth || !container.clientHeight) return;
+      map.invalidateSize({ animate: false, pan: false, debounceMoveend: true });
+      updateMapBounds();
+    });
+  });
+  mapResizeObserver.observe(map.getContainer());
   map.on('popupopen', animatePopupCard);
   map.on('popupclose', onPopupClose);
   // 更新邊界
@@ -1118,36 +1131,6 @@ const onMapReady = (map: any) => {
   }
   // ScheduleGridRender removed
 };
-
-// 組件掛載時執行（修復直接進入頁面時地圖不顯示的問題）
-onMounted(() => {
-  isMapPageMounted = true;
-  // 預先載入區域資料（Local-First 策略）
-  // preloadAllRegions(); // Disable preloading to save bandwidth (10MB+ taipei.json)
-  
-  // 等待容器真正可見後再 invalidateSize（修復 app.vue v-show 競爭條件）
-  // app.vue 的 isInitializing 會讓容器 display:none，Leaflet 在 0×0 下計算磚座標會全部錯位
-  const waitForVisible = () => {
-    if (!isMapPageMounted) return;
-
-    const mapEl = document.getElementById('map');
-    if (mapEl && mapEl.offsetHeight > 0) {
-      // 容器已可見，等一個 rAF 確保 layout 完成
-      visibilityFrameId = requestAnimationFrame(() => {
-        visibilityFrameId = null;
-        if (isMapPageMounted && leafletMap) {
-          leafletMap.invalidateSize();
-          debugMap('[Map] Forced map resize after visible');
-        }
-      });
-    } else {
-      // 容器尚未可見，繼續等待
-      visibilityFrameId = requestAnimationFrame(waitForVisible);
-    }
-  };
-  nextTick(waitForVisible);
-});
-
 
 // 地圖互動開始 - 清空網格以避免 DOM 同步錯誤
 // Reverted: User found this caused stuttering. Now relying on Smart Diff in useS2Grid.ts to prevent crashes.
@@ -1895,15 +1878,16 @@ if (typeof window !== 'undefined') {
 
 // 清理
 onUnmounted(() => {
-  isMapPageMounted = false;
 
   if (abortController) {
     abortController.abort();
     abortController = null;
   }
-  if (visibilityFrameId !== null) {
-    cancelAnimationFrame(visibilityFrameId);
-    visibilityFrameId = null;
+  mapResizeObserver?.disconnect();
+  mapResizeObserver = null;
+  if (mapResizeFrame !== null) {
+    cancelAnimationFrame(mapResizeFrame);
+    mapResizeFrame = null;
   }
   if (searchResultTimer) {
     clearTimeout(searchResultTimer);
@@ -2075,7 +2059,9 @@ onUnmounted(() => {
 }
 
 .map-canvas {
-  min-height: 100%;
+  position: absolute;
+  inset: 0;
+  min-height: 0;
   border-radius: inherit;
   background: rgb(226 235 232);
 }

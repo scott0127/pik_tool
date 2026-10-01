@@ -106,8 +106,8 @@ onUnmounted(() => { media?.revert(); clearResponse(); });
 
 
 <style scoped>
-.album-cover { position: relative; isolation: isolate; min-height: 13rem; color: #23483c; }
-.album-copy { position: relative; z-index: 2; width: 51%; padding: .6rem .1rem .8rem; }
+.album-cover { position: relative; isolation: isolate; min-height: 13rem; padding: 1.25rem; overflow: clip; color: #23483c; }
+.album-copy { position: relative; z-index: 2; width: 53%; padding: 0; }
 .album-eyebrow { color: #829085; font-size: .61rem; font-weight: 600; letter-spacing: .14em; }
 h1 { margin-top: .55rem; color: #193e33; font-size: clamp(1.65rem,6.5vw,2rem); line-height: 1.2; font-weight: 850; letter-spacing: -.045em; }
 .album-subtitle { margin-top: .6rem; max-width: 12rem; color: #6d8173; font-size: .7rem; line-height: 1.7; text-wrap: pretty; }
@@ -115,7 +115,7 @@ h1 { margin-top: .55rem; color: #193e33; font-size: clamp(1.65rem,6.5vw,2rem); l
 .album-progress strong { color: #234c40; font-size: 1.55rem; font-weight: 800; line-height: 1; letter-spacing: -.04em; }.album-progress p > span { font-size: .8rem; color: #7b8d7f; }.album-progress > small { display: block; margin-top: .35rem; color: #078a61; font-size: .65rem; }
 .album-progress-track { height: 3px; margin-top: .4rem; overflow: hidden; border-radius: 3px; background: #e1e7dc; }.album-progress-track span { display: block; width: 100%; height: 100%; transform-origin: left; background: #10b981; transition: transform .3s; }
 .album-browse { display: inline-flex; align-items: center; gap: .8rem; min-height: 44px; margin-top: .55rem; padding: .3rem 0; color: #078a61; font-size: .72rem; font-weight: 700; }.album-browse span { font-size: 1rem; }
-.album-art { position: absolute; z-index: 1; top: .8rem; right: .4rem; width: 47%; height: 11.5rem; padding: 0; border: 0; background: none; -webkit-tap-highlight-color: transparent; }
+.album-art { position: absolute; z-index: 1; top: 1.4rem; right: 1.25rem; width: 42%; height: 11.5rem; padding: 0; border: 0; background: none; -webkit-tap-highlight-color: transparent; }
 .album-fan { position: absolute; inset: 0; transform-origin: bottom center; }
 .specimen-paper { position: absolute; top: .4rem; width: 38%; height: 9.8rem; transform-origin: 50% 90%; }.specimen-red { left: 0; z-index: 1; transform: rotate(-5deg); }.specimen-yellow { left: 30%; z-index: 3; top: .7rem; transform: rotate(2deg); }.specimen-blue { right: 0; z-index: 2; top: 1rem; transform: rotate(5deg); }
 .specimen-lift { position: relative; display: flex; flex-direction: column; width: 100%; height: 100%; padding: .4rem .25rem .2rem; border: 1px solid #e7e5d9; border-radius: .16rem; background: #fffdf7; box-shadow: 0 2px 0 #e8e9df, 0 5px 9px #334b3312; transform-origin: bottom center; }
@@ -123,7 +123,7 @@ h1 { margin-top: .55rem; color: #193e33; font-size: clamp(1.65rem,6.5vw,2rem); l
 .specimen-window { display: block; flex: 1; min-height: 0; }.specimen-window img { display: block; width: 100%; height: 100%; object-fit: contain; padding: .25rem .1rem; }
 .specimen-caption { display: flex; align-items: center; justify-content: space-between; gap: .2rem; min-height: .8rem; padding: .15rem; color: #9ba491; font: 600 .55rem ui-monospace,monospace; }.specimen-dot { display: block; width: .3rem; height: .3rem; border-radius: 50%; }.dot-red { background: #df8373; }.dot-yellow { background: #d9bf62; }.dot-blue { background: #7cadc0; }
 .album-browse:focus-visible,.album-art:focus-visible { outline: 3px solid #10b981; outline-offset: 3px; border-radius: .3rem; }
-@media(max-width:360px) { .album-copy { width: 52%; }.album-art { width: 47%; }.album-eyebrow { font-size: .55rem; }.album-subtitle { font-size: .66rem; }.specimen-paper { height: 9.1rem; }.album-progress strong { font-size: 1.35rem; }.album-progress p>span { font-size: .7rem; } }
+@media(max-width:360px) { .album-cover { padding: 1rem; }.album-copy { width: 54%; }.album-art { width: 40%; right: 1rem; }.album-eyebrow { font-size: .55rem; }.album-subtitle { font-size: .66rem; }.specimen-paper { height: 9.1rem; }.album-progress strong { font-size: 1.35rem; }.album-progress p>span { font-size: .7rem; } }
 @media(min-width:640px) { .album-cover { min-height: 15rem; }.album-copy { padding: 1.1rem; width: 58%; }.album-eyebrow { font-size: .72rem; }h1 { font-size: 2.75rem; }.album-subtitle { max-width: 24rem; font-size: .9rem; }.album-progress { margin-top: 1.2rem; }.album-progress strong { font-size: 2rem; }.album-progress p>span { font-size: .95rem; }.album-art { width: 18rem; right: 2rem; top: 1.5rem; height: 13rem; }.specimen-paper { height: 12rem; width: 37%; }.album-browse { font-size: .8rem; }.specimen-lift { padding: .5rem .4rem .3rem; }.specimen-caption { font-size: .65rem; }.specimen-tape { height: .55rem; } }
 @media(prefers-reduced-motion:reduce) { .album-progress-track span { transition: none; } }
 </style>
