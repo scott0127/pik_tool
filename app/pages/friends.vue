@@ -1,11 +1,14 @@
 <template>
   <div ref="friendsPage" class="friends-page min-h-screen py-8 px-4">
     <div class="friends-page-shell max-w-6xl mx-auto">
-      <header class="friends-page-header mb-7">
+      <FriendsComicScene :friend="recommendedPosts[0] ?? posts[0]" :copied-code="copiedCode" @browse="browseFriends" @copy="copyCode">
+      <header class="friends-page-header comic-page-header">
         <div class="friends-page-heading">
           <div>
             <span class="friends-eyebrow">{{ $t('friends.board_eyebrow') }}</span>
-            <h1 class="text-3xl font-extrabold text-slate-900">{{ $t('friends.title') }}</h1>
+            <h1 class="text-3xl font-extrabold text-slate-900" :aria-label="$t('friends.title')">
+              <span v-for="(letter, index) in heroTitleLetters" :key="index" class="friends-title-mask" aria-hidden="true"><span class="friends-title-letter">{{ letter === ' ' ? '\u00a0' : letter }}</span></span>
+            </h1>
             <p class="text-slate-500 mt-1">{{ $t('friends.subtitle') }}</p>
             <button v-if="user" type="button" class="friends-compose-trigger" :aria-expanded="showComposer" @click="toggleComposer">
               <span>{{ showComposer ? $t('friends.close_compose') : $t('friends.open_compose') }}</span>
@@ -17,14 +20,15 @@
           </div>
         </div>
         <div class="friends-hero-side">
-          <div class="friends-page-count" aria-live="polite">
-            <strong>{{ totalPostCount ?? '—' }}</strong>
+          <div class="friends-page-count" :aria-label="`${$t('friends.total_players')}: ${totalPostCount ?? '—'}`">
+            <strong aria-hidden="true">{{ animatedPostCount }}</strong>
             <span>{{ $t('friends.total_players') }}</span>
           </div>
         </div>
       </header>
+      </FriendsComicScene>
 
-      <details class="friends-tips-panel mb-6">
+      <details class="friends-tips-panel mb-6" @toggle="refreshMotionLayout">
         <summary>{{ $t('friends.tips.title') }} <span aria-hidden="true">＋</span></summary>
         <ul>
           <li>{{ $t('friends.tips.row1') }}</li>
@@ -289,11 +293,11 @@
         role="region"
         :aria-label="$t('friends.carousel_label')"
         aria-roledescription="carousel"
-        @mouseenter="setRecommendationInteraction(true)"
-        @mouseleave="setRecommendationInteraction(false)"
-        @focusin="setRecommendationInteraction(true)"
-        @focusout="handleRecommendationFocusOut"
       >
+        <div class="friend-paper-scene" aria-hidden="true">
+          <span class="friend-paper-underlay"></span>
+          <span class="friend-paper-backdrop"></span>
+        </div>
         <header class="friend-showcase-header">
           <div class="friend-showcase-heading">
             <span class="friend-section-index">01</span>
@@ -332,6 +336,7 @@
               <Icon name="lucide:chevron-right" class="w-4 h-4" />
             </button>
           </div>
+          <span class="friend-section-rule" aria-hidden="true"></span>
         </header>
 
         <div
@@ -339,7 +344,11 @@
           class="friend-carousel-track scrollbar-hide"
           aria-live="off"
           @scroll.passive="handleRecommendationScroll"
-          @touchstart.passive="pauseRecommendationForTouch"
+          @touchstart.passive="beginRecommendationTouch"
+          @touchmove.passive="moveRecommendationTouch"
+          @touchend.passive="endRecommendationTouch"
+          @touchcancel.passive="endRecommendationTouch"
+          @wheel.passive="handleRecommendationWheel"
         >
           <article
             v-for="(post, index) in recommendedPosts"
@@ -351,7 +360,7 @@
             <div class="flex items-center gap-2.5 mb-3">
               <div class="relative shrink-0">
                 <div class="friend-recommendation-avatar">
-                  <img :src="getPikminAvatar(post.username)" :alt="post.username" class="w-full h-full object-contain bg-white group-hover:scale-105 transition-transform duration-300" loading="lazy" />
+                  <img :src="getPikminAvatar(post.username)" :alt="post.username" class="w-full h-full object-contain bg-white group-hover:scale-105 transition-transform duration-300" loading="lazy" @error="useAvatarFallback" />
                 </div>
               </div>
               <div class="flex-1 min-w-0">
@@ -363,7 +372,7 @@
             <!-- Friend Code Box (iOS style inset) -->
             <button
               type="button"
-              @click="copyCode(post.friend_code)"
+              @click="copyCode(post.friend_code, $event)"
               class="friend-recommendation-code group/code"
               :title="$t('friends.copy_tooltip')"
             >
@@ -371,7 +380,7 @@
               <span class="friend-code-value">
                 {{ formatDisplayCode(post.friend_code) }}
               </span>
-              <span class="friend-code-copy">{{ $t('friends.copy_btn') }} ↗</span>
+              <span class="friend-code-copy">{{ copiedCode === post.friend_code ? $t('friends.copied_short') : $t('friends.copy_btn') }} <span aria-hidden="true">{{ copiedCode === post.friend_code ? '✓' : '↗' }}</span></span>
             </button>
 
             <!-- Tags Section -->
@@ -401,7 +410,7 @@
 
             <!-- Action Button -->
             <button
-              @click="copyCode(post.friend_code)"
+              @click="copyCode(post.friend_code, $event)"
               class="friend-recommendation-action group/btn"
             >
               <span class="group-hover/btn:scale-110 transition-transform">{{ $t('friends.add_friend') }}</span>
@@ -419,6 +428,7 @@
               :class="{ 'is-active': activeRecommendationIndex === index }"
             />
           </div>
+          <div class="friend-carousel-progress" aria-hidden="true"><span ref="recommendationProgress"></span></div>
           <span class="friend-carousel-position">
             {{ activeRecommendationIndex + 1 }} / {{ recommendedPosts.length }}
           </span>
@@ -427,7 +437,11 @@
 
       <!-- Posts Section -->
       <section class="friend-directory">
-        <div class="flex items-center justify-between mb-6">
+        <div class="friend-directory-scene" aria-hidden="true">
+          <span class="friend-directory-sheet sheet-back"></span>
+          <span class="friend-directory-sheet sheet-front"></span>
+        </div>
+        <div class="friend-directory-heading flex items-center justify-between mb-6">
           <h2 class="text-xl font-bold text-gray-800 flex items-center gap-3">
             <span class="friend-section-index">02</span>
             {{ $t('friends.all_players') }}
@@ -445,6 +459,7 @@
           >
             <Icon name="lucide:refresh-cw" class="h-4 w-4" :class="{ 'animate-spin': loading }" />
           </button>
+          <span class="friend-section-rule" aria-hidden="true"></span>
         </div>
 
         <!-- Filter Bar -->
@@ -545,18 +560,20 @@
         </div>
 
         <!-- Posts Grid -->
-        <div v-else class="friend-directory-grid">
+        <div v-else class="friend-directory-grid" :aria-busy="loading">
           <div
-            v-for="post in posts"
+            v-for="(post, index) in posts"
             :key="post.id"
-            class="friend-directory-card"
+            class="friend-directory-slot"
           >
+          <article class="friend-directory-card">
+            <span class="friend-paper-tab" aria-hidden="true">{{ String(index + 1).padStart(2, '0') }}</span>
             <!-- User Header -->
             <div class="flex items-center justify-between mb-4">
               <div class="flex items-center gap-3.5">
                 <div class="relative shrink-0">
                   <div class="friend-directory-avatar">
-                    <img :src="getPikminAvatar(post.username)" :alt="post.username" class="w-full h-full object-contain bg-white" loading="lazy" />
+                    <img :src="getPikminAvatar(post.username)" :alt="post.username" class="w-full h-full object-contain bg-white" loading="lazy" @error="useAvatarFallback" />
                   </div>
                 </div>
                 <div>
@@ -569,13 +586,13 @@
 
             <button
               type="button"
-              @click="copyCode(post.friend_code)"
+              @click="copyCode(post.friend_code, $event)"
               class="friend-directory-code"
               :title="$t('friends.copy_code')"
             >
               <span class="friend-code-label">{{ $t('friends.friend_code_label') }}</span>
               <span class="friend-code-value">{{ formatDisplayCode(post.friend_code) }}</span>
-              <span class="friend-code-copy">{{ $t('friends.copy_btn') }} ↗</span>
+              <span class="friend-code-copy">{{ copiedCode === post.friend_code ? $t('friends.copied_short') : $t('friends.copy_btn') }} <span aria-hidden="true">{{ copiedCode === post.friend_code ? '✓' : '↗' }}</span></span>
             </button>
             
             <!-- Tags Row -->
@@ -610,6 +627,7 @@
                 刪除我的文章
               </button>
             </div>
+          </article>
           </div>
         </div>
 
@@ -659,6 +677,7 @@
 
 <script setup lang="ts">
 import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 interface FriendPost {
   id: string;
@@ -687,17 +706,134 @@ const {
 const friendsPage = ref<HTMLElement | null>(null);
 const composePanel = ref<HTMLElement | null>(null);
 const showComposer = ref(false);
+const heroTitleLetters = computed(() => Array.from(t('friends.title')));
+const animatedPostCount = ref<string | number>('—');
+const copiedCode = ref('');
 let motionContext: gsap.Context | null = null;
-let cardObserver: IntersectionObserver | null = null;
+let directoryMotionContext: gsap.Context | null = null;
+let showcaseMotionContext: gsap.Context | null = null;
+let recommendationTween: gsap.core.Tween | null = null;
+let recommendationAutoscrollTween: gsap.core.Tween | null = null;
+let recommendationMoving = false;
+let recommendationPaperReady = false;
+let recommendationPaperCards: Array<{
+  element: HTMLElement;
+  left: number;
+  width: number;
+  set: Record<'y' | 'scale' | 'rotation' | 'rotationY', (value: number) => void>;
+}> = [];
+
+const useAvatarFallback = (event: Event) => {
+  const image = event.target as HTMLImageElement;
+  if (image.dataset.fallback) return;
+  image.dataset.fallback = 'true';
+  image.src = '/images/friends-comic/pikmin-red.png';
+};
+
+const motionEnabled = () => !!motionContext && !reducedMotionQuery?.matches;
+const refreshMotionLayout = () => {
+  if (motionEnabled()) nextTick(() => ScrollTrigger.refresh());
+};
+
+const initializeBoardMotion = () => {
+  if (!friendsPage.value || reducedMotionQuery?.matches) return;
+  motionContext = gsap.context(() => {
+    const intro = gsap.timeline({ defaults: { ease: 'power3.out', duration: 0.8 } });
+    intro
+      .fromTo('.friends-page-header', { y: 28, opacity: 0 }, { y: 0, opacity: 1, clearProps: 'transform,opacity' }, 0)
+      .fromTo('.friends-eyebrow', { x: -20, opacity: 0 }, { x: 0, opacity: 1, clearProps: 'transform,opacity' }, 0.15)
+      .fromTo('.friends-title-letter', { yPercent: 115, rotation: 7 }, { yPercent: 0, rotation: 0, stagger: 0.055, duration: 0.9, clearProps: 'transform' }, 0.26)
+      .fromTo('.friends-page-heading p', { y: 18, opacity: 0 }, { y: 0, opacity: 1, clearProps: 'transform,opacity' }, 0.62)
+      .fromTo('.friends-compose-trigger', { y: 14, scale: 0.92, opacity: 0 }, { y: 0, scale: 1, opacity: 1, ease: 'back.out(1.4)', clearProps: 'transform,opacity' }, 0.78)
+      .fromTo('.friends-page-count', { y: 20, opacity: 0 }, { y: 0, opacity: 1, clearProps: 'transform,opacity' }, 0.8);
+
+    const directory = friendsPage.value?.querySelector('.friend-directory');
+    if (directory) {
+      gsap.timeline({
+        scrollTrigger: { trigger: directory, start: 'top 96%', end: 'top 28%', scrub: 0.45 },
+        defaults: { ease: 'none' },
+      })
+        .fromTo('.sheet-back', { y: 42, rotation: -1.8 }, { y: 0, rotation: -0.5 }, 0)
+        .fromTo('.sheet-front', { y: 24, rotationX: 5 }, { y: 0, rotationX: 0 }, 0);
+      gsap.timeline({
+        defaults: { ease: 'power3.out', duration: 0.65 },
+        scrollTrigger: { trigger: directory, start: 'top 88%', once: true },
+      })
+        .fromTo('.friend-directory-heading .friend-section-index', { rotation: -90, scale: 0.5, opacity: 0 }, { rotation: 0, scale: 1, opacity: 1, clearProps: 'transform,opacity' })
+        .fromTo('.friend-directory-heading h2', { x: -24, opacity: 0 }, { x: 0, opacity: 1, clearProps: 'transform,opacity' }, 0.1)
+        .fromTo('.friend-directory-heading .friend-section-rule', { scaleX: 0 }, { scaleX: 1, transformOrigin: 'left center' }, 0.14)
+        .fromTo('.friend-filter-panel > div:not(.h-px)', { y: 20, opacity: 0 }, { y: 0, opacity: 1, stagger: 0.12, clearProps: 'transform,opacity' }, 0.24);
+    }
+  }, friendsPage.value);
+};
+
+const refreshDirectoryMotion = () => {
+  directoryMotionContext?.revert();
+  directoryMotionContext = null;
+  if (!motionEnabled() || !friendsPage.value) return;
+  const cards = Array.from(friendsPage.value.querySelectorAll<HTMLElement>('.friend-directory-card'));
+  directoryMotionContext = gsap.context(() => {
+    cards.forEach((card, index) => {
+      // The static slot measures the scroll range; its paper card moves inside it.
+      // Keep the middle of the journey still so codes and messages can be read.
+      gsap.timeline({
+        defaults: { ease: 'none' },
+        scrollTrigger: {
+          trigger: card.parentElement,
+          start: 'top 96%', end: 'bottom 12%', scrub: 0.25,
+        },
+      })
+        .fromTo(card,
+          { y: 36, rotationX: 11, rotation: index % 2 ? 2.2 : -2.2, scale: 0.93, transformOrigin: '50% 60%' },
+          { y: 0, rotationX: 0, rotation: 0, scale: 1, duration: 0.28 })
+        .to(card, { y: 0, rotationX: 0, rotation: 0, scale: 1, duration: 0.54 })
+        .to(card, { y: -14, rotationX: -4, scale: 0.97, duration: 0.18 });
+    });
+  }, friendsPage.value);
+  ScrollTrigger.refresh();
+};
+
+const animateBoardExit = async () => {
+  directoryMotionContext?.revert();
+  directoryMotionContext = null;
+  if (!motionEnabled() || !friendsPage.value) return;
+  const visible = Array.from(friendsPage.value.querySelectorAll<HTMLElement>('.friend-directory-card')).filter(card => {
+    const bounds = card.getBoundingClientRect();
+    return bounds.bottom > 0 && bounds.top < window.innerHeight;
+  });
+  if (!visible.length) return;
+  await new Promise<void>(resolve => {
+    motionContext?.add(() => gsap.to(visible, {
+      y: -14, opacity: 0, scale: 0.98, duration: 0.2, stagger: 0.025,
+      ease: 'power2.in', onComplete: resolve, onInterrupt: resolve,
+    }));
+  });
+  gsap.set(visible, { clearProps: 'transform,opacity' });
+};
 
 const toggleComposer = async () => {
   showComposer.value = !showComposer.value;
-  if (!showComposer.value) return;
+  if (!showComposer.value) {
+    refreshMotionLayout();
+    return;
+  }
   await nextTick();
   composePanel.value?.scrollIntoView({ behavior: reducedMotionQuery?.matches ? 'auto' : 'smooth', block: 'start' });
   if (!reducedMotionQuery?.matches && composePanel.value && motionContext) {
-    motionContext.add(() => gsap.fromTo(composePanel.value, { y: 18, opacity: 0 }, { y: 0, opacity: 1, duration: 0.48, ease: 'power2.out', clearProps: 'transform,opacity' }));
+    motionContext.add(() => {
+      const panel = composePanel.value!;
+      gsap.timeline({ defaults: { ease: 'power3.out' } })
+        .fromTo(panel, { y: 24, scale: 0.98, opacity: 0 }, { y: 0, scale: 1, opacity: 1, duration: 0.6, clearProps: 'transform,opacity' })
+        .fromTo(Array.from(panel.querySelector('form')?.children ?? []),
+          { y: 16, opacity: 0 }, { y: 0, opacity: 1, duration: 0.45, stagger: 0.06, clearProps: 'transform,opacity' }, 0.18);
+    });
   }
+  refreshMotionLayout();
+};
+
+const browseFriends = () => {
+  const target = friendsPage.value?.querySelector('.friend-showcase, .friend-directory');
+  target?.scrollIntoView({ behavior: reducedMotionQuery?.matches ? 'auto' : 'smooth', block: 'start' });
 };
 
 const posts = ref<FriendPost[]>([]);
@@ -812,22 +948,10 @@ onMounted(async () => {
     reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
     recommendationAutoplay.value = !reducedMotionQuery.matches;
     reducedMotionQuery.addEventListener('change', handleReducedMotionChange);
-    if (friendsPage.value && !reducedMotionQuery.matches) {
-      motionContext = gsap.context(() => {
-        gsap.fromTo('.friends-page-header, .friends-tips-panel',
-          { y: 20, opacity: 0 },
-          { y: 0, opacity: 1, duration: 0.62, stagger: 0.09, ease: 'power2.out', clearProps: 'transform,opacity' });
-      }, friendsPage.value);
-      cardObserver = new IntersectionObserver((entries) => {
-        const entering = entries.filter(entry => entry.isIntersecting).map(entry => entry.target as HTMLElement);
-        entering.forEach(card => cardObserver?.unobserve(card));
-        if (entering.length && !reducedMotionQuery?.matches) {
-          motionContext?.add(() => gsap.fromTo(entering,
-            { y: 18, opacity: 0 },
-            { y: 0, opacity: 1, duration: 0.5, stagger: 0.045, ease: 'power2.out', clearProps: 'transform,opacity' }));
-        }
-      }, { threshold: 0.08, rootMargin: '0px 0px 70px 0px' });
-    }
+    document.addEventListener('visibilitychange', handleRecommendationVisibility);
+    window.addEventListener('resize', handleRecommendationResize);
+    gsap.registerPlugin(ScrollTrigger);
+    initializeBoardMotion();
   }
 
   await Promise.all([fetchPosts(), fetchTotalPostCount()]);
@@ -840,10 +964,18 @@ onMounted(async () => {
   }
 });
 
-watch(() => posts.value.map(post => post.id).join('|'), async () => {
-  await nextTick();
-  friendsPage.value?.querySelectorAll<HTMLElement>('.friend-directory-card').forEach(card => cardObserver?.observe(card));
-}, { flush: 'post' });
+watch(totalPostCount, (count) => {
+  if (count === null) return;
+  if (!motionEnabled()) {
+    animatedPostCount.value = count;
+    return;
+  }
+  const counter = { value: Number(animatedPostCount.value) || 0 };
+  motionContext?.add(() => gsap.to(counter, {
+    value: count, duration: 1.3, ease: 'power2.out', snap: { value: 1 },
+    onUpdate: () => { animatedPostCount.value = counter.value; },
+  }));
+});
 
 const fetchTotalPostCount = async () => {
   try {
@@ -873,6 +1005,7 @@ const fetchPosts = async (isLoadMore = false) => {
       const sig = buildFilterSignature();
       const cached = readFriendsCache(sig);
       if (cached) {
+        await animateBoardExit();
         posts.value = cached.data;
         filteredPostCount.value = cached.count;
         hasMorePosts.value = cached.data.length < cached.count;
@@ -919,6 +1052,7 @@ const fetchPosts = async (isLoadMore = false) => {
       if (isLoadMore) {
         posts.value.push(...data);
       } else {
+        await animateBoardExit();
         posts.value = data;
         // Save to cache (first page only)
         writeFriendsCache(data, resultCount, buildFilterSignature());
@@ -937,6 +1071,9 @@ const fetchPosts = async (isLoadMore = false) => {
     } else {
       loading.value = false;
     }
+    await nextTick();
+    if (!error.value) refreshDirectoryMotion();
+    refreshMotionLayout();
   }
 };
 
@@ -1040,13 +1177,26 @@ const deletePost = async (postId: string) => {
   }
 };
 
-const copyCode = async (code: string) => {
+const copyCode = async (code: string, event?: MouseEvent) => {
+  const button = event?.currentTarget as HTMLElement | null;
   try {
     await navigator.clipboard.writeText(code.replace(/\s/g, ''));
+    copiedCode.value = code;
     showCopyToast.value = true;
+    const card = button?.closest('.friend-directory-card, .friend-recommendation-card');
+    const surface = card?.querySelector('.friend-directory-code, .friend-recommendation-code');
+    if (surface && motionEnabled()) {
+      motionContext?.add(() => {
+        gsap.timeline()
+          .to(surface, { scale: 0.98, rotationX: -5, duration: 0.12, ease: 'power2.in', transformOrigin: '50% 100%' })
+          .to(surface, { scale: 1, rotationX: 0, duration: 0.45, ease: 'back.out(1.6)', clearProps: 'transform,transformOrigin' })
+          .fromTo(surface.querySelector('.friend-code-copy'), { y: 8, opacity: 0 }, { y: 0, opacity: 1, duration: 0.3, clearProps: 'transform,opacity' }, 0.1);
+      });
+    }
     if (copyToastTimer) clearTimeout(copyToastTimer);
     copyToastTimer = setTimeout(() => {
       showCopyToast.value = false;
+      copiedCode.value = '';
       copyToastTimer = null;
     }, 2000);
   } catch (e) {
@@ -1075,11 +1225,13 @@ const formatDate = (dateStr: string) => {
 const recommendedPosts = ref<FriendPost[]>([]);
 const recommendationQueue = ref<FriendPost[]>([]);
 const recommendationTrack = ref<HTMLElement | null>(null);
+const recommendationProgress = ref<HTMLElement | null>(null);
 const activeRecommendationIndex = ref(0);
 const recommendationAutoplay = ref(true);
-const recommendationInteractionPaused = ref(false);
-let recommendTimer: ReturnType<typeof setInterval> | null = null;
-let recommendationResumeTimer: ReturnType<typeof setTimeout> | null = null;
+let recommendationDragging = false;
+let recommendationTouchOrigin: { x: number; y: number } | null = null;
+let recommendationScrollDirection: 1 | -1 = 1;
+let recommendationWheelTimer: ReturnType<typeof setTimeout> | null = null;
 let recommendationScrollFrame: number | null = null;
 let reducedMotionQuery: MediaQueryList | null = null;
 let filterFetchTimer: ReturnType<typeof setTimeout> | null = null;
@@ -1101,6 +1253,8 @@ const shuffleArray = <T>(array: T[]): T[] => {
 };
 
 const resetRecommendationPosition = () => {
+  stopRecommendationAutoscroll();
+  recommendationScrollDirection = 1;
   activeRecommendationIndex.value = 0;
   nextTick(() => {
     recommendationTrack.value?.scrollTo({ left: 0, behavior: 'auto' });
@@ -1150,10 +1304,17 @@ const refreshRecommendations = () => {
   resetRecommendationPosition();
 };
 
-const stopRecommendationTimer = () => {
-  if (!recommendTimer) return;
-  clearInterval(recommendTimer);
-  recommendTimer = null;
+const stopRecommendationAutoscroll = () => {
+  recommendationAutoscrollTween?.kill();
+  recommendationAutoscrollTween = null;
+};
+
+const updateRecommendationProgress = () => {
+  const track = recommendationTrack.value;
+  const progress = recommendationProgress.value;
+  if (!track || !progress) return;
+  const maxScroll = track.scrollWidth - track.clientWidth;
+  progress.style.transform = `scaleX(${maxScroll > 0 ? track.scrollLeft / maxScroll : 0})`;
 };
 
 const getRecommendationCards = () => {
@@ -1161,6 +1322,65 @@ const getRecommendationCards = () => {
   return Array.from(
     recommendationTrack.value.querySelectorAll<HTMLElement>('.friend-recommendation-card'),
   );
+};
+
+const focusRecommendation = () => {
+  if (!motionEnabled() || !recommendationPaperReady) return;
+  updateRecommendationPaper();
+  const card = recommendationPaperCards[activeRecommendationIndex.value]?.element;
+  if (!card) return;
+  motionContext?.add(() => {
+    // Light catches the paper once as focus changes; the code stays still.
+    gsap.fromTo(card, { '--paper-light-x': '-140%' }, {
+      '--paper-light-x': '140%', duration: 0.85, ease: 'power2.inOut', overwrite: 'auto',
+    });
+  });
+};
+
+const measureRecommendationPaper = () => {
+  const cards = getRecommendationCards();
+  recommendationPaperCards = cards.map(element => ({
+    element, left: element.offsetLeft, width: element.offsetWidth,
+    set: {
+      y: gsap.quickSetter(element, 'y', 'px'),
+      scale: gsap.quickSetter(element, 'scale'),
+      rotation: gsap.quickSetter(element, 'rotation', 'deg'),
+      rotationY: gsap.quickSetter(element, 'rotationY', 'deg'),
+    },
+  }));
+};
+
+const clearRecommendationPaper = () => {
+  recommendationPaperReady = false;
+  if (recommendationPaperCards.length) {
+    gsap.set(recommendationPaperCards.map(card => card.element), { clearProps: 'transform,--paper-light-x' });
+  }
+  recommendationPaperCards = [];
+};
+
+const updateRecommendationPaper = () => {
+  const track = recommendationTrack.value;
+  if (!track || !recommendationPaperReady || !motionEnabled()) return;
+  const left = track.scrollLeft;
+  const right = left + track.clientWidth;
+  // Measure once per layout change. Only transforms are written while scrolling.
+  for (const card of recommendationPaperCards) {
+    const visible = Math.max(0, Math.min(card.left + card.width, right) - Math.max(card.left, left)) / card.width;
+    const edge = gsap.utils.clamp(0, 1, (0.9 - visible) / 0.7);
+    const weight = edge * edge * (3 - 2 * edge);
+    const side = card.left + card.width / 2 < (left + right) / 2 ? -1 : 1;
+    card.set.y(weight * 12);
+    card.set.scale(1 - weight * 0.035);
+    card.set.rotation(side * weight * 1.3);
+    card.set.rotationY(side * weight * 4.8);
+  }
+};
+
+const cancelRecommendationMotion = () => {
+  recommendationTween?.kill();
+  recommendationTween = null;
+  recommendationMoving = false;
+  if (recommendationTrack.value) gsap.set(recommendationTrack.value, { clearProps: 'scrollSnapType,scrollBehavior' });
 };
 
 const scrollRecommendationTo = (index: number, behavior: ScrollBehavior = 'smooth') => {
@@ -1172,11 +1392,36 @@ const scrollRecommendationTo = (index: number, behavior: ScrollBehavior = 'smoot
   const card = cards[safeIndex];
   if (!card) return;
 
+  stopRecommendationAutoscroll();
+  cancelRecommendationMotion();
+  const targetLeft = Math.min(card.offsetLeft, track.scrollWidth - track.clientWidth);
   activeRecommendationIndex.value = safeIndex;
-  track.scrollTo({ left: card.offsetLeft, behavior });
+  if (!motionEnabled() || behavior === 'auto') {
+    track.scrollTo({ left: targetLeft, behavior: 'auto' });
+    return;
+  }
+  recommendationMoving = true;
+  gsap.set(track, { scrollSnapType: 'none', scrollBehavior: 'auto' });
+  motionContext?.add(() => {
+    recommendationTween = gsap.to(track, {
+      scrollLeft: targetLeft, duration: 0.9, ease: 'power3.inOut',
+      onUpdate: () => { updateRecommendationProgress(); updateRecommendationPaper(); },
+      onComplete: () => {
+        recommendationMoving = false;
+        recommendationTween = null;
+        gsap.set(track, { clearProps: 'scrollSnapType,scrollBehavior' });
+        startRecommendationAutoscroll();
+      },
+      onInterrupt: () => {
+        recommendationMoving = false;
+        gsap.set(track, { clearProps: 'scrollSnapType,scrollBehavior' });
+      },
+    });
+  });
 };
 
 const scrollRecommendation = (direction: -1 | 1) => {
+  recommendationScrollDirection = direction;
   const maxIndex = recommendedPosts.value.length - 1;
   if (maxIndex < 1) return;
 
@@ -1200,15 +1445,19 @@ const scrollRecommendation = (direction: -1 | 1) => {
 };
 
 const handleRecommendationScroll = () => {
+  if (recommendationMoving) return;
   if (recommendationScrollFrame !== null) {
     cancelAnimationFrame(recommendationScrollFrame);
   }
 
   recommendationScrollFrame = requestAnimationFrame(() => {
     recommendationScrollFrame = null;
+    if (recommendationMoving) return;
     const track = recommendationTrack.value;
     const cards = getRecommendationCards();
     if (!track || cards.length === 0) return;
+    updateRecommendationProgress();
+    updateRecommendationPaper();
 
     let closestIndex = 0;
     let closestDistance = Number.POSITIVE_INFINITY;
@@ -1219,67 +1468,160 @@ const handleRecommendationScroll = () => {
         closestIndex = index;
       }
     });
-    activeRecommendationIndex.value = closestIndex;
+    activeRecommendationIndex.value = track.scrollLeft <= 2
+      ? 0
+      : track.scrollLeft >= track.scrollWidth - track.clientWidth - 2
+        ? cards.length - 1
+        : closestIndex;
   });
 };
 
-const startRecommendationTimer = () => {
-  stopRecommendationTimer();
+const startRecommendationAutoscroll = () => {
+  stopRecommendationAutoscroll();
   if (
     !recommendationAutoplay.value
-    || recommendationInteractionPaused.value
+    || recommendationDragging
+    || recommendationWheelTimer
+    || document.visibilityState !== 'visible'
+    || recommendationMoving
     || recommendedPosts.value.length <= 1
   ) return;
 
-  recommendTimer = setInterval(() => {
-    if (document.visibilityState === 'visible') {
-      scrollRecommendation(1);
-    }
-  }, 10000);
+  const track = recommendationTrack.value;
+  if (!track) return;
+  const maxScroll = track.scrollWidth - track.clientWidth;
+  if (maxScroll <= 1) return;
+  if (track.scrollLeft >= maxScroll - 1) recommendationScrollDirection = -1;
+  else if (track.scrollLeft <= 1) recommendationScrollDirection = 1;
+  const target = recommendationScrollDirection === 1 ? maxScroll : 0;
+  gsap.set(track, { scrollBehavior: 'auto' });
+  recommendationAutoscrollTween = gsap.to(track, {
+    scrollLeft: target,
+    duration: Math.max(0.5, Math.abs(target - track.scrollLeft) / 16),
+    ease: 'none',
+    onUpdate: updateRecommendationProgress,
+    onComplete: () => {
+      recommendationAutoscrollTween = null;
+      recommendationScrollDirection = recommendationScrollDirection === 1 ? -1 : 1;
+      startRecommendationAutoscroll();
+    },
+  });
 };
 
-const setRecommendationInteraction = (paused: boolean) => {
-  recommendationInteractionPaused.value = paused;
-  if (paused) {
-    stopRecommendationTimer();
-  } else {
-    startRecommendationTimer();
+const handleRecommendationVisibility = () => {
+  if (document.visibilityState === 'visible') startRecommendationAutoscroll();
+  else stopRecommendationAutoscroll();
+};
+
+const handleRecommendationResize = () => {
+  if (recommendationPaperReady) measureRecommendationPaper();
+  startRecommendationAutoscroll();
+  handleRecommendationScroll();
+};
+
+const beginRecommendationTouch = (event: TouchEvent) => {
+  const touch = event.touches[0];
+  recommendationTouchOrigin = touch ? { x: touch.clientX, y: touch.clientY } : null;
+};
+
+const moveRecommendationTouch = (event: TouchEvent) => {
+  const touch = event.touches[0];
+  if (!touch || !recommendationTouchOrigin || recommendationDragging) return;
+  const dx = Math.abs(touch.clientX - recommendationTouchOrigin.x);
+  const dy = Math.abs(touch.clientY - recommendationTouchOrigin.y);
+  if (dx > 8 && dx > dy) {
+    recommendationDragging = true;
+    stopRecommendationAutoscroll();
+    cancelRecommendationMotion();
   }
 };
 
-const handleRecommendationFocusOut = (event: FocusEvent) => {
-  const section = event.currentTarget as HTMLElement;
-  const nextTarget = event.relatedTarget as Node | null;
-  if (nextTarget && section.contains(nextTarget)) return;
-  setRecommendationInteraction(false);
+const endRecommendationTouch = () => {
+  recommendationTouchOrigin = null;
+  if (!recommendationDragging) return;
+  recommendationDragging = false;
+  startRecommendationAutoscroll();
 };
 
-const pauseRecommendationForTouch = () => {
-  setRecommendationInteraction(true);
-  if (recommendationResumeTimer) clearTimeout(recommendationResumeTimer);
-  recommendationResumeTimer = setTimeout(() => {
-    recommendationResumeTimer = null;
-    setRecommendationInteraction(false);
-  }, 8000);
+const handleRecommendationWheel = () => {
+  stopRecommendationAutoscroll();
+  cancelRecommendationMotion();
+  if (recommendationWheelTimer) clearTimeout(recommendationWheelTimer);
+  recommendationWheelTimer = setTimeout(() => {
+    recommendationWheelTimer = null;
+    startRecommendationAutoscroll();
+  }, 120);
 };
 
 const toggleRecommendationAutoplay = () => {
   recommendationAutoplay.value = !recommendationAutoplay.value;
   if (recommendationAutoplay.value) {
-    startRecommendationTimer();
+    startRecommendationAutoscroll();
   } else {
-    stopRecommendationTimer();
+    stopRecommendationAutoscroll();
   }
 };
 
 const handleReducedMotionChange = (event: MediaQueryListEvent) => {
   recommendationAutoplay.value = !event.matches;
   if (event.matches) {
-    stopRecommendationTimer();
+    stopRecommendationAutoscroll();
+    cancelRecommendationMotion();
+    directoryMotionContext?.revert();
+    showcaseMotionContext?.revert();
+    motionContext?.revert();
+    clearRecommendationPaper();
+    directoryMotionContext = null;
+    showcaseMotionContext = null;
+    motionContext = null;
+    animatedPostCount.value = totalPostCount.value ?? '—';
   } else {
-    startRecommendationTimer();
+    initializeBoardMotion();
+    refreshDirectoryMotion();
+    refreshShowcaseMotion();
+    startRecommendationAutoscroll();
   }
 };
+
+watch(activeRecommendationIndex, focusRecommendation);
+
+const refreshShowcaseMotion = async () => {
+  await nextTick();
+  stopRecommendationAutoscroll();
+  cancelRecommendationMotion();
+  showcaseMotionContext?.revert();
+  showcaseMotionContext = null;
+  clearRecommendationPaper();
+  const section = friendsPage.value?.querySelector('.friend-showcase');
+  if (!section || !motionEnabled()) {
+    startRecommendationAutoscroll();
+    return;
+  }
+  showcaseMotionContext = gsap.context(() => {
+    measureRecommendationPaper();
+    const sceneScroll = {
+      trigger: section, start: 'top bottom', end: 'bottom top', scrub: 0.45,
+    };
+    gsap.fromTo('.friend-paper-underlay', { y: 18, rotation: -1 }, { y: -12, rotation: 0.4, ease: 'none', scrollTrigger: sceneScroll });
+    gsap.fromTo('.friend-paper-backdrop', { y: 8 }, { y: -5, ease: 'none', scrollTrigger: sceneScroll });
+    gsap.timeline({
+      defaults: { ease: 'power3.out' },
+      scrollTrigger: { trigger: section, start: 'top 88%', once: true },
+      onComplete: () => { recommendationPaperReady = true; focusRecommendation(); },
+    })
+      .fromTo('.friend-showcase-header .friend-section-index', { rotation: -90, scale: 0.5, opacity: 0 }, { rotation: 0, scale: 1, opacity: 1, duration: 0.6, clearProps: 'transform,opacity' })
+      .fromTo('.friend-showcase-heading h2, .friend-showcase-heading p', { x: -24, opacity: 0 }, { x: 0, opacity: 1, duration: 0.65, stagger: 0.07, clearProps: 'transform,opacity' }, 0.1)
+      .fromTo('.friend-showcase-header .friend-section-rule', { scaleX: 0 }, { scaleX: 1, duration: 0.8, transformOrigin: 'left center' }, 0.1)
+      .fromTo('.friend-recommendation-card',
+        { y: 42, rotationX: 9, rotation: -2, scale: 0.96, opacity: 0 },
+        { y: 0, rotationX: 0, rotation: 0, scale: 1, opacity: 1, duration: 0.8, stagger: 0.045, ease: 'power3.out', clearProps: 'transform,opacity' }, 0.2);
+  }, section);
+  startRecommendationAutoscroll();
+  refreshMotionLayout();
+};
+
+watch(recommendedPosts, refreshShowcaseMotion, { flush: 'post' });
+watch([showComposer, showAdvancedSettings], refreshMotionLayout);
 
 // 監聽 posts 變更，重新建立 Queue
 watch(posts, (newPosts) => {
@@ -1293,7 +1635,7 @@ watch(posts, (newPosts) => {
       const eligiblePosts = newPosts.filter(p => p.message && p.message.trim() !== '');
       recommendationQueue.value = shuffleArray(eligiblePosts);
       refreshRecommendations();
-      startRecommendationTimer();
+      startRecommendationAutoscroll();
     }
   }
 });
@@ -1357,18 +1699,26 @@ watch([selectedRegionFilters, selectedCategories, selectedIntentFilters], () => 
 }, { deep: true });
 
 onUnmounted(() => {
-  cardObserver?.disconnect();
+  cancelRecommendationMotion();
+  directoryMotionContext?.revert();
+  showcaseMotionContext?.revert();
   motionContext?.revert();
-  stopRecommendationTimer();
-  if (recommendationResumeTimer) {
-    clearTimeout(recommendationResumeTimer);
-    recommendationResumeTimer = null;
+  clearRecommendationPaper();
+  directoryMotionContext = null;
+  showcaseMotionContext = null;
+  motionContext = null;
+  stopRecommendationAutoscroll();
+  if (recommendationWheelTimer) {
+    clearTimeout(recommendationWheelTimer);
+    recommendationWheelTimer = null;
   }
   if (recommendationScrollFrame !== null) {
     cancelAnimationFrame(recommendationScrollFrame);
     recommendationScrollFrame = null;
   }
   reducedMotionQuery?.removeEventListener('change', handleReducedMotionChange);
+  document.removeEventListener('visibilitychange', handleRecommendationVisibility);
+  window.removeEventListener('resize', handleRecommendationResize);
   reducedMotionQuery = null;
   if (filterFetchTimer) {
     clearTimeout(filterFetchTimer);
@@ -2563,5 +2913,180 @@ onUnmounted(() => {
   .friends-compose-trigger,
   .friend-intent-option,
   .friend-region-option { transition-duration: 0.01ms; }
+}
+
+.friends-page-header::before,
+.friends-page-header::after { display: none; }
+.friends-title-mask {
+  display: inline-block;
+  overflow: hidden;
+  padding-bottom: 0.08em;
+  margin-bottom: -0.08em;
+  vertical-align: bottom;
+}
+.friends-title-letter { display: inline-block; }
+.friend-showcase-header,
+.friend-directory-heading { position: relative; border-bottom: 0 !important; }
+.friend-section-rule {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1px;
+  background: #a9c4ad;
+  transform-origin: left center;
+  pointer-events: none;
+}
+.friend-carousel-track,
+.friend-directory-grid { perspective: 1100px; }
+.friend-carousel-track { padding-block: 0.8rem 1rem; scroll-snap-type: none; }
+.friend-recommendation-card,
+.friend-directory-card { transition: border-color 180ms ease, box-shadow 180ms ease; }
+.friend-recommendation-card:hover,
+.friend-directory-card:hover,
+.friend-directory-card:focus-within { transform: none; }
+.friend-carousel-progress {
+  flex: 1;
+  max-width: 12rem;
+  height: 2px;
+  overflow: hidden;
+  background: #dce7d9;
+}
+.friend-carousel-progress span {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: #3e8860;
+  transform: scaleX(0);
+  transform-origin: left center;
+}
+.friend-code-copy { display: inline-block; }
+@media (max-width: 767px) {
+  .friend-showcase-header { align-items: center; gap: 0.75rem; }
+  .friend-showcase-heading { min-width: 0; }
+  .friend-showcase-heading .friend-section-index { display: none; }
+  .friend-showcase-heading h2 { font-size: 1.15rem; }
+  .friend-showcase-heading p { font-size: 0.72rem; line-height: 1.5; }
+  .friend-carousel-controls { flex: 0 0 auto; gap: 0.25rem; }
+  .friend-carousel-control { width: 44px; height: 44px; }
+  .friend-carousel-track {
+    grid-auto-columns: minmax(14.5rem, calc(100% - 2.75rem));
+    gap: 0.75rem;
+  }
+  .friend-recommendation-card { min-height: 18.5rem; padding: 0.9rem; }
+  .friend-recommendation-avatar { width: 2.75rem; height: 2.75rem; }
+  .friend-recommendation-code { padding: 0.7rem 0.75rem; }
+  .friend-recommendation-code .friend-code-value { font-size: 1rem; }
+  .friend-recommendation-message p { font-size: 0.85rem; line-height: 1.65; }
+  .friend-recommendation-action { min-height: 44px; font-size: 0.85rem; }
+  .friend-directory-refresh { width: 44px; height: 44px; }
+  .friend-filter-panel button,
+  .friend-region-option,
+  .friend-login-action { min-height: 44px; }
+}
+@media (max-width: 360px) {
+  .friend-recommendation-code .friend-code-value { font-size: 0.92rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .friend-carousel-progress { visibility: hidden; }
+}
+
+/* Paper scenery sits behind the touch surfaces and never catches a gesture. */
+.friends-page { overflow: clip; }
+.friend-showcase { position: relative; isolation: isolate; margin-top: 2.25rem; margin-bottom: 4rem; }
+.friend-paper-scene { position: absolute; inset: 4.5rem -0.65rem -0.5rem; z-index: -1; pointer-events: none; }
+.friend-paper-underlay {
+  position: absolute; inset: 0.8rem 0.15rem -0.35rem 0.3rem;
+  border: 1px solid #d0dac7; border-radius: 1rem;
+  background: #dbe4d1;
+  box-shadow: 0 8px 20px rgb(44 64 37 / 6%);
+  transform: rotate(-0.6deg);
+}
+.friend-paper-backdrop {
+  position: absolute; inset: 0 0 0.15rem;
+  border: 1px solid #d8e1d0; border-radius: 1rem;
+  background: #e8eddf;
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 70%), 0 2px 3px rgb(44 64 37 / 5%), 0 18px 30px rgb(44 64 37 / 7%);
+}
+.friend-carousel-track { padding: 1.1rem 0.1rem 1.4rem; }
+.friend-carousel-footer { position: relative; margin-top: 0.4rem; }
+.friend-recommendation-card,
+.friend-directory-card {
+  position: relative;
+  border-radius: 0.65rem 0.65rem 1.1rem 0.65rem;
+  box-shadow: 0 1px 0 #eef0e5, 0 3px 0 #cdd8c4, 0 10px 20px rgb(42 66 39 / 8%);
+  background: #fffef9;
+}
+.friend-recommendation-card::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(110deg, transparent 38%, rgb(255 255 255 / 45%) 49%, transparent 60%);
+  transform: translateX(var(--paper-light-x, 140%)); opacity: 0.55;
+}
+.friend-recommendation-code, .friend-directory-code { backface-visibility: hidden; }
+.friend-recommendation-card.is-current,
+.friend-recommendation-card:hover,
+.friend-directory-card:hover,
+.friend-directory-card:focus-within {
+  box-shadow: 0 1px 0 #eef0e5, 0 3px 0 #cdd8c4, 0 14px 26px rgb(42 66 39 / 11%);
+}
+.friend-directory { position: relative; isolation: isolate; padding: 1.25rem 0 2rem; }
+.friend-directory-scene { position: absolute; inset: 0 -0.75rem; z-index: -1; perspective: 1200px; pointer-events: none; }
+.friend-directory-sheet { position: absolute; inset: 0; border: 1px solid #c7d3bb; border-radius: 1rem; transform-origin: center top; }
+.sheet-back { bottom: auto; height: 36rem; max-height: 100%; background: #e2e7d8; transform: rotate(-0.5deg); box-shadow: 0 2px 0 #c9d4bd; }
+.sheet-front { background: #f6f5ec; box-shadow: 0 12px 28px rgb(42 66 39 / 6%); }
+.friend-directory-heading { margin-inline: 0.25rem; }
+.friend-filter-panel { background: #fffef7; box-shadow: 0 3px 0 #dce3d0, 0 8px 18px rgb(42 66 39 / 5%); }
+.friend-directory-grid { gap: 1.5rem 1.1rem; padding: 0.85rem 0.2rem 1rem; }
+.friend-directory-slot { min-width: 0; perspective: 1100px; }
+.friend-directory-card { height: 100%; transform-origin: 50% 60%; }
+.friend-paper-tab {
+  position: absolute; top: -0.55rem; right: 1rem; width: 2.4rem; height: 1.5rem;
+  display: flex; align-items: center; justify-content: center;
+  border: 1px solid #c7d0b0; background: #e4eacb; color: #64794e;
+  font: 700 0.6rem ui-monospace, monospace; letter-spacing: 0.12em;
+  transform: rotate(3deg); box-shadow: 0 2px 0 rgb(74 97 58 / 9%);
+}
+@media (max-width: 767px) {
+  .friend-directory-grid { grid-template-columns: minmax(0, 1fr); gap: 1.6rem; }
+  .friend-directory-card { padding: 1.1rem; }
+  .friend-directory-message { font-size: 0.9rem; line-height: 1.75; }
+  .friend-showcase { margin-bottom: 3rem; }
+  .friend-paper-scene { inset-inline: -0.6rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .friend-directory-card { transform: none; }
+  .friend-recommendation-card::after { display: none; }
+}
+
+/* The comic opening shares the board's real title, count, and posting action. */
+.friends-page { background: #f5f3e9; }
+.comic-page-header {
+  display: block; min-height: 0; padding: 1.6rem 1.5rem 0;
+  border: 0; border-radius: 0; background: transparent; box-shadow: none; overflow: visible;
+}
+.comic-page-header .friends-eyebrow { color: #717d5d; margin-bottom: 0.65rem; font-size: 0.58rem; }
+.comic-page-header h1 { color: #274638; font-size: clamp(2.05rem, 5vw, 3.75rem); max-width: none; }
+.comic-page-header p { color: #4f654d; margin-top: 0.65rem; font-size: 0.86rem; max-width: 28rem; }
+.comic-page-header .friends-compose-trigger {
+  margin-top: 1rem; min-height: 44px; min-width: 9rem; background: #274638; color: #fff8e5;
+  border: 1px solid #274638; border-radius: 2rem; box-shadow: 0 3px 0 #b4c09b;
+}
+.comic-page-header .friends-compose-trigger:focus-visible { outline-color: #548e67; }
+.comic-page-header .friends-hero-side { position: absolute; top: 1.5rem; right: 1.5rem; margin: 0; }
+.comic-page-header .friends-page-count { color: #657659; align-items: flex-end; }
+.comic-page-header .friends-page-count strong { color: #274638; font-size: 1.4rem; }
+.comic-page-header .friends-page-count span { font-size: 0.58rem; margin-top: 0.2rem; }
+.friend-showcase, .friend-directory { scroll-margin-top: 8rem; }
+@media (min-width: 768px) {
+  .comic-page-header { padding: 2rem 2.25rem; }
+  .comic-page-header p { max-width: 23rem; }
+  .comic-page-header .friends-hero-side { top: 2rem; right: 2.25rem; }
+}
+@media (max-width: 360px) {
+  .comic-page-header { padding: 1.25rem 1rem 0; }
+  .comic-page-header .friends-eyebrow { font-size: 0.5rem; }
+  .comic-page-header h1 { font-size: 1.85rem; }
+  .comic-page-header .friends-hero-side { right: 1rem; top: 1.25rem; }
+  .comic-page-header .friends-page-count strong { font-size: 1.1rem; }
 }
 </style>

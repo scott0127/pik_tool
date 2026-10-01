@@ -46,6 +46,7 @@
 
 <script setup lang="ts">
 import { computed } from "vue";
+import { getGridPalette } from '~/utils/mapPalette';
 
 interface RadialItem {
   id: string;
@@ -86,10 +87,14 @@ const iconItems = computed(() => safeItems.value.slice(0, Math.min(props.maxDisp
 const markerStyle = computed(() => ({
   width: `${props.size}px`,
   height: `${Math.round(props.size * 0.84)}px`,
+  '--badge-color': getGridPalette(props.count, props.isReported).color,
+  '--badge-soft': getGridPalette(props.count, props.isReported).soft,
+  '--badge-ink': getGridPalette(props.count, props.isReported).ink,
 }));
 
 const statusLabel = computed(() => {
   if (props.isReported) return "已回報";
+  if (props.count === 0) return "路邊";
   if (props.count <= 1) return "純種";
   if (props.count <= 3) return "混合";
   return "複雜";
@@ -317,25 +322,17 @@ const titleText = computed(() => {
   font-size: 0;
 }
 
-.decor-badge-shell.is-compact .decor-badge-state.is-reported {
-  color: #0284c7;
-}
-
-.decor-badge-shell.is-compact .decor-badge-state.is-pure {
-  color: #059669;
-}
-
-.decor-badge-shell.is-compact .decor-badge-state.is-mixed {
-  color: #d97706;
-}
-
-.decor-badge-shell.is-compact .decor-badge-state.is-complex {
-  color: #7c3aed;
-}
-
 @media (prefers-reduced-motion: reduce) {
   .decor-badge-shell {
     transition-duration: 0.01ms;
   }
 }
+</style>
+
+<style scoped>
+.decor-badge-shell { background: #faf9f1; border-color: #d6dccb; }
+.decor-badge-count { background: var(--badge-soft); border-color: var(--badge-color); color: var(--badge-ink); box-shadow: 0 2px 6px rgb(39 58 30 / 8%), inset 0 1px 0 #ffffffb3; }
+.decor-badge-label { color: #67755f; }
+.decor-badge-state { color: var(--badge-ink); border-color: var(--badge-soft); }
+.decor-badge-shell.is-compact .decor-badge-state { color: var(--badge-color); }
 </style>

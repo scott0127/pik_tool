@@ -3,7 +3,7 @@
   <MapMaintenance v-if="MAINTENANCE_MODE" />
   
   <ClientOnly v-else>
-    <div class="map-page relative w-full overflow-hidden">
+    <div ref="mapInterface" class="map-page relative w-full overflow-hidden" @click="animateMapControl" @pointerover="previewMapObject" @pointerout="releaseMapObject">
       <!-- 地圖容器 -->
       <div id="map" class="map-canvas w-full h-full overflow-hidden">
         <LMap
@@ -32,7 +32,7 @@
             <LIcon :icon-size="[22, 22]" :icon-anchor="[11, 11]" class-name="user-location-icon">
               <div class="w-5 h-5 rounded-full bg-blue-500 ring-4 ring-blue-200 border-2 border-white shadow-md"></div>
             </LIcon>
-            <LPopup>
+            <LPopup :options="popupOptions">
               <div class="text-xs text-gray-600">{{ $t('map.user_location') }}</div>
             </LPopup>
           </LMarker>
@@ -49,107 +49,21 @@
               :fill-color="getCellStyleWithReports(cell).fillColor"
               :fill-opacity="getCellStyleWithReports(cell).fillOpacity"
             >
-              <LPopup v-if="isGridMode">
-                <div class="min-w-[200px] p-2">
-                  <div class="font-bold text-gray-800 text-sm mb-2 flex items-center gap-2">
-                    <Icon name="lucide:grid-3x3" class="w-4 h-4 text-emerald-600" />
-                    <span>S2 Cell L17</span>
-                  </div>
-                  <div class="text-xs text-gray-500 mb-3 font-mono break-all">
-                    {{ cell.cellId }}
-                  </div>
+              <LPopup v-if="isGridMode" :options="popupOptions">
+                <MapCellCard
+                  :cell-id="cell.cellId"
+                  :community-count="communitySpotsByCell.get(cell.cellId)?.length || 0"
+                  @open-community="focusCommunityCell(cell.cellId)"
+                  :count="getEffectiveDecors(cell).size"
+                  :decors="getCellCardDecors(cell)"
+                  :reported="isReported(cell.cellId)"
+                  :can-report="!!user"
+                  :can-report-pure="!isReported(cell.cellId) && getCellDecorIds(cell).length === 1 && getAddedDecors(cell.cellId).size === 0"
                   
-                  <div class="space-y-2">
-                    <div class="text-xs font-semibold text-gray-700 mb-1">{{$t('map.cell_info.decor_types')}} ({{ getEffectiveDecors(cell).size }}{{$t('map.cell_info.types_unit')}})：</div>
-                    <div class="flex flex-wrap gap-1">
-                      <!-- Existing Decors -->
-                      <span
-                        v-for="decorId in getVisibleBaseDecorIds(cell)"
-                        :key="decorId"
-                        class="inline-flex items-center gap-1 px-2 py-1 bg-emerald-50 text-emerald-700 rounded text-xs"
-                      >
-                        <Icon v-if="getDecorInfo(decorId)?.iconName" :name="getDecorInfo(decorId)!.iconName!" class="w-3.5 h-3.5" />
-                        <span v-else>{{ getDecorInfo(decorId)?.icon }}</span>
-                        <span>{{ getDecorInfo(decorId)?.name }}</span>
-                      </span>
-                      
-                      <!-- Added Decors -->
-                      <span
-                        v-for="decorId in Array.from(getAddedDecors(cell.cellId))"
-                        :key="`added-${decorId}`"
-                        class="inline-flex items-center gap-1 px-2 py-1 bg-blue-50 text-blue-700 rounded text-xs border border-blue-200"
-                        :title="$t('map.cell_info.user_reported')"
-                      >
-                        <Icon v-if="getDecorInfo(decorId)?.iconName" :name="getDecorInfo(decorId)!.iconName!" class="w-3.5 h-3.5" />
-                        <span v-else>{{ getDecorInfo(decorId)?.icon }}</span>
-                        <span>{{ getDecorInfo(decorId)?.name }}</span>
-                        <Icon name="lucide:user" class="w-3 h-3 text-blue-400" />
-                      </span>
-
-                      <!-- Removed Decors -->
-                      <span
-                        v-for="decorId in Array.from(getRemovedDecors(cell.cellId))"
-                        :key="`removed-${decorId}`"
-                        class="inline-flex items-center gap-1 px-2 py-1 bg-red-50 text-red-700 rounded text-xs border border-red-200 line-through decoration-red-500"
-                        :title="$t('map.cell_info.user_reported_extra')"
-                      >
-                        <Icon v-if="getDecorInfo(decorId)?.iconName" :name="getDecorInfo(decorId)!.iconName!" class="w-3.5 h-3.5" />
-                        <span v-else>{{ getDecorInfo(decorId)?.icon }}</span>
-                        <span>{{ getDecorInfo(decorId)?.name }}</span>
-                        <Icon name="lucide:user-x" class="w-3 h-3 text-red-400" />
-                      </span>
-                    </div>
-
-                    <div class="mt-2 pt-2 border-t border-gray-200">
-                      <!-- Purity Status -->
-                      <div class="text-xs text-gray-600 mb-2">
-                        <span class="font-medium">{{ getEffectiveDecors(cell).size }}</span> {{ $t('map.cell_info.mixed_types') }}
-                        <span v-if="getEffectiveDecors(cell).size === 1" class="text-emerald-600">（{{ $t('map.cell_info.pure') }}）</span>
-                        <span v-else-if="getEffectiveDecors(cell).size <= 3" class="text-yellow-600">（{{ $t('map.cell_info.medium') }}）</span>
-                        <span v-else class="text-red-600">（{{ $t('map.cell_info.mixed') }}）</span>
-                      </div>
-                      
-                      <!-- Report Actions -->
-                      <div class="space-y-1">
-                          <!-- Not Pure Warning -->
-                          <div v-if="isReported(cell.cellId)" class="w-full bg-purple-50 text-purple-700 font-bold px-2 py-1.5 rounded flex items-center gap-1.5 border border-purple-200 text-xs text-left">
-                              <Icon name="lucide:alert-triangle" class="w-3.5 h-3.5 shrink-0" />
-                              <span>{{ $t('map.report.impure_warning') }}</span>
-                          </div>
-                           
-                           <!-- Report Functions (Only if logged in) -->
-                           <div v-if="user" class="grid grid-cols-2 gap-1 pt-1">
-                                <!-- Report Pure Error -->
-                               <button 
-                                  v-if="!isReported(cell.cellId) && getCellDecorIds(cell).length === 1 && getAddedDecors(cell.cellId).size === 0"
-                                  @click="confirmReport(cell.cellId)"
-                                  class="col-span-2 bg-gray-50 hover:bg-red-50 text-gray-500 hover:text-red-600 px-2 py-1.5 rounded border border-gray-200 hover:border-red-200 text-xs transition-colors"
-                              >
-                                  {{ $t('map.report.error_pure') }}
-                              </button>
-                              
-                              <!-- Report Missing Decor -->
-                              <button 
-                                  @click="openDecorSelector(cell, 'missing')"
-                                  class="bg-emerald-50 hover:bg-emerald-100 text-emerald-600 hover:text-emerald-700 px-2 py-1.5 rounded border border-emerald-200 hover:border-emerald-300 text-xs font-medium transition-colors flex items-center justify-center gap-1 cursor-pointer"
-                              >
-                                  <Icon name="lucide:plus" class="w-3.5 h-3.5" />
-                                  <span>{{ $t('map.report.missing') }}</span>
-                              </button>
-
-                              <!-- Report Extra Decor -->
-                              <button 
-                                  @click="openDecorSelector(cell, 'extra')"
-                                  class="bg-red-50 hover:bg-red-100 text-red-600 hover:text-red-700 px-2 py-1.5 rounded border border-red-200 hover:border-red-300 text-xs font-medium transition-colors flex items-center justify-center gap-1 cursor-pointer"
-                              >
-                                  <Icon name="lucide:minus" class="w-3.5 h-3.5" />
-                                  <span>{{ $t('map.report.extra') }}</span>
-                              </button>
-                           </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                  @report-pure="confirmReport(cell.cellId)"
+                  @report-missing="openDecorSelector(cell, 'missing')"
+                  @report-extra="openDecorSelector(cell, 'extra')"
+                />
               </LPopup>
             </LPolygon>
           </template>
@@ -167,30 +81,21 @@
               :fill-opacity="getCellStyleWithReports(cell).fillOpacity"
               @click="handlePolygonClick(cell)"
             >
-              <LPopup>
-                <div class="min-w-[160px] p-1">
-                  <div class="text-xs text-gray-600 flex items-center gap-2 mb-2">
-                    <Icon v-if="getFirstDecorInfo(cell)?.iconName" :name="getFirstDecorInfo(cell)!.iconName!" class="w-5 h-5" />
-                    <span v-else class="text-lg">{{ getFirstDecorInfo(cell)?.icon }}</span>
-                    <span class="font-bold">{{ getFirstDecorInfo(cell)?.name }}</span>
-                    <span class="text-emerald-600 text-[10px] border border-emerald-200 px-1 rounded bg-emerald-50">{{ $t('map.modes.pure') }}</span>
-                  </div>
-                  
-                  <!-- Report Status / Action -->
-                  <div class="text-xs border-t border-gray-100 pt-2 mt-1">
-                      <div v-if="isReported(cell.cellId)" class="bg-purple-50 text-purple-700 font-bold px-2 py-1.5 rounded flex items-center gap-1.5 border border-purple-200 mb-1">
-                          <Icon name="lucide:alert-triangle" class="w-3.5 h-3.5 shrink-0" />
-                          <span>{{ $t('map.report.impure_warning') }}</span>
-                      </div>
-                       <button 
-                          v-else-if="user"
-                          @click="confirmReport(cell.cellId)"
-                          class="w-full bg-gray-50 hover:bg-red-50 text-gray-500 hover:text-red-600 font-medium px-2 py-1.5 rounded transition-colors text-center border border-gray-200 hover:border-red-200"
-                      >
-                          {{ $t('map.report.error_pure') }}
-                      </button>
-                  </div>
-                </div>
+              <LPopup :options="popupOptions">
+                <MapCellCard
+                  :cell-id="cell.cellId"
+                  :community-count="communitySpotsByCell.get(cell.cellId)?.length || 0"
+                  @open-community="focusCommunityCell(cell.cellId)"
+                  :count="getEffectiveDecors(cell).size"
+                  :decors="getCellCardDecors(cell)"
+                  :reported="isReported(cell.cellId)"
+                  :can-report="!!user"
+                  :can-report-pure="!isReported(cell.cellId) && getCellDecorIds(cell).length === 1 && getAddedDecors(cell.cellId).size === 0"
+                  pure-mode
+                  @report-pure="confirmReport(cell.cellId)"
+                  @report-missing="openDecorSelector(cell, 'missing')"
+                  @report-extra="openDecorSelector(cell, 'extra')"
+                />
               </LPopup>
             </LPolygon>
           </template>
@@ -205,11 +110,12 @@
                 :lat-lng="[cell.center.lat, cell.center.lng]"
               >
                 <LIcon
-                  :icon-size="[0, 0]"
+                  :icon-size="[44, 44]"
+                  :icon-anchor="[22, 22]"
                   class-name="cell-badge-container"
                 >
                   <!-- 放射狀徽章組件 -->
-                  <div class="absolute -translate-x-1/2 -translate-y-1/2 pointer-events-none">
+                  <div class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 cursor-pointer">
                     <MapRadialBadge
                       :items="getRadialItems(cell)"
                       :count="getEffectiveDecors(cell).size"
@@ -223,6 +129,22 @@
                     />
                   </div>
                 </LIcon>
+                <LPopup :options="popupOptions">
+                  <MapCellCard
+                    :cell-id="cell.cellId"
+                  :community-count="communitySpotsByCell.get(cell.cellId)?.length || 0"
+                  @open-community="focusCommunityCell(cell.cellId)"
+                    :count="getEffectiveDecors(cell).size"
+                    :decors="getCellCardDecors(cell)"
+                    :reported="isReported(cell.cellId)"
+                    :can-report="!!user"
+                    :can-report-pure="!isReported(cell.cellId) && getCellDecorIds(cell).length === 1 && getAddedDecors(cell.cellId).size === 0"
+                    :pure-mode="isSingleMode"
+                    @report-pure="confirmReport(cell.cellId)"
+                    @report-missing="openDecorSelector(cell, 'missing')"
+                    @report-extra="openDecorSelector(cell, 'extra')"
+                  />
+                </LPopup>
               </LMarker>
             </template>
           </template>
@@ -238,7 +160,7 @@
               <div class="relative w-[50px] h-[64px] transition-transform hover:scale-110 active:scale-95 origin-bottom">
                 <!-- 紅色大頭針形狀 -->
                 <svg viewBox="0 0 50 64" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full drop-shadow-md">
-                  <path d="M25 0C11.1929 0 0 11.1929 0 25C0 42 17 58 25 64C33 58 50 42 50 25C50 11.1929 38.8071 0 25 0Z" fill="#ef4444"/>
+                  <path d="M25 0C11.1929 0 0 11.1929 0 25C0 42 17 58 25 64C33 58 50 42 50 25C50 11.1929 38.8071 0 25 0Z" fill="var(--map-accent)"/>
                 </svg>
                 
                 <!-- 白色圓形底圖與圖示 -->
@@ -253,32 +175,25 @@
                 </div>
               </div>
             </LIcon>
-            <LPopup>
-              <div class="text-center min-w-[180px] p-1">
-                <img 
-                  v-if="poi.iconUrl" 
-                  :src="poi.iconUrl" 
-                  :alt="poi.decorName"
-                  class="w-12 h-12 mx-auto mb-2 object-contain"
-                />
-                <div v-else class="text-4xl mb-2">{{ poi.decorIcon }}</div>
-                <div class="font-bold text-gray-800 text-base mb-1">{{ poi.name }}</div>
-                <div class="text-sm text-emerald-600 font-medium mb-2">{{ poi.decorName }}</div>
-                <div class="text-xs text-gray-400 flex items-center justify-center gap-1">
-                  <Icon name="lucide:map-pin" class="w-3 h-3" /> {{ poi.lat.toFixed(5) }}, {{ poi.lon.toFixed(5) }}
-                </div>
-              </div>
+            <LPopup :options="popupOptions">
+              <section class="map-place-card">
+                <span class="map-place-icon"><img v-if="poi.iconUrl" :src="poi.iconUrl" :alt="poi.decorName" class="w-7 h-7 object-contain" /><span v-else>{{ poi.decorIcon }}</span></span>
+                <h3>{{ poi.name }}</h3><p>{{ poi.decorName }}</p>
+                <p class="map-place-coordinates">{{ poi.lat.toFixed(5) }}, {{ poi.lon.toFixed(5) }}</p>
+              </section>
             </LPopup>
           </LMarker>
+
+          <CommunitySpotLayer :spots="visibleCommunityPoints" :zoom="mapZoom" :focused-id="focusedCommunitySpotId" :popup-options="popupOptions" @select="focusedCommunitySpotId = $event" @close="id => { if (focusedCommunitySpotId === id) focusedCommunitySpotId = null; }" />
 
           <!-- Scanner Pin Overlay -->
           <template v-if="scannerPinLocation">
             <LCircle
               :lat-lng="scannerPinLocation"
               :radius="100"
-              color="#3b82f6"
+              color="#668257"
               :weight="1"
-              fill-color="#3b82f6"
+              fill-color="#668257"
               :fill-opacity="0.1"
               :dash-array="'5, 5'"
             />
@@ -294,17 +209,17 @@
                   
                   <!-- Main 3D Body with Jump Animation -->
                   <div 
-                    class="relative w-full h-full rounded-full bg-gradient-to-br from-blue-400 to-blue-600 border-[3px] border-white shadow-[0_8px_15px_-3px_rgba(0,0,0,0.3)] transform transition-transform duration-200"
+                    class="relative w-full h-full rounded-full bg-[var(--map-accent)] border-[3px] border-white shadow-[0_8px_15px_-3px_rgba(0,0,0,0.3)] transform transition-transform duration-200"
                     :class="{ '-translate-y-3 scale-110': isMapMoving }"
                   >
                     <!-- Glass/Gloss Reflection -->
                     <div class="absolute top-0 left-0 w-full h-1/2 bg-gradient-to-b from-white/40 to-transparent rounded-t-full"></div>
                     
                     <!-- Center Radar Screen -->
-                    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[24px] h-[24px] bg-blue-900 rounded-full overflow-hidden border border-blue-300/50 flex items-center justify-center">
+                    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[24px] h-[24px] bg-[#253e30] rounded-full overflow-hidden border border-[#abc18c] flex items-center justify-center">
                       <!-- Radar Sweep Animation -->
                       <div class="absolute inset-0 bg-gradient-to-tr from-green-400/0 via-green-400/50 to-green-400/0 animate-spin origin-bottom-left" style="width: 50%; height: 50%; top: 50%; left: 50%;"></div>
-                      <Icon name="lucide:radar" class="relative z-10 w-3 h-3 text-green-300" />
+                      <Icon name="lucide:radar" class="relative z-10 w-3 h-3 text-[#dce9be]" />
                     </div>
                   </div>
                   
@@ -316,22 +231,22 @@
 
                   <!-- Persistent Hint Label -->
                   <div class="absolute top-full left-1/2 -translate-x-1/2 mt-2 whitespace-nowrap pointer-events-none z-[1000]">
-                    <div class="bg-gray-900/80 backdrop-blur text-white text-[10px] px-2 py-1 rounded-full shadow-lg border border-white/20 flex items-center gap-1">
+                    <div class="bg-[#304f3a] backdrop-blur text-white text-[10px] px-2 py-1 rounded-full shadow-lg border border-white/20 flex items-center gap-1">
                        <Icon name="lucide:hand" class="w-3 h-3" />
                        <span>可拖曳</span>
                     </div>
                   </div>
                 </div>
               </LIcon>
-              <LPopup>
-                <div class="text-center p-1">
-                  <div class="font-bold text-blue-600 mb-0.5">掃描器範圍</div>
+              <LPopup :options="popupOptions">
+                <div class="map-place-card">
+                  <div class="font-bold text-[#304f3a] mb-1">掃描器範圍</div>
                   <div class="text-[10px] text-gray-500 mb-2 flex flex-col gap-0.5">
-                    <span class="text-blue-500 flex items-center gap-1"><Icon name="lucide:scan" class="w-3 h-3" /> 範圍：120m</span>
+                    <span class="text-blue-500 flex items-center gap-1"><Icon name="lucide:scan" class="w-3 h-3" /> 範圍：100m</span>
                   </div>
                   <button 
                     @click="scannerPinLocation = null"
-                    class="text-xs bg-red-50 text-red-600 px-2 py-1 rounded border border-red-200 hover:bg-red-100"
+                    class="map-remove-scanner"
                   >
                     移除圖釘
                   </button>
@@ -358,7 +273,7 @@
 
       <!-- [NEW] Scanner Prediction Panel -->
       <ScannerPanel 
-        v-if="isScannerMode && scannerPinLocation && !showPanel && !showDecorSelector && !isSingleMode"
+        v-if="isScannerMode && scannerPinLocation && !showPanel && !showDecorSelector && !isSingleMode && !isInfoPopupOpen"
         :show="isScannerMode && scannerPinLocation !== null"
         :predicted-decors="scannerPredictedRules"
         :is-calculating="isScannerCalculating"
@@ -376,101 +291,75 @@
 
       <!-- Panel Toggle Button (for side panel) -->
       <button
-        v-if="!showPanel && !showDecorSelector"
+        v-if="!showPanel && !showDecorSelector && !isSingleMode"
         @click="showPanel = true"
         class="map-floating-control map-filter-toggle absolute z-[1000]"
         :title="$t('map.panel.show')"
       >
-        <Icon name="lucide:list-filter" class="h-5 w-5" />
-        <span class="hidden md:inline">{{ $t('map.panel.title') }}</span>
+        <span class="map-filter-book" aria-hidden="true"><img src="/images/map-field/fold-map.webp" alt="" width="48" height="40" draggable="false" /></span>
+        <span>{{ $t('map.panel.title') }}</span>
+        <span class="map-filter-toggle-count">{{ selectedFilters.length }}</span>
       </button>
 
       <!-- UI 控制按鈕組 (Mobile-Optimized) -->
       <nav class="map-mode-switch absolute z-[1002]" aria-label="地圖顯示模式">
         <div class="map-mode-switch-inner">
+          <span class="map-mode-indicator" aria-hidden="true"></span>
           <!-- 網格模式按鈕 -->
           <div class="relative group h-full">
             <button
               @click="viewMode = 'grid'"
+              data-map-object="grid"
               :aria-pressed="isGridMode"
               :class="[
                 'map-mode-button',
                 isGridMode ? 'is-active' : ''
               ]"
             >
-              <Icon name="lucide:grid-2x2" class="h-[18px] w-[18px]" />
-              <span class="hidden md:inline">{{ $t('map.modes.grid') }}</span>
+              <span class="map-mode-glyph map-mode-grid" aria-hidden="true"><span v-for="cell in 4" :key="cell" class="map-grid-cell"></span></span>
+              <span>{{ $t('map.modes.grid') }}</span>
             </button>
             
             <!-- 網格模式 Tooltip -->
-             <div class="hidden md:block absolute right-0 top-full mt-2 w-64 bg-gray-900 text-white text-xs rounded-xl p-3 shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-[2000] pointer-events-none translate-y-2 group-hover:translate-y-0">
-              <div class="font-bold mb-2 text-emerald-300">網格模式 (Grid Mode)</div>
-              <div class="flex gap-3 mb-2">
-                <div class="w-16 h-16 bg-emerald-900/50 border border-emerald-500/30 rounded grid grid-cols-2 gap-px p-px">
-                  <div class="bg-emerald-500/20 flex items-center justify-center text-[10px]">☕</div>
-                  <div class="bg-emerald-500/20"></div>
-                  <div class="bg-emerald-500/20"></div>
-                  <div class="bg-emerald-500/20 flex items-center justify-center text-[10px]">🍔</div>
-                </div>
-                <div class="flex-1 space-y-1">
-                  <p>• 任何縮放：顯示網格</p>
-                  <p>• 切換標記模式：顯示大頭針</p>
-                </div>
-              </div>
-              <div class="text-gray-400 text-[10px]">適合：查看飾品分佈與覆蓋率</div>
-            </div>
+            <div class="map-tooltip hidden md:block absolute right-0 top-full mt-2 w-64 rounded-xl p-4 shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible z-[2000] pointer-events-none"><strong>網格模式</strong><p>點格子查看推算的飾品類型。網格邊界不等於遊戲探測器範圍。</p></div>
           </div>
           
           <!-- 標記模式按鈕 -->
           <div class="relative group h-full">
             <button
               @click="viewMode = 'pin'"
+              data-map-object="pin"
               :aria-pressed="isPinMode"
               :class="[
                 'map-mode-button',
                 isPinMode ? 'is-active' : ''
               ]"
             >
-              <Icon name="lucide:map-pin" class="h-[18px] w-[18px]" />
-              <span class="hidden md:inline">{{ $t('map.modes.pin') }}</span>
+              <span class="map-mode-glyph" aria-hidden="true"><Icon name="lucide:map-pin" class="h-[18px] w-[18px]" /></span>
+              <span>{{ $t('map.modes.pin') }}</span>
             </button>
              <!-- 標記模式 Tooltip -->
-            <div class="hidden md:block absolute right-0 top-full mt-2 w-64 bg-gray-900 text-white text-xs rounded-xl p-3 shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-[2000] pointer-events-none translate-y-2 group-hover:translate-y-0">
-              <div class="font-bold mb-2 text-blue-300">標記模式 (Pin Mode)</div>
-              <div class="flex gap-3 mb-2">
-                <div class="w-16 h-16 bg-blue-900/50 border border-blue-500/30 rounded flex items-center justify-center">
-                  <svg viewBox="0 0 50 64" class="w-8 h-8 drop-shadow-lg">
-                    <path d="M25 0C11.1929 0 0 11.1929 0 25C0 42 17 58 25 64C33 58 50 42 50 25C50 11.1929 38.8071 0 25 0Z" fill="#ef4444"/>
-                    <circle cx="25" cy="25" r="10" fill="white"/>
-                  </svg>
-                </div>
-                <div class="flex-1 space-y-1">
-                  <p>• 永遠顯示紅色大頭針</p>
-                  <p>• 隱藏所有網格</p>
-                </div>
-              </div>
-              <div class="text-gray-400 text-[10px]">適合：單純尋找地點，畫面清爽</div>
-            </div>
+            <div class="map-tooltip hidden md:block absolute right-0 top-full mt-2 w-64 rounded-xl p-4 shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible z-[2000] pointer-events-none"><strong>標記模式</strong><p>查看個別地點與店名，方便規劃下一站。</p></div>
           </div>
 
           <!-- 單一飾品格子提示按鈕（避免干擾，僅在網格模式下顯示） -->
           <div class="relative group h-full">
             <button
               @click="toggleSingleTypeCells"
+              data-map-object="single"
               class="map-mode-button"
               :class="{ 'is-active': isSingleMode }"
               :aria-pressed="isSingleMode"
             >
-              <Icon name="lucide:scan-search" class="hidden md:block h-[18px] w-[18px]" />
-              <span class="md:hidden text-xs">{{ $t('map.modes.pure') }}</span>
-              <span class="hidden md:inline">{{ $t('map.modes.pure') }}</span>
+              <span class="map-mode-glyph" aria-hidden="true"><Icon name="lucide:scan-search" class="h-[18px] w-[18px]" /><span class="map-mode-focus-ring"></span></span>
+              <span>{{ $t('map.modes.pure') }}</span>
             </button>
             
             <!-- Desktop Tooltip (Hover) -->
-            <div class="hidden md:block absolute right-0 top-full mt-2 w-64 bg-gray-900 text-white text-xs rounded-xl p-3 shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-[2000] pointer-events-none translate-y-2 group-hover:translate-y-0">
+            <div class="map-tooltip hidden md:block absolute right-0 top-full mt-2 w-64 bg-gray-900 text-white text-xs rounded-xl p-3 shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-[2000] pointer-events-none translate-y-2 group-hover:translate-y-0">
               <div class="font-bold mb-2 text-emerald-300">純種區模式</div>
-              <p class="leading-relaxed mb-1">該區域僅包含「單一種」飾品（或路邊），不會混雜其他類型。</p>
-              <p class="leading-relaxed">適合：精準鎖定特定飾品，排除干擾。</p>
+              <p class="leading-relaxed mb-1">依地圖資料推算只有單一飾品類型；仍須到現場確認。</p>
+              <p class="leading-relaxed">可搭配雷達預測，規劃尋找特定飾品的路線。</p>
             </div>
 
             <!-- Mobile Ephemeral Tooltip (Auto-hide) -->
@@ -484,13 +373,13 @@
             >
               <div 
                 v-if="showPureModeHint" 
-                class="md:hidden absolute right-0 top-full mt-2 w-56 bg-gray-900/95 text-white text-xs rounded-xl p-3 shadow-xl z-[2000] backdrop-blur-sm border border-emerald-500/30"
+                class="map-tooltip md:hidden absolute right-0 top-full mt-2 w-56 bg-gray-900/95 text-white text-xs rounded-xl p-3 shadow-xl z-[2000] backdrop-blur-sm border border-emerald-500/30"
               >
                 <div class="flex items-start gap-2">
                   <Icon name="lucide:sparkles" class="w-5 h-5 text-emerald-400 shrink-0" />
                   <div>
                     <div class="font-bold text-emerald-300 mb-1">純種區模式</div>
-                    <p class="leading-relaxed">此區域僅判定為一種飾品（或路邊），不混雜其他類型，專為精準鎖定設計。</p>
+                    <p class="leading-relaxed">依地圖資料推算的單一飾品區域，請到現場用遊戲探測器確認。</p>
                   </div>
                 </div>
               </div>
@@ -522,11 +411,12 @@
             </div>
             <div class="text-xs text-gray-700 leading-relaxed">
               <span class="font-bold text-emerald-700 block mb-0.5">純種模式已開啟</span>
-              地圖上顯示的每一個格子，都保證<span class="font-bold text-gray-900">只有一種飾品類型</span>（或是路邊貼紙）。
-              <br>這代表該區域是 42 種飾品中，剛好只有其中一種的重生點，沒有其他干擾，但<span class="font-bold text-red-900">網格不是掃描範圍，請用右側雷達模擬範圍</span>。
+              依地圖資料推算<span class="font-bold">只有一種飾品類型</span>，實際結果以遊戲為準。
+              <br>網格不是掃描範圍；先用雷達預測，再到現場確認。
             </div>
             <button 
               @click="showPureModeExplanation = false"
+              aria-label="關閉純種模式提示"
               class="text-gray-400 hover:text-gray-600 p-1"
             >
               <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
@@ -631,15 +521,21 @@
         v-if="isSingleMode"
         v-model:selected-types="selectedPureTypes"
         v-model:show-panel="showPureModePanel"
+        v-model:show-community="showCommunityOnMap"
+        :community-count="selectedCommunityPoints.length"
         :is-loading="isSingleTypeCellsLoading"
         :cached-types="cachedPureTypes"
         @load="loadNewPureTypes"
+        @open-community="showCommunitySpots = true"
       />
+      <CommunitySpots v-model="showCommunitySpots" @locate="locateCommunitySpot" />
     </div>
   </ClientOnly>
 </template>
 
 <script setup lang="ts">
+import { gsap } from 'gsap';
+import { getGridPalette, MAP_GRID_PALETTE } from '~/utils/mapPalette';
 import { LMap, LTileLayer, LMarker, LPopup, LIcon, LPolygon, LCircle } from '@vue-leaflet/vue-leaflet';
 import 'leaflet/dist/leaflet.css';
 import type { MapBounds, POIPoint, GeocodingResult } from '~/types/map';
@@ -649,6 +545,11 @@ import { useLocalFirstPOI } from '~/composables/useLocalFirstPOI';
 import { useS2Grid } from '~/composables/useS2Grid';
 import { useGeocoding } from '~/composables/useGeocoding';
 import { useCellReports } from '~/composables/useCellReports'; // [NEW]
+import '~/assets/css/map-theme.css';
+import MapCellCard from '~/components/map/MapCellCard.vue';
+import CommunitySpots from '~/components/map/CommunitySpots.vue';
+import CommunitySpotLayer from '~/components/map/CommunitySpotLayer.vue';
+import { filterCommunityPoints, communityPureSpots, type CommunitySpot, type LocatedCommunitySpot } from '~/utils/communitySpots';
 import MapControlPanel from '~/components/map/MapControlPanel.vue';
 import MapSearch from '~/components/map/MapSearch.vue';
 import MapDecorSelector from '~/components/map/MapDecorSelector.vue';
@@ -705,6 +606,15 @@ const getVisibleBaseDecorIds = (cell: S2CellData | SingleTypeCellView | any): st
     return getCellDecorIds(cell).filter(decorId => !removedDecors.has(decorId));
 };
 
+const getCellCardDecors = (cell: S2CellData | SingleTypeCellView) => {
+  const groups = [
+    { ids: getVisibleBaseDecorIds(cell), state: 'base' as const },
+    { ids: Array.from(getAddedDecors(cell.cellId)), state: 'added' as const },
+    { ids: Array.from(getRemovedDecors(cell.cellId)), state: 'removed' as const },
+  ];
+  return groups.flatMap(group => group.ids.map(id => ({ id, ...getDecorInfo(id), state: group.state })));
+};
+
 const getEffectiveDecors = (cell: S2CellData | SingleTypeCellView | any) => {
     const localDecors = new Set(getCellDecorSet(cell));
     const removedDecors = getRemovedDecors(cell.cellId);
@@ -723,10 +633,10 @@ const getCellStyleWithReports = (cell: any) => { // Use 'any' or correct type
          // Note: isReported checks 'not_pure' in old logic, but let's strictly use isReportedNotPure from new composable
          // Actually, isReportedNotPure is what we want.
          return {
-            strokeColor: '#9333ea', // Purple-600
+            strokeColor: MAP_GRID_PALETTE.reported.color,
             strokeWeight: 2,
             strokeOpacity: 0.8,
-            fillColor: '#9333ea',
+            fillColor: MAP_GRID_PALETTE.reported.color,
             fillOpacity: 0.2
         };
     }
@@ -744,21 +654,20 @@ const getCellStyleWithReports = (cell: any) => { // Use 'any' or correct type
         
         // Logic copied/adapted from getCellStyle in useS2Grid (simplified)
         // 1 = Green, 2-3 = Yellow, 4+ = Red
-        let color = '#9CA3AF'; // Default Gray
-        if (size === 1) color = '#00B92F'; // Green
-        else if (size <= 3) color = '#F59E0B'; // Yellow
-        else color = '#EF4444'; // Red
+        const color = getGridPalette(size).color;
         
         return {
             strokeColor: color,
             strokeWeight: 1,
             strokeOpacity: 0.5,
             fillColor: color,
-            fillOpacity: 0.35
+            fillOpacity: 0.24
         };
     }
 
-    return getCellStyle(cell);
+    const style = getCellStyle(cell);
+    const color = getGridPalette(effectiveDecors.size).color;
+    return { ...style, strokeColor: color, fillColor: color, fillOpacity: 0.2 };
 };
 
 const handlePolygonClick = (cell: any) => {
@@ -769,6 +678,7 @@ const { t } = useI18n();
 
 // [NEW] Decor Selector Logic
 const showDecorSelector = ref(false);
+const showCommunitySpots = ref(false);
 const selectedCellForDecorReport = ref<string | null>(null);
 const selectedDecorReportMode = ref<'missing' | 'extra'>('missing');
 const selectedDecorReportOptions = ref<string[]>([]);
@@ -793,6 +703,11 @@ const openDecorSelector = (cell: S2CellData | SingleTypeCellView | any, mode: 'm
 // 響應式視窗寬度
 const windowWidth = ref(typeof window !== 'undefined' ? window.innerWidth : 1024);
 const isMobile = computed(() => windowWidth.value < 768);
+const popupOptions = computed(() => ({
+  autoPanPaddingTopLeft: isMobile.value ? [12, 180] : [340, 110],
+  autoPanPaddingBottomRight: isMobile.value ? [60, 84] : [60, 30],
+  maxHeight: isMobile.value ? Math.min(380, window.innerHeight - 330) : 480,
+}));
 const cellBadgeSize = computed(() => isMobile.value ? 74 : 84);
 
 // 監聯視窗大小變化
@@ -831,7 +746,7 @@ const MIN_ZOOM_FOR_QUERY = 17; // 最小查詢縮放層級
 let leafletMap: any = null; // 不使用 ref，直接用普通變數
 
 // 狀態管理
-const showPanel = ref(true);
+const showPanel = ref(!isMobile.value);
 const defaultSelectedFilters = decorRules
   .filter(rule => rule.tags.length > 0 && rule.region !== 'JP')
   .map(rule => rule.id);
@@ -847,6 +762,69 @@ let searchDebounceTimer: ReturnType<typeof setTimeout> | null = null;
 // 顯示模式（網格 / 標記 / 單一格）
 type MapViewMode = 'grid' | 'pin' | 'single';
 const viewMode = ref<MapViewMode>('grid');
+const mapInterface = ref<HTMLElement | null>(null);
+const isInfoPopupOpen = ref(false);
+let interfaceMotion: gsap.Context | null = null;
+const mapMotionAllowed = () => !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const modePosition = () => ({ grid: 0, pin: 100, single: 200 })[viewMode.value];
+watch(mapInterface, element => {
+  interfaceMotion?.revert();
+  if (!element) { interfaceMotion = null; return; }
+  interfaceMotion = gsap.context(() => {
+    gsap.set('.map-mode-indicator', { xPercent: modePosition() });
+    if (!mapMotionAllowed()) return;
+    gsap.fromTo('.map-mode-switch-inner, .map-search-field, .map-navigation-controls',
+      { y: -12, opacity: 0 }, { y: 0, opacity: 1, duration: 0.6, stagger: 0.07, ease: 'power3.out', clearProps: 'transform,opacity' });
+  }, element);
+}, { flush: 'post' });
+watch(viewMode, () => interfaceMotion?.add(() => {
+  gsap.to('.map-mode-indicator', { xPercent: modePosition(), duration: mapMotionAllowed() ? 0.42 : 0, ease: 'power3.inOut', overwrite: true });
+}));
+const animateMapControl = (event: MouseEvent) => {
+  const button = (event.target as HTMLElement).closest<HTMLElement>('[data-map-object]');
+  if (!button || !mapMotionAllowed()) return;
+  const glyph = button.querySelector('.map-mode-glyph, .map-nav-glyph');
+  const kind = button.dataset.mapObject;
+  if (!glyph) return;
+  gsap.killTweensOf([glyph, ...glyph.children]);
+  interfaceMotion?.add(() => {
+    const timeline = gsap.timeline({ defaults: { ease: 'power2.out' } });
+    if (kind === 'grid') {
+      timeline.fromTo(glyph.querySelectorAll('.map-grid-cell'), {
+        x: (index: number) => index % 2 ? 3 : -3, y: (index: number) => index < 2 ? -3 : 3, rotation: 45, scale: 0.65,
+      }, { x: 0, y: 0, rotation: 0, scale: 1, duration: 0.4, stagger: 0.025, ease: 'back.out(1.8)', clearProps: 'transform' });
+    } else if (kind === 'pin') {
+      timeline.fromTo(glyph, { y: -8, rotation: -12, scaleY: 1.15 }, { y: 1, rotation: 0, scaleY: 0.75, duration: 0.16, ease: 'power2.in' })
+        .to(glyph, { y: 0, scaleY: 1, duration: 0.38, ease: 'elastic.out(1,0.4)', clearProps: 'transform' });
+    } else if (kind === 'single') {
+      timeline.fromTo(glyph, { scale: 1.35, rotation: -25 }, { scale: 1, rotation: 0, duration: 0.42, ease: 'back.out(1.8)', clearProps: 'transform' });
+      timeline.fromTo(button.querySelector('.map-mode-focus-ring'), { scale: 1.5, opacity: 0.7 }, { scale: 0.7, opacity: 0, duration: 0.45 }, 0);
+    } else if (kind === 'locate') {
+      timeline.fromTo(glyph, { rotation: -40, scale: 0.85 }, { rotation: 0, scale: 1, duration: 0.6, ease: 'elastic.out(1,0.45)', clearProps: 'transform' });
+      timeline.fromTo(button.querySelector('.map-nav-ring'), { scale: 0.5, opacity: 0.65 }, { scale: 1.4, opacity: 0, duration: 0.6 }, 0);
+    } else if (kind === 'scanner') {
+      timeline.fromTo(glyph, { rotation: -90 }, { rotation: 0, duration: 0.5, ease: 'power3.out', clearProps: 'transform' })
+        .fromTo(button.querySelector('.map-scanner-slit'), { xPercent: -160, opacity: 0.8 }, { xPercent: 160, opacity: 0, duration: 0.6, ease: 'power1.inOut' }, 0);
+    }
+  });
+};
+const previewMapObject = (event: PointerEvent) => {
+  if (event.pointerType !== 'mouse' || !mapMotionAllowed()) return;
+  const button = (event.target as HTMLElement).closest<HTMLElement>('[data-map-object]');
+  if (!button || button.contains(event.relatedTarget as Node | null)) return;
+  const glyph = button.querySelector('.map-mode-glyph, .map-nav-glyph');
+  if (!glyph) return;
+  interfaceMotion?.add(() => gsap.to(glyph, { y: -2, rotation: button.dataset.mapObject === 'pin' ? -9 : 5, duration: 0.25, ease: 'power2.out', overwrite: 'auto' }));
+};
+const releaseMapObject = (event: PointerEvent) => {
+  if (event.pointerType !== 'mouse' || !mapMotionAllowed()) return;
+  const button = (event.target as HTMLElement).closest<HTMLElement>('[data-map-object]');
+  if (!button || button.contains(event.relatedTarget as Node | null)) return;
+  const glyph = button.querySelector('.map-mode-glyph, .map-nav-glyph');
+  if (!glyph) return;
+  interfaceMotion?.add(() => gsap.to(glyph, { y: 0, rotation: 0, duration: 0.35, ease: 'back.out(1.7)', overwrite: 'auto', clearProps: 'transform' }));
+};
+onUnmounted(() => interfaceMotion?.revert());
 const isGridMode = computed(() => viewMode.value === 'grid');
 const isPinMode = computed(() => viewMode.value === 'pin');
 const isSingleMode = computed(() => viewMode.value === 'single');
@@ -1091,10 +1069,34 @@ const resetLayers = () => {
 
 // Helper functions removed (cloneCellsForRender, scheduleGridRender, renderInBatches)
 
+// Animate the contents only; Leaflet owns positioning and auto-pan.
+const animatePopupCard = (event: any) => {
+  isInfoPopupOpen.value = true;
+  if (!mapMotionAllowed()) return;
+  const card = event.popup.getElement()?.querySelector('.map-cell-card, .map-place-card, .community-map-card') as HTMLElement | undefined;
+  if (!card) return;
+  interfaceMotion?.add(() => {
+    const timeline = gsap.timeline({ defaults: { ease: 'power3.out' } });
+    timeline.fromTo(card, { y: 14, opacity: 0 }, { y: 0, opacity: 1, duration: 0.35, clearProps: 'transform,opacity' }, 0);
+    const heading = card.querySelector('.map-cell-heading');
+    if (heading) timeline.fromTo(heading, { rotationX: -18, transformOrigin: 'bottom' }, { rotationX: 0, duration: 0.4, clearProps: 'transform,transformOrigin' }, 0.05);
+    const compass = card.querySelector('.map-cell-stamp');
+    if (compass) timeline.fromTo(compass, { rotation: -80 }, { rotation: -12, duration: 0.65, ease: 'back.out(1.4)', clearProps: 'transform' }, 0.1);
+    const list = card.querySelector('.map-cell-decors');
+    const listBounds = list?.getBoundingClientRect();
+    const decors = Array.from(card.querySelectorAll<HTMLElement>('.map-cell-decor')).filter(item => !listBounds || item.getBoundingClientRect().top < listBounds.bottom);
+    if (decors.length) timeline.fromTo(decors, { x: -12, y: 6, rotation: -2, opacity: 0 }, { x: 0, y: 0, rotation: 0, opacity: 1, duration: 0.3, stagger: 0.045, clearProps: 'transform,opacity' }, 0.12);
+  });
+};
+
+const onPopupClose = () => { isInfoPopupOpen.value = false; };
+
 // 地圖準備完成
 const onMapReady = (map: any) => {
   // 不使用 ref 儲存 Leaflet 地圖實例！
   leafletMap = map;
+  map.on('popupopen', animatePopupCard);
+  map.on('popupclose', onPopupClose);
   // 更新邊界
   updateMapBounds();
 
@@ -1204,6 +1206,7 @@ const updateMapBounds = () => {
     east: bounds.getEast(),
     west: bounds.getWest(),
   };
+  communityBounds.value = currentBounds;
   
   // Directly update S2 grid if needed
   if (!isPinMode.value) {
@@ -1392,6 +1395,45 @@ const showPureModePanel = ref(true);
 
 // 選中的純種類型（複選）
 const selectedPureTypes = ref<string[]>(['restaurant']);
+
+const showCommunityOnMap = ref(true);
+const communityBounds = shallowRef<MapBounds | null>(null);
+const focusedCommunitySpotId = ref<string | null>(null);
+const selectedCommunityPoints = computed(() => filterCommunityPoints(selectedPureTypes.value));
+const visibleCommunityPoints = computed(() => isSingleMode.value && showCommunityOnMap.value && mapZoom.value >= 16 && communityBounds.value
+  ? filterCommunityPoints(selectedPureTypes.value, communityBounds.value) : []);
+const communitySpotsByCell = computed(() => {
+  const groups = new Map<string, LocatedCommunitySpot[]>();
+  if (isSingleMode.value && showCommunityOnMap.value) for (const spot of selectedCommunityPoints.value) {
+    const group = groups.get(spot.cellId) || [];
+    group.push(spot);
+    groups.set(spot.cellId, group);
+  }
+  return groups;
+});
+const focusCommunityCell = (cellId: string) => {
+  const spot = communitySpotsByCell.value.get(cellId)?.[0];
+  if (spot) locateCommunitySpot(spot);
+};
+const locateCommunitySpot = async (candidate: CommunitySpot) => {
+  const spot = communityPureSpots.find(point => point.id === candidate.id);
+  if (!spot || !leafletMap) return;
+  showCommunitySpots.value = false;
+  showPureModePanel.value = false;
+  showPanel.value = false;
+  showPureModeHint.value = false;
+  showPureModeExplanation.value = false;
+  viewMode.value = 'single';
+  showCommunityOnMap.value = true;
+  selectedPureTypes.value = [...spot.decorIds];
+  focusedCommunitySpotId.value = null;
+  leafletMap.closePopup();
+  leafletMap.setView([spot.lat, spot.lng], 18, { animate: mapMotionAllowed(), duration: 0.5 });
+  updateMapBounds();
+  await nextTick();
+  focusedCommunitySpotId.value = spot.id;
+  void loadNewPureTypes(spot.decorIds);
+};
 
 // 純種格資料快取（按類型存儲）
 const pureTypeCellsCache = ref<Map<string, any[]>>(new Map());
@@ -1888,6 +1930,8 @@ onUnmounted(() => {
     pureModeHintTimer = null;
   }
   window.removeEventListener('resize', updateWindowWidth);
+  leafletMap?.off('popupopen', animatePopupCard);
+  leafletMap?.off('popupclose', onPopupClose);
   leafletMap = null;
 });
 </script>
@@ -2268,5 +2312,41 @@ onUnmounted(() => {
   .map-floating-control {
     transition-duration: 0.01ms;
   }
+}
+</style>
+<style scoped>
+.map-page { background: #e9ecdf; }
+.map-floating-control, .map-mode-switch-inner { border-color: #d6dccb; background: #fafaf3; color: #344d3b; box-shadow: 0 3px 0 #c8d0ba, 0 12px 26px rgb(39 58 30 / 13%); }
+.map-floating-control { top: 1rem; left: 1rem; height: 48px; width: 15rem; border-radius: 0.7rem; }
+.map-filter-toggle { height: 60px; background: var(--map-accent); color: #fff; padding-left: 8px; gap: 12px; box-shadow: 0 3px 0 #078a63, 0 12px 26px #173b3529; }
+.map-filter-book { position: relative; display: grid; place-items: center; width: 48px; height: 44px; flex-shrink: 0; border: 1px solid #d8d5ad; border-radius: 4px 9px 9px 4px; background: #fff9e8 url('/images/map-field/woodland-camp.webp') right bottom / auto 100%; box-shadow: -2px 2px 0 #e5e3cf; transform: rotate(-5deg); }
+.map-filter-book img { position: relative; width: 40px; height: 30px; object-fit: contain; transform: rotate(5deg); filter: drop-shadow(0 2px 1px #25433030); }
+.map-filter-toggle-count { display: grid; place-items: center; min-width: 1.7rem; height: 1.7rem; margin-left: auto; background: #ffffff26; border: 1px solid #ffffff40; border-radius: 0.35rem; font-size: 0.8rem; font-weight: 700; color: #fff; }
+.map-mode-switch { top: 1rem; right: 1rem; }
+.map-mode-switch-inner { position: relative; isolation: isolate; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); width: 18.5rem; height: 52px; padding: 4px; gap: 0; border-radius: 0.75rem; }
+.map-mode-switch-inner > .group { z-index: 1; }
+.map-mode-indicator { position: absolute; left: 4px; top: 4px; width: calc((100% - 8px) / 3); height: calc(100% - 8px); border-radius: 0.5rem; background: var(--map-accent); box-shadow: 0 2px 0 #008c7259; pointer-events: none; }
+.map-mode-button { width: 100%; min-width: 0; min-height: 44px; padding-inline: 0.35rem; gap: 0.35rem; background: transparent; color: #6b795c; font-size: 0.76rem; }
+.map-mode-glyph { position: relative; display: grid; place-items: center; width: 18px; height: 18px; flex-shrink: 0; }
+.map-mode-grid { grid-template-columns: repeat(2, 1fr); gap: 3px; padding: 1px; }
+.map-grid-cell { width: 100%; height: 100%; border: 1.5px solid currentColor; border-radius: 1px; }
+.map-mode-focus-ring { position: absolute; inset: -4px; border: 1px solid currentColor; border-radius: 50%; opacity: 0; pointer-events: none; }
+.map-mode-button.is-active, .map-mode-button.is-active:hover { background: transparent; color: #fff; box-shadow: none; }
+.map-mode-button:hover { background: #e9eedf; }
+.map-mode-button:focus-visible, .map-floating-control:focus-visible { outline: 2px solid #668257; outline-offset: 2px; }
+.map-pure-explanation { top: 8.2rem; }
+.map-pure-explanation-card, .map-result-toast, .map-loading-toast { border-color: #d6dccb; background: #fafaf3; box-shadow: 0 3px 0 #c8d0ba, 0 12px 26px rgb(39 58 30 / 13%); }
+.map-result-toast, .map-loading-toast { top: 8.5rem; white-space: normal; width: max-content; }
+@media (min-width: 768px) and (max-width: 1100px) { .map-mode-switch { top: 4.5rem; } .map-result-toast, .map-loading-toast { top: 11.8rem; } }
+@media (max-width: 767px) {
+  .map-mode-switch { top: 4.25rem; left: 0.75rem; right: 4.15rem; }
+  .map-mode-switch-inner { width: 100%; }
+  .map-mode-button { font-size: 0.75rem; gap: 0.25rem; padding-inline: 0.2rem; }
+  .map-mode-glyph { width: 16px; height: 16px; }
+  .map-mode-button > .iconify { width: 15px; height: 15px; }
+  .map-filter-toggle { inset: auto 0.75rem 1.4rem; width: auto; min-width: 44px; height: 60px; padding-inline: 8px 1rem; justify-content: flex-start; border-radius: 0.75rem; }
+  .map-filter-toggle-count { margin-left: auto; }
+  .map-result-toast, .map-loading-toast { top: 11.3rem; font-size: 0.72rem; }
+  .map-pure-explanation { top: 8.2rem; }
 }
 </style>

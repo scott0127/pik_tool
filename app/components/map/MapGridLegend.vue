@@ -12,7 +12,7 @@
       <div
         v-if="visible && showGridLegend"
         :class="[
-          'map-grid-legend absolute z-[999]',
+          'map-grid-legend absolute z-[1003]',
           'max-w-[calc(100vw-1.5rem)] md:max-w-xs'
         ]"
       >
@@ -22,9 +22,9 @@
           @click="showGridLegend = false"
         >
           <div class="flex items-center gap-2">
-            <span class="text-sm font-bold text-gray-800">{{ isSingleMode ? '🦄 純種模式說明' : '🔲 網格顏色說明' }}</span>
+            <span class="text-sm font-bold text-gray-800">{{ isSingleMode ? '純種模式說明' : '網格顏色說明' }}</span>
           </div>
-          <button class="text-gray-400 hover:text-gray-600 transition-colors">
+          <button aria-label="關閉圖例" class="min-w-11 min-h-11 text-gray-400 hover:text-gray-600 transition-colors">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
               <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
             </svg>
@@ -36,19 +36,19 @@
           <!-- Grid Mode Legend -->
           <template v-if="isGridMode">
               <div class="flex items-center gap-2 text-xs">
-              <div class="w-4 h-4 rounded-sm flex-shrink-0" style="background-color: #00B92F; opacity: 0.5;"></div>
+              <div class="w-4 h-4 rounded-sm flex-shrink-0" :style="{ backgroundColor: MAP_GRID_PALETTE.single.color }"></div>
               <span class="text-gray-700"><span class="font-semibold">綠色</span>：單一飾品類型</span>
               </div>
               <div class="flex items-center gap-2 text-xs">
-              <div class="w-4 h-4 rounded-sm flex-shrink-0" style="background-color: #F59E0B; opacity: 0.5;"></div>
+              <div class="w-4 h-4 rounded-sm flex-shrink-0" :style="{ backgroundColor: MAP_GRID_PALETTE.mixed.color }"></div>
               <span class="text-gray-700"><span class="font-semibold">黃色</span>：2-3 種飾品混合</span>
               </div>
               <div class="flex items-center gap-2 text-xs">
-              <div class="w-4 h-4 rounded-sm flex-shrink-0" style="background-color: #EF4444; opacity: 0.5;"></div>
+              <div class="w-4 h-4 rounded-sm flex-shrink-0" :style="{ backgroundColor: MAP_GRID_PALETTE.complex.color }"></div>
               <span class="text-gray-700"><span class="font-semibold">紅色</span>：4+ 種飾品混雜</span>
               </div>
               <div class="flex items-center gap-2 text-xs">
-              <div class="w-4 h-4 rounded-sm flex-shrink-0" style="background-color: #9CA3AF; opacity: 0.5;"></div>
+              <div class="w-4 h-4 rounded-sm flex-shrink-0" :style="{ backgroundColor: MAP_GRID_PALETTE.roadside.color }"></div>
               <span class="text-gray-700"><span class="font-semibold">灰色</span>：路邊區域（無標籤）</span>
               </div>
               <div class="pt-2 mt-2 border-t border-gray-200 text-xs text-gray-500">
@@ -59,16 +59,16 @@
           <!-- Single Mode Legend -->
           <template v-if="isSingleMode">
               <div class="flex items-center gap-2 text-xs">
-              <div class="w-4 h-4 rounded-sm flex-shrink-0" style="background-color: #00B92F; opacity: 0.5;"></div>
+              <div class="w-4 h-4 rounded-sm flex-shrink-0" :style="{ backgroundColor: MAP_GRID_PALETTE.single.color }"></div>
               <span class="text-gray-700"><span class="font-semibold">綠色</span>：單一飾品類型 (純種)</span>
               </div>
               <div class="flex items-center gap-2 text-xs">
-              <div class="w-4 h-4 rounded-sm flex-shrink-0 border border-purple-300" style="background-color: #9333ea; opacity: 0.5;"></div>
-              <span class="text-gray-700"><span class="font-semibold text-purple-700">紫色</span>：已被回報 (非純種)</span>
+              <div class="w-4 h-4 rounded-sm flex-shrink-0 border border-[#b5a6b4]" :style="{ backgroundColor: MAP_GRID_PALETTE.reported.color }"></div>
+              <span class="text-gray-700"><span class="font-semibold text-[#776075]">紫色</span>：已被回報 (非純種)</span>
               </div>
               
               <div class="pt-2 mt-2 border-t border-gray-200 text-xs text-gray-500 leading-relaxed">
-                若發現綠色格子非純種，<br>請點擊格子回報 ⚠️
+                若發現綠色格子非純種，<br>請點擊格子回報。
               </div>
           </template>
         </div>
@@ -87,7 +87,7 @@
       <button
         v-if="visible && !showGridLegend"
         @click="showGridLegend = true"
-        class="map-grid-legend-toggle absolute z-[999]"
+        class="map-grid-legend-toggle absolute z-[1003]"
         title="顯示說明"
       >
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 md:h-6 md:w-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -99,6 +99,7 @@
 </template>
 
 <script setup lang="ts">
+import { MAP_GRID_PALETTE } from "~/utils/mapPalette";
 const props = defineProps<{
   isGridMode: boolean;
   isSingleMode: boolean;
@@ -178,4 +179,15 @@ const showGridLegend = ref(false);
     transition-duration: 0.01ms;
   }
 }
+</style>
+<style scoped>
+.map-grid-legend, .map-grid-legend-toggle { background: #fafaf3; border-color: #d6dccb; box-shadow: 0 3px 0 #c8d0ba, 0 12px 26px rgb(39 58 30 / 13%); }
+.map-grid-legend-toggle { width: 44px; height: 44px; border-radius: 50%; }
+.map-grid-legend-toggle:focus-visible { outline: 2px solid #668257; outline-offset: 2px; }
+@media (max-width: 767px) { .map-grid-legend-toggle { top: 13.2rem; right: 0.75rem; bottom: auto; } .map-grid-legend { bottom: 5.4rem; } }
+</style>
+
+<style scoped>
+.map-grid-legend .text-xs { font-size: 13px; line-height: 1.6; }
+.map-grid-legend [class*="text-gray"] { color: #67755f; }
 </style>

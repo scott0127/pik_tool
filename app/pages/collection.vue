@@ -1,78 +1,18 @@
 <template>
-  <div ref="collectionPage" class="collection-page space-y-6 pb-8 relative" :style="collectionMotionStyle" @click="respondToControl">
-    <!-- Decorative floating elements -->
-    <div
-      class="collection-page-ambient absolute top-0 left-0 w-full h-[400px] overflow-hidden pointer-events-none -z-10"
-    >
-      <div class="deco-leaf deco-leaf-1">
-        <Icon name="lucide:leaf" class="w-6 h-6 text-emerald-300/30" />
-      </div>
-      <div class="deco-leaf deco-leaf-2">
-        <Icon name="lucide:flower-2" class="w-5 h-5 text-pink-300/25" />
-      </div>
-      <div class="deco-leaf deco-leaf-3">
-        <Icon name="lucide:sparkles" class="w-4 h-4 text-amber-300/30" />
-      </div>
-      <div class="deco-leaf deco-leaf-4">
-        <Icon name="lucide:leaf" class="w-8 h-8 text-teal-300/20" />
-      </div>
-      <div class="deco-leaf deco-leaf-5">
-        <Icon name="lucide:star" class="w-3 h-3 text-purple-300/25" />
-      </div>
-    </div>
-
-    <!-- -->
-    <div
-      class="collection-page-header flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
-    >
-      <div>
-        <h1
-          class="collection-page-title text-3xl font-extrabold text-gray-800 flex items-center gap-3"
-        >
-          <span
-            class="collection-page-title-icon w-10 h-10 flex items-center justify-center"
-          >
-            <Icon name="lucide:book-open" class="w-5 h-5 text-white" />
-          </span>
-          <span>{{ $t("collection.title") }}</span>
-        </h1>
-        <p class="collection-page-subtitle text-slate-700 font-semibold mt-1">{{ $t("collection.subtitle") }}</p>
-      </div>
-
-      <!-- Quick stats -->
-      <div class="collection-overview flex items-center gap-4 px-4 py-2">
-        <div class="text-right">
-          <p class="text-xs text-gray-500">
-            {{ $t("collection.stats.showing") }}
-          </p>
-          <p class="text-lg font-bold text-emerald-600">
-            {{ filteredItems.length }} {{ $t("collection.stats.items") }}
-          </p>
-        </div>
-        <div class="w-px h-8 bg-gray-200"></div>
-        <div class="text-right">
-          <p class="text-xs text-gray-500">
-            {{ $t("collection.stats.collected") }}
-          </p>
-          <p class="text-lg font-bold text-emerald-600">{{ collectedCount }}</p>
-        </div>
-      </div>
-    </div>
+  <div ref="collectionPage" class="collection-page space-y-4 pb-8 relative" :class="{ 'has-album-index': !hasActiveFilters }" :style="collectionMotionStyle" @click="respondToControl">
+    <CollectionAlbumCover
+      :title="$t('collection.title')"
+      :subtitle="$t('collection.subtitle')"
+      :total="allDecorItems.length"
+      :collected="albumCollectedCount"
+      @browse="browseAlbum"
+    />
 
     <!-- Filters Section -->
     <div
       class="collection-filter-panel card relative rounded-3xl p-5 md:p-6 mb-6 z-10 transition-all duration-300"
     >
-      <!-- Background gradients wrapper (clipped) -->
-      <div class="collection-filter-ambient absolute inset-0 overflow-hidden rounded-3xl pointer-events-none -z-10">
-        <div
-          class="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-emerald-100/40 to-teal-50/40 rounded-full blur-3xl translate-x-1/3 -translate-y-1/3"
-        ></div>
-        <div
-          class="absolute bottom-0 left-0 w-64 h-64 bg-gradient-to-tr from-purple-50/40 to-pink-50/40 rounded-full blur-3xl -translate-x-1/3 translate-y-1/3"
-        ></div>
-      </div>
-
+      <div class="collection-filter-kicker"><span>INDEX / 01</span><span>{{ locale === 'en' ? 'Find your next discovery' : '找到下一個小發現' }}</span></div>
       <!-- Collapsed: compact summary bar -->
       <div
         class="flex items-center gap-3"
@@ -97,14 +37,14 @@
           <span>{{ activeFilterCount }}</span>
         </div>
         <button
+          ref="filterEntry"
           @click="isFilterExpanded = true"
+          :aria-label="$t('collection.filters.title')"
           :aria-expanded="isFilterExpanded"
-          class="collection-soft-button relative flex items-center gap-2 px-4 py-2.5 text-emerald-800 rounded-xl text-sm font-bold transition-all"
+          class="collection-filter-open relative flex items-center gap-2 px-4 py-2.5 text-emerald-800 rounded-xl text-sm font-bold transition-all"
         >
           <Icon name="lucide:sliders-horizontal" class="w-4 h-4" />
-          <span class="hidden sm:inline">{{
-            $t("collection.filters.expand")
-          }}</span>
+          <span>{{ locale === "en" ? "Filters" : "篩選" }}</span>
           <Icon name="lucide:chevron-down" class="w-4 h-4" />
           
         </button>
@@ -112,7 +52,7 @@
 
       <!-- Expanded: full filter panel -->
       <Transition :css="false" @enter="enterPanel" @leave="leavePanel" @enter-cancelled="cancelPanel" @leave-cancelled="cancelPanel">
-      <div v-if="isFilterExpanded" class="hidden md:block space-y-6">
+      <div v-if="isFilterExpanded" class="collection-desktop-filters hidden md:block space-y-6">
         <!-- Collapse toggle header -->
         <div class="flex items-center justify-between">
           <span
@@ -335,12 +275,17 @@
       </Transition>
     </div>
 
+    <div v-if="hasActiveFilters" class="collection-active-summary">
+      <p>{{ locale === 'en' ? 'Results' : '搜尋結果' }} <strong>{{ filteredItems.length }}</strong><span>{{ selectedFilterSummary }}</span></p>
+      <button type="button" @click="clearAllFilters">{{ locale === 'en' ? 'Reset' : '重設' }} <span aria-hidden="true">×</span></button>
+    </div>
+
     <section
       v-if="!hasActiveFilters && rareDashboardHasContent"
       class="capture-dashboard"
       aria-labelledby="capture-dashboard-title"
     >
-      <div class="capture-dashboard-header">
+      <button type="button" class="capture-dashboard-header" :aria-expanded="isRadarExpanded" aria-controls="collection-radar-content" @click="isRadarExpanded = !isRadarExpanded">
         <div class="capture-dashboard-heading">
           <span class="capture-dashboard-icon">
             <Icon name="lucide:sparkles" class="w-4 h-4" />
@@ -350,11 +295,10 @@
             <p>{{ captureDashboardLabels.subtitle }}</p>
           </div>
         </div>
-        <span class="capture-dashboard-badge">
-          {{ captureDashboardLabels.badge }}
-        </span>
-      </div>
-
+        <span class="capture-dashboard-badge">{{ locale === 'en' ? 'Analysis' : '分析頁籤' }} <span class="radar-chevron" :class="{ 'is-open': isRadarExpanded }" aria-hidden="true">↓</span></span>
+      </button>
+      <Transition :css="false" @enter="enterPanel" @leave="leavePanel" @enter-cancelled="cancelPanel" @leave-cancelled="cancelPanel">
+      <div v-if="isRadarExpanded" id="collection-radar-content" class="collection-radar-content">
       <div
         class="capture-dashboard-grid rare-dashboard-grid"
         :class="{ 'is-score-empty': rareLevelUpRecommendations.length === 0 && rareVirtualRecommendations.length === 0 }"
@@ -527,6 +471,8 @@
           </span>
         </div>
       </div>
+      </div>
+      </Transition>
     </section>
 
     <!-- ===== Mobile Navigation Drawer (Bottom Sheet with Three.js) ===== -->
@@ -549,6 +495,9 @@
 
             <!-- Bottom Sheet Content -->
             <div
+              ref="filterSheet"
+              role="dialog" aria-modal="true" :aria-label="$t('collection.filters.title')" tabindex="-1"
+              @keydown="handleFilterKeys"
               class="collection-filter-sheet bg-white/95 border border-white/70 shadow-2xl relative w-full max-h-[85vh] rounded-t-[2.5rem] pointer-events-auto flex flex-col overflow-hidden"
             >
               <!-- Notch -->
@@ -574,6 +523,7 @@
                 </span>
                 <button
                   @click="isFilterExpanded = false"
+                  type="button" :aria-label="locale === 'en' ? 'Close filters' : '關閉篩選'"
                   class="collection-soft-button p-2 text-gray-500 hover:text-gray-700 rounded-full active:scale-90 transition-transform"
                 >
                   <Icon name="lucide:x" class="w-5 h-5" />
@@ -584,6 +534,7 @@
               <div
                 class="flex-1 overflow-y-auto px-6 py-6 space-y-8 custom-scrollbar"
               >
+                <div class="collection-sheet-tabs" aria-hidden="true"><span>01 {{ locale === 'en' ? 'SEARCH' : '搜尋' }}</span><span>02 {{ locale === 'en' ? 'SELECT' : '選取' }}</span><span>03 {{ locale === 'en' ? 'COLLECT' : '收藏' }}</span></div>
                 <!-- Mobile Search -->
                 <div class="w-full relative group">
                   <label
@@ -684,7 +635,7 @@
                   class="btn-primary flex-[2] py-3.5 rounded-xl text-sm active:scale-95 flex items-center justify-center gap-2"
                 >
                   <Icon name="lucide:check" class="w-5 h-5" />
-                  顯示 {{ filteredItems.length }} 個結果
+                  {{ locale === 'en' ? `Show ${filteredItems.length} results` : `顯示 ${filteredItems.length} 個結果` }}
                 </button>
               </div>
             </div>
@@ -693,8 +644,14 @@
       </Teleport>
     </ClientOnly>
 
+    <nav class="collection-journal-tabs" :aria-label="locale === 'en' ? 'Collection sections' : '圖鑑分類'">
+      <button type="button" :aria-pressed="selectedCategoryType === null" @click="selectedCategoryType = null">{{ locale === 'en' ? 'Full album' : '全部圖鑑' }}</button>
+      <button type="button" :aria-pressed="selectedCategoryType === 'regular'" @click="selectedCategoryType = 'regular'">{{ $t('collection.sections.regular.title') }}</button>
+      <button type="button" :aria-pressed="selectedCategoryType === 'special'" @click="selectedCategoryType = 'special'">{{ $t('collection.sections.special.title') }}</button>
+    </nav>
+
     <!-- Results Section -->
-    <div class="collection-results">
+    <div id="collection-album-results" class="collection-results" tabindex="-1">
       <!-- Category Grouped View (when no filters) -->
       <template v-if="!hasActiveFilters">
         <!-- Regular Categories Section -->
@@ -737,104 +694,33 @@
             </div>
           </div>
 
-          <!-- Info Box -->
-          <div
-            class="collection-info-card p-4 mb-6 rounded-2xl"
-          >
-            <div class="flex items-start gap-3">
-              <span
-                class="collection-info-icon w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
-              >
-                <Icon name="lucide:info" class="w-4 h-4 text-emerald-600" />
-              </span>
-              <div>
-                <p class="collection-info-title text-sm font-semibold text-emerald-800 mb-1">
-                  {{ $t("collection.info.regular.title") }}
-                </p>
-                <p class="collection-info-desc text-xs text-emerald-700">
-                  {{ $t("collection.info.regular.desc") }}
-                </p>
-              </div>
-            </div>
-          </div>
+          <details class="collection-info-card">
+            <summary>{{ $t("collection.info.regular.title") }}<span aria-hidden="true">+</span></summary>
+            <p class="collection-info-desc">{{ $t("collection.info.regular.desc") }}</p>
+          </details>
 
           <div
-            v-for="def in regularCategories"
+            v-for="(def, chapterIndex) in regularCategories"
             :key="def.category.id"
             :id="`cat-${def.category.id}`"
             class="mb-6"
           >
-            <!-- Category Header (clickable accordion) -->
-            <div
-              class="collection-category-header flex items-center gap-3 sticky top-[120px] z-10 px-4 py-3 rounded-xl cursor-pointer group"
-              @click="toggleCategory(def.category.id)"
-            >
-              <Icon :name="getCategoryIcon(def.category.icon)" class="text-2xl flex-shrink-0" />
-              <div class="flex-1 min-w-0">
-                <h2 class="text-lg font-bold text-gray-800">
-                  {{
-                    locale === "en" ? def.category.nameEn : def.category.name
-                  }}
-                </h2>
-                <p class="text-xs text-gray-500">
-                  {{
-                    locale === "en" ? def.category.name : def.category.nameEn
-                  }}
-                </p>
-              </div>
-              <button
-                @click.stop="
-                  handleCollectAll(
-                    def.category.id,
-                    locale === 'en' ? def.category.nameEn : def.category.name,
-                  )
-                "
-                class="collection-collect-button px-3 py-1.5 text-xs rounded-lg flex items-center gap-1"
-                :title="$t('collection.actions.collect_all_tooltip')"
-              >
-                <Icon name="lucide:check-check" class="w-3.5 h-3.5" />
-                <span class="hidden sm:inline">{{
-                  $t("collection.actions.collect_all")
-                }}</span>
+            <div class="collection-category-header" :class="{ 'is-expanded': isCategoryExpanded(def.category.id) }">
+              <button type="button" class="collection-category-toggle" :aria-expanded="isCategoryExpanded(def.category.id)" :aria-controls="`category-content-${def.category.id}`" @click="toggleCategory(def.category.id)">
+                <span class="collection-chapter-number">{{ String(chapterIndex + 1).padStart(2, '0') }}</span>
+                <span class="collection-category-name"><strong>{{ locale === 'en' ? def.category.nameEn : def.category.name }}</strong><small>{{ locale === 'en' ? def.category.name : def.category.nameEn }}</small></span>
+                <span class="collection-category-progress"><strong>{{ getCategoryProgress(def.category.id) }}</strong><span class="collection-progress-track"><span class="collection-progress-fill" :style="{ transform: `scaleX(${getCategoryProgressPercent(def.category.id) / 100})` }" /></span></span>
+                <span class="collection-category-chevron" aria-hidden="true">↓</span>
               </button>
-              <div class="text-right flex-shrink-0 w-20">
-                <p
-                  class="text-sm font-bold"
-                  :class="
-                    getCategoryProgressPercent(def.category.id) === 100
-                      ? 'text-amber-500'
-                      : 'text-emerald-600'
-                  "
-                >
-                  {{ getCategoryProgress(def.category.id) }}
-                </p>
-                <!-- Mini Progress Bar -->
-                <div
-                  class="h-1.5 w-full bg-gray-200 rounded-full mt-1 overflow-hidden"
-                >
-                  <div
-                    class="collection-progress-fill h-full rounded-full"
-                    :class="
-                      getCategoryProgressPercent(def.category.id) === 100
-                        ? 'bg-gradient-to-r from-amber-400 to-yellow-300'
-                        : 'bg-gradient-to-r from-emerald-400 to-teal-400'
-                    "
-                    :style="{
-                      transform: `scaleX(${getCategoryProgressPercent(def.category.id) / 100})`,
-                    }"
-                  ></div>
-                </div>
-              </div>
-              <Icon
-                name="lucide:chevron-down"
-                class="w-5 h-5 text-gray-400 transition-transform duration-300 flex-shrink-0"
-                :class="isCategoryExpanded(def.category.id) ? 'rotate-180' : ''"
-              />
+              <button type="button" class="collection-collect-button" @click="handleCollectAll(def.category.id, locale === 'en' ? def.category.nameEn : def.category.name)" :title="$t('collection.actions.collect_all_tooltip')" :aria-label="$t('collection.actions.collect_all_tooltip')"><Icon name="lucide:check-check" class="w-4 h-4" /></button>
             </div>
 
             <!-- Collapsible content -->
             <div
               class="collection-category-content-wrapper"
+              :id="`category-content-${def.category.id}`"
+              :inert="!isCategoryExpanded(def.category.id) || undefined"
+              :aria-hidden="!isCategoryExpanded(def.category.id) || undefined"
               :class="{
                 'is-open': isCategoryExpanded(def.category.id),
                 'is-animating': isCategoryAnimating(def.category.id),
@@ -878,104 +764,33 @@
             </p>
           </div>
 
-          <!-- Info Box -->
-          <div
-            class="collection-info-card collection-info-card-purple p-4 mb-6 rounded-2xl"
-          >
-            <div class="flex items-start gap-3">
-              <span
-                class="collection-info-icon w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
-              >
-                <Icon name="lucide:sparkles" class="w-4 h-4 text-purple-600" />
-              </span>
-              <div>
-                <p class="collection-info-title text-sm font-semibold text-purple-800 mb-1">
-                  {{ $t("collection.info.special.title") }}
-                </p>
-                <p class="collection-info-desc text-xs text-purple-700">
-                  {{ $t("collection.info.special.desc") }}
-                </p>
-              </div>
-            </div>
-          </div>
+          <details class="collection-info-card">
+            <summary>{{ $t("collection.info.special.title") }}<span aria-hidden="true">+</span></summary>
+            <p class="collection-info-desc">{{ $t("collection.info.special.desc") }}</p>
+          </details>
 
           <div
-            v-for="def in specialCategories"
+            v-for="(def, chapterIndex) in specialCategories"
             :key="def.category.id"
             :id="`cat-${def.category.id}`"
             class="mb-6"
           >
-            <!-- Category Header (clickable accordion) -->
-            <div
-              class="collection-category-header flex items-center gap-3 sticky top-[120px] z-10 px-4 py-3 rounded-xl cursor-pointer group collection-category-header-special"
-              @click="toggleCategory(def.category.id)"
-            >
-              <Icon :name="getCategoryIcon(def.category.icon)" class="text-2xl flex-shrink-0" />
-              <div class="flex-1 min-w-0">
-                <h2 class="text-lg font-bold text-gray-800">
-                  {{
-                    locale === "en" ? def.category.nameEn : def.category.name
-                  }}
-                </h2>
-                <p class="text-xs text-gray-500">
-                  {{
-                    locale === "en" ? def.category.name : def.category.nameEn
-                  }}
-                </p>
-              </div>
-              <button
-                @click.stop="
-                  handleCollectAll(
-                    def.category.id,
-                    locale === 'en' ? def.category.nameEn : def.category.name,
-                  )
-                "
-                class="collection-collect-button px-3 py-1.5 text-xs rounded-lg flex items-center gap-1"
-                :title="$t('collection.actions.collect_all_tooltip')"
-              >
-                <Icon name="lucide:check-check" class="w-3.5 h-3.5" />
-                <span class="hidden sm:inline">{{
-                  $t("collection.actions.collect_all")
-                }}</span>
+            <div class="collection-category-header collection-category-header-special" :class="{ 'is-expanded': isCategoryExpanded(def.category.id) }">
+              <button type="button" class="collection-category-toggle" :aria-expanded="isCategoryExpanded(def.category.id)" :aria-controls="`category-content-${def.category.id}`" @click="toggleCategory(def.category.id)">
+                <span class="collection-chapter-number">{{ String(chapterIndex + 1).padStart(2, '0') }}</span>
+                <span class="collection-category-name"><strong>{{ locale === 'en' ? def.category.nameEn : def.category.name }}</strong><small>{{ locale === 'en' ? def.category.name : def.category.nameEn }}</small></span>
+                <span class="collection-category-progress"><strong>{{ getCategoryProgress(def.category.id) }}</strong><span class="collection-progress-track"><span class="collection-progress-fill" :style="{ transform: `scaleX(${getCategoryProgressPercent(def.category.id) / 100})` }" /></span></span>
+                <span class="collection-category-chevron" aria-hidden="true">↓</span>
               </button>
-              <div class="text-right flex-shrink-0 w-20">
-                <p
-                  class="text-sm font-bold"
-                  :class="
-                    getCategoryProgressPercent(def.category.id) === 100
-                      ? 'text-amber-500'
-                      : 'text-purple-600'
-                  "
-                >
-                  {{ getCategoryProgress(def.category.id) }}
-                </p>
-                <!-- Mini Progress Bar -->
-                <div
-                  class="h-1.5 w-full bg-gray-200 rounded-full mt-1 overflow-hidden"
-                >
-                  <div
-                    class="collection-progress-fill h-full rounded-full"
-                    :class="
-                      getCategoryProgressPercent(def.category.id) === 100
-                        ? 'bg-gradient-to-r from-amber-400 to-yellow-300'
-                        : 'bg-gradient-to-r from-purple-400 to-fuchsia-400'
-                    "
-                    :style="{
-                      transform: `scaleX(${getCategoryProgressPercent(def.category.id) / 100})`,
-                    }"
-                  ></div>
-                </div>
-              </div>
-              <Icon
-                name="lucide:chevron-down"
-                class="w-5 h-5 text-gray-400 transition-transform duration-300 flex-shrink-0"
-                :class="isCategoryExpanded(def.category.id) ? 'rotate-180' : ''"
-              />
+              <button type="button" class="collection-collect-button" @click="handleCollectAll(def.category.id, locale === 'en' ? def.category.nameEn : def.category.name)" :title="$t('collection.actions.collect_all_tooltip')" :aria-label="$t('collection.actions.collect_all_tooltip')"><Icon name="lucide:check-check" class="w-4 h-4" /></button>
             </div>
 
             <!-- Collapsible content -->
             <div
               class="collection-category-content-wrapper"
+              :id="`category-content-${def.category.id}`"
+              :inert="!isCategoryExpanded(def.category.id) || undefined"
+              :aria-hidden="!isCategoryExpanded(def.category.id) || undefined"
               :class="{
                 'is-open': isCategoryExpanded(def.category.id),
                 'is-animating': isCategoryAnimating(def.category.id),
@@ -1053,6 +868,62 @@ const selectedRareAnalysisCategoryId = ref<string | null>(null);
 
 // UX: Collapsible filter panel (default collapsed)
 const isFilterExpanded = ref(false);
+const isRadarExpanded = ref(false);
+const filterEntry = ref<HTMLButtonElement | null>(null);
+const filterSheet = ref<HTMLElement | null>(null);
+const allDecorItems = computed(() => getAllDecorItems());
+const albumCollectedCount = computed(() => allDecorItems.value.filter(item => isCollected(item.id)).length);
+const selectedFilterSummary = computed(() => [
+  selectedCategoryType.value ? getCategoryTypeName(selectedCategoryType.value) : '',
+  selectedPikminType.value ? t(`pikmin_types.${selectedPikminType.value}`) : '',
+  collectionFilter.value !== 'all' ? collectionFilters.value.find(filter => filter.value === collectionFilter.value)?.label : '',
+  isLimitedMode.value ? t('collection.filters.limited') : '',
+  selectedCategoryId.value ? getCategoryName(selectedCategoryId.value) : '',
+].filter(Boolean).join(' · '));
+const browseAlbum = async () => {
+  await nextTick();
+  const results = document.getElementById('collection-album-results');
+  if (!results) return;
+  const headerHeight = document.querySelector('header')?.getBoundingClientRect().height ?? 90;
+  window.scrollTo({ top: Math.max(0, results.getBoundingClientRect().top + window.scrollY - headerHeight - 12), behavior: collectionMotionEnabled() ? 'smooth' : 'auto' });
+  results.focus({ preventScroll: true });
+};
+const handleFilterKeys = (event: KeyboardEvent) => {
+  if (event.key !== 'Tab' || !filterSheet.value) return;
+  const elements = Array.from(filterSheet.value.querySelectorAll<HTMLElement>('button, input, select, [tabindex="0"]')).filter(element => element.getClientRects().length && !element.hasAttribute('disabled'));
+  const first = elements[0], last = elements[elements.length - 1];
+  if (!first || !last) return;
+  if (event.shiftKey && (document.activeElement === first || document.activeElement === filterSheet.value)) { event.preventDefault(); last.focus(); }
+  else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+};
+let previousBodyOverflow: string | null = null;
+const restoreFilterScroll = () => {
+  if (previousBodyOverflow === null) return;
+  document.body.style.overflow = previousBodyOverflow;
+  previousBodyOverflow = null;
+};
+let mobileFilterQuery: MediaQueryList | null = null;
+const syncFilterViewport = async () => {
+  if (!import.meta.client) return;
+  if (isFilterExpanded.value && (mobileFilterQuery?.matches ?? window.innerWidth < 768)) {
+    if (previousBodyOverflow === null) previousBodyOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    await nextTick();
+    if (isFilterExpanded.value && mobileFilterQuery?.matches) filterSheet.value?.focus({ preventScroll: true });
+  } else restoreFilterScroll();
+};
+watch(isFilterExpanded, async (expanded) => {
+  await syncFilterViewport();
+  if (!expanded && !isFilterExpanded.value) filterEntry.value?.focus({ preventScroll: true });
+});
+onMounted(() => {
+  mobileFilterQuery = window.matchMedia('(max-width: 767px)');
+  mobileFilterQuery.addEventListener('change', syncFilterViewport);
+});
+onBeforeUnmount(() => {
+  mobileFilterQuery?.removeEventListener('change', syncFilterViewport);
+  restoreFilterScroll();
+});
 
 const { isAmbientPaused } = useParallax();
 watch(isFilterExpanded, (expanded) => {
@@ -1185,22 +1056,18 @@ const markCategoriesAnimating = (categoryIds: string[]) => {
   animatingCategories.value = nextAnimating;
 };
 
-const toggleCategory = (categoryId: string) => {
+const toggleCategory = async (categoryId: string) => {
   cancelCategoryBulkToggle();
   markCategoriesAnimating([categoryId]);
-  requestAnimationFrame(() => {
-    const newSet = new Set(collapsedCategories.value);
-    if (newSet.has(categoryId)) {
-      newSet.delete(categoryId);
-    } else {
-      newSet.add(categoryId);
-    }
-    collapsedCategories.value = newSet;
-    if (!newSet.has(categoryId) && animatingCategories.value.has(categoryId)) {
-      const category = document.getElementById(`cat-${categoryId}`);
-      if (category) revealCategory(category);
-    }
-  });
+  const newSet = new Set(collapsedCategories.value);
+  if (newSet.has(categoryId)) newSet.delete(categoryId);
+  else newSet.add(categoryId);
+  collapsedCategories.value = newSet;
+  await nextTick();
+  if (isCategoryExpanded(categoryId) && animatingCategories.value.has(categoryId)) {
+    const category = document.getElementById(`cat-${categoryId}`);
+    if (category) revealCategory(category);
+  }
 };
 
 const isCategoryExpanded = (categoryId: string) =>
@@ -2261,402 +2128,147 @@ const handleCollectAll = (categoryId: string, categoryName: string) => {
   font-weight: 850;
 }
 
-.collection-section-card {
-  position: relative;
-  overflow: hidden;
-  background: rgba(255, 255, 255, 0.72);
-  border: 1px solid rgba(255, 255, 255, 0.72);
-  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.1);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
+/* Album styles are scoped to this page and its teleported filter paper. */
+.collection-page, .collection-filter-overlay { --album-green: #10b981; --album-ink: #234c40; --album-muted: #718779; --album-line: #d6e2d5; --album-paper: #fffcf3; color: var(--album-ink); }
+.collection-page { padding-bottom: 5rem; }
+@media (min-width: 640px) { .collection-page.has-album-index { padding-right: 6.6rem; } }
+.collection-filter-panel { border: 1px solid var(--album-line); border-radius: 1.1rem; padding: 1rem; background: var(--album-paper); box-shadow: 0 4px 0 #dce6d7, 0 14px 30px #234c400a; }
+.collection-filter-kicker { display: flex; justify-content: space-between; gap: .6rem; margin-bottom: .8rem; color: var(--album-muted); font-size: .68rem; font-weight: 700; }
+.collection-filter-kicker span:first-child { letter-spacing: .1em; font-family: ui-monospace, monospace; }
+.collection-filter-panel :deep(.input-field), .collection-filter-sheet :deep(.input-field) { min-height: 48px; border: 1px solid #dce5db; border-radius: .7rem; background: #f5f7ed; box-shadow: inset 0 2px 3px #234c4005; font-size: 16px; color: var(--album-ink); }
+.collection-filter-open { display: inline-flex; align-items: center; justify-content: center; gap: .4rem; flex-shrink: 0; min-height: 48px; padding: .65rem .8rem; border-radius: .7rem; border: 1px solid #10b981; background: #10b981; color: #fff; font-size: .85rem; font-weight: 800; box-shadow: 0 3px 0 #078966; }
+.collection-filter-open:active { transform: translateY(2px); box-shadow: 0 1px 0 #078966; }
+.collection-filter-panel .collection-filter-chip { display: none; }
+.collection-filter-panel :deep(button:focus-visible), .collection-filter-sheet :deep(button:focus-visible), .collection-category-toggle:focus-visible, .collection-collect-button:focus-visible, .capture-dashboard-header:focus-visible { outline: 3px solid #10b981; outline-offset: 3px; }
+.collection-desktop-filters { margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--album-line); }
+.collection-active-summary { display: flex; align-items: center; justify-content: space-between; gap: .8rem; padding: .4rem .2rem; }
+.collection-active-summary p { min-width: 0; font-size: .85rem; }
+.collection-active-summary strong { margin-inline: .35rem; color: #078966; }
+.collection-active-summary p > span { display: block; margin-top: .3rem; font-size: .74rem; color: var(--album-muted); }
+.collection-active-summary button { flex-shrink: 0; min-height: 44px; color: #078966; font-size: .8rem; font-weight: 700; }
+.collection-active-summary button span { padding-left: .5rem; }
+.collection-soft-button, .collection-filter-chip { display: inline-flex; align-items: center; justify-content: center; gap: .4rem; min-height: 44px; border: 1px solid var(--album-line); background: #f5f7ed; color: var(--album-ink); border-radius: .65rem; font-weight: 700; }
+.collection-page :deep(.category-tag), .collection-filter-overlay :deep(.category-tag), .collection-page :deep(.filter-chip), .collection-filter-overlay :deep(.filter-chip) { min-height: 44px; box-shadow: none; backdrop-filter: none; border-radius: .65rem; }
+.collection-page :deep(.category-tag-active), .collection-filter-overlay :deep(.category-tag-active), .collection-page :deep(.filter-chip-active), .collection-filter-overlay :deep(.filter-chip-active) { background: #10b981 !important; border-color: #10b981 !important; color: #fff !important; }
+.collection-page :deep(.category-tag-inactive), .collection-filter-overlay :deep(.category-tag-inactive), .collection-page :deep(.filter-chip-inactive), .collection-filter-overlay :deep(.filter-chip-inactive) { background: #f5f7ed; color: var(--album-ink); border-color: var(--album-line); }
+.collection-filter-overlay { perspective: 1200px; }
+.collection-filter-backdrop { background: #152e27a8; }
+.collection-filter-sheet { max-height: 88dvh; border: 1px solid #d2ddce; border-radius: 1.4rem 1.4rem 0 0; background: #fffcf3; box-shadow: 0 -5px 0 #e7e9db, 0 -10px 0 #bac9b2, 0 -24px 55px #172f2726; transform-origin: bottom center; }
+.collection-filter-sheet > div:first-child { padding-top: .8rem; padding-bottom: .5rem; }
+.collection-filter-sheet > div:first-child > div { background: #bac9b2; height: 4px; }
+.collection-filter-sheet > div:nth-child(2) { padding: .25rem 1.2rem .75rem; border-bottom: 1px solid var(--album-line); }
+.collection-filter-sheet > div:nth-child(3) { padding: 1rem 1.2rem; overscroll-behavior: contain; }
+.collection-filter-sheet .text-gray-800, .collection-filter-sheet .text-gray-600 { color: var(--album-ink); }
+.collection-filter-sheet > div:last-child { padding: .85rem 1rem calc(.85rem + env(safe-area-inset-bottom)); background: #f0f4e9; border-top: 1px solid var(--album-line); }
+.collection-filter-sheet .btn-primary { background: #10b981; color: #fff; box-shadow: 0 3px 0 #078966; }
+.collection-sheet-tabs { display: flex; justify-content: space-between; padding: .2rem 0 .8rem; border-bottom: 1px dashed #d6e2d5; color: #7b8e75; font-size: .66rem; letter-spacing: .06em; font-weight: 700; }
+.capture-dashboard { padding: 0; border: 1px solid var(--album-line); border-radius: .9rem; background: #f8f8ed; box-shadow: 0 3px 0 #dce6d7; backdrop-filter: none; -webkit-backdrop-filter: none; }
+.capture-dashboard-header { display: flex; align-items: center; justify-content: space-between; width: 100%; text-align: left; gap: .5rem; padding: .85rem 1rem; margin: 0; }
+.capture-dashboard-heading { gap: .7rem; }
+.capture-dashboard-heading h2 { font-size: .95rem; color: var(--album-ink); }
+.capture-dashboard-heading p { display: none; }
+.capture-dashboard-icon { border: 1px solid #c9dac7; border-radius: .5rem; background: #eaf0df; color: #718779; box-shadow: none; }
+.capture-dashboard-badge { gap: .6rem; min-width: auto; padding: .4rem 0; border: 0; background: transparent; color: #718779; font-size: .7rem; }
+.radar-chevron { display: inline-block; transition: transform .25s; font-size: 1rem; }
+.radar-chevron.is-open { transform: rotate(180deg); }
+.collection-radar-content { border-top: 1px solid var(--album-line); }
+.capture-dashboard-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0; }
+.rare-recommendation-panel { padding: 1rem; border: 0; border-radius: 0; background: transparent; }
+.rare-recommendation-panel + .rare-recommendation-panel { border-left: 1px solid var(--album-line); }
+.capture-recommendation { background: #fffcf3; border-color: var(--album-line); box-shadow: 0 3px 0 #dce6d7; }
+.capture-recommendation-icon { border-radius: .6rem; background: #e8f3e8; color: #078966; }
+.capture-recommendation-progress { background: #dce6d7; }
+.capture-recommendation-progress > span { background: #10b981; }
+.rare-analysis-panel { border: 0; border-top: 1px solid var(--album-line); border-radius: 0; background: #f0f4e9; }
+.rare-analysis-stat, .rare-analysis-action, .rare-analysis-select { background: #fffcf3; border-color: var(--album-line); }
+.collection-results { outline: none; perspective: 1200px; }
+.collection-section-card { position: relative; display: flex; align-items: center; gap: .8rem; padding: 1rem .2rem; margin-bottom: .3rem; border: 0; border-bottom: 1px solid #b8d0be; border-radius: 0; background: transparent; box-shadow: none; }
+.collection-section-icon { flex-shrink: 0; width: 42px; height: 42px; border-radius: .55rem; background: #10b981; color: #fff; box-shadow: 0 3px 0 #078966; }
+.collection-section-card-purple .collection-section-icon { background: #10b981; }
+.collection-section-title { font-size: 1.4rem; color: var(--album-ink); letter-spacing: -.025em; }
+.collection-section-desc { color: #718779; font-size: .75rem; }
+.collection-section-actions { display: flex; align-items: center; gap: .25rem; flex-shrink: 0; }
+.collection-section-action { display: grid; place-items: center; width: 44px; height: 44px; color: #078966; border: 1px solid var(--album-line); border-radius: .6rem; background: #fffcf3; }
+.collection-count-pill { padding: .55rem .6rem; border: 1px solid var(--album-line); border-radius: .6rem; background: #e9f0df; color: #718779; font-size: .72rem; font-weight: 700; white-space: nowrap; }
+.collection-info-card { padding: .2rem .2rem; margin-bottom: .5rem; background: none; border: 0; box-shadow: none; }
+.collection-info-card summary { display: flex; align-items: center; justify-content: space-between; min-height: 44px; list-style: none; color: #718779; font-size: .75rem; cursor: pointer; }
+.collection-info-card summary::-webkit-details-marker { display: none; }
+.collection-info-card summary > span { font-size: 1.1rem; transition: transform .2s; }
+.collection-info-card[open] summary > span { transform: rotate(45deg); }
+.collection-info-card .collection-info-desc { padding: .25rem 0 .75rem; }
+.collection-info-icon { display: none; }
+.collection-info-title { color: #527561; font-size: .75rem; }
+.collection-info-desc { color: #718779; font-size: .75rem; line-height: 1.6; }
+.collection-category-header { position: sticky; top: 104px; z-index: 9; display: flex; gap: .3rem; align-items: center; width: 100%; padding: .25rem .5rem .25rem .25rem; border: 1px solid var(--album-line); border-left: 5px solid #10b981; border-radius: .65rem .9rem .9rem .65rem; background: #fffcf3; box-shadow: 0 4px 0 #dce6d7, 0 9px 16px #234c4008; }
+.collection-category-toggle { flex: 1; min-width: 0; display: flex; gap: .7rem; align-items: center; min-height: 64px; text-align: left; padding: .45rem; }
+.collection-chapter-number { flex-shrink: 0; width: 2rem; align-self: center; color: #91a489; font: 500 .85rem ui-monospace, monospace; }
+.collection-category-name { flex: 1; min-width: 0; }
+.collection-category-name strong { display: block; color: var(--album-ink); font-size: 1rem; font-weight: 800; line-height: 1.4; overflow-wrap: anywhere; }
+.collection-category-name small { display: block; color: #8b9b85; font-size: .68rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.collection-category-progress { width: 3.1rem; flex-shrink: 0; }
+.collection-category-progress strong { display: block; text-align: right; color: #078966; font-size: .78rem; font-variant-numeric: tabular-nums; }
+.collection-progress-track { display: block; height: 3px; margin-top: .4rem; border-radius: 3px; background: #dce6d7; overflow: hidden; }
+.collection-progress-fill { display: block; height: 100%; background: #10b981; }
+.collection-category-chevron { flex-shrink: 0; color: #7b937b; font-size: 1.1rem; transition: transform .3s; }
+.is-expanded .collection-category-chevron { transform: rotate(180deg); }
+.collection-collect-button { display: grid; place-items: center; flex-shrink: 0; width: 44px; height: 44px; border: 1px solid #10b981; border-radius: .65rem; background: #10b981; color: #fff; box-shadow: 0 3px 0 #078966; }
+.collection-collect-button:active { transform: translateY(2px); box-shadow: 0 1px 0 #078966; }
+.collection-category-content-inner { padding: .2rem .1rem .6rem; }
+@media (max-width: 767px) {
+  .collection-page { margin-inline: -.25rem; }
+  .collection-section-card { flex-wrap: wrap; gap: .7rem; }
+  .collection-section-card > .flex-1 { flex-basis: calc(100% - 60px); }
+  .collection-section-actions { width: 100%; justify-content: flex-end; padding-top: .1rem; }
+  .collection-category-header { top: 91px; }
+  .collection-category-toggle { gap: .45rem; min-height: 61px; }
+  .collection-chapter-number { width: 1.5rem; font-size: .72rem; }
+  .collection-category-name strong { font-size: .92rem; }
+  .collection-category-name small { font-size: .62rem; }
+  .capture-dashboard-grid { grid-template-columns: 1fr; }
+  .rare-recommendation-panel + .rare-recommendation-panel { border-left: 0; border-top: 1px solid var(--album-line); }
+  .rare-analysis-toolbar { flex-direction: column; align-items: stretch; }
+  .rare-analysis-select { width: 100%; max-width: none; }
+  .rare-analysis-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 360px) {
+  .collection-filter-panel { padding: .8rem; }
+  .collection-filter-kicker { font-size: .6rem; }
+  .collection-filter-open { padding: .65rem; }
+  .collection-filter-open > .iconify:last-child { display: none; }
+  .collection-category-toggle { gap: .35rem; padding: .4rem .25rem; }
+  .collection-chapter-number { width: 1.2rem; }
+  .collection-category-progress { width: 2.7rem; }
 }
 
-.collection-section-card::before {
-  display: none;
-}
-
-.collection-section-card::after {
-  display: none;
-}
-
-.collection-section-card > * {
-  position: relative;
-  z-index: 1;
-}
-
-.collection-section-card-purple {
-  background: rgba(255, 255, 255, 0.72);
-}
-
-.collection-section-card-purple::before {
-  display: none;
-}
-
-.collection-section-card-purple::after {
-  display: none;
-}
-
-.collection-section-icon {
-  box-shadow:
-    0 12px 24px rgba(0, 133, 35, 0.22),
-    0 1px 8px rgba(255, 255, 255, 0.5) inset;
-}
-
-.collection-section-title {
-  paint-order: normal;
-  text-shadow: none;
-}
-
-.collection-section-desc,
-.collection-section-count,
-.collection-info-desc {
-  paint-order: normal;
-  text-shadow: none;
-}
-
-.collection-section-actions {
-  padding: 4px;
-  border-radius: 18px;
-  background: rgba(255, 255, 255, 0.3);
-  border: 1px solid rgba(255, 255, 255, 0.72);
-  box-shadow: 0 1px 10px rgba(255, 255, 255, 0.78) inset;
-}
-
-.collection-section-action {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 30px;
-  height: 30px;
-  color: rgb(6 95 70 / 0.82);
-  border-radius: 12px;
-  transition: all 180ms ease;
-}
-
-.collection-section-action:hover {
-  color: rgb(4 120 87);
-  background: rgba(255, 255, 255, 0.58);
-  transform: translateY(-1px);
-}
-
-.collection-count-pill {
-  min-width: max-content;
-  padding: 7px 10px;
-  color: rgb(6 95 70);
-  font-size: 0.82rem;
-  font-weight: 800;
-  line-height: 1;
-  border-radius: 999px;
-  background: rgba(214, 255, 224, 0.68);
-  border: 1px solid rgba(115, 255, 150, 0.82);
-  box-shadow:
-    0 6px 14px rgba(0, 133, 35, 0.08),
-    0 1px 8px rgba(255, 255, 255, 0.78) inset;
-}
-
-.collection-count-pill-purple {
-  color: rgb(107 33 168);
-  background: rgba(250, 245, 255, 0.7);
-  border-color: rgba(216, 180, 254, 0.78);
-}
-
-.collection-category-header {
-  width: 100%;
-  background: linear-gradient(135deg, rgba(236, 253, 245, 0.95), rgba(240, 253, 250, 0.9));
-  border: 1px solid rgba(255, 255, 255, 0.78);
-  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-}
-
-.collection-category-header-special {
-  background: linear-gradient(135deg, rgba(250, 245, 255, 0.95), rgba(253, 242, 248, 0.9));
-}
-
-.collection-info-card {
-  background: rgba(236, 253, 245, 0.72);
-  border: 1px solid rgba(255, 255, 255, 0.76);
-  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.08);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-}
-
-.collection-info-card-purple {
-  background: rgba(250, 245, 255, 0.74);
-}
-
-.collection-info-icon {
-  background: rgba(255, 255, 255, 0.54);
-  border: 1px solid rgba(255, 255, 255, 0.78);
-  box-shadow: 0 1px 10px rgba(255, 255, 255, 0.78) inset;
-}
-
-.collection-info-title {
-  letter-spacing: 0.01em;
-  paint-order: normal;
-  text-shadow: none;
-}
-
-.collection-filter-chip,
-.collection-soft-button {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.375rem;
-  background: rgba(255, 255, 255, 0.78);
-  border: 1px solid rgba(255, 255, 255, 0.82);
-  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.07);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-}
-
-.collection-soft-button:hover {
-  background: rgba(236, 253, 245, 0.9);
-  border-color: rgba(110, 231, 183, 0.7);
-}
-
-.collection-collect-button {
-  color: white;
-  background: linear-gradient(135deg, var(--brand-green), var(--brand-green-dark));
-  box-shadow: 0 8px 16px rgba(0, 170, 136, 0.18);
-  transition: transform 180ms ease, box-shadow 180ms ease;
-}
-
-.collection-collect-button:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 10px 20px rgba(0, 170, 136, 0.24);
-}
-
-@media (max-width: 1024px) {
-  .capture-dashboard-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
-@media (max-width: 640px) {
-  .capture-dashboard {
-    padding: 0.78rem;
-    border-radius: 1.05rem;
-    backdrop-filter: none;
-    -webkit-backdrop-filter: none;
-  }
-
-  .capture-dashboard-header {
-    align-items: flex-start;
-    margin-bottom: 0.6rem;
-  }
-
-  .capture-dashboard-heading {
-    gap: 0.55rem;
-  }
-
-  .capture-dashboard-icon {
-    width: 2rem;
-    height: 2rem;
-    border-radius: 0.75rem;
-  }
-
-  .capture-dashboard-heading h2 {
-    font-size: 0.95rem;
-  }
-
-  .capture-dashboard-heading p {
-    font-size: 0.72rem;
-  }
-
-  .capture-dashboard-badge {
-    padding: 0.3rem 0.5rem;
-    font-size: 0.68rem;
-  }
-
-  .capture-dashboard-grid {
-    grid-template-columns: 1fr;
-    gap: 0.5rem;
-  }
-
-  .rare-recommendation-panel {
-    padding: 0.52rem;
-    border-radius: 0.9rem;
-  }
-
-  .rare-recommendation-panel-head {
-    align-items: flex-start;
-  }
-
-  .rare-recommendation-panel-head span {
-    font-size: 0.8rem;
-  }
-
-  .rare-recommendation-panel-head small {
-    max-width: 8rem;
-    font-size: 0.62rem;
-  }
-
-  .capture-recommendation {
-    min-height: 3.8rem;
-    padding: 0.58rem 0.62rem 0.74rem;
-    border-radius: 0.9rem;
-  }
-
-  .capture-recommendation-icon {
-    width: 2.2rem;
-    height: 2.2rem;
-    border-radius: 0.78rem;
-  }
-
-  .capture-recommendation-copy strong {
-    font-size: 0.84rem;
-  }
-
-  .capture-recommendation-copy span {
-    font-size: 0.68rem;
-  }
-
-  .capture-recommendation-hint {
-    font-size: 0.62rem;
-  }
-
-  .rare-analysis-panel {
-    padding: 0.58rem;
-    border-radius: 0.9rem;
-  }
-
-  .rare-analysis-toolbar {
-    align-items: stretch;
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-
-  .rare-analysis-select {
-    width: 100%;
-    max-width: none;
-  }
-
-  .rare-analysis-summary {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0.42rem;
-  }
-
-  .rare-analysis-stat {
-    padding: 0.48rem 0.52rem;
-  }
-
-  .rare-analysis-stat strong {
-    font-size: 0.8rem;
-  }
-
-  .collection-category-header {
-    width: calc(100% - 16px);
-    margin-inline: auto;
-    gap: 0.65rem;
-    padding: 0.8rem 0.85rem;
-  }
-
-  .collection-category-header :deep(.collection-collect-button),
-  .collection-category-header .collection-collect-button {
-    width: 2.1rem;
-    height: 2.1rem;
-    flex: 0 0 auto;
-    justify-content: center;
-    padding: 0;
-  }
-
-  .collection-category-header .text-right {
-    width: 3.55rem;
-  }
-
-  .collection-section-card {
-    display: grid;
-    grid-template-columns: 48px minmax(0, 1fr);
-    align-items: center;
-    column-gap: 12px;
-    row-gap: 10px;
-    padding: 16px 14px;
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
-  }
-
-  .collection-section-icon {
-    width: 48px;
-    height: 48px;
-  }
-
-  .collection-section-title {
-    font-size: 1.45rem;
-    line-height: 1.1;
-  }
-
-  .collection-section-actions {
-    position: static;
-    grid-column: 2;
-    justify-self: start;
-    max-width: 100%;
-  }
-
-  .collection-section-desc {
-    max-width: none;
-  }
-}
-
-/* Floating decorative elements */
-.deco-leaf {
-  position: absolute;
-  animation: deco-float 8s ease-in-out infinite;
-}
-
-.deco-leaf-1 {
-  top: 20px;
-  left: 8%;
-  animation-delay: 0s;
-  animation-duration: 7s;
-}
-
-.deco-leaf-2 {
-  top: 60px;
-  right: 15%;
-  animation-delay: 1.5s;
-  animation-duration: 9s;
-}
-
-.deco-leaf-3 {
-  top: 100px;
-  left: 25%;
-  animation-delay: 3s;
-  animation-duration: 6s;
-}
-
-.deco-leaf-4 {
-  top: 40px;
-  right: 30%;
-  animation-delay: 2s;
-  animation-duration: 10s;
-}
-
-.deco-leaf-5 {
-  top: 120px;
-  left: 60%;
-  animation-delay: 4s;
-  animation-duration: 8s;
-}
-
-@keyframes deco-float {
-  0%,
-  100% {
-    transform: translateY(0) rotate(0deg);
-    opacity: 0.6;
-  }
-  25% {
-    transform: translateY(-12px) rotate(8deg);
-    opacity: 1;
-  }
-  50% {
-    transform: translateY(-6px) rotate(-5deg);
-    opacity: 0.8;
-  }
-  75% {
-    transform: translateY(-15px) rotate(3deg);
-    opacity: 1;
-  }
-}
+/* Collection journal: planar specimens, quiet paper edges, touch-first tabs. */
+.collection-page { --album-paper: #fffdf7; --album-line: #e0e3d7; --album-muted: #7c897b; background: #f8faf2; border-radius: 1rem; }
+.collection-filter-panel { border: 0; padding: 0; background: transparent; box-shadow: none; }
+.collection-filter-kicker { display: none; }
+.collection-filter-panel :deep(.input-field) { background: #fffdf8; border-color: #e2e4d9; box-shadow: 0 2px 6px #324c3110; border-radius: .85rem; }
+.collection-filter-open { box-shadow: 0 2px 0 #079b6c; border-radius: .85rem; }
+.collection-journal-tabs { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: .25rem; position: relative; margin-bottom: -1rem!important; z-index: 2; padding-inline: .45rem; }
+.collection-journal-tabs button { min-height: 48px; padding: .55rem .25rem; border: 1px solid #e0e3d7; border-bottom: 0; border-radius: .8rem .8rem 0 0; background: #f0f3e9; color: #73816d; font-size: .8rem; font-weight: 700; }
+.collection-journal-tabs button[aria-pressed="true"] { background: #10b981; border-color: #10b981; color: #fff; }
+.collection-journal-tabs button:focus-visible { outline: 3px solid #07835c; outline-offset: 2px; }
+.collection-results { position: relative; margin-top: 1rem; padding: .8rem; border: 1px solid #e0e3d7; border-radius: 1rem; background: #fffdf7; box-shadow: 0 3px 0 #e8ecdf; }
+.capture-dashboard { background: #f7f8ef; box-shadow: none; border-color: #e1e4d7; }
+.collection-section-card { flex-wrap: nowrap; gap: .5rem; padding: .4rem 0 .75rem; margin-bottom: .2rem; border-color: #e0e3d7; }
+.collection-section-icon { display: none; }.collection-section-card > .flex-1 { flex-basis: auto; min-width: 0; }
+.collection-section-title { font-size: 1.25rem; font-weight: 800; }.collection-section-desc { font-size: .72rem; }
+.collection-section-actions { width: auto; padding-top: 0; gap: .2rem; }
+.collection-section-action { width: 38px; min-height: 44px; border: 0; background: transparent; }
+.collection-count-pill { padding: .35rem .3rem; border: 0; border-radius: .3rem; background: none; font-size: .65rem; color: #7e8d7a; }
+.collection-category-header { padding: .1rem 0; border: 0; border-bottom: 1px solid #e0e4d7; border-radius: 0; background: #fffdf7; box-shadow: none; }
+.collection-category-toggle { min-height: 58px; gap: .5rem; padding: .35rem 0; }
+.collection-chapter-number { align-self: stretch; display: flex; align-items: center; justify-content: center; width: 1.8rem; color: #92a286; font-size: .73rem; }
+.collection-category-name strong { font-size: .9rem; }.collection-category-name small { color: #99a38f; font-size: .6rem; }
+.collection-category-progress strong { font-weight: 600; font-size: .75rem; }.collection-category-progress { width: 3.4rem; }.collection-progress-track { height: 2px; }
+.collection-collect-button { width: 40px; min-height: 44px; border-radius: .55rem; box-shadow: 0 2px 0 #079b6c; }
+.collection-category-header-special .collection-chapter-number { color: #be8c72; }
+.collection-category-content-inner { padding: 0 0 .65rem; }
+@media(max-width:767px) { .collection-section-desc { display: none; }.collection-results { padding: .75rem; }.collection-section-title { font-size: 1.15rem; } }
+@media(max-width:360px) { .collection-results { padding: .6rem; }.collection-section-title { font-size: 1rem; }.collection-section-actions { gap: 0; }.collection-section-action { width: 32px; }.collection-chapter-number { width: 1.3rem; }.collection-category-name strong { font-size: .82rem; }.collection-journal-tabs button { font-size: .73rem; } }
+@media(min-width:768px) { .collection-results { padding: 1.4rem; }.collection-journal-tabs { max-width: 34rem; }.collection-section-title { font-size: 1.65rem; }.collection-category-toggle { min-height: 68px; }.collection-category-name strong { font-size: 1.05rem; } }
 
 /* Accordion CSS Grid height animation */
 .collection-category-content-wrapper {
@@ -2713,312 +2325,5 @@ const handleCollectAll = (categoryId: string, categoryName: string) => {
   }
 }
 
-/* Collection visual hierarchy */
-.collection-page {
-  --collection-ink: rgb(15 23 42);
-  --collection-muted: rgb(100 116 139);
-  --collection-line: rgba(148, 163, 184, 0.24);
-}
 
-.collection-page-ambient {
-  opacity: 0.48;
-}
-
-.collection-page-header {
-  padding: 0.2rem 0.15rem;
-}
-
-.collection-page-title {
-  color: var(--collection-ink);
-  letter-spacing: 0;
-}
-
-.collection-page-title-icon {
-  flex: 0 0 auto;
-  border: 1px solid rgba(15, 118, 110, 0.18);
-  border-radius: 0.75rem;
-  background: rgb(15 118 110);
-  box-shadow: 0 8px 18px rgba(15, 118, 110, 0.18);
-}
-
-.collection-page-subtitle {
-  margin-left: 3.25rem;
-  color: var(--collection-muted);
-  font-size: 0.88rem;
-  font-weight: 650;
-}
-
-.collection-overview {
-  min-width: 13.5rem;
-  border: 1px solid var(--collection-line);
-  border-radius: 0.88rem;
-  background: rgba(255, 255, 255, 0.78);
-  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.05);
-}
-
-.collection-overview p:first-child {
-  color: var(--collection-muted);
-  font-weight: 700;
-}
-
-.collection-overview p:last-child {
-  color: rgb(15 118 110);
-  font-variant-numeric: tabular-nums;
-}
-
-.collection-filter-panel {
-  overflow: visible;
-  border: 1px solid var(--collection-line);
-  border-radius: 1rem;
-  background: rgba(255, 255, 255, 0.78);
-  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.055);
-}
-
-.collection-filter-ambient {
-  display: none;
-}
-
-.capture-dashboard {
-  padding: 0;
-  border-color: var(--collection-line);
-  border-radius: 1rem;
-  background: rgba(255, 255, 255, 0.84);
-  box-shadow: 0 10px 28px rgba(15, 23, 42, 0.06);
-  backdrop-filter: none;
-  -webkit-backdrop-filter: none;
-}
-
-.capture-dashboard-header {
-  margin: 0;
-  padding: 0.92rem 1rem;
-  border-bottom: 1px solid var(--collection-line);
-}
-
-.capture-dashboard-icon {
-  border-radius: 0.7rem;
-  background: rgb(240 253 250);
-}
-
-.capture-dashboard-grid {
-  grid-template-columns: minmax(0, 1.18fr) minmax(18rem, 0.82fr);
-  grid-template-areas:
-    "primary virtual"
-    "primary unlock";
-  gap: 0;
-}
-
-.rare-recommendation-panel {
-  gap: 0.62rem;
-  padding: 0.9rem 1rem 1rem;
-  border: 0;
-  border-radius: 0;
-  background: transparent;
-}
-
-.rare-recommendation-panel-primary {
-  grid-area: primary;
-  border-right: 1px solid var(--collection-line);
-  background: rgba(240, 253, 250, 0.22);
-}
-
-.rare-recommendation-panel-virtual {
-  grid-area: virtual;
-  border-bottom: 1px solid var(--collection-line);
-  background: rgba(255, 251, 235, 0.28);
-}
-
-.rare-recommendation-panel-unlock {
-  grid-area: unlock;
-  background: rgba(248, 250, 252, 0.42);
-}
-
-.rare-recommendation-panel-head {
-  padding-inline: 0.1rem;
-}
-
-.capture-recommendation {
-  min-height: 4rem;
-  border-color: var(--collection-line);
-  border-radius: 0.78rem;
-  background: rgb(255 255 255);
-  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.035);
-}
-
-.capture-recommendation:hover,
-.capture-recommendation:focus-visible {
-  transform: translateY(-1px);
-  background: rgb(248 253 251);
-  box-shadow: 0 8px 18px rgba(15, 118, 110, 0.08);
-}
-
-.capture-recommendation-icon {
-  border-radius: 0.72rem;
-}
-
-.rare-analysis-panel {
-  gap: 0.78rem;
-  margin: 0;
-  padding: 0.95rem 1rem 1rem;
-  border: 0;
-  border-top: 1px solid var(--collection-line);
-  border-radius: 0;
-  background: rgb(248 250 252 / 0.72);
-}
-
-.rare-analysis-stat,
-.rare-analysis-action {
-  border-color: var(--collection-line);
-  border-radius: 0.7rem;
-  background: rgb(255 255 255 / 0.86);
-}
-
-@media (max-width: 768px) {
-  .collection-page-header {
-    padding-inline: 0.15rem;
-  }
-
-  .collection-page-subtitle {
-    margin-left: 0;
-  }
-
-  .collection-overview {
-    width: 100%;
-    min-width: 0;
-    justify-content: flex-end;
-  }
-
-  .collection-filter-panel {
-    border-radius: 0.9rem;
-  }
-
-  .capture-dashboard-grid {
-    grid-template-columns: minmax(0, 1fr);
-    grid-template-areas:
-      "primary"
-      "virtual"
-      "unlock";
-  }
-
-  .capture-dashboard-header {
-    align-items: flex-start;
-    gap: 0.7rem;
-    padding: 0.9rem 0.85rem;
-  }
-
-  .capture-dashboard-heading {
-    align-items: flex-start;
-  }
-
-  .capture-dashboard-heading p {
-    margin-top: 0.22rem;
-    line-height: 1.5;
-  }
-
-  .capture-dashboard-badge {
-    margin-top: 0.05rem;
-    white-space: nowrap;
-  }
-
-  .rare-recommendation-panel {
-    gap: 0.7rem;
-    padding: 0.82rem 0.8rem 0.9rem;
-  }
-
-  .rare-recommendation-panel-head {
-    gap: 0.7rem;
-    padding-inline: 0.12rem;
-  }
-
-  .rare-recommendation-panel-head span {
-    line-height: 1.35;
-  }
-
-  .rare-recommendation-panel-head small {
-    line-height: 1.35;
-  }
-
-  .capture-recommendation-list {
-    gap: 0.58rem;
-  }
-
-  .capture-recommendation {
-    min-height: 4.35rem;
-    row-gap: 0.38rem;
-    padding: 0.66rem 0.68rem 0.92rem;
-  }
-
-  .capture-recommendation-copy {
-    gap: 0.16rem;
-  }
-
-  .capture-recommendation-copy strong {
-    line-height: 1.3;
-  }
-
-  .capture-recommendation-copy span,
-  .capture-recommendation-hint {
-    line-height: 1.38;
-  }
-
-  .capture-recommendation-hint {
-    padding-top: 0.02rem;
-  }
-
-  .capture-recommendation-progress {
-    right: 0.68rem;
-    bottom: 0.42rem;
-    left: 0.68rem;
-  }
-
-  .rare-recommendation-panel-primary {
-    border-right: 0;
-    border-bottom: 1px solid var(--collection-line);
-  }
-
-  .rare-recommendation-panel-virtual {
-    border-bottom: 1px solid var(--collection-line);
-  }
-}
-
-@media (min-width: 1024px) {
-  .collection-filter-panel {
-    padding: 1rem 1.25rem;
-  }
-
-  .capture-dashboard-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    grid-template-areas: "primary virtual unlock";
-    align-items: start;
-  }
-
-  .rare-recommendation-panel {
-    min-width: 0;
-    align-self: stretch;
-  }
-
-  .rare-recommendation-panel-virtual {
-    border-bottom: 0;
-    border-right: 1px solid var(--collection-line);
-  }
-
-  .capture-dashboard-grid.is-score-empty {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    grid-template-areas: "primary virtual" "unlock unlock";
-  }
-
-  .is-score-empty .rare-recommendation-panel-unlock {
-    border-top: 1px solid var(--collection-line);
-  }
-
-  .is-score-empty .rare-recommendation-panel-unlock .capture-recommendation-list {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .collection-page-ambient {
-    display: none;
-  }
-}
 </style>
-

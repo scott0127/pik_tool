@@ -6,9 +6,9 @@
 
 @layer base {
   :root {
-    --brand-green: #00aa88;
-    --brand-green-dark: #008c72;
-    --brand-green-soft: #d9fff0;
+    --brand-green: #10b981;
+    --brand-green-dark: #059669;
+    --brand-green-soft: #e3f8ee;
     --color-soil: #8B6914;
     --color-grass: var(--brand-green);
     --color-sky: #87CEEB;

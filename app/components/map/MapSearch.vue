@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div ref="searchSurface">
     <!-- 地點搜尋欄 -->
     <div 
       class="map-search-wrap absolute z-[1001]"
@@ -8,10 +8,10 @@
       <div class="relative">
         <!-- 搜尋輸入框 -->
         <div class="map-search-field flex items-center overflow-hidden">
-          <div class="pl-3 md:pl-4 text-gray-400">
+          <div class="pl-3 md:pl-4 text-gray-400"><span class="map-search-glass">
             <Icon v-if="!isSearching" name="lucide:search" class="h-4 w-4 md:h-[18px] md:w-[18px]" />
             <Icon v-else name="lucide:loader-circle" class="h-4 w-4 animate-spin md:h-[18px] md:w-[18px]" />
-          </div>
+          </span></div>
           <input
             v-model="searchQuery"
             @input="handleSearchInput"
@@ -19,6 +19,7 @@
             @keydown="handleSearchKeydown"
             type="text"
             :placeholder="$t('map.search.placeholder')"
+            :aria-label="$t('map.search.placeholder')"
             class="map-search-input flex-1 px-3 h-full outline-none"
           />
           <button
@@ -32,21 +33,14 @@
         </div>
 
         <!-- 搜尋結果下拉選單 -->
-        <Transition
-          enter-active-class="transition duration-200 ease-out"
-          enter-from-class="opacity-0 -translate-y-2"
-          enter-to-class="opacity-100 translate-y-0"
-          leave-active-class="transition duration-150 ease-in"
-          leave-from-class="opacity-100 translate-y-0"
-          leave-to-class="opacity-0 -translate-y-2"
-        >
+        <Transition :css="false" @enter="enterResults" @leave="leaveResults">
           <div
             v-if="showSearchResults && (searchResults.length > 0 || searchError)"
             class="map-search-results absolute top-full mt-2 w-full overflow-hidden max-h-80 overflow-y-auto"
           >
             <!-- 錯誤訊息 -->
             <div v-if="searchError" class="p-3 text-sm text-red-600 flex items-center gap-2">
-              <span>⚠️</span>
+              <Icon name="lucide:circle-alert" class="w-4 h-4 shrink-0" />
               <span>{{ searchError }}</span>
             </div>
 
@@ -77,12 +71,15 @@
     <!-- Top-Center: "Search This Area" Floating Pill -->
     <div class="map-search-area absolute left-1/2 -translate-x-1/2 z-[1000]">
       <button
-        v-if="!isLoading && canSearchArea && hasSelectedFilters && !isSingleMode"
+        v-if="canSearchArea && hasSelectedFilters && !isSingleMode"
         @click="$emit('search-area')"
+        :disabled="isLoading"
+        :aria-busy="isLoading"
         class="map-search-area-button flex items-center gap-2 px-4 font-bold transition-all"
       >
-        <Icon name="lucide:search" class="h-4 w-4" />
-        <span>{{ $t('map.search.search_area') }}</span>
+        <span class="map-search-sweep" aria-hidden="true"></span>
+        <span class="map-search-area-glyph"><Icon :name="isLoading ? 'lucide:loader-circle' : 'lucide:search'" class="h-4 w-4" :class="{ 'animate-spin': isLoading }" /></span>
+        <span class="map-search-area-label">{{ $t(isLoading ? 'map.search.loading' : 'map.search.search_area') }}</span>
       </button>
 
       <!-- Loading State Pill -->
@@ -101,6 +98,7 @@
 </template>
 
 <script setup lang="ts">
+import { gsap } from 'gsap';
 import { useGeocoding } from '~/composables/useGeocoding';
 import type { GeocodingResult } from '~/types/map';
 
@@ -117,6 +115,42 @@ const emit = defineEmits<{
   (e: 'fly-to', lat: number, lon: number): void;
 }>();
 
+const searchSurface = ref<HTMLElement | null>(null);
+let searchMotion: gsap.Context | null = null;
+let searchSweep: gsap.core.Tween | null = null;
+const motionDuration = (duration: number) => window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : duration;
+onMounted(() => { searchMotion = gsap.context(() => {}, searchSurface.value!); });
+const enterResults = (element: Element, done: () => void) => {
+  searchMotion?.add(() => {
+    gsap.timeline({ onComplete: done })
+      .fromTo(element, { y: -8, opacity: 0, scaleY: 0.97, transformOrigin: 'top' }, {
+        y: 0, opacity: 1, scaleY: 1, duration: motionDuration(0.3), ease: 'power3.out', clearProps: 'transform,opacity,transformOrigin',
+      })
+      .fromTo(Array.from(element.querySelectorAll('.map-search-result')).slice(0, 4), { x: -6, opacity: 0 }, {
+        x: 0, opacity: 1, duration: motionDuration(0.24), stagger: motionDuration(0.04), ease: 'power2.out', clearProps: 'transform,opacity',
+      }, motionDuration(0.08));
+  });
+};
+const leaveResults = (element: Element, done: () => void) => {
+  searchMotion?.add(() => gsap.to(element, { y: -5, opacity: 0, duration: motionDuration(0.16), overwrite: true, onComplete: done }));
+};
+watch(() => props.isLoading, async loading => {
+  await nextTick();
+  searchSweep?.kill();
+  searchSweep = null;
+  const sweep = searchSurface.value?.querySelector('.map-search-sweep');
+  if (!sweep) return;
+  gsap.set(sweep, { scaleX: 0 });
+  if (motionDuration(1)) searchMotion?.add(() => {
+    gsap.fromTo('.map-search-area-label', { y: loading ? 5 : -5, opacity: 0.6 }, { y: 0, opacity: 1, duration: 0.28, ease: 'power2.out', overwrite: true, clearProps: 'transform,opacity' });
+    gsap.fromTo('.map-search-area-glyph', { scale: 0.7, rotation: loading ? -25 : 25 }, { scale: 1, rotation: 0, duration: 0.35, ease: 'back.out(1.6)', overwrite: true, clearProps: 'transform' });
+  });
+  if (loading && motionDuration(1)) searchMotion?.add(() => {
+    searchSweep = gsap.fromTo(sweep, { scaleX: 0.1 }, { scaleX: 1, duration: 1.1, repeat: -1, yoyo: true, ease: 'power1.inOut' });
+  });
+}, { flush: 'post' });
+onUnmounted(() => { searchSweep?.kill(); searchMotion?.revert(); });
+
 const { searchLocation, isSearching, searchError } = useGeocoding();
 
 const searchQuery = ref('');
@@ -126,6 +160,7 @@ const selectedResultIndex = ref(-1);
 let searchDebounceTimer: ReturnType<typeof setTimeout> | null = null;
 
 const handleSearchInput = () => {
+  lookForPlace();
   if (searchDebounceTimer) clearTimeout(searchDebounceTimer);
   
   if (!searchQuery.value.trim()) {
@@ -144,9 +179,22 @@ const handleSearchInput = () => {
 };
 
 const handleSearchFocus = () => {
+  if (motionDuration(1)) searchMotion?.add(() => {
+    gsap.fromTo('.map-search-glass', { rotation: -18, scale: 0.85 }, { rotation: 0, scale: 1, duration: 0.4, ease: 'back.out(1.8)', overwrite: true, clearProps: 'transform' });
+  });
   if (searchResults.value.length > 0) {
     showSearchResults.value = true;
   }
+};
+
+const lookForPlace = () => {
+  const glass = searchSurface.value?.querySelector('.map-search-glass');
+  if (!glass || !motionDuration(1)) return;
+  gsap.killTweensOf(glass);
+  searchMotion?.add(() => gsap.timeline()
+    .to(glass, { x: 3, y: -1, rotation: 14, duration: 0.12, ease: 'power2.out' })
+    .to(glass, { x: -2, y: 1, rotation: -9, duration: 0.17, ease: 'power1.inOut' })
+    .to(glass, { x: 0, y: 0, rotation: 0, duration: 0.25, ease: 'power2.out', clearProps: 'transform' }));
 };
 
 const handleSearchKeydown = (e: KeyboardEvent) => {
@@ -357,5 +405,32 @@ if (typeof window !== 'undefined') {
   .map-search-area-button {
     transition-duration: 0.01ms;
   }
+}
+</style>
+<style scoped>
+.map-search-wrap { top: 1rem; left: 17rem; right: auto; width: min(24rem, calc(100% - 38rem)); z-index: 1005; }
+.map-search-wrap.is-panel-visible { left: 22rem; width: min(24rem, calc(100% - 43rem)); }
+.map-search-field, .map-search-results { border-color: #d6dccb; background: #fafaf3; color: #344d3b; box-shadow: 0 3px 0 #c8d0ba, 0 12px 26px rgb(39 58 30 / 13%); }
+.map-search-field { height: 48px; border-radius: 0.7rem; }
+.map-search-field:focus-within { border-color: var(--map-accent); box-shadow: 0 3px 0 #aebf97, 0 12px 26px rgb(39 58 30 / 13%); }
+.map-search-input { color: #344d3b; font-size: 0.86rem; font-weight: 500; }
+.map-search-input::placeholder { color: #7a866f; font-weight: 500; }
+.map-search-clear { min-width: 44px; height: 44px; }
+.map-search-glass, .map-search-area-glyph { display: grid; place-items: center; }
+.map-search-area-label { display: inline-block; }
+.map-search-results { border-radius: 0.7rem; max-height: min(40dvh, 20rem); }
+.map-search-result:hover, .map-search-result:focus-visible, .map-search-result.is-active { background: #e9eedc; }
+.map-search-area { top: 5.2rem; }
+.map-search-area-button { position: relative; overflow: hidden; height: 44px; border: 1px solid var(--map-action); border-radius: 2rem; background: var(--map-action); color: #fff; box-shadow: 0 3px 0 #b7c29e, 0 10px 22px rgb(37 61 32 / 20%); font-weight: 600; }
+.map-search-area-button:hover, .map-search-area-button:focus-visible { background: var(--map-action-hover); border-color: var(--map-action-hover); }
+.map-search-area-button:disabled { cursor: progress; }
+.map-search-sweep { position: absolute; inset: auto 0 0; height: 3px; background: #d7e7a6; transform: scaleX(0); transform-origin: left; }
+.map-search-field:focus-within { outline: 2px solid var(--map-accent); outline-offset: 2px; }
+@media (min-width: 768px) and (max-width: 1100px) { .map-search-wrap { width: calc(100% - 18rem); } .map-search-wrap.is-panel-visible { width: calc(100% - 23rem); } .map-search-area { top: 8.6rem; } }
+@media (max-width: 767px) {
+  .map-search-wrap, .map-search-wrap.is-panel-visible { inset: 0.75rem 0.75rem auto; width: auto; }
+  .map-search-input { font-size: 16px; }
+  .map-search-area { top: 8rem; left: calc(50% - 1.5rem); }
+  .map-search-area-button { font-size: 0.78rem; }
 }
 </style>

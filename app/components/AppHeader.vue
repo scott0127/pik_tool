@@ -1,5 +1,5 @@
 <template>
-  <header class="sticky top-0 z-50">
+  <header v-bind="$attrs" class="sticky top-0 z-50">
     <!-- Decorative top bar -->
     <div class="app-top-bar h-1 bg-gradient-to-r from-emerald-400 via-teal-400 to-emerald-400"></div>
     
@@ -8,19 +8,17 @@
       :class="{ 'mobile-menu-shell-open': showMobileMenu }"
     >
       <div class="app-header-inner max-w-8xl mx-auto px-4 py-3">
-        <div class="flex items-center justify-between">
+        <div class="app-header-row flex items-center justify-between">
           <!-- Logo and Title -->
-          <NuxtLink to="/" class="app-header-brand flex items-center gap-3 group">
+          <NuxtLink to="/" class="app-header-brand flex items-center gap-3 group" :aria-label="$t('app.title')">
             <div class="relative">
               <div class="app-header-logo w-12 h-12 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-2xl flex items-center justify-center shadow-lg group-hover:shadow-xl group-hover:scale-110 transition-all duration-300">
-                <span class="app-header-logo-mark text-2xl">🌱</span>
+                <img class="app-header-logo-mark" src="/images/brand/seedling.png" width="256" height="256" alt="" draggable="false" />
               </div>
-              <!-- Floating leaf decoration -->
-              <span class="absolute -top-1 -right-1 text-sm sway">🍃</span>
             </div>
             <div>
               <h1 class="app-header-title text-xl font-extrabold text-gradient group-hover:opacity-80 transition-opacity">
-                {{ $t('app.title') }}
+                <span class="app-brand-name">Pikmin Bloom</span><span class="app-brand-description">{{ $t('app.short_title') }}</span>
               </h1>
               <p class="app-header-subtitle text-xs text-gray-500 font-medium">{{ $t('app.subtitle') }}</p>
             </div>
@@ -104,41 +102,7 @@
               </div>
             </div>
 
-            <!-- Buy Me a Coffee Button (Desktop) -->
-            <button 
-              @click="handleCoffeeClick"
-              class="hidden md:flex items-center gap-2 px-4 h-10 rounded-xl bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 !text-white transition-all hover:shadow-lg group"
-              :title="$t('header.coffee_mobile')"
-            >
-              <span class="text-lg group-hover:scale-110 transition-transform">☕</span>
-              <span class="text-sm font-semibold hidden xl:inline">{{ $t('header.coffee') }}</span>
-            </button>
-
-            <!-- GitHub Star Button (Desktop) -->
-            <a 
-              href="https://github.com/scott0127/pik_tool"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="hidden md:flex items-center gap-2 px-4 h-10 rounded-xl bg-gradient-to-r from-gray-800 to-gray-900 hover:from-gray-700 hover:to-gray-800 !text-white transition-all hover:shadow-lg group"
-              :title="$t('header.star_mobile')"
-            >
-              <span class="text-lg group-hover:scale-110 transition-transform">⭐</span>
-              <span class="text-sm font-semibold hidden xl:inline">{{ $t('header.star') }}</span>
-            </a>
-
-            <!-- Feedback Button (Desktop) -->
-            <button 
-              @click="showFeedbackModal = true"
-              class="app-feedback-button hidden md:flex items-center gap-2 px-4 h-10 rounded-xl bg-gradient-to-r from-violet-500 to-purple-600 hover:from-violet-600 hover:to-purple-700 !text-white transition-all hover:shadow-lg group overflow-hidden"
-              :title="$t('header.feedback')"
-            >
-              <Icon name="lucide:message-square" class="text-lg shrink-0" />
-              <div class="app-feedback-label hidden 2xl:block w-24 overflow-hidden">
-                <span class="inline-block whitespace-nowrap animate-marquee text-sm font-semibold">
-                  {{ $t('header.feedback') }}&nbsp;&nbsp;&nbsp;&nbsp;{{ $t('header.feedback') }}&nbsp;&nbsp;&nbsp;&nbsp;
-                </span>
-              </div>
-            </button>
+            <HeaderSupportAction v-for="kind in supportKinds" :key="kind" :kind="kind" compact @activate="activateSupport(kind)" />
 
             <!-- Search Button (Desktop) -->
             <button 
@@ -152,7 +116,7 @@
             <LanguageSwitcher class="hidden md:flex" />
 
             <!-- User Menu -->
-            <div class="hidden sm:block">
+            <div class="app-header-user hidden sm:block">
               <template v-if="user">
                 <div class="flex items-center gap-2">
                   <div 
@@ -178,23 +142,20 @@
               </NuxtLink>
             </div>
 
-            <!-- Mobile Menu Button -->
-            <button 
+            <!-- Two paper strokes fold into the close mark. -->
+            <button
+              ref="menuButton"
+              type="button"
               @click="toggleMobileMenu"
-              class="app-mobile-menu-button md:hidden w-10 h-10 flex items-center justify-center rounded-xl bg-white/60 hover:bg-white transition-all"
+              @keydown.esc.stop="showMobileMenu = false"
+              class="app-mobile-menu-button md:hidden"
+              :class="{ 'is-open': showMobileMenu }"
+              :aria-expanded="showMobileMenu"
+              aria-controls="mobile-navigation-panel"
+              :aria-label="$t(showMobileMenu ? 'header.close_menu' : 'header.open_menu')"
             >
-              <Transition
-                enter-active-class="transition duration-200"
-                enter-from-class="rotate-90 opacity-0"
-                enter-to-class="rotate-0 opacity-100"
-                leave-active-class="transition duration-200"
-                leave-from-class="rotate-0 opacity-100"
-                leave-to-class="-rotate-90 opacity-0"
-                mode="out-in"
-              >
-                <span v-if="showMobileMenu" class="text-xl">✕</span>
-                <span v-else class="text-xl">☰</span>
-              </Transition>
+              <span class="app-menu-strokes" aria-hidden="true"><span></span><span></span></span>
+              <span class="app-menu-caption" aria-hidden="true">{{ $t(showMobileMenu ? 'header.close' : 'header.menu') }}</span>
             </button>
           </div>
         </div>
@@ -240,7 +201,9 @@
           <div
             v-if="showMobileMenu"
             :key="mobileMenuRenderKey"
+            id="mobile-navigation-panel"
             class="mobile-menu-panel md:hidden mt-4 space-y-4"
+            @keydown.esc.stop="closeMobileMenu"
           >
             <!-- Mobile Progress -->
             <div class="flex items-center justify-between bg-white/50 rounded-2xl p-4">
@@ -273,42 +236,9 @@
               </NuxtLink>
             </div>
 
-            <!-- Buy Me a Coffee Button (Mobile) -->
-            <button 
-              @click="handleCoffeeClick"
-              class="mobile-action-button flex items-center justify-center gap-2 bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 text-white rounded-2xl p-4 transition-all w-full max-w-[200px]"
-            >
-              <span class="text-2xl flex-shrink-0">☕</span>
-              <span class="font-semibold">{{ $t('header.coffee_mobile') }}</span>
-            </button>
-
-            <!-- GitHub Star Button (Mobile) -->
-            <a 
-              href="https://github.com/scott0127/pik_tool"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="mobile-action-button flex items-center justify-center gap-2 bg-gradient-to-r from-gray-800 to-gray-900 text-white rounded-2xl p-4 hover:from-gray-700 hover:to-gray-800 transition-all w-full max-w-[200px] overflow-hidden"
-            >
-              <span class="text-2xl flex-shrink-0">⭐</span>
-              <div class="overflow-hidden">
-                <span class="mobile-action-marquee inline-block whitespace-nowrap animate-marquee font-semibold">
-                  {{ $t('header.star_mobile') }}&nbsp;&nbsp;&nbsp;&nbsp;{{ $t('header.star_mobile') }}&nbsp;&nbsp;&nbsp;&nbsp;
-                </span>
-              </div>
-            </a>
-
-            <!-- Feedback Button (Mobile) -->
-            <button 
-              @click="showFeedbackModal = true; showMobileMenu = false"
-              class="mobile-action-button flex items-center justify-center gap-2 bg-gradient-to-r from-violet-500 to-purple-600 text-white rounded-2xl p-4 hover:from-violet-600 hover:to-purple-700 transition-all w-full max-w-[200px] overflow-hidden"
-            >
-              <span class="text-2xl flex-shrink-0">💬</span>
-              <div class="overflow-hidden">
-                <span class="mobile-action-marquee inline-block whitespace-nowrap animate-marquee font-semibold">
-                  {{ $t('header.feedback') }}&nbsp;&nbsp;&nbsp;&nbsp;{{ $t('header.feedback') }}&nbsp;&nbsp;&nbsp;&nbsp;
-                </span>
-              </div>
-            </button>
+            <div class="mobile-support-actions">
+              <HeaderSupportAction v-for="kind in supportKinds" :key="kind" :kind="kind" @activate="activateSupport(kind)" />
+            </div>
 
             <!-- Mobile Search & Language -->
             <div class="flex gap-2 items-center">
@@ -381,12 +311,12 @@
       >
         <div 
           v-if="showCoffeeModal"
-          class="bg-white rounded-3xl shadow-2xl max-w-md w-full overflow-hidden"
+          class="coffee-support-dialog bg-white rounded-3xl shadow-2xl max-w-md w-full"
         >
           <!-- Header -->
-          <div class="bg-gradient-to-r from-yellow-400 to-orange-500 p-6 text-center">
-            <div class="text-5xl mb-3">☕</div>
-            <h3 class="text-2xl font-bold text-white">{{ $t('coffee.title') }}</h3>
+          <div class="coffee-support-heading p-6 text-center">
+            <SupportActionArt kind="coffee" hero />
+            <h3 class="text-2xl font-bold">{{ $t('coffee.title') }}</h3>
           </div>
 
           <!-- Content -->
@@ -438,7 +368,7 @@
             </button>
             <button
               @click="confirmCoffee"
-              class="flex-1 px-6 py-3 rounded-xl bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 text-white font-semibold transition-all shadow-lg hover:shadow-xl"
+              class="coffee-support-confirm flex-1 px-6 py-3 rounded-xl font-semibold transition-all"
             >
               {{ $t('coffee.confirm') }}
             </button>
@@ -597,13 +527,21 @@
 </template>
 
 <script setup lang="ts">
+defineOptions({ inheritAttrs: false });
 const authStore = useAuthStore();
 const router = useRouter();
 const supabase = useSupabaseClient<any>();
 const { getStats } = useCollection();
 const { canInstallIos, canInstallAndroid, triggerIosPrompt, triggerAndroidPrompt } = usePwaInstall();
 
+const supportKinds = ['coffee', 'star', 'feedback'] as const;
+const activateSupport = (kind: typeof supportKinds[number]) => {
+  showMobileMenu.value = false;
+  if (kind === 'coffee') handleCoffeeClick();
+  if (kind === 'feedback') showFeedbackModal.value = true;
+};
 const showMobileMenu = ref(false);
+const menuButton = ref<HTMLButtonElement | null>(null);
 const mobileMenuRenderKey = ref(0);
 const showSearch = ref(false);
 const searchQuery = ref('');
@@ -710,6 +648,11 @@ const toggleMobileMenu = () => {
   showMobileMenu.value = !showMobileMenu.value;
 };
 
+const closeMobileMenu = () => {
+  showMobileMenu.value = false;
+  nextTick(() => menuButton.value?.focus({ preventScroll: true }));
+};
+
 const handleLogout = async () => {
   if (isLoggingOut.value) return;
   isLoggingOut.value = true;
@@ -757,6 +700,16 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
+.coffee-support-heading { background: linear-gradient(135deg, #fff0df, #f7d6c1); color: #744a36; }
+.coffee-support-dialog { max-height: calc(100dvh - 32px); overflow-y: auto; overscroll-behavior: contain; }
+.coffee-support-confirm { background: #f7d6c1; color: #744a36; box-shadow: 0 3px 0 #d4a88c; }
+.coffee-support-confirm:hover { background: #f3c9ad; }
+.coffee-support-confirm:focus-visible { outline: 2px solid #744a36; outline-offset: 3px; }
+.mobile-support-actions { display: grid; gap: 12px; padding-bottom: 4px; }
+.app-header-logo-mark { width: 76%; height: 76%; object-fit: contain; }
+.app-brand-name { white-space: nowrap; }
+.app-brand-description::before { content: ' '; white-space: pre; }
+
 @media (min-width: 768px) and (max-width: 1360px) {
   .app-header-inner {
     padding-inline: 0.875rem;
@@ -775,48 +728,53 @@ onUnmounted(() => {
     padding-inline: 0.875rem !important;
   }
 
-  .app-feedback-button {
-    display: none !important;
-  }
+
 }
 
 @media (max-width: 767px) {
-  .app-top-bar {
-    height: 5px;
-  }
-
+  .app-top-bar { height: 4px; }
   .app-header-inner {
-    padding: 1rem 1.55rem;
+    padding: calc(12px + env(safe-area-inset-top, 0px)) max(14px, env(safe-area-inset-right, 0px)) 12px max(14px, env(safe-area-inset-left, 0px));
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
   }
-
+  .app-header-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; }
+  .app-header-brand { min-width: 0; gap: 11px; }
+  .app-header-brand > .relative { flex-shrink: 0; }
+  .app-header-brand > div:last-child { min-width: 0; }
   .app-header-logo {
-    width: 4rem;
-    height: 4rem;
-    border-radius: 1.35rem;
+    width: 46px; height: 46px; border-radius: 16px 18px 16px 10px;
+    box-shadow: 0 2px 0 rgb(5 150 105 / 16%), 0 7px 15px rgb(5 150 105 / 13%);
   }
-
-  .app-header-logo-mark {
-    font-size: 2rem;
-    line-height: 1;
-  }
-
   .app-header-title {
-    font-size: clamp(1.55rem, 5.9vw, 2rem);
-    line-height: 1.08;
+    display: flex; flex-direction: column; gap: 3px;
+    font-family: 'Nunito', 'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', system-ui, sans-serif;
+    font-size: 19px; font-weight: 800; line-height: 1.15; letter-spacing: -0.025em;
+    color: #059669; background: none; -webkit-text-fill-color: currentColor;
   }
-
-  .app-header-subtitle {
-    margin-top: 0.28rem;
-    font-size: 0.95rem;
-    font-weight: 700;
-  }
-
+  .app-brand-description { font-size: 12px; font-weight: 600; line-height: 1.4; letter-spacing: 0.06em; }
+  .app-brand-description::before { content: none; }
+  .app-header-subtitle { display: none; }
+  .app-header-actions { gap: 8px; flex-shrink: 0; }
+  .app-header-progress, .app-header-user { display: none; }
+  .app-header-actions > button { flex-shrink: 0; min-width: 44px; min-height: 44px; padding-inline: 10px; }
   .app-mobile-menu-button {
-    width: 3.75rem;
-    height: 3.75rem;
-    border-radius: 1.35rem;
-    font-size: 1.55rem;
+    display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 6px;
+    width: 48px; height: 48px; padding: 0 !important; border-radius: 15px;
+    color: #047857; background: rgb(255 255 255 / 76%); border: 1px solid rgb(16 185 129 / 13%);
+    box-shadow: 0 2px 0 rgb(5 150 105 / 9%); -webkit-tap-highlight-color: transparent;
+    transition: background 220ms, color 220ms, box-shadow 220ms, transform 220ms;
   }
+  .app-mobile-menu-button.is-open { color: #fff; background: var(--brand-green); border-color: var(--brand-green); box-shadow: 0 3px 10px rgb(16 185 129 / 18%); }
+  .app-mobile-menu-button:active { transform: translateY(1px) scale(0.97); }
+  .app-mobile-menu-button:focus-visible, .app-header-brand:focus-visible { outline: 2px solid #059669; outline-offset: 3px; }
+  .app-menu-strokes { position: relative; width: 20px; height: 12px; }
+  .app-menu-strokes > span { position: absolute; left: 0; height: 2px; border-radius: 2px; background: currentColor; transition: transform 280ms cubic-bezier(0.2, 0.8, 0.2, 1), width 220ms; }
+  .app-menu-strokes > span:first-child { top: 2px; width: 20px; }
+  .app-menu-strokes > span:last-child { top: 9px; width: 14px; }
+  .is-open .app-menu-strokes > span:first-child { transform: translateY(3.5px) rotate(45deg); }
+  .is-open .app-menu-strokes > span:last-child { width: 20px; transform: translateY(-3.5px) rotate(-45deg); }
+  .app-menu-caption { font-size: 10px; font-weight: 700; line-height: 1; letter-spacing: 0.08em; }
 
   .mobile-menu-shell-open {
     background:
@@ -827,12 +785,18 @@ onUnmounted(() => {
   }
 
   .mobile-menu-panel {
+    max-height: calc(100vh - 100px - env(safe-area-inset-top, 0px));
+    max-height: calc(100dvh - 100px - env(safe-area-inset-top, 0px));
+    overflow-y: auto; overscroll-behavior: contain;
+    padding-bottom: max(8px, env(safe-area-inset-bottom, 0px));
     contain: layout paint;
     isolation: isolate;
     will-change: transform, opacity;
   }
 
   .mobile-menu-panel .mobile-nav-link {
+    min-width: 0;
+    padding-inline: 4px;
     animation: mobile-nav-tile-in 520ms cubic-bezier(0.2, 0.9, 0.22, 1.2) both;
     transform-origin: 50% 80%;
   }
@@ -843,6 +807,7 @@ onUnmounted(() => {
     transform-origin: center;
     will-change: transform, opacity;
   }
+  .mobile-nav-link > span:not(.iconify) { white-space: nowrap; }
 }
 
 @keyframes mobile-nav-tile-in {
@@ -876,11 +841,6 @@ onUnmounted(() => {
     opacity: 1;
     transform: translateY(0) scale(1) rotate(0);
   }
-}
-
-.mobile-action-marquee {
-  min-width: max-content;
-  animation: marquee 8s linear infinite;
 }
 
 .mobile-nav-link-active,
@@ -945,16 +905,7 @@ onUnmounted(() => {
     font-variant-numeric: tabular-nums;
   }
 
-  .app-feedback-button {
-    display: flex !important;
-    width: 2.5rem;
-    padding-inline: 0;
-    justify-content: center;
-  }
 
-  .app-feedback-label {
-    display: none;
-  }
 }
 
 @media (min-width: 768px) and (max-width: 1279px) {
@@ -1004,5 +955,18 @@ onUnmounted(() => {
   .app-desktop-nav .nav-item > span:not(.iconify) {
     display: inline;
   }
+}
+@media (max-width: 350px) {
+  .app-header-row { gap: 8px; }
+  .app-header-brand { gap: 8px; }
+  .app-header-logo { width: 40px; height: 40px; }
+  .app-header-title { font-size: 17px; }
+  .app-brand-description { font-size: 11px; letter-spacing: 0.025em; }
+  .app-header-actions { gap: 5px; }
+  .app-mobile-menu-button { width: 44px; height: 46px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .app-menu-strokes > span, .app-mobile-menu-button { transition: none; }
+  .mobile-menu-panel .mobile-nav-link, .mobile-menu-panel .mobile-nav-icon { animation: none; }
 }
 </style>

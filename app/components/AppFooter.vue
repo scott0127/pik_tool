@@ -1,81 +1,45 @@
 <template>
-  <footer class="glass border-b-0 mt-auto">
-    <div class="max-w-7xl mx-auto px-4 py-6">
-      <div class="text-center space-y-5">
-        <!-- Page Views Counter -->
-        <div class="flex items-center justify-center gap-3">
-          <span class="text-2xl">👀</span>
-          <div>
-            <p class="text-sm text-gray-500">{{ $t('footer.total_views') }}</p>
-            <p class="text-2xl font-bold text-gradient">
-              {{ formattedViews }}
-            </p>
+  <footer class="app-footer mt-auto">
+    <div class="footer-inner">
+      <div class="footer-top">
+        <section class="visitor-ledger" aria-labelledby="footer-views-title">
+          <div class="ledger-heading">
+            <span class="ledger-mark" aria-hidden="true"><img src="/images/brand/seedling.png" width="40" height="40" alt="" /></span>
+            <h2 id="footer-views-title">{{ $t('footer.total_views') }}</h2>
           </div>
-        </div>
+          <FooterFlipCounter :value="pageViews" />
+          <p class="ledger-thanks">{{ $t('footer.thanks') }}</p>
+        </section>
 
-        <!-- Divider -->
-        <div class="h-px bg-gradient-to-r from-transparent via-gray-300 to-transparent"></div>
-
-        <!-- Primary Links (Larger) -->
-        <div class="flex flex-col sm:flex-row flex-wrap items-center justify-center gap-3 sm:gap-4 text-base px-2">
-          <a 
-            href="https://www.pikminwiki.com/Decor_Pikmin" 
-            target="_blank"
-            rel="noopener noreferrer"
-            class="text-emerald-600 hover:text-emerald-700 transition-colors font-medium underline underline-offset-2 py-2 sm:py-0"
-          >
-            {{ $t('footer.source') }}
-          </a>
-          <span class="hidden sm:inline text-gray-300">•</span>
-          <a 
-            href="https://www.pikminwiki.com/Pikipedia:General_disclaimer" 
-            target="_blank"
-            rel="noopener noreferrer"
-            class="text-gray-700 hover:text-emerald-600 transition-colors font-medium py-2 sm:py-0"
-          >
-            {{ $t('footer.disclaimer') }}
-          </a>
-          <span class="hidden sm:inline text-gray-300">•</span>
-          <a 
-            href="https://pik-tool.onrender.com/feedback"
-            class="text-gray-700 hover:text-emerald-600 transition-colors font-medium py-2 sm:py-0"
-          >
-            {{ $t('footer.feedback') }}
-          </a>
-        </div>
-
-        <!-- Secondary Links (Smaller) -->
-        <div class="flex flex-wrap items-center justify-center gap-3 text-sm text-gray-500">
-          <a 
-            href="https://github.com/scott0127/pik_tool" 
-            target="_blank"
-            rel="noopener noreferrer"
-            class="hover:text-emerald-600 transition-colors flex items-center gap-1"
-          >
-            <span>⭐</span>
-            <span>GitHub</span>
-          </a>
-        </div>
-
-        <!-- Contact Email -->
-        <div class="text-sm text-gray-600 max-w-2xl mx-auto px-4">
-          <p>
-            {{ $t('footer.contact_me') }}
-            <a 
-              href="mailto:scott5497ify@gmail.com"
-              class="text-emerald-600 hover:text-emerald-700 underline underline-offset-2 font-medium"
-            >
-              scott5497ify@gmail.com
+        <div class="footer-information">
+          <nav class="footer-links" :aria-label="$t('footer.links_label')">
+            <a href="https://www.pikminwiki.com/Decor_Pikmin" target="_blank" rel="noopener noreferrer" class="footer-source footer-link">
+              <span>{{ $t('footer.source') }}</span><span class="footer-link-arrow" aria-hidden="true">↗</span>
             </a>
-          </p>
-          <p class="text-xs text-gray-500 mt-1">{{ $t('footer.takedown_help') }}</p>
+            <div class="footer-link-pair">
+              <a href="https://www.pikminwiki.com/Pikipedia:General_disclaimer" target="_blank" rel="noopener noreferrer" class="footer-link">
+                <span>{{ $t('footer.disclaimer') }}</span><span class="footer-link-arrow" aria-hidden="true">↗</span>
+              </a>
+              <a href="https://pik-tool.onrender.com/feedback" class="footer-link">
+                <span>{{ $t('footer.feedback') }}</span><span class="footer-link-arrow" aria-hidden="true">↗</span>
+              </a>
+            </div>
+            <a href="https://github.com/scott0127/pik_tool" target="_blank" rel="noopener noreferrer" class="footer-github footer-link">
+              <span><Icon name="ph:github-logo-fill" aria-hidden="true" /> GitHub</span><span class="footer-link-arrow" aria-hidden="true">↗</span>
+            </a>
+          </nav>
+
+          <address class="footer-contact">
+            <p>{{ $t('footer.contact_me') }}</p>
+            <a href="mailto:scott5497ify@gmail.com">scott5497ify@gmail.com <span aria-hidden="true">↗</span></a>
+            <small>{{ $t('footer.takedown_help') }}</small>
+          </address>
         </div>
+      </div>
 
         <!-- Detailed Copyright Disclaimer -->
-        <div class="border-t border-gray-200 pt-5">
-          <h3 class="text-base font-bold text-gray-700 mb-4 text-center">
-            完整版權與授權免責聲明 (Full Copyright Disclaimer)
-          </h3>
+        <details class="footer-legal">
+          <summary><span>{{ $t('footer.full_disclaimer') }}</span><span class="legal-toggle" aria-hidden="true"></span></summary>
           
           <div class="text-left max-w-4xl mx-auto bg-gray-50 rounded-2xl p-4 sm:p-6 space-y-4 sm:space-y-6 text-xs sm:text-sm">
               <!-- Chinese Disclaimer -->
@@ -160,15 +124,14 @@
                 </div>
               </div>
             </div>
-        </div>
+        </details>
 
         <!-- Copyright -->
-        <div class="text-xs text-gray-400 space-y-1">
+        <div class="footer-copyright">
           <p>{{ $t('footer.copyright') }}</p>
           <p>{{ $t('footer.unofficial') }}</p>
-          <p class="text-gray-400">{{ $t('footer.made_by') }}</p>
+          <p>{{ $t('footer.made_by') }}</p>
         </div>
-      </div>
     </div>
   </footer>
 </template>
@@ -176,14 +139,49 @@
 <script setup lang="ts">
 const { pageViews, incrementPageViews } = usePageViews();
 
-// Format number with thousands separator
-const formattedViews = computed(() => {
-  if (pageViews.value === null) return '---';
-  return pageViews.value.toLocaleString('zh-TW');
-});
-
 // Increment page views on mount
 onMounted(async () => {
   await incrementPageViews();
 });
 </script>
+
+<style scoped>
+.app-footer { position: relative; border-top: 3px solid #10b981; background: #f6faf5; color: #294b3f; }
+.footer-inner { max-width: 1056px; margin: 0 auto; padding: 28px 18px 24px; }
+.footer-top { display: grid; gap: 24px; }
+.visitor-ledger { position: relative; padding: 22px 18px 18px; border: 1px solid #d5e5da; border-radius: 24px 24px 24px 10px; background: #fffdf7; box-shadow: 0 4px 0 #dfebe0, 0 12px 22px #2a654209, inset 0 1px 0 #fff; }
+.ledger-heading { display: flex; align-items: center; gap: 11px; margin-bottom: 20px; }
+.ledger-mark { display: grid; place-items: center; width: 42px; height: 42px; background: #e6f5e8; border-radius: 13px 13px 13px 5px; flex-shrink: 0; }
+.ledger-mark img { width: 32px; height: 32px; object-fit: contain; }
+.ledger-heading h2 { margin: 0; color: #294b3f; font-size: 16px; font-weight: 800; letter-spacing: .04em; }
+.ledger-thanks { margin: 16px 0 0; color: #728379; font-size: 11px; letter-spacing: .05em; }
+.footer-information { min-width: 0; }
+.footer-links { display: grid; gap: 0; }
+.footer-link { display: flex; justify-content: space-between; align-items: center; gap: 10px; min-height: 50px; padding: 10px 0; color: #39574a; font-size: 13px; font-weight: 650; text-decoration: none; border-bottom: 1px solid #dbe7de; -webkit-tap-highlight-color: transparent; }
+.footer-source { color: #059669; font-size: 15px; font-weight: 750; }
+.footer-link-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+.footer-link-arrow { flex-shrink: 0; color: #82988b; font-size: 17px; transition: transform .2s, color .2s; }
+.footer-github > span:first-child { display: flex; align-items: center; gap: 8px; }
+.footer-github :deep(.iconify) { width: 19px; height: 19px; }
+.footer-link:active { color: #059669; }
+.footer-link:active .footer-link-arrow { transform: translate(2px, -2px); }
+.footer-contact { margin-top: 20px; font-style: normal; }
+.footer-contact p { margin: 0 0 5px; color: #728379; font-size: 11px; }
+.footer-contact a { display: inline-flex; align-items: center; gap: 10px; min-height: 32px; color: #047857; font-size: 14px; font-weight: 700; text-decoration-thickness: 1px; text-underline-offset: 4px; }
+.footer-contact a span { color: #82988b; }
+.footer-contact small { display: block; margin-top: 4px; color: #728379; font-size: 11px; line-height: 1.7; }
+.footer-legal { margin-top: 24px; border-top: 1px solid #dbe7de; border-bottom: 1px solid #dbe7de; }
+.footer-legal summary { display: flex; justify-content: space-between; align-items: center; gap: 14px; min-height: 54px; padding: 12px 0; list-style: none; cursor: pointer; color: #546d5f; font-size: 12px; font-weight: 650; }
+.footer-legal summary::-webkit-details-marker { display: none; }
+.legal-toggle { position: relative; width: 22px; height: 22px; border: 1px solid #cdded2; border-radius: 50%; flex-shrink: 0; }
+.legal-toggle::before, .legal-toggle::after { content: ''; position: absolute; inset: 9px 5px auto; height: 1px; background: #5f7d6a; }
+.legal-toggle::after { transform: rotate(90deg); transition: transform .2s; }
+.footer-legal[open] .legal-toggle::after { transform: rotate(0); }
+.footer-legal > div { margin: 0 0 18px; background: #edf4ed; color: #456151; }
+.footer-copyright { display: grid; gap: 6px; padding-top: 20px; color: #798b80; font-size: 10px; line-height: 1.7; }
+.footer-copyright p { margin: 0; }
+.app-footer a:focus-visible, .footer-legal summary:focus-visible { outline: 2px solid #10b981; outline-offset: 4px; border-radius: 3px; }
+@media (hover: hover) { .footer-link:hover { color: #059669; } .footer-link:hover .footer-link-arrow { color: #059669; transform: translate(2px, -2px); } }
+@media (min-width: 640px) { .footer-inner { padding: 40px 28px 28px; } .footer-top { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 48px; align-items: center; } .visitor-ledger { padding: 26px 26px 22px; } .ledger-heading { margin-bottom: 26px; } .ledger-thanks { margin-top: 22px; } .footer-copyright { grid-template-columns: 1fr auto; } .footer-copyright p:nth-child(2) { grid-column: 1; } .footer-copyright p:last-child { grid-column: 2; grid-row: 1 / span 2; align-self: end; } }
+@media (prefers-reduced-motion: reduce) { .footer-link-arrow, .legal-toggle::after { transition: none; } }
+</style>

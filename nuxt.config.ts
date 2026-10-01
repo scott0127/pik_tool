@@ -3,7 +3,7 @@ const securityHeaders = {
   'x-content-type-options': 'nosniff',
   'x-frame-options': 'DENY',
   'referrer-policy': 'strict-origin-when-cross-origin',
-  'permissions-policy': 'camera=(), microphone=(), geolocation=()',
+  'permissions-policy': 'camera=(), microphone=(), geolocation=(self)',
   'content-security-policy': [
     "default-src 'self'",
     "base-uri 'self'",
@@ -135,7 +135,7 @@ export default defineNuxtConfig({
     head: {
       meta: [
         { charset: 'utf-8' },
-        { name: 'viewport', content: 'width=device-width, initial-scale=1' },
+        { name: 'viewport', content: 'width=device-width, initial-scale=1, viewport-fit=cover' },
         { name: 'theme-color', content: '#059669' },
         
         // Open Graph Image is static so keeping it here as fallback, though dynamic also handles it

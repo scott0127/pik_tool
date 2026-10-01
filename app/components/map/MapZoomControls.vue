@@ -13,31 +13,34 @@
     <!-- Location Button -->
     <button
       @click="$emit('locate')"
+      data-map-object="locate"
       :disabled="isLocating"
       class="map-nav-button flex items-center justify-center transition-all"
       :title="locationError || $t('map.user_location')"
     >
-      <Icon v-if="isLocating" name="lucide:loader-circle" class="h-5 w-5 animate-spin text-emerald-500" />
-      <Icon v-else name="lucide:locate-fixed" class="h-5 w-5" :class="locationError ? 'text-red-500' : ''" />
+      <span class="map-nav-ring" aria-hidden="true"></span>
+      <span class="map-nav-glyph"><Icon v-if="isLocating" name="lucide:loader-circle" class="h-5 w-5 animate-spin text-emerald-500" /><Icon v-else name="lucide:locate-fixed" class="h-5 w-5" :class="locationError ? 'text-red-500' : ''" /></span>
     </button>
 
     <!-- Scanner Button -->
     <div class="relative group">
       <button
         @click="$emit('toggle-scanner')"
+        data-map-object="scanner"
         class="map-nav-button flex items-center justify-center transition-all"
         :class="{ 'is-active': isScannerMode }"
         :aria-pressed="isScannerMode"
         :title="isScannerMode ? '關閉掃描器' : '開啟掃描器'"
       >
-        <Icon name="lucide:scan-line" class="h-5 w-5" />
+        <span class="map-scanner-slit" aria-hidden="true"></span>
+        <span class="map-nav-glyph"><Icon name="lucide:scan-line" class="h-5 w-5" /></span>
       </button>
       
       <!-- Scanner Tooltip (Left side) -->
-      <div class="absolute right-full top-1/2 -translate-y-1/2 mr-3 px-3 py-1.5 bg-gray-900 text-white text-xs rounded-xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all whitespace-nowrap z-[2000] pointer-events-none">
+      <div class="map-tooltip absolute right-full top-1/2 -translate-y-1/2 mr-3 px-3 py-1.5 bg-gray-900 text-white text-xs rounded-xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all whitespace-nowrap z-[2000] pointer-events-none">
           <div v-if="isScannerMode" class="font-bold text-blue-300">掃描器已開啟</div>
           <div v-else class="font-bold">開啟掃描器</div>
-          <div class="text-[10px] text-gray-400 mt-0.5">顯示 120m 範圍</div>
+          <div class="text-[10px] text-gray-400 mt-0.5">顯示 100m 預測範圍</div>
       </div>
     </div>
 
@@ -152,4 +155,19 @@ defineEmits<{
     transition-duration: 0.01ms;
   }
 }
+</style>
+<style scoped>
+.map-navigation-controls { top: 5.2rem; right: 1rem; gap: 0.5rem; }
+.map-nav-button, .map-zoom-status { width: 44px; border-color: #d6dccb; background: #fafaf3; color: #506548; border-radius: 50%; box-shadow: 0 3px 0 #c8d0ba, 0 8px 18px rgb(39 58 30 / 12%); }
+.map-nav-button { height: 44px; }
+.map-nav-button { position: relative; overflow: hidden; }
+.map-nav-glyph { display: grid; place-items: center; }
+.map-nav-ring { position: absolute; inset: 7px; border: 1px solid currentColor; border-radius: 50%; opacity: 0; pointer-events: none; }
+.map-scanner-slit { position: absolute; top: 0; bottom: 0; left: 0; width: 100%; background: linear-gradient(90deg, transparent, rgb(207 227 168 / 70%), transparent); opacity: 0; pointer-events: none; }
+.map-nav-button:hover, .map-nav-button:focus-visible { border-color: #68865b; background: #eaf0dd; color: #304f3a; outline: 2px solid #68865b; outline-offset: 2px; }
+.map-nav-button.is-active { background: var(--map-action); border-color: var(--map-action); color: #fff; box-shadow: 0 3px 0 #adc192, 0 8px 18px rgb(39 58 30 / 16%); }
+.map-zoom-status { border-radius: 0.55rem; min-height: 1.9rem; }
+.map-zoom-status > div:first-child { border: 0; background: #fafaf3; color: #6b7a5c; }
+@media (min-width: 768px) and (max-width: 1100px) { .map-navigation-controls { top: 8.6rem; } }
+@media (max-width: 767px) { .map-navigation-controls { top: 4.25rem; right: 0.75rem; } }
 </style>

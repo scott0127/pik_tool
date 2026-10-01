@@ -84,7 +84,7 @@
         isMapPage ? 'flex h-dvh flex-col overflow-hidden' : '',
       ]"
     >
-      <AppHeader v-if="!isStandalonePage" />
+      <AppHeader v-if="!isStandalonePage" :class="{ 'app-map-header': isMapPage }" />
 
       <main :class="mainClass">
         <NuxtPage />

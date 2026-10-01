@@ -1,13 +1,18 @@
 <template>
-  <div ref="gridRoot">
+  <div ref="gridRoot" :class="{ 'is-single-specimen-grid': isSingleSpecimenGrid }">
     <!-- Grouped by Variant -->
     <div 
       v-for="(group, groupIndex) in groupedItems" 
       :key="group.key"
-      class="mb-6 decor-grid-group"
+      class="decor-grid-group"
+      :style="{ '--decor-group-height': `calc(${getGroupPlaceholderHeight(group.items.length)} + ${group.items.length > 1 && (groupedItems.length > 1 || group.isRare) ? 32 : 0}px)` }"
       :data-group-key="group.key"
       :data-group-index="groupIndex"
     >
+      <div v-if="group.items.length > 1 && (groupedItems.length > 1 || group.isRare)" class="decor-series-heading">
+        <span>{{ locale === 'en' ? group.variantNameEn : group.variantName }}</span>
+        <small>{{ group.isRare ? (locale === 'en' ? 'Rare series' : '稀有系列') : String(groupIndex + 1).padStart(2, '0') }}</small>
+      </div>
       <!-- Pikmin Row for this Variant -->
         <div
           v-if="isGroupVisible(group.key)"
@@ -20,7 +25,7 @@
           :category-id="item.categoryId"
           :variant-id="item.variantId"
           :pikmin-type="item.pikminType"
-            class="decor-grid-card w-full sm:w-[calc(12.5%-0.72rem)] sm:min-w-[100px] sm:max-w-[138px]"
+            class="decor-grid-card"
             @toggle="$emit('toggle', $event)"
           />
         </div>
@@ -39,18 +44,14 @@
     >
       <div 
         v-if="items.length === 0" 
-        class="card text-center py-16 mt-4"
+        class="decor-grid-empty"
       >
-        <div class="inline-block mb-4">
-          <div class="w-20 h-20 bg-gradient-to-br from-gray-100 to-gray-50 rounded-full flex items-center justify-center mx-auto shadow-inner">
-            <Icon name="lucide:search-x" class="w-9 h-9 text-gray-300" />
-          </div>
-        </div>
-        <p class="text-xl font-bold text-gray-700 mb-2">{{ $t('components.decor_grid.empty_title') }}</p>
-        <p class="text-gray-500 mb-6">{{ $t('components.decor_grid.empty_desc') }}</p>
+        <span class="decor-empty-index" aria-hidden="true">00</span>
+        <p class="decor-empty-title">{{ $t('components.decor_grid.empty_title') }}</p>
+        <p class="decor-empty-description">{{ $t('components.decor_grid.empty_desc') }}</p>
         <button 
           @click="$emit('clear-filters')"
-          class="btn-secondary"
+          class="decor-empty-reset"
         >
           {{ $t('components.decor_grid.clear_filters') }}
         </button>
@@ -72,9 +73,12 @@ defineEmits<{
 }>();
 
 const { getVariant, getImageUrl } = useDecorData();
+const { locale } = useI18n();
 const gridRoot = ref<HTMLElement | null>(null);
 const visibleGroupKeys = ref<Set<string>>(new Set());
-const viewportWidth = ref(typeof window !== 'undefined' ? window.innerWidth : 1024);
+// Keep the first client render identical to SSR; measure the phone after mounting.
+const viewportWidth = ref(1024);
+const gridWidth = ref(0);
 let visibilityObserver: IntersectionObserver | null = null;
 let preloadFrame: number | null = null;
 const preloadedImageUrls = new Set<string>();
@@ -84,6 +88,7 @@ const groupedItems = computed(() => {
   const groups = new Map<string, { 
     key: string; 
     variantName: string;
+    variantNameEn: string;
     isRare: boolean;
     items: DecorItem[] 
   }>();
@@ -95,7 +100,8 @@ const groupedItems = computed(() => {
       groups.set(key, { 
         key, 
         variantName: variant?.name || item.variantId,
-        isRare: item.variantId.toLowerCase().includes('rare'),
+        variantNameEn: variant?.nameEn || variant?.name || item.variantId,
+        isRare: Boolean(variant?.isRare) || item.variantId.toLowerCase().includes('rare'),
         items: [] 
       });
     }
@@ -108,6 +114,10 @@ const groupedItems = computed(() => {
 const groupedItemsByKey = computed(() => {
   return new Map(groupedItems.value.map(group => [group.key, group]));
 });
+
+// Filtering to one Pikmin color turns each series into a single specimen.
+// Lay those series beside each other instead of retaining empty color slots.
+const isSingleSpecimenGrid = computed(() => groupedItems.value.length > 0 && groupedItems.value.every(group => group.items.length === 1));
 
 const groupIndexByKey = computed(() => {
   return new Map(groupedItems.value.map((group, index) => [group.key, index]));
@@ -176,23 +186,26 @@ const setGroupVisibility = (key: string, isVisible: boolean) => {
 
 const getGroupPlaceholderHeight = (itemCount: number) => {
   const isMobileLayout = viewportWidth.value < 640;
-  const gap = 12;
+  const gap = 10;
   
   if (isMobileLayout) {
-    // Mobile is always 3 columns grid
-    const availableWidth = Math.min(viewportWidth.value - 24, 544);
-    const cardWidth = (availableWidth - gap * 2) / 3;
-    const rows = Math.ceil(itemCount / 3);
-    const cardHeight = cardWidth + 58;
-    const rowGap = 16; // 1rem in CSS
+    // Narrow phones use two readable columns; larger phones keep three.
+    const columns = viewportWidth.value <= 360 ? 2 : 3;
+    const availableWidth = Math.min(gridWidth.value || viewportWidth.value - 24, 544);
+    const cardWidth = (availableWidth - 8 - gap * (columns - 1)) / columns;
+    const rows = Math.ceil(itemCount / columns);
+    const cardHeight = cardWidth + 86; // Image mount plus two-line name, translation, and stamp.
+    if (isSingleSpecimenGrid.value) return `${Math.ceil(cardHeight)}px`;
+    const rowGap = 14;
     return `${Math.ceil(rows * cardHeight + Math.max(0, rows - 1) * rowGap)}px`;
   } else {
     // Desktop flex layout
-    const availableWidth = Math.min(Math.max(viewportWidth.value - 32, 320), 1280);
-    const cardWidth = Math.min(Math.max((availableWidth - gap * 7) / 8, 100), 140);
-    const cardsPerRow = Math.max(1, Math.floor((availableWidth + gap) / (cardWidth + gap)));
-    const rows = Math.max(1, Math.ceil(itemCount / Math.min(cardsPerRow, 8)));
-    return `${Math.ceil(rows * (cardWidth + 58) + Math.max(0, rows - 1) * gap)}px`;
+    const availableWidth = Math.max((gridWidth.value || viewportWidth.value - 32) - 16, 100);
+    if (isSingleSpecimenGrid.value) return `${Math.ceil(Math.min(availableWidth, 138) + 86)}px`;
+    const cardWidth = Math.min(Math.max((availableWidth - 12 * 7) / 8, 100), 138);
+    const cardsPerRow = Math.max(1, Math.floor((availableWidth + 12) / (cardWidth + 12)));
+    const rows = Math.max(1, Math.ceil(itemCount / cardsPerRow));
+    return `${Math.ceil(rows * (cardWidth + 86) + Math.max(0, rows - 1) * 12)}px`;
   }
 };
 
@@ -200,6 +213,7 @@ const syncObservedGroups = async () => {
   await nextTick();
   const root = gridRoot.value;
   if (!root) return;
+  gridWidth.value = root.clientWidth;
 
   if (!('IntersectionObserver' in window)) {
     visibleGroupKeys.value = new Set(groupedItems.value.map(group => group.key));
@@ -231,6 +245,7 @@ const syncObservedGroups = async () => {
 
 const updateViewportWidth = () => {
   viewportWidth.value = window.innerWidth;
+  gridWidth.value = gridRoot.value?.clientWidth || 0;
 };
 
 onMounted(() => {
@@ -256,8 +271,9 @@ onUnmounted(() => {
 
 <style scoped>
 .decor-grid-group {
+  margin-bottom: 1.6rem;
   content-visibility: auto;
-  contain-intrinsic-size: auto 198px;
+  contain-intrinsic-size: auto var(--decor-group-height, 248px);
   overflow: visible;
 }
 
@@ -265,22 +281,63 @@ onUnmounted(() => {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   justify-items: center;
-  gap: 1rem 0.85rem;
+  gap: 14px 10px;
   width: min(100%, 34rem);
   margin-inline: auto;
-  padding-inline: 0.35rem;
+  padding-inline: 4px;
 }
 
 .decor-grid-card {
   min-width: 0;
+  width: 100%;
   max-width: 10.25rem;
 }
 
+.is-single-specimen-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: start;
+  gap: 14px 10px;
+  width: min(100%, 34rem);
+  margin-inline: auto;
+  padding-inline: 4px;
+}
+
+.is-single-specimen-grid .decor-grid-group { margin-bottom: 0; min-width: 0; }
+.is-single-specimen-grid .decor-grid-row { display: grid; grid-template-columns: minmax(0, 1fr); gap: 0; width: 100%; padding-inline: 0; }
+.is-single-specimen-grid .decor-grid-card { width: 100%; min-width: 0; max-width: none; }
+
+.decor-series-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin: 0 4px 0.7rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid #e2e6d7;
+  color: #577561;
+  font-size: 0.75rem;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.decor-series-heading small { flex: 0 0 auto; color: #8a987f; font-size: 0.65rem; }
+
 .decor-grid-placeholder {
-  border: 1px solid rgba(255, 255, 255, 0.46);
-  background:
-    linear-gradient(135deg, rgba(255, 255, 255, 0.34), rgba(255, 255, 255, 0.12)),
-    rgba(255, 255, 255, 0.08);
+  border: 1px dashed #dde3d3;
+  background: #f5f6ed;
+}
+
+.decor-grid-empty { padding: 2.5rem 1rem; text-align: center; border: 1px solid #dde4d5; border-radius: 1rem; background: #fffef7; }
+.decor-empty-index { display: inline-block; padding: 0.55rem 0.7rem; margin-bottom: 0.8rem; border: 1px solid #dbe3d1; border-radius: 0.5rem; color: #92a38b; font-size: 1.15rem; font-variant-numeric: tabular-nums; }
+.decor-empty-title { color: #294e43; font-size: 1rem; font-weight: 750; }
+.decor-empty-description { margin-top: 0.4rem; color: #71816f; font-size: 0.8rem; line-height: 1.6; }
+.decor-empty-reset { min-height: 44px; padding: 0.65rem 1.15rem; margin-top: 1.2rem; border-radius: 0.7rem; background: #10b981; color: #fff; font-size: 0.85rem; font-weight: 700; }
+.decor-empty-reset:focus-visible { outline: 2px solid #047857; outline-offset: 3px; }
+
+@media (max-width: 360px) {
+  .decor-grid-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .is-single-specimen-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
 @media (min-width: 640px) {
@@ -293,5 +350,8 @@ onUnmounted(() => {
     max-width: none;
     padding-inline: 0.5rem;
   }
+
+  .decor-grid-card { width: calc(12.5% - 10.5px); min-width: 100px; max-width: 138px; }
+  .is-single-specimen-grid { grid-template-columns: repeat(auto-fill, minmax(100px, 138px)); gap: 12px; width: 100%; padding-inline: 8px; }
 }
 </style>

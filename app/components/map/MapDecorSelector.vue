@@ -12,22 +12,22 @@
       class="absolute inset-0 z-[2000] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"
       @click.self="$emit('update:modelValue', false)"
     >
-      <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[80vh] flex flex-col overflow-hidden">
+      <div role="dialog" aria-modal="true" :aria-label="$t(mode === 'extra' ? 'map.report.extra_title' : 'map.report.title')" class="map-decor-dialog bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[80vh] flex flex-col overflow-hidden">
         <!-- Header -->
         <div
           :class="[
-            'p-4 border-b border-gray-100 flex items-center justify-between',
+            'map-decor-dialog-header p-4 border-b border-gray-100 flex items-center justify-between',
             mode === 'extra' ? 'bg-red-50' : 'bg-emerald-50'
           ]"
         >
             <div class="flex items-center gap-2">
-            <Icon :name="mode === 'extra' ? 'lucide:minus-circle' : 'lucide:plus-circle'" :class="['w-6 h-6', mode === 'extra' ? 'text-red-600' : 'text-emerald-600']" />
+            <Icon :name="mode === 'extra' ? 'lucide:minus-circle' : 'lucide:plus-circle'" :class="['w-6 h-6', mode === 'extra' ? 'text-[#496d50]' : 'text-[#496d50]']" />
             <div>
               <h3 class="font-bold text-gray-800">{{ $t(mode === 'extra' ? 'map.report.extra_title' : 'map.report.title') }}</h3>
               <p class="text-xs text-gray-500">{{ $t(mode === 'extra' ? 'map.report.extra_subtitle' : 'map.report.subtitle') }}</p>
             </div>
           </div>
-          <button @click="$emit('update:modelValue', false)" class="text-gray-400 hover:text-gray-600 p-2">
+          <button @click="$emit('update:modelValue', false)" :aria-label="$t('map.panel.close')" class="text-gray-400 hover:text-gray-600 p-2">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
             </svg>
@@ -35,8 +35,8 @@
         </div>
 
         <!-- List -->
-        <div class="overflow-y-auto p-4 grid grid-cols-4 gap-2">
-          <div v-if="displayDecors.length === 0" class="col-span-4 py-10 text-center text-sm text-gray-500">
+        <div class="map-decor-options overflow-y-auto p-4 grid grid-cols-4 gap-2">
+          <div v-if="displayDecors.length === 0" class="col-span-full py-10 text-center text-sm text-gray-500">
             {{ $t(mode === 'extra' ? 'map.report.no_extra_options' : 'map.report.no_missing_options') }}
           </div>
           <button
@@ -45,7 +45,8 @@
             @click="toggleDecorReport(decor.id)"
             :disabled="loading"
             :class="[
-              'flex flex-col items-center justify-center p-2 rounded-xl border transition-all text-center h-24',
+              { 'is-reported': isAlreadyReported(decor.id) },
+              'map-decor-option flex flex-col items-center justify-center p-2 rounded-xl border transition-all text-center h-24',
               isAlreadyReported(decor.id)
                 ? mode === 'extra'
                   ? 'bg-red-100 border-red-500 ring-2 ring-red-200 cursor-default opacity-50'
@@ -55,18 +56,18 @@
                   : 'bg-gray-50 border-gray-100 hover:bg-emerald-50 hover:border-emerald-200 hover:shadow-md'
             ]"
           >
-            <div class="text-3xl mb-1">{{ decor.icon }}</div>
+            <Icon v-if="decor.iconName" :name="decor.iconName" class="h-7 w-7" /><span v-else>{{ decor.icon }}</span>
             <div class="text-xs text-gray-700 font-medium leading-tight line-clamp-2">
                 {{ $t('decor_types.' + decor.id) }}
             </div>
-            <div v-if="isAlreadyReported(decor.id)" :class="['text-[10px] font-bold mt-1', mode === 'extra' ? 'text-red-700' : 'text-emerald-700']">
+            <div v-if="isAlreadyReported(decor.id)" :class="['text-[10px] font-bold mt-1', mode === 'extra' ? 'text-[#496d50]' : 'text-[#496d50]']">
                 {{ $t('map.report.reported') }}
             </div>
           </button>
         </div>
 
         <!-- Footer -->
-        <div class="p-4 border-t border-gray-100 bg-gray-50 text-xs text-gray-500 text-center">
+        <div class="map-decor-dialog-footer p-4 border-t border-gray-100 bg-gray-50 text-xs text-gray-500 text-center">
             {{ $t('map.report.footer') }}
         </div>
       </div>

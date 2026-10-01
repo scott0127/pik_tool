@@ -4,127 +4,46 @@
     role="button"
     tabindex="0"
     :aria-pressed="isCollected"
+    :aria-label="cardLabel"
     @keydown.enter.prevent="handleClick"
     @keydown.space.prevent="handleClick"
     @click="handleClick"
-    class="decor-card relative group cursor-pointer"
+    class="decor-card"
+    :class="{ 'is-collected': isCollected, 'is-rare': isRareVariant }"
   >
-    <div
-      class="decor-card-shell relative bg-white/80 rounded-2xl overflow-hidden z-10 border"
-      :class="borderShadowClass"
-    >
-      <!-- Image Container -->
-      <div
-        class="decor-image-stage relative aspect-square p-3 overflow-hidden"
-        :class="bgGradientClass"
-      >
-        <!-- Background pattern -->
-        <div class="absolute inset-0" :class="patternOpacityClass">
-          <div
-            class="absolute inset-0"
-            :style="patternStyle"
-          ></div>
-        </div>
+    <div class="decor-card-shell">
+      <div class="decor-image-stage">
 
-        <div v-if="showRareSweep" class="rare-sweep pointer-events-none" aria-hidden="true" />
-
-        <!-- Image -->
         <img
           v-if="imageUrl && !hasError"
           :src="imageUrl"
-          :alt="`${locale === 'en' ? variant?.nameEn : variant?.name} ${t('pikmin_types.' + pikminType)}`"
-          class="decor-image relative w-full h-full object-contain"
-          :class="isCollected ? 'opacity-100 saturate-[1.02]' : 'opacity-[0.45] grayscale-[70%] saturate-[0.3]'"
+          :alt="`${variantName} ${t('pikmin_types.' + pikminType)}`"
+          class="decor-image"
           loading="lazy"
+          decoding="async"
           referrerpolicy="no-referrer"
           @error="handleImageError"
         >
-        <div
-          v-else
-          class="w-full h-full flex items-center justify-center text-5xl"
-        >
-          <Icon :name="category?.icon || 'line-md:question-circle'" class="text-4xl" />
+        <div v-else class="decor-image decor-image-fallback">
+          <Icon :name="category?.icon || 'line-md:question-circle'" />
         </div>
 
-        <Transition
-          enter-active-class="transition duration-200 ease-out"
-          enter-from-class="opacity-0 scale-95"
-          enter-to-class="opacity-100 scale-100"
-          leave-active-class="transition-opacity duration-150"
-          leave-from-class="opacity-100"
-          leave-to-class="opacity-0"
-        >
-          <div
-            v-if="!isCollected"
-            class="absolute inset-0 bg-slate-400/18 pointer-events-none flex items-center justify-center"
-          >
-            <!-- Lock Icon (SVG) -->
-            <div class="w-9 h-9 rounded-full bg-slate-500/28 flex items-center justify-center ring-1 ring-white/30">
-              <svg xmlns="http://www.w3.org/2000/svg" class="w-4.5 h-4.5 text-slate-500/70" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <rect width="18" height="11" x="3" y="11" rx="2" ry="2"/>
-                <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-              </svg>
-            </div>
-          </div>
-        </Transition>
-
-        <!-- Pikmin Type Badge -->
-        <div
-          class="absolute top-2 right-2 w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold shadow-lg ring-1 ring-white/70 transform group-hover:scale-110 transition-transform"
-          :class="[pikminBadgeClass, !isCollected && 'opacity-50 saturate-50']"
-        >
-          {{ pikminTypeShort }}
-        </div>
-
-        <!-- Rare Sparkle -->
-        <div
-          v-if="variant?.isRare"
-          class="rare-sparkle absolute top-2 left-2 text-yellow-400"
-        >
-          <Icon name="lucide:sparkles" class="w-5 h-5 drop-shadow-sm" />
-        </div>
-
-        <!-- Collected Checkmark -->
-          <div
-            v-if="isCollected"
-            class="decor-checkmark absolute bottom-2 right-2 w-8 h-8 bg-emerald-500 rounded-xl flex items-center justify-center shadow-lg ring-2 ring-white/80"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" viewBox="0 0 20 20" fill="currentColor">
-              <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
-            </svg>
-          </div>
-
-        <!-- Hover overlay -->
-        <div
-          class="absolute inset-0 transition-colors duration-300 rounded-lg pointer-events-none"
-          :class="isCollected ? 'bg-emerald-500/0 group-hover:bg-emerald-500/8' : 'bg-slate-900/0 group-hover:bg-slate-900/6'"
-        ></div>
+        <span class="decor-type-badge" :title="t('pikmin_types.' + pikminType)"><span class="decor-color-dot" :class="pikminBadgeClass" aria-hidden="true" />{{ t('pikmin_types.' + pikminType) }}</span>
+        <span v-if="isRareVariant" class="decor-rare-label">{{ copy.rare }}</span>
       </div>
 
-      <!-- Info Section -->
-      <div
-        class="p-3 text-center border-t"
-        :class="isCollected
-          ? 'bg-white/93 border-white/70'
-          : 'bg-slate-50/90 border-slate-200/50'"
-      >
-        <p
-          class="text-sm font-extrabold truncate"
-          :class="isCollected ? 'text-slate-900' : 'text-slate-400'"
-          :title="locale === 'en' ? variant?.nameEn : variant?.name"
-        >
-          {{ (locale === 'en' ? variant?.nameEn : variant?.name) || 'Unknown' }}
-        </p>
-        <p
-          class="text-xs truncate mt-0.5 font-semibold"
-          :class="isCollected ? 'text-slate-700' : 'text-slate-400'"
-          :title="locale === 'en' ? variant?.name : variant?.nameEn"
-        >
-          {{ (locale === 'en' ? variant?.name : variant?.nameEn) || '' }}
-        </p>
+      <div class="decor-card-info">
+        <p class="decor-card-name" :title="variantName">{{ variantName }}</p>
+        <p class="decor-card-translation" :title="variantOtherName">{{ variantOtherName }}</p>
+        <div class="decor-card-status" aria-hidden="true">
+          <span class="decor-uncollected-label">{{ copy.collect }}</span>
+          <span class="decor-collected-stamp">
+            <span class="decor-stamp-check" />
+            {{ copy.collected }}
+          </span>
+        </div>
       </div>
     </div>
-
   </div>
 </template>
 
@@ -154,147 +73,124 @@ const variant = computed(() => getVariant(props.categoryId, props.variantId));
 const category = computed(() => getCategory(props.categoryId));
 const isCollected = computed(() => checkCollected(props.itemId));
 const imageUrl = computed(() => getImageUrl(props.categoryId, props.variantId, props.pikminType));
-const isRareVariant = computed(() => props.variantId.toLowerCase().includes('rare'));
-
-const borderShadowClass = computed(() => {
-  if (isRareVariant.value) {
-    return isCollected.value
-      ? 'border-yellow-300/90 shadow-[0_14px_34px_rgba(146,64,14,0.28)] rare-golden-glow'
-      : 'border-slate-300/50 shadow-[0_6px_16px_rgba(15,23,42,0.1)]';
-  } else {
-    return isCollected.value
-      ? 'border-emerald-300/90 shadow-[0_12px_30px_rgba(5,150,105,0.24)]'
-      : 'border-slate-300/50 shadow-[0_6px_16px_rgba(15,23,42,0.1)]';
-  }
+const isRareVariant = computed(() => Boolean(variant.value?.isRare) || props.variantId.toLowerCase().includes('rare'));
+const variantName = computed(() => (locale.value === 'en' ? variant.value?.nameEn : variant.value?.name) || 'Unknown');
+const variantOtherName = computed(() => (locale.value === 'en' ? variant.value?.name : variant.value?.nameEn) || '');
+const copy = computed(() => locale.value === 'en'
+  ? { rare: 'Rare', collect: 'Not collected', collected: 'Collected', remove: 'Remove from collection' }
+  : { rare: '稀有', collect: '未收藏', collected: '已收藏', remove: '取消收藏' });
+const cardLabel = computed(() => `${variantName.value} ${t('pikmin_types.' + props.pikminType)} · ${isCollected.value ? copy.value.remove : copy.value.collect}`);
+const pikminTypeShort = computed(() => t(`pikmin_types_short.${props.pikminType}`));
+const pikminBadgeClass = computed(() => {
+  const textClass = props.pikminType === 'white' || props.pikminType === 'yellow' ? 'text-gray-800' : 'text-white';
+  return `${PIKMIN_TYPE_COLORS[props.pikminType]} ${textClass}`;
 });
 
-const bgGradientClass = computed(() => {
-  if (isRareVariant.value) {
-    return isCollected.value
-      ? 'bg-gradient-to-br from-amber-50/92 via-yellow-50/86 to-orange-50/84'
-      : 'bg-gradient-to-br from-slate-100/88 via-gray-50/82 to-slate-50/78';
-  } else {
-    return isCollected.value
-      ? 'bg-gradient-to-br from-white/92 via-emerald-50/84 to-teal-50/80'
-      : 'bg-gradient-to-br from-slate-100/88 via-gray-50/82 to-slate-50/78';
-  }
-});
-
-const patternOpacityClass = computed(() => {
-  if (isRareVariant.value) {
-    return isCollected.value ? 'opacity-10' : 'opacity-[0.04]';
-  } else {
-    return isCollected.value ? 'opacity-5' : 'opacity-[0.03]';
-  }
-});
-
-const patternStyle = computed(() => {
-  if (isCollected.value) {
-    return isRareVariant.value
-      ? 'background-image: radial-gradient(circle, #fbbf24 1px, transparent 1px); background-size: 16px 16px;'
-      : 'background-image: radial-gradient(circle, #00b92f 1px, transparent 1px); background-size: 20px 20px;';
-  } else {
-    return 'background-image: radial-gradient(circle, #94a3b8 1px, transparent 1px); background-size: 20px 20px;';
-  }
-});
 const hasError = ref(false);
 const cardRoot = ref<HTMLElement | null>(null);
-const showRareSweep = ref(false);
-let feedback: gsap.core.Timeline | undefined;
+let feedbackContext: gsap.Context | undefined;
 let feedbackVersion = 0;
 let disposed = false;
+let motionPreference: MediaQueryList | undefined;
 
-const pikminTypeShort = computed(() => {
-  return t(`pikmin_types_short.${props.pikminType}`);
-});
-
-const pikminBadgeClass = computed(() => {
-  const baseClass = PIKMIN_TYPE_COLORS[props.pikminType];
-  const textClass = props.pikminType === 'white' || props.pikminType === 'yellow' ? 'text-gray-800' : 'text-white';
-  return `${baseClass} ${textClass}`;
-});
+// Reverting the gesture reveals the current CSS state and releases its DOM references.
+const clearFeedback = () => {
+  feedbackContext?.revert();
+  feedbackContext = undefined;
+};
 
 const handleClick = async () => {
   const version = ++feedbackVersion;
-  // Finish the previous gesture before replaying; repeated clicks never stack effects.
-  feedback?.progress(1).kill();
+  clearFeedback();
   const collected = toggleCollected(props.itemId);
-  showRareSweep.value = collected && isRareVariant.value && collectionMotionEnabled();
   if (collected) toast.success(t('components.toast.saved'), 1200);
   else toast.info(t('components.toast.removed'), 1200);
   emit('toggle', props.itemId);
 
   await nextTick();
   const root = cardRoot.value;
-  if (disposed || version !== feedbackVersion || !root || !collectionMotionEnabled()) return;
-  const shell = root.querySelector<HTMLElement>('.decor-card-shell');
-  const image = root.querySelector<HTMLElement>('.decor-image');
-  const checkmark = root.querySelector<HTMLElement>('.decor-checkmark');
-  const sweep = root.querySelector<HTMLElement>('.rare-sweep');
-  if (!shell) return;
+  if (disposed || version !== feedbackVersion || collected !== isCollected.value || !root || !collectionMotionEnabled()) return;
 
-  feedback = gsap.timeline({
-    defaults: { ease: motion.ease },
-    onComplete: () => { showRareSweep.value = false; },
-  });
-  feedback.fromTo(shell, { scale: 0.97 }, {
-    scale: 1, duration: collected ? motion.settle : motion.exit,
-    ease: collected ? motion.spring : motion.ease, clearProps: 'transform',
-  }, 0);
-  if (collected && image) {
-    feedback.to(image, { y: -6, duration: motion.press }, 0)
-      .to(image, { y: 0, duration: motion.enter, clearProps: 'transform' }, motion.press);
-  }
-  if (collected && checkmark) {
-    feedback.fromTo(checkmark, { scale: 0.6, opacity: 0 }, {
-      scale: 1, opacity: 1, duration: motion.enter, ease: motion.spring, clearProps: 'transform,opacity',
-    }, motion.press);
-  }
-  if (collected && sweep) {
-    feedback.fromTo(sweep, { xPercent: -100, opacity: 0 }, {
-      xPercent: 100, opacity: 0.7, duration: motion.settle,
-    }, 0).to(sweep, { opacity: 0, duration: motion.press }, motion.settle);
+  feedbackContext = gsap.context(() => {
+    const shell = root.querySelector<HTMLElement>('.decor-card-shell');
+    const image = root.querySelector<HTMLElement>('.decor-image');
+    const pocket = root.querySelector<HTMLElement>('.decor-pocket');
+    const stamp = root.querySelector<HTMLElement>('.decor-collected-stamp');
+    const label = root.querySelector<HTMLElement>('.decor-uncollected-label');
+    if (!shell || !stamp) return;
+
+    const timeline = gsap.timeline({ defaults: { ease: motion.ease } });
+    timeline.fromTo(shell, { y: 1, scale: 0.98 }, {
+      y: 0, scale: 1, duration: motion.settle, clearProps: 'transform',
+    }, 0);
+
+    if (collected) {
+      // The specimen settles behind the pocket before the ownership stamp lands.
+      if (image) timeline.to(image, { y: 5, scale: 0.96, duration: motion.press }, 0)
+        .to(image, { y: 0, scale: 1, duration: motion.settle, clearProps: 'transform' }, motion.press);
+      if (pocket) timeline.fromTo(pocket, { y: 2 }, {
+        y: 0, duration: motion.enter, clearProps: 'transform',
+      }, motion.press);
+      timeline.fromTo(stamp, { y: -12, rotation: -16, scale: 1.55, opacity: 0 }, {
+        y: 0, rotation: 0, scale: 1, opacity: 1,
+        duration: motion.enter, ease: motion.spring, clearProps: 'transform,opacity',
+      }, motion.press);
+    } else {
+      // Lift the old stamp away, then expose the invitation underneath it.
+      if (label) timeline.fromTo(label, { opacity: 0 }, {
+        opacity: 1, duration: motion.enter, clearProps: 'opacity',
+      }, motion.press);
+      timeline.fromTo(stamp, { y: 0, rotation: -3, scale: 1, opacity: 1 }, {
+        y: -9, rotation: -10, scale: 1.08, opacity: 0,
+        duration: motion.exit, clearProps: 'transform,opacity',
+      }, 0);
+      if (image) timeline.fromTo(image, { y: 3 }, {
+        y: 0, duration: motion.enter, clearProps: 'transform',
+      }, motion.press);
+    }
+  }, root);
+};
+
+const handleImageError = () => { hasError.value = true; };
+const handleMotionPreference = () => {
+  if (motionPreference?.matches) {
+    feedbackVersion += 1;
+    clearFeedback();
   }
 };
 
-const handleImageError = () => {
-  hasError.value = true;
-};
-
+watch(imageUrl, () => { hasError.value = false; });
+// Bulk collection and cloud updates should also settle any gesture already running.
+watch(isCollected, clearFeedback, { flush: 'sync' });
+onMounted(() => {
+  motionPreference = window.matchMedia('(prefers-reduced-motion: reduce)');
+  motionPreference.addEventListener('change', handleMotionPreference);
+});
 onBeforeUnmount(() => {
   disposed = true;
   feedbackVersion += 1;
-  feedback?.kill();
+  clearFeedback();
+  motionPreference?.removeEventListener('change', handleMotionPreference);
 });
 </script>
 
 <style scoped>
-.decor-card {
-  border-radius: 1rem;
-}
-
-.decor-card:focus-visible {
-  outline: 3px solid #047857;
-  outline-offset: 4px;
-}
-
-.decor-card-shell {
-  transition: border-color var(--collection-motion-fast, 0.18s), background-color var(--collection-motion-fast, 0.18s);
-}
-
-.decor-image-stage { isolation: isolate; }
-.decor-image { transition: opacity var(--collection-motion-fast, 0.18s); }
-
-/* A single transform-only accent for rare finds; no persistent particles or blur animation. */
-.rare-sweep {
-  position: absolute;
-  inset: 0;
-  z-index: 3;
-  background: linear-gradient(110deg, transparent 25%, rgb(253 230 138 / 0.7) 50%, transparent 75%);
-  opacity: 0;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .decor-card *, .decor-card-shell, .decor-image { transition: none !important; animation: none !important; }
-}
+.decor-card { position: relative; width: 100%; min-width: 0; cursor: pointer; touch-action: manipulation; border-radius: .65rem; -webkit-tap-highlight-color: transparent; }
+.decor-card:focus-visible { outline: 3px solid #10b981; outline-offset: 3px; }
+.decor-card-shell { position: relative; padding: .4rem; border: 1px solid #e4e5da; border-radius: .65rem; background: #fbfaf4; transition: border-color .18s, background .18s; overflow: hidden; }
+.is-collected .decor-card-shell { border-color: #b9ddcd; background: #fffdf7; }.is-rare .decor-card-shell { border-top-color: #d8bd83; }.decor-card:active .decor-card-shell { border-color: #10b981; }
+.decor-image-stage { position: relative; aspect-ratio: 1 / 1.08; padding-bottom: 1.2rem; }
+.decor-image { position: absolute; top: 3%; left: 5%; width: 90%; height: calc(94% - 1.2rem); object-fit: contain; opacity: .78; transition: opacity .18s; }.is-collected .decor-image { opacity: 1; }.decor-image-fallback { display: grid; place-items: center; color: #819680; font-size: 1.75rem; }
+.decor-type-badge { position: absolute; bottom: 0; left: 0; right: 0; display: flex; align-items: center; justify-content: center; gap: .25rem; color: #526e5e; font-size: .7rem; font-weight: 650; line-height: 1.5; white-space: nowrap; }
+.decor-color-dot { display: block; width: .5rem; height: .5rem; flex-shrink: 0; border: 1px solid #24463d18; border-radius: 50%; }
+.decor-rare-label { position: absolute; top: 1px; left: 1px; padding: 1px 4px; border: 1px solid #e4d4a7; border-radius: .2rem; background: #fff6dc; color: #997038; font-size: .6rem; font-weight: 650; }
+.decor-card-info { padding: .35rem .05rem .1rem; text-align: center; }
+.decor-card-name { display: -webkit-box; min-height: 2.7em; overflow: hidden; -webkit-box-orient: vertical; -webkit-line-clamp: 2; color: #264b3c; font-size: .75rem; font-weight: 650; line-height: 1.35; overflow-wrap: anywhere; }
+.decor-card-translation { display: none; }
+.decor-card-status { position: relative; display: grid; place-items: center; height: 26px; margin-top: .3rem; }
+.decor-uncollected-label { color: #8a9484; font-size: .68rem; }.is-collected .decor-uncollected-label { opacity: 0; }
+.decor-collected-stamp { position: absolute; display: inline-flex; align-items: center; justify-content: center; gap: .25rem; max-width: 100%; padding: .3rem .45rem; border-radius: 99px; background: #10b981; color: #fff; font-size: .67rem; font-weight: 650; line-height: 1; opacity: 0; white-space: nowrap; pointer-events: none; }.is-collected .decor-collected-stamp { opacity: 1; }
+.decor-stamp-check { display: block; width: 8px; height: 5px; margin-top: -2px; border-bottom: 1.5px solid currentColor; border-left: 1.5px solid currentColor; transform: rotate(-45deg); }
+@media(min-width:640px) { .decor-card-translation { display: block; margin-top: .15rem; min-height: 1.35em; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; color: #8c9785; font-size: .6rem; }.decor-card-shell { padding: .5rem; }.decor-card-name { font-size: .78rem; } }
+@media(prefers-reduced-motion:reduce) { .decor-card * { transition: none!important; } }
 </style>

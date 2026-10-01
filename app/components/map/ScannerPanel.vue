@@ -9,7 +9,7 @@
   >
     <div
       v-if="show"
-      class="scanner-panel-wrap fixed left-0 w-full z-[2000] p-4 md:left-1/2 md:-translate-x-1/2 md:w-auto md:min-w-[400px]"
+      class="scanner-panel-wrap fixed left-0 w-full z-[1001] p-4 md:left-1/2 md:-translate-x-1/2 md:w-auto md:min-w-[400px]"
     >
       <div 
         class="scanner-panel-card p-5 overflow-hidden relative"
@@ -29,6 +29,7 @@
           <button 
             @click="$emit('close')"
             class="scanner-panel-close w-8 h-8 flex items-center justify-center transition-colors active:scale-95"
+            aria-label="關閉探測器預測"
           >
             <Icon name="lucide:x" class="h-4 w-4" />
           </button>
@@ -93,7 +94,7 @@
              <div class="scanner-info-note p-2.5 flex items-start gap-2">
                 <Icon name="lucide:info" class="w-4 h-4 text-teal-600 mt-0.5 shrink-0" />
                 <p class="text-xs text-teal-800 leading-relaxed font-medium">
-                  真實遊戲通常只會顯示最多 6 種圖示。使用雷達必定會出現在清單中顯示的其中一種飾品。
+                  這是地圖資料推算的候選飾品。範圍與類型可能和遊戲不同，請到現場確認探測器。
                 </p>
              </div>
           </div>
@@ -212,4 +213,13 @@ const overflowCount = computed(() => props.predictedDecors.length - MAX_DISPLAY)
     transition-duration: 0.01ms;
   }
 }
+</style>
+<style scoped>
+.scanner-panel-wrap { position: absolute; pointer-events: none; bottom: 1rem; padding: 0 1rem; }
+.scanner-panel-card { pointer-events: auto; border-color: #d6dccb; background: #fafaf3; border-radius: 1rem; box-shadow: 0 3px 0 #c8d0ba, 0 12px 26px rgb(39 58 30 / 13%); max-height: 40dvh; overflow-y: auto; }
+.scanner-panel-mark { border-color: #d0dac0; background: #e9eedc; color: #506548; }
+.scanner-panel-close { width: 44px; height: 44px; background: #f0f2e6; color: #617553; border-radius: 50%; }
+.scanner-panel-close:focus-visible { outline: 2px solid #668257; outline-offset: 2px; }
+.scanner-result-tile, .scanner-info-note { background: #edf1e4; border-color: #d6dfc8; }
+@media (max-width: 767px) { .scanner-panel-wrap { bottom: 5.4rem; padding: 0 0.75rem; } .scanner-panel-card { padding: 0.8rem 1rem; max-height: 34dvh; } .scanner-panel-card > div:first-child { margin-bottom: 0.4rem; } }
 </style>

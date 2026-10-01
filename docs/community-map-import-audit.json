@@ -1,0 +1,37 @@
+{
+  "reviewedAt": "2026-10-01",
+  "discoveredVia": "https://www.threads.com/@liwanghong7/post/DXOldesEzz9",
+  "sources": [
+    {
+      "sourceId": "threads-map-north",
+      "filename": "北北基皮克敏純點 非官方.kml",
+      "sha256": "cd1d1d668ebe4d59dad088ad5fa26784d4b7851121d3bc0c1b30fdfe96cab37b",
+      "rawPoints": 1022,
+      "imported": 1022,
+      "duplicates": 0
+    },
+    {
+      "sourceId": "threads-map-tainan",
+      "filename": "台南皮克敏純點地圖（非官方）.kml",
+      "sha256": "ecdf1ddec11c5167de88c8dd7caaea07fcc6f791fb233a2c664eb580fb63d161",
+      "rawPoints": 372,
+      "imported": 372,
+      "duplicates": 0
+    },
+    {
+      "sourceId": "threads-map-kaohsiung",
+      "filename": "pikmin bloom皮克敏高雄純點（非官方）.kml",
+      "sha256": "40c1ec7b0564aa474b17dce0e75f6b0e409a28ab0a4ff048302947e63c6aeec5",
+      "rawPoints": 529,
+      "imported": 529,
+      "duplicates": 0
+    }
+  ],
+  "skipped": [],
+  "totalRecords": 1953,
+  "statusCounts": {
+    "unverified": 124,
+    "mixed": 200,
+    "reported_pure": 1629
+  }
+}
