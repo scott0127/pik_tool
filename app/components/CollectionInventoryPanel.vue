@@ -1,20 +1,30 @@
 <template>
   <section ref="panelEl" class="collection-inventory-panel" :class="{ 'is-expanded': isExpanded }">
-    <div class="inventory-panel-header">
-      <div class="inventory-panel-copy">
-        <p class="inventory-panel-kicker">{{ copy.journal }}</p>
-        <p class="inventory-summary-score"><span v-if="summary.hasRareDecor">Lv. {{ rareProgress.level }} <span class="inventory-summary-divider">/</span> <strong>{{ number(rareProgress.points) }}</strong> pt</span><span v-else>{{ copy.inventory }}</span></p>
+    <div class="inventory-entry">
+      <div class="inventory-panel-header">
+        <div class="inventory-panel-copy">
+          <p class="inventory-panel-kicker">{{ copy.journal }}</p>
+          <h3 class="inventory-panel-title">{{ summary.hasRareDecor ? copy.title : copy.inventory }}</h3>
+          <p class="inventory-panel-description">{{ summary.hasRareDecor ? copy.description : copy.inventoryDescription }}</p>
+        </div>
+        <CollectionToolMotion kind="journal" :active="!isExpanded" class="inventory-journal-motion" />
       </div>
-      <button type="button" class="inventory-action-button inventory-action-button-primary" :aria-expanded="isExpanded" :aria-controls="bodyId" @click.stop="isExpanded = !isExpanded">
-        {{ isExpanded ? labels.close : summary.hasRareDecor ? copy.open : labels.manage }}<Icon :name="isExpanded ? 'lucide:chevron-up' : 'lucide:arrow-down-right'" class="w-4 h-4" />
-      </button>
+      <p v-if="summary.hasRareDecor" class="inventory-summary-score"><span>Lv. <strong>{{ rareProgress.level }}</strong></span><span class="inventory-summary-divider" aria-hidden="true" /> <span><strong>{{ number(rareProgress.points) }}</strong> pt</span></p>
+      <div class="inventory-entry-actions">
+        <button type="button" class="inventory-action-button inventory-action-button-primary" :aria-expanded="isExpanded" :aria-controls="bodyId" @click.stop="isExpanded = !isExpanded">
+          <CollectionParticleBorder :active="!isExpanded" on-dark />
+          <span>{{ isExpanded ? copy.collapse : hasRecords ? copy.update : copy.start }}</span><span class="inventory-action-knob"><Icon :name="isExpanded ? 'lucide:chevron-up' : hasRecords ? 'lucide:arrow-down-right' : 'lucide:plus'" class="w-4 h-4" /></span>
+        </button>
+        <CollectionGuideButton topic="inventory" @start="isExpanded = true" />
+      </div>
+      <dl v-if="!isExpanded" class="inventory-summary-grid">
+        <div><dt>{{ labels.seedlingShort }}</dt><dd>{{ summary.seedlingCount }}</dd></div>
+        <div><dt>{{ labels.preDecorShort }}</dt><dd>{{ summary.preDecorCount }}</dd></div>
+        <div><dt>{{ copy.decorSummary }}</dt><dd>{{ summary.decorCount }}</dd></div>
+        <div><dt>{{ labels.releaseLine }}</dt><dd>{{ summary.releaseNoDecorCount }} <span>/</span> {{ summary.releaseWithDecorCount }}</dd></div>
+      </dl>
+      <p v-if="!isExpanded" class="inventory-entry-note">{{ hasRecords ? copy.releaseLegend : copy.emptyHint }}</p>
     </div>
-    <dl v-if="!isExpanded" class="inventory-summary-grid">
-      <div><dt>{{ labels.seedlingShort }}</dt><dd>{{ summary.seedlingCount }}</dd></div>
-      <div><dt>{{ labels.preDecorShort }}</dt><dd>{{ summary.preDecorCount }}</dd></div>
-      <div><dt>{{ labels.decorShort }}</dt><dd>{{ summary.decorCount }}</dd></div>
-      <div><dt>{{ labels.releaseLine }}</dt><dd>{{ summary.releaseNoDecorCount }} <span>/</span> {{ summary.releaseWithDecorCount }}<small>{{ copy.releaseOrder }}</small></dd></div>
-    </dl>
     <Transition :css="false" @enter="enterPaper" @leave="leavePaper" @enter-cancelled="cancelPaper" @leave-cancelled="cancelPaper">
       <div v-if="isExpanded" :id="bodyId" class="inventory-panel-body">
         <div v-if="summary.hasRareDecor" class="rare-progress-panel">
@@ -443,16 +453,25 @@ const formatEvent = (event: CollectionEvent): string => {
 
 
 const copy = computed(() => locale.value === 'en' ? {
-  journal: 'FIELD NOTES / Inventory', inventory: 'Inventory records', open: 'Edit records', rules: 'Point guide',
+  journal: 'GROWTH JOURNAL', title: 'Inventory & points', inventory: 'Inventory records', rules: 'Point guide',
+  description: 'Log plucking, decor and releases to track your rare progress.',
+  inventoryDescription: 'Keep track of seedlings, decor and releases by color.',
+  start: 'Start recording', update: 'Update records', collapse: 'Collapse', decorSummary: 'With decor',
+  emptyHint: 'Start with the seedlings you already have.', releaseLegend: 'Released: without decor / with decor',
   series: 'Series', chooseColor: 'Choose a color to edit', editing: 'Editing', saved: 'Changes save automatically',
   releaseOrder: 'plain / decor', seedlingDesc: 'Still growing', preDecorDesc: 'Plucked, under 4 hearts',
   decorDesc: 'Huge seedling or 4-heart gift', releasePlainDesc: 'Without a decor', releaseDecorDesc: 'With a decor',
 } : {
-  journal: '成長手記 · 庫存與積分', inventory: '庫存紀錄', open: '積分紀錄', rules: '計分方式',
+  journal: '成長手帳', title: '庫存與積分紀錄', inventory: '庫存紀錄', rules: '計分方式',
+  description: '記下拔苗、拿裝飾與放生，追蹤稀有進度。',
+  inventoryDescription: '依顏色記下小盆栽、拿裝飾與放生的數量。',
+  start: '開始記錄', update: '更新紀錄', collapse: '收合', decorSummary: '已拿裝飾',
+  emptyHint: '從你現有的小盆栽開始記。', releaseLegend: '放生數量：無飾品 / 有飾品',
   series: '飾品系列', chooseColor: '選一個顏色，記錄它的成長', editing: '正在記錄', saved: '調整後自動儲存',
   releaseOrder: '無飾品 / 有飾品', seedlingDesc: '尚未拔苗', preDecorDesc: '小盆栽拔苗，尚未滿 4 心',
   decorDesc: '大盆栽拔苗或滿 4 心禮物', releasePlainDesc: '未取得飾品', releaseDecorDesc: '已取得飾品',
 });
+const hasRecords = computed(() => summary.value.seedlingCount + summary.value.preDecorCount + summary.value.decorCount + summary.value.releaseNoDecorCount + summary.value.releaseWithDecorCount > 0 || rareProgress.value.points > 0);
 const allControls = computed(() => [...primaryControls.value, ...releaseControls.value].map((control, index) => ({
   ...control, description: [copy.value.seedlingDesc, copy.value.preDecorDesc, copy.value.decorDesc, copy.value.releasePlainDesc, copy.value.releaseDecorDesc][index],
 })));
@@ -556,19 +575,29 @@ onBeforeUnmount(() => {
 </script>
 
 <style scoped>
-.collection-inventory-panel { margin: 1rem 0 1.25rem; padding: 1rem; border: 1px solid #e2e4d9; border-radius: .9rem; background: #f8f8f0; color: #24463d; }
-.inventory-panel-header { display: flex; align-items: center; justify-content: space-between; gap: .75rem; }
+.collection-inventory-panel { margin: 1rem 0 1.25rem; padding: 1rem; border: 1px solid #cfe7d8; border-radius: 1.15rem; background: #fbfcf6; color: #24463d; box-shadow: 0 3px 0 #e8eee0, 0 8px 20px #254d3510; }
+.inventory-entry { position: relative; isolation: isolate; overflow: hidden; margin: -1rem; padding: 1rem; border-radius: inherit; background: radial-gradient(ellipse at 100% 0, #d8f3ddc9, transparent 62%), linear-gradient(125deg, #fffef8, #f4f9ef); }
+.inventory-entry > :not(:first-child) { position: relative; z-index: 1; }
+.inventory-panel-header { display: grid; grid-template-columns: minmax(0,1fr) 64px; align-items: center; gap: .65rem; }
 .inventory-panel-copy { min-width: 0; }
-.inventory-panel-kicker { font-size: .68rem; color: #778478; letter-spacing: .03em; }
-.inventory-summary-score { margin-top: .25rem; font-size: .85rem; font-variant-numeric: tabular-nums; }
+.inventory-panel-kicker { color: #56826a; font-size: .6rem; font-weight: 700; letter-spacing: .12em; }
+.inventory-panel-title { margin-top: .25rem; color: #214d3d; font-size: 1rem; font-weight: 800; line-height: 1.45; letter-spacing: -.02em; }
+.inventory-panel-description { max-width: 30rem; margin-top: .3rem; color: #627b68; font-size: .72rem; line-height: 1.65; }
+.inventory-journal-motion { width: 64px; height: 64px; }
+.inventory-summary-score { display: inline-flex; align-items: center; gap: .6rem; margin-top: .7rem; padding: .28rem .5rem; border: 1px solid #dbe9d7; border-radius: .4rem; background: #ffffffb3; color: #57816b; font-size: .72rem; font-variant-numeric: tabular-nums; }
 .inventory-summary-score strong { font-weight: 800; }
-.inventory-summary-divider { padding-inline: .4rem; color: #b0b6a9; }
-.inventory-action-button { display: inline-flex; align-items: center; justify-content: center; gap: .5rem; min-height: 44px; flex-shrink: 0; padding: .6rem .7rem; border-radius: .65rem; border: 1px solid #10b981; background: #10b981; color: white; font-size: .78rem; font-weight: 750; box-shadow: 0 2px 0 #079b6c; }
-.inventory-summary-grid { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); margin-top: .8rem; padding-top: .7rem; border-top: 1px solid #e0e4d8; gap: .4rem; }
-.inventory-summary-grid dt { color: #7b877b; font-size: .66rem; line-height: 1.5; }
-.inventory-summary-grid dd { margin-top: .2rem; font-size: 1.05rem; font-weight: 750; font-variant-numeric: tabular-nums; }
-.inventory-summary-grid dd span { font-size: .75rem; color: #94a18f; }.inventory-summary-grid small { display: block; margin-top: .15rem; font-size: .58rem; color: #869180; font-weight: 500; }
-.inventory-panel-body { min-width: 0; margin-top: 1rem; }
+.inventory-summary-divider { height: .75rem; width: 1px; background: #c7ddc8; }
+.inventory-entry-actions { display: flex; flex-wrap: wrap; align-items: center; gap: .6rem; margin-top: .7rem; }
+.inventory-action-button { position: relative; isolation: isolate; overflow: hidden; display: inline-flex; align-items: center; justify-content: space-between; gap: .65rem; min-height: 44px; flex: 1 1 110px; padding: .4rem .45rem .4rem .85rem; border-radius: 999px; border: 1px solid #0aab75; background: linear-gradient(110deg, #059669, #10b981 65%, #20ca91); color: white; font-size: .78rem; font-weight: 750; box-shadow: inset 0 1px 0 #ffffff40, 0 2px 0 #079b6c; }
+.inventory-action-button > span:not(.collection-particle-border) { position: relative; }
+.inventory-action-knob { display: grid; place-items: center; flex-shrink: 0; width: 30px; height: 30px; border-radius: 50%; background: #f2fff9; color: #07966c; box-shadow: 0 1px 4px #03543b30; }
+.inventory-summary-grid { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); margin-top: .85rem; gap: .35rem; }
+.inventory-summary-grid > div { min-width: 0; padding: .5rem .35rem; border: 1px solid #e0ead7; border-radius: .5rem; background: #fffef9bd; }
+.inventory-summary-grid dt { min-height: 1.5em; color: #6f826e; font-size: .62rem; line-height: 1.5; }
+.inventory-summary-grid dd { margin-top: .2rem; color: #2d654b; font-size: 1rem; font-weight: 750; line-height: 1.25; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.inventory-summary-grid dd span { font-size: .75rem; color: #94a18f; }
+.inventory-entry-note { margin-top: .5rem; color: #748572; font-size: .62rem; line-height: 1.55; }
+.inventory-panel-body { min-width: 0; margin-top: 2rem; }
 .rare-progress-panel { position: relative; padding: 1rem; border: 1px solid #dfdfcf; border-radius: .75rem; background: #fffdf5; box-shadow: 0 3px 0 #e8e9de; }
 .rare-progress-panel::before { content: ''; position: absolute; top: -.22rem; right: 1rem; width: 2rem; height: .45rem; background: #f0cdb9; border-radius: 1px; transform: rotate(-3deg); }
 .rare-progress-main { display: flex; align-items: flex-end; justify-content: space-between; gap: .65rem; }
@@ -589,7 +618,7 @@ onBeforeUnmount(() => {
 .inventory-save-note { padding: .6rem; color: #859080; font-size: .65rem; text-align: right; }
 .inventory-event-log { margin-top: .75rem; border-top: 1px solid #dce1d4; }.inventory-event-log-toggle { display: flex; align-items: center; justify-content: space-between; gap: .7rem; width: 100%; min-height: 44px; font-size: .74rem; font-weight: 650; }.inventory-event-log-toggle > span:last-child { color: #87927f; font-size: .65rem; }.inventory-event-log-body { color: #7a8777; font-size: .7rem; }.inventory-event-log-body li { display: flex; justify-content: space-between; gap: .5rem; padding: .55rem 0; border-top: 1px dashed #e1e5d8; }.inventory-event-log-body time { flex-shrink: 0; font-variant-numeric: tabular-nums; font-size: .65rem; }.inventory-event-log-body > p { padding-block: .8rem; }
 button { -webkit-tap-highlight-color: transparent; }button:not(:disabled):active { transform: translateY(1px); }button:focus-visible,select:focus-visible { outline: 3px solid #10b981; outline-offset: 3px; }
-@media (max-width: 360px) { .collection-inventory-panel { padding: .7rem; }.inventory-control-row { padding-inline: .45rem; }.inventory-control-index { display: none; }.inventory-control-copy { gap: .15rem; }.inventory-control-score { margin-left: 0; }.inventory-control-description { max-width: 8rem; font-size: .6rem; }.inventory-control-stepper { grid-template-columns: 44px minmax(1.5rem,auto) 44px; }.inventory-color-tab { gap: .22rem; }.rare-progress-panel { padding: .8rem; }.inventory-panel-kicker { font-size: .62rem; } }
-@media (min-width: 768px) { .inventory-color-tabs { grid-template-columns: repeat(8,minmax(0,1fr)); }.inventory-editor { max-width: 44rem; }.inventory-control-copy { flex-wrap: nowrap; }.inventory-control-score { flex-basis: auto; margin-left: auto; margin-right: 1rem; }.inventory-control-row { padding-inline: 1rem; }.inventory-summary-grid { max-width: 35rem; }.rare-progress-panel { max-width: 44rem; } }
+@media (max-width: 360px) { .collection-inventory-panel { padding: .7rem; }.inventory-entry { margin: -.7rem; padding: .7rem; }.inventory-panel-header { gap: .35rem; grid-template-columns: minmax(0,1fr) 56px; }.inventory-journal-motion { width: 56px; height: 56px; }.inventory-panel-title { font-size: .94rem; }.inventory-summary-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }.inventory-summary-grid > div { display: flex; align-items: center; justify-content: space-between; gap: .3rem; padding: .45rem; }.inventory-summary-grid dd { margin-top: 0; }.inventory-control-row { padding-inline: .45rem; }.inventory-control-index { display: none; }.inventory-control-copy { gap: .15rem; }.inventory-control-score { margin-left: 0; }.inventory-control-description { max-width: 8rem; font-size: .6rem; }.inventory-control-stepper { grid-template-columns: 44px minmax(1.5rem,auto) 44px; }.inventory-color-tab { gap: .22rem; }.rare-progress-panel { padding: .8rem; } }
+@media (min-width: 768px) { .inventory-panel-header { grid-template-columns: minmax(0,1fr) 76px; }.inventory-journal-motion { width: 76px; height: 76px; }.inventory-entry-actions { max-width: 25rem; }.inventory-color-tabs { grid-template-columns: repeat(8,minmax(0,1fr)); }.inventory-editor { max-width: 44rem; }.inventory-control-copy { flex-wrap: nowrap; }.inventory-control-score { flex-basis: auto; margin-left: auto; margin-right: 1rem; }.inventory-control-row { padding-inline: 1rem; }.inventory-summary-grid { max-width: 35rem; }.rare-progress-panel { max-width: 44rem; } }
 @media (prefers-reduced-motion: reduce) { *,::before,::after { transition: none !important; } }
 </style>

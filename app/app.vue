@@ -51,6 +51,8 @@
 
     <!-- Loading State -->
     <Transition
+      @before-enter="hasFinishedLoading = false"
+      @after-leave="hasFinishedLoading = true"
       enter-active-class="transition duration-300"
       enter-from-class="opacity-0"
       enter-to-class="opacity-100"
@@ -94,7 +96,7 @@
     </div>
 
     <!-- Global Components -->
-    <GlobalAnnouncement v-if="!isStandalonePage && !isMapPage" />
+    <GlobalAnnouncement v-if="isAppReady && hasFinishedLoading && !isStandalonePage && !isMapPage" />
     <PwaInstallPrompt v-if="!isStandalonePage" />
     <Toast
       v-if="currentToast && isShowingToast"
@@ -126,6 +128,7 @@ const isInitializing = ref(true);
 const isUpdatingVersion = useState('isUpdatingVersion', () => false);
 const isCheckingVersion = useState('isCheckingVersion', () => true);
 const isAppReady = computed(() => !isInitializing.value && !isCheckingVersion.value);
+const hasFinishedLoading = ref(false);
 const route = useRoute();
 const isStandalonePage = computed(() => route.meta.standalone === true);
 const isMapPage = computed(() => route.path === '/map');
@@ -202,6 +205,7 @@ const initializeAppShell = () => {
 onMounted(async () => {
   if (isStandalonePage.value) {
     isInitializing.value = false;
+    hasFinishedLoading.value = true;
     return;
   }
 

@@ -1,19 +1,25 @@
 <template>
   <Transition
-    enter-active-class="transform ease-out duration-300 transition"
-    enter-from-class="translate-y-2 opacity-0 sm:translate-y-0 sm:translate-x-2"
-    enter-to-class="translate-y-0 opacity-100 sm:translate-x-0"
-    leave-active-class="transition ease-in duration-200"
-    leave-from-class="opacity-100"
-    leave-to-class="opacity-0"
+    appear
+    :css="false"
+    @before-enter="beforeEnter"
+    @enter="enter"
+    @leave="leave"
+    @enter-cancelled="stopPanelMotion"
+    @leave-cancelled="stopPanelMotion"
+    @after-leave="cleanupMotion"
   >
     <div 
       v-if="isVisible" 
       class="fixed inset-x-0 bottom-0 sm:top-16 sm:bottom-auto sm:right-4 sm:left-auto z-[9999] p-4 flex justify-center sm:justify-end pointer-events-none"
     >
-      <div class="glass-surface-readable announcement-panel pointer-events-auto max-w-md w-full rounded-3xl p-4 flex flex-col gap-3">
+      <div class="announcement-panel scrollbar-hide pointer-events-auto max-w-md w-full rounded-3xl p-4 flex flex-col gap-3">
+        <div class="announcement-backdrop glass-surface-readable" aria-hidden="true">
+          <div class="announcement-ambient"></div>
+          <div class="announcement-rim-glint"></div>
+        </div>
         <!-- 頂部標題與關閉按鈕 -->
-        <div class="flex items-center justify-between">
+        <div class="announcement-header flex items-center justify-between">
           <div class="flex items-center gap-2">
             <div class="shrink-0 text-emerald-500">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -21,25 +27,28 @@
               </svg>
             </div>
             <!-- 分頁切換 -->
-            <div class="flex gap-1">
+            <div class="announcement-tabs">
+              <span ref="tabIndicator" class="announcement-tab-indicator" aria-hidden="true"></span>
               <button 
-                @click="currentTab = 'update'" 
+                @click="selectTab('update')"
+                :aria-pressed="selectedTab === 'update'"
                 class="px-2 py-1 text-xs rounded-full transition-colors"
-                :class="currentTab === 'update' ? 'bg-emerald-500 text-white shadow-sm' : 'glass-control text-gray-700 hover:text-emerald-700'"
+                :class="selectedTab === 'update' ? 'text-white' : 'text-gray-700 hover:text-emerald-700'"
               >
                 📢 更新
               </button>
               <button 
-                @click="currentTab = 'event'" 
+                @click="selectTab('event')"
+                :aria-pressed="selectedTab === 'event'"
                 class="px-2 py-1 text-xs rounded-full transition-colors"
-                :class="currentTab === 'event' ? 'bg-green-500 text-white shadow-sm' : 'glass-control text-gray-700 hover:text-emerald-700'"
+                :class="selectedTab === 'event' ? 'text-white' : 'text-gray-700 hover:text-emerald-700'"
               >
                 🎉 活動
               </button>
             </div>
           </div>
           <button
-            @click="isVisible = false"
+            @click="dismiss"
             class="announcement-close-button shrink-0 w-8 h-8 rounded-full flex items-center justify-center transition-all"
             aria-label="關閉公告"
           >
@@ -49,8 +58,10 @@
           </button>
         </div>
 
+        <div class="announcement-content-stage">
         <!-- 更新內容 -->
-        <div v-show="currentTab === 'update'" class="flex-1">
+        <div ref="updateContent" class="announcement-page" :class="{ 'is-current': currentTab === 'update' }"
+          :aria-hidden="currentTab !== 'update'" :inert="currentTab !== 'update'">
           <ul class="announcement-copy announcement-list text-sm leading-relaxed">
             <li class="announcement-update-item announcement-update-item-feature">
               <span class="announcement-update-date">9/30</span>
@@ -103,8 +114,9 @@
         </div>
 
         <!-- 9月皮克敏活動 -->
-        <div v-show="currentTab === 'event'" class="flex-1 space-y-3">
-          <div class="announcement-copy text-sm space-y-2">
+        <div ref="eventContent" class="announcement-page space-y-3" :class="{ 'is-current': currentTab === 'event' }"
+          :aria-hidden="currentTab !== 'event'" :inert="currentTab !== 'event'">
+          <div class="announcement-event-card announcement-copy text-sm space-y-2">
             <p class="font-medium text-green-600">🌾 皮克敏9月活動</p>
             <p class="text-xs">活動時間：<span class="font-bold">2026/9/1 – 9/30</span></p>
             <p class="text-xs font-medium">🌱 本月金色花苗飾品：</p>
@@ -116,7 +128,7 @@
           </div>
 
           <!-- LINE 散步趣活動 -->
-          <div class="flex gap-3 items-center pt-2 border-t border-gray-200/50">
+          <div class="announcement-event-card flex gap-3 items-center pt-2 border-t border-gray-200/50">
             <!-- QR Code -->
             <img 
               src="/260108172000.png" 
@@ -131,11 +143,13 @@
               <p class="text-xs flex items-center gap-1">
                 邀請碼：
                 <button 
+                  ref="copyButton"
                   @click="copyInviteCode"
-                  class="font-mono glass-control px-1.5 py-0.5 rounded active:bg-emerald-200 transition-colors cursor-pointer inline-flex items-center gap-1"
+                  class="announcement-invite-button font-mono glass-control px-1.5 py-0.5 rounded transition-colors cursor-pointer inline-flex items-center justify-center gap-1"
+                  :data-copied="copied"
                   :title="copied ? '已複製！' : '點擊複製'"
                 >
-                  G79K77XF
+                  {{ copied ? '已複製！' : INVITE_CODE }}
                   <svg v-if="!copied" xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
                   </svg>
@@ -148,9 +162,10 @@
           </div>
         </div>
 
+        </div>
         <!-- 進度條 -->
-        <div class="w-full glass-control rounded-full h-1 overflow-hidden">
-          <div class="bg-emerald-500 h-full transition-all duration-[10000ms] ease-linear w-full" :class="{ '!w-0': startProgress }"></div>
+        <div class="announcement-progress w-full glass-control rounded-full h-1 overflow-hidden">
+          <div class="announcement-progress-fill bg-emerald-500 h-full w-full origin-left"></div>
         </div>
       </div>
     </div>
@@ -158,80 +173,394 @@
 </template>
 
 <script setup lang="ts">
-const isVisible = ref(true);
-const startProgress = ref(false);
-const currentTab = ref<'update' | 'event'>('update'); // 預設先顯示更新
-const copied = ref(false);
+import { gsap } from 'gsap';
 
+type Tab = 'update' | 'event';
+const isVisible = ref(true);
+const currentTab = ref<Tab>('update');
+const selectedTab = ref<Tab>('update');
+const copied = ref(false);
+const updateContent = ref<HTMLElement | null>(null);
+const eventContent = ref<HTMLElement | null>(null);
+const tabIndicator = ref<HTMLElement | null>(null);
+const copyButton = ref<HTMLButtonElement | null>(null);
 const INVITE_CODE = 'G79K77XF';
+
+let root: Element | null = null;
+let context: gsap.Context | null = null;
+let panelMotion: gsap.core.Timeline | null = null;
+let pageMotion: gsap.core.Timeline | null = null;
+let indicatorMotion: gsap.core.Tween | null = null;
+let progressMotion: gsap.core.Tween | null = null;
+let motionPreference: MediaQueryList | null = null;
+let enterDone: (() => void) | null = null;
+let tabRequest = 0;
+let manualTabSelected = false;
+let readingStarted = false;
+let disposed = false;
 const timers: ReturnType<typeof setTimeout>[] = [];
 let copyResetTimer: ReturnType<typeof setTimeout> | null = null;
+const reducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const pageFor = (tab: Tab) => tab === 'update' ? updateContent.value : eventContent.value;
+const cardsIn = (page: Element) => Array.from(page.querySelectorAll<HTMLElement>(
+  '.announcement-update-item, .announcement-event-card',
+));
+const movingParts = (page: Element) => [
+  page, ...page.querySelectorAll('.announcement-update-item, .announcement-event-card, .announcement-update-date, .announcement-update-icon, .announcement-update-copy'),
+];
 
-const schedule = (callback: () => void, delay: number) => {
+// offsetTop/offsetHeight describe the resting layout even during an interrupted transform.
+function stackOffsets(cards: HTMLElement[]) {
+  const first = cards[0];
+  if (!first) return [];
+  const list = first.parentElement!;
+  const stackTop = (list.offsetHeight - first.offsetHeight) / 2;
+  return cards.map((card, index) => stackTop + index * 5 - card.offsetTop);
+}
+
+function schedule(callback: () => void, delay: number) {
   const timer = setTimeout(() => {
     const index = timers.indexOf(timer);
     if (index >= 0) timers.splice(index, 1);
-    callback();
+    if (!disposed) callback();
   }, delay);
   timers.push(timer);
-  return timer;
-};
+}
 
-const scheduleCopyReset = () => {
+function startReading() {
+  if (readingStarted || !isVisible.value || disposed) return;
+  readingStarted = true;
+  const progress = root?.querySelector('.announcement-progress-fill');
+  if (progress) progressMotion = gsap.to(progress, { scaleX: 0, duration: 10, ease: 'none' });
+  schedule(() => {
+    if (!manualTabSelected) selectTab('event', false);
+  }, 3000);
+  schedule(dismiss, 10000);
+}
+
+function finishOpening() {
+  const done = enterDone;
+  enterDone = null;
+  done?.();
+  startReading();
+}
+
+function stopPanelMotion() {
+  panelMotion?.kill();
+  panelMotion = null;
+  enterDone = null;
+}
+
+function beforeEnter(element: Element) {
+  root = element;
+  context?.revert();
+  context = gsap.context(() => {
+    if (!reducedMotion()) gsap.set('.announcement-panel', { autoAlpha: 0 });
+  }, element);
+}
+
+function enter(element: Element, done: () => void) {
+  enterDone = done;
+  if (reducedMotion()) { finishOpening(); return; }
+  const cards = cardsIn(element.querySelector('.announcement-page.is-current')!);
+  const offsets = stackOffsets(cards);
+  context?.add(() => {
+    gsap.set('.announcement-backdrop', { autoAlpha: 0, y: 16, scale: 0.96 });
+    gsap.set('.announcement-ambient', { x: -6, y: 6 });
+    gsap.set('.announcement-header, .announcement-progress', { autoAlpha: 0, y: 8 });
+    gsap.set(cards, {
+      y: index => offsets[index], x: index => index * 4, rotation: index => -2 + index * 1.4,
+      scale: index => 0.94 - index * 0.018, zIndex: index => cards.length - index,
+      willChange: 'transform',
+    });
+    gsap.set('.announcement-update-copy, .announcement-update-icon', { autoAlpha: 0 });
+    gsap.set('.announcement-update-date', { autoAlpha: 0, scale: 0.8 });
+    gsap.set(cards[0]!.querySelector('.announcement-update-date'), { autoAlpha: 1, scale: 1 });
+    gsap.set('.announcement-panel', { autoAlpha: 1 });
+
+    panelMotion = gsap.timeline({ defaults: { ease: 'power3.out' }, onComplete: finishOpening })
+      .addLabel('stack', 0)
+      .fromTo('.announcement-content-stage', { y: 26, autoAlpha: 0 }, {
+        y: 0, autoAlpha: 1, duration: 0.28, clearProps: 'transform,opacity,visibility',
+      }, 'stack')
+      .to('.announcement-backdrop', {
+        autoAlpha: 1, y: 0, scale: 1, duration: 0.34, clearProps: 'transform,opacity,visibility',
+      }, 0.1)
+      .to('.announcement-header, .announcement-progress', {
+        autoAlpha: 1, y: 0, duration: 0.24, clearProps: 'transform,opacity,visibility',
+      }, 0.14)
+      .addLabel('unfold', 0.16)
+      .to(cards, {
+        x: 0, y: 0, rotation: 0, scale: 1, duration: 0.46, stagger: 0.085, ease: 'power2.inOut',
+        clearProps: 'transform,zIndex',
+      }, 'unfold')
+      .to('.announcement-update-date', {
+        autoAlpha: 1, scale: 1, duration: 0.22, stagger: 0.085,
+        clearProps: 'transform,opacity,visibility',
+      }, 0.37)
+      .to('.announcement-update-copy', {
+        autoAlpha: 1, duration: 0.22, stagger: 0.085, clearProps: 'opacity,visibility',
+      }, 0.4)
+      .fromTo('.announcement-update-icon', { scale: 0.72, rotation: -8 }, {
+        autoAlpha: 1, scale: 1, rotation: 0, duration: 0.26, stagger: 0.085,
+        ease: 'back.out(1.1)', clearProps: 'transform,opacity,visibility',
+      }, 0.43)
+      .to('.announcement-ambient', { x: 0, y: 0, duration: 0.65, clearProps: 'transform' }, 0.15)
+      .addLabel('settle', 0.7)
+      .fromTo('.announcement-rim-glint', { xPercent: -120, opacity: 0 }, {
+        xPercent: 120, opacity: 0.65, duration: 0.25,
+      }, 'settle')
+      .set('.announcement-rim-glint', { opacity: 0 })
+      .set(cards, { clearProps: 'willChange' });
+  });
+}
+
+// A tab click can take over before the opening finishes without snapping the cards.
+function settleShell() {
+  if (!enterDone) return;
+  panelMotion?.kill();
+  context?.add(() => {
+    panelMotion = gsap.timeline({ onComplete: finishOpening })
+      .to('.announcement-backdrop, .announcement-header, .announcement-progress, .announcement-content-stage', {
+        autoAlpha: 1, x: 0, y: 0, scale: 1, duration: 0.18,
+        clearProps: 'transform,opacity,visibility',
+      })
+      .set('.announcement-ambient', { clearProps: 'transform' })
+      .set('.announcement-rim-glint', { opacity: 0 });
+  });
+}
+
+async function selectTab(tab: Tab, manual = true) {
+  if (manual) manualTabSelected = true;
+  if (!isVisible.value || disposed || selectedTab.value === tab) return;
+  selectedTab.value = tab;
+  const request = ++tabRequest;
+  const direction = tab === 'event' ? 1 : -1;
+  pageMotion?.kill();
+  indicatorMotion?.kill();
+  settleShell();
+  context?.add(() => {
+    indicatorMotion = gsap.to(tabIndicator.value, {
+      xPercent: tab === 'event' ? 100 : 0, duration: reducedMotion() ? 0 : 0.3, ease: 'power3.out',
+    });
+  });
+
+  const reveal = async () => {
+    if (request !== tabRequest || !isVisible.value || disposed) return;
+    const previousPage = pageFor(currentTab.value);
+    currentTab.value = tab;
+    await nextTick();
+    if (request !== tabRequest || !isVisible.value || disposed) return;
+    const incoming = pageFor(tab);
+    if (!incoming) return;
+    if (previousPage) gsap.set(movingParts(previousPage), { clearProps: 'transform,opacity,visibility,zIndex,willChange' });
+    gsap.set(movingParts(incoming), { clearProps: 'transform,opacity,visibility,zIndex,willChange' });
+    if (reducedMotion()) return;
+    context?.add(() => {
+      pageMotion = gsap.timeline({ defaults: { ease: 'power3.out' } })
+        .fromTo(incoming, { x: direction * 24, autoAlpha: 0 }, {
+          x: 0, autoAlpha: 1, duration: 0.32, clearProps: 'transform,opacity,visibility',
+        })
+        .fromTo(cardsIn(incoming), { x: direction * 8 }, {
+          x: 0, duration: 0.245, stagger: 0.025, clearProps: 'transform',
+        }, 0)
+        .to('.announcement-ambient', { x: 0, duration: 0.32, clearProps: 'transform' }, 0);
+    });
+  };
+
+  const outgoing = pageFor(currentTab.value);
+  if (reducedMotion() || !outgoing) { await reveal(); return; }
+  context?.add(() => {
+    pageMotion = gsap.timeline({ defaults: { ease: 'power2.out' } });
+    if (currentTab.value === tab) {
+      // Reversing a pending page change settles from its current position.
+      pageMotion.to(movingParts(outgoing), {
+        x: 0, y: 0, scale: 1, rotation: 0, autoAlpha: 1, duration: 0.25,
+        clearProps: 'transform,opacity,visibility,zIndex,willChange',
+      }).to('.announcement-ambient', { x: 0, duration: 0.25, clearProps: 'transform' }, 0);
+    } else {
+      pageMotion.to(outgoing, {
+        x: -direction * 20, autoAlpha: 0, duration: 0.16, ease: 'power2.in',
+      }).to('.announcement-ambient', { x: direction * 6, duration: 0.16 }, 0)
+        .call(() => { void reveal(); });
+    }
+  });
+}
+
+function dismiss() {
+  if (!isVisible.value) return;
+  ++tabRequest;
+  timers.splice(0).forEach(clearTimeout);
   if (copyResetTimer) clearTimeout(copyResetTimer);
-  copyResetTimer = setTimeout(() => {
-    copied.value = false;
-    copyResetTimer = null;
-  }, 2000);
-};
+  progressMotion?.kill();
+  isVisible.value = false;
+}
+
+function leave(element: Element, done: () => void) {
+  stopPanelMotion();
+  pageMotion?.kill();
+  indicatorMotion?.kill();
+  if (reducedMotion()) { done(); return; }
+  const page = element.querySelector('.announcement-page.is-current');
+  const cards = page ? cardsIn(page) : [];
+  const offsets = stackOffsets(cards);
+  context?.add(() => {
+    panelMotion = gsap.timeline({ defaults: { ease: 'power2.in' }, onComplete: done });
+    if (cards.length) panelMotion.to(cards, {
+      y: index => offsets[index], x: index => index * 4, scale: index => 0.94 - index * 0.018,
+      rotation: index => -2 + index * 1.4, duration: 0.2,
+      stagger: { each: 0.035, from: 'end' },
+    }, 0);
+    panelMotion.to('.announcement-update-copy, .announcement-update-icon', { autoAlpha: 0, duration: 0.12 }, 0)
+      .to('.announcement-header, .announcement-progress', { autoAlpha: 0, y: 8, duration: 0.15 }, 0.08)
+      .to('.announcement-backdrop', { y: 16, scale: 0.96, autoAlpha: 0, duration: 0.23 }, 0.17)
+      .to('.announcement-content-stage', { y: 26, autoAlpha: 0, duration: 0.17 }, 0.23)
+      .to('.announcement-ambient', { y: 6, duration: 0.25 }, 0.15);
+  });
+}
+
+function finishMotionForPreference(event: MediaQueryListEvent) {
+  if (!event.matches) return;
+  panelMotion?.progress(1);
+  pageMotion?.progress(1);
+  indicatorMotion?.progress(1);
+}
 
 async function copyInviteCode() {
   try {
     await navigator.clipboard.writeText(INVITE_CODE);
-    copied.value = true;
-    scheduleCopyReset();
-  } catch (err) {
-    // Fallback for older browsers
+  } catch {
     const textArea = document.createElement('textarea');
     textArea.value = INVITE_CODE;
+    textArea.style.cssText = 'position:fixed;opacity:0;pointer-events:none';
     document.body.appendChild(textArea);
     textArea.select();
     document.execCommand('copy');
-    document.body.removeChild(textArea);
-    copied.value = true;
-    scheduleCopyReset();
+    textArea.remove();
   }
+  if (disposed || !isVisible.value) return;
+  copied.value = true;
+  if (copyResetTimer) clearTimeout(copyResetTimer);
+  copyResetTimer = setTimeout(() => { copied.value = false; copyResetTimer = null; }, 2000);
+  await nextTick();
+  if (disposed || !isVisible.value || reducedMotion() || !copyButton.value) return;
+  context?.add(() => {
+    gsap.fromTo(copyButton.value, { scale: 0.94 }, {
+      scale: 1, duration: 0.3, ease: 'back.out(1.5)', overwrite: true, clearProps: 'transform',
+    });
+  });
+}
+
+function cleanupMotion() {
+  stopPanelMotion();
+  pageMotion?.kill();
+  indicatorMotion?.kill();
+  progressMotion?.kill();
+  context?.revert();
+  context = null;
+  root = null;
 }
 
 onMounted(() => {
-  // Start progress bar animation slightly after mount
-  schedule(() => {
-    startProgress.value = true;
-  }, 100);
-
-  // 3秒後自動切換到活動分頁
-  schedule(() => {
-    if (currentTab.value === 'update') {
-      currentTab.value = 'event';
-    }
-  }, 3000);
-
-  // 10秒後自動隱藏
-  schedule(() => {
-    isVisible.value = false;
-  }, 10000);
+  motionPreference = window.matchMedia('(prefers-reduced-motion: reduce)');
+  motionPreference.addEventListener('change', finishMotionForPreference);
 });
-
 onBeforeUnmount(() => {
+  disposed = true;
+  ++tabRequest;
   timers.splice(0).forEach(clearTimeout);
-  if (copyResetTimer) {
-    clearTimeout(copyResetTimer);
-    copyResetTimer = null;
-  }
+  if (copyResetTimer) clearTimeout(copyResetTimer);
+  motionPreference?.removeEventListener('change', finishMotionForPreference);
+  cleanupMotion();
 });
 </script>
 
 <style scoped>
+.announcement-panel {
+  position: relative;
+  isolation: isolate;
+  max-height: calc(100dvh - 32px);
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.announcement-backdrop {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: inherit;
+  pointer-events: none;
+  border-color: rgba(214, 231, 221, 0.8);
+  box-shadow: 0 12px 36px rgba(23, 62, 47, 0.12), 0 1px 0 rgba(255, 255, 255, 0.9) inset;
+}
+
+.announcement-ambient {
+  position: absolute;
+  inset: -8px;
+  background: radial-gradient(ellipse at 5% 5%, rgba(16, 185, 129, 0.16), transparent 55%),
+    radial-gradient(ellipse at 95% 100%, rgba(167, 243, 208, 0.22), transparent 50%);
+}
+
+.announcement-rim-glint {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  border-top: 2px solid rgba(255, 255, 255, 0.95);
+  border-bottom: 2px solid rgba(255, 255, 255, 0.8);
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+.announcement-header, .announcement-progress { position: relative; z-index: 2; }
+/* The backing already blurs the scene; nested filters add no useful depth. */
+.announcement-panel .glass-control {
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  transition-property: background-color, border-color, color, box-shadow;
+}
+.announcement-panel .announcement-progress { transition: none; }
+.announcement-tabs {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  padding: 3px;
+  border-radius: 999px;
+  background: rgba(222, 241, 232, 0.65);
+}
+.announcement-tabs button { position: relative; z-index: 1; }
+.announcement-tab-indicator {
+  position: absolute;
+  top: 3px;
+  bottom: 3px;
+  left: 3px;
+  width: calc(50% - 3px);
+  border-radius: 999px;
+  background: #10b981;
+  box-shadow: 0 2px 5px rgba(5, 150, 105, 0.18);
+}
+.announcement-content-stage {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  min-width: 0;
+  margin: -6px;
+  padding: 6px;
+  overflow: clip;
+}
+.announcement-page {
+  position: relative;
+  grid-area: 1 / 1;
+  align-self: start;
+  min-width: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+.announcement-page.is-current { visibility: visible; pointer-events: auto; }
+.announcement-invite-button { min-width: 6.5rem; }
+.announcement-invite-button[data-copied='true'] { background: #10b981; color: white; }
+.announcement-invite-button[data-copied='true'] svg { color: white; }
+.announcement-tabs button:active, .announcement-close-button:active { transform: scale(0.94); }
+
 .announcement-panel :deep(*) {
   paint-order: normal;
 }
@@ -242,61 +571,52 @@ onBeforeUnmount(() => {
 }
 
 .announcement-list {
+  position: relative;
   display: grid;
-  gap: 0.45rem;
+  grid-auto-rows: 1fr;
+  gap: 0.5rem;
 }
 
 .announcement-update-item {
   position: relative;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.6rem;
   min-width: 0;
-  padding: 0.42rem 0.55rem;
+  padding: 0.5rem 0.65rem;
   overflow: hidden;
   list-style: none;
-  border: 1px solid rgba(148, 163, 184, 0.18);
-  border-radius: 0.9rem;
+  border: 1px solid rgba(99, 133, 115, 0.13);
+  border-radius: 1rem;
   background:
     radial-gradient(circle at 16% 0%, rgba(255, 255, 255, 0.92), transparent 42%),
-    linear-gradient(135deg, rgba(255, 255, 255, 0.66), rgba(241, 245, 249, 0.42));
+    linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(241, 248, 245, 0.96));
   box-shadow:
-    0 8px 18px rgba(15, 23, 42, 0.05),
-    0 1px 8px rgba(255, 255, 255, 0.72) inset;
+    0 2px 8px rgba(23, 62, 47, 0.035),
+    0 1px 0 rgba(255, 255, 255, 0.85) inset;
 }
 
 .announcement-update-item-feature {
-  border-color: rgba(16, 185, 129, 0.24);
+  border-color: rgba(16, 185, 129, 0.2);
   background:
     radial-gradient(circle at 16% 0%, rgba(255, 255, 255, 0.96), transparent 42%),
-    linear-gradient(135deg, rgba(236, 253, 245, 0.92), rgba(255, 255, 255, 0.62));
-}
-
-.announcement-update-item-feature::after {
-  position: absolute;
-  inset: 0;
-  content: "";
-  background: linear-gradient(110deg, transparent 0%, rgba(255, 255, 255, 0.78) 44%, transparent 58%);
-  opacity: 0.42;
-  transform: translateX(-115%);
-  animation: announcement-feature-sheen 3.6s ease-in-out infinite;
-  pointer-events: none;
+    linear-gradient(135deg, rgba(236, 253, 245, 0.98), rgba(255, 255, 255, 0.96));
 }
 
 .announcement-update-date {
   position: relative;
   z-index: 1;
   flex: 0 0 auto;
-  min-width: 2.35rem;
-  padding: 0.18rem 0.42rem;
+  min-width: 2.55rem;
+  padding: 0.25rem 0.42rem;
   color: white;
   font-size: 0.68rem;
-  font-weight: 900;
+  font-weight: 800;
   line-height: 1;
   text-align: center;
   border-radius: 999px;
-  background: linear-gradient(135deg, #00b92f, #008523);
-  box-shadow: 0 6px 14px rgba(0, 133, 35, 0.2);
+  background: linear-gradient(135deg, #10b981, #059669);
+  box-shadow: 0 2px 5px rgba(5, 150, 105, 0.13);
 }
 
 .announcement-update-icon {
@@ -312,7 +632,7 @@ onBeforeUnmount(() => {
   border: 1px solid rgba(255, 255, 255, 0.72);
   border-radius: 0.65rem;
   background: rgba(255, 255, 255, 0.58);
-  box-shadow: 0 1px 6px rgba(255, 255, 255, 0.68) inset;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.8) inset;
 }
 
 .announcement-update-icon-emerald {
@@ -322,7 +642,7 @@ onBeforeUnmount(() => {
 
 .announcement-update-icon-dark {
   color: white;
-  background: rgb(17, 24, 39);
+  background: #253a31;
 }
 
 .announcement-update-flags {
@@ -342,33 +662,24 @@ onBeforeUnmount(() => {
   gap: 0.24rem 0.38rem;
   color: rgb(15, 23, 42);
   font-size: 0.78rem;
-  font-weight: 850;
-  line-height: 1.35;
+  font-weight: 650;
+  line-height: 1.5;
 }
 
 .announcement-update-kicker {
   color: rgb(4, 120, 87);
-  font-weight: 950;
+  font-weight: 800;
 }
 
 .announcement-update-highlight {
   overflow: hidden;
   color: transparent;
-  font-weight: 950;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  background: linear-gradient(90deg, #047857, #00b92f, #0ea5e9);
+  font-weight: 750;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  background: linear-gradient(90deg, #047857, #059669, #0f766e);
   -webkit-background-clip: text;
   background-clip: text;
-}
-
-@keyframes announcement-feature-sheen {
-  0%, 42% {
-    transform: translateX(-115%);
-  }
-  72%, 100% {
-    transform: translateX(115%);
-  }
 }
 
 .announcement-close-button {
@@ -376,16 +687,26 @@ onBeforeUnmount(() => {
   min-height: 2.75rem;
   color: rgb(31 41 55);
   background: rgba(255, 255, 255, 0.72);
-  border: 1px solid rgba(75, 85, 99, 0.28);
+  border: 1px solid rgba(99, 133, 115, 0.2);
   box-shadow:
     0 1px 6px rgba(255, 255, 255, 0.82) inset,
-    0 3px 10px rgba(15, 23, 42, 0.12);
+    0 2px 7px rgba(23, 62, 47, 0.07);
 }
 
 .announcement-close-button:hover {
   color: rgb(3 7 18);
   background: rgba(255, 255, 255, 0.92);
   border-color: rgba(31, 41, 55, 0.42);
+}
+
+.announcement-panel button:focus-visible {
+  outline: 2px solid #047857;
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .announcement-rim-glint { display: none; }
+  .announcement-panel button { transition: none; }
 }
 
 .ios-badge,

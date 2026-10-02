@@ -285,18 +285,26 @@
       class="capture-dashboard"
       aria-labelledby="capture-dashboard-title"
     >
-      <button type="button" class="capture-dashboard-header" :aria-expanded="isRadarExpanded" aria-controls="collection-radar-content" @click="isRadarExpanded = !isRadarExpanded">
-        <div class="capture-dashboard-heading">
-          <span class="capture-dashboard-icon">
-            <Icon name="lucide:sparkles" class="w-4 h-4" />
-          </span>
-          <div>
+      <div class="radar-tool-entry">
+        <div class="radar-tool-heading">
+          <div class="radar-tool-copy">
+            <p class="radar-tool-eyebrow">{{ locale === 'en' ? 'FIELD TOOLS / 01' : '探險工具 / 01' }}</p>
             <h2 id="capture-dashboard-title">{{ captureDashboardLabels.title }}</h2>
-            <p>{{ captureDashboardLabels.subtitle }}</p>
+            <p class="radar-tool-question">{{ locale === 'en' ? 'Which types are closest to the reward?' : '哪些種類快達保底？' }}</p>
           </div>
+          <CollectionToolMotion kind="radar" :active="!isRadarExpanded" />
         </div>
-        <span class="capture-dashboard-badge">{{ locale === 'en' ? 'Analysis' : '分析頁籤' }} <span class="radar-chevron" :class="{ 'is-open': isRadarExpanded }" aria-hidden="true">↓</span></span>
-      </button>
+        <p class="radar-tool-description">{{ locale === 'en' ? 'Compare all types and find your nearest guaranteed reward.' : '一次比較所有種類，找出最接近保底的目標。' }}</p>
+        <div class="radar-tool-actions">
+          <button type="button" class="radar-tool-open" :aria-expanded="isRadarExpanded" aria-controls="collection-radar-content" @click="isRadarExpanded = !isRadarExpanded">
+            <CollectionParticleBorder :active="!isRadarExpanded" on-dark />
+            <span>{{ isRadarExpanded ? (locale === 'en' ? 'Close progress' : '收合進度') : (locale === 'en' ? 'Compare progress' : '查看保底進度') }}</span>
+            <span class="radar-tool-knob"><Icon :name="isRadarExpanded ? 'lucide:chevron-up' : 'lucide:arrow-up-right'" class="w-4 h-4" /></span>
+          </button>
+          <CollectionGuideButton topic="radar" @start="isRadarExpanded = true" />
+        </div>
+        <p v-if="!isRadarExpanded" class="radar-tool-summary"><span aria-hidden="true"></span>{{ radarEntrySummary }}</p>
+      </div>
       <Transition :css="false" @enter="enterPanel" @leave="leavePanel" @enter-cancelled="cancelPanel" @leave-cancelled="cancelPanel">
       <div v-if="isRadarExpanded" id="collection-radar-content" class="collection-radar-content">
       <div
@@ -943,12 +951,12 @@ const categoryIds = computed(() => decorDefinitions.value.map((d) => d.category.
 const captureDashboardLabels = computed(() => {
   if (locale.value === "en") {
     return {
-      title: "Rare score radar",
-      subtitle: "Prioritize each decor subtype closest to a guaranteed rare decor Pikmin.",
+      title: "Gold Seedling Progress",
+      subtitle: "Compare all decor types to find the closest guaranteed Gold Seedling.",
       badge: "Rare scoring",
-      realCloseTitle: "Closest by score",
+      realCloseTitle: "Closest to a Gold Seedling",
       realCloseDesc: "Real points only",
-      virtualCloseTitle: "Close with reserves",
+      virtualCloseTitle: "Progress with reserves",
       virtualCloseDesc: "Small seedlings + <4-heart Pikmin",
       unlockCloseTitle: "Closest to unlock",
       unlockCloseDesc: "Regular decor gaps",
@@ -957,13 +965,13 @@ const captureDashboardLabels = computed(() => {
       noRealClose: "No unlocked rare-score subtype yet.",
       noVirtualClose: "No reserves can move a subtype closer yet.",
       noUnlockClose: "No rare subtype is close to unlocking.",
-      toNextUnit: "to next",
+      toNextUnit: "to reward",
       afterVirtualUnit: "left",
       regularUnit: "regular",
       colorGapUnit: "colors",
       statusLabel: "Status",
       scoreLabel: "Score",
-      nextLabel: "Next",
+      nextLabel: "To reward",
       virtualLabel: "Reserve",
       missingColorsLabel: "Missing colors",
       unlockedStatus: (level: number) => `Lv. ${level}`,
@@ -971,50 +979,50 @@ const captureDashboardLabels = computed(() => {
       nextText: (points: number) => `${points} pt`,
       noNextText: "Not unlocked",
       realAction: (actions: number) => `Get decor, including huge seedlings, ${actions} more time${actions > 1 ? "s" : ""}`,
-      virtualReady: "Using reserves can reach the next level",
+      virtualReady: "Using reserves can reach the guaranteed reward",
       virtualAction: (remaining: number) => `After reserves, still ${remaining} pt short`,
       unlockAction: (colors: string) => `Complete ${colors} first to unlock rare scoring.`,
       analysisUnlockedAction: (actions: number) => `Best move: get decor, including huge seedlings, ${actions} more time${actions > 1 ? "s" : ""}.`,
-      analysisVirtualReady: "Best move: convert the tracked reserves; they can reach the next level.",
+      analysisVirtualReady: "Best move: convert the tracked reserves to reach the guaranteed Gold Seedling threshold.",
       analysisVirtualShort: (remaining: number) => `Convert reserves first, then earn ${remaining} more pt.`,
       analysisLockedAction: (colors: string) => `First unlock rare scoring by collecting ${colors}.`,
     };
   }
 
   return {
-    title: "稀有積分雷達",
-    subtitle: "依裝飾子種類分開看，優先衝最接近保底稀有的目標。",
+    title: "金盆栽保底進度",
+    subtitle: "一次比較所有裝飾種類，找出最接近保底金盆栽的目標。",
     badge: "稀有積分",
-    realCloseTitle: "實分快升等",
+    realCloseTitle: "最接近保底",
     realCloseDesc: "只看目前分數",
-    virtualCloseTitle: "虛分後接近",
+    virtualCloseTitle: "加上庫存後的進度",
     virtualCloseDesc: "小盆 + 未滿4心",
     unlockCloseTitle: "快解鎖稀有",
     unlockCloseDesc: "普通裝飾缺口",
     analysisTitle: "單一子種類分析",
     analysisDesc: "選一個子種類，看下一步怎麼做。",
     noRealClose: "目前沒有已解鎖稀有積分的子種類。",
-    noVirtualClose: "目前沒有可推近升等的子種類庫存。",
+    noVirtualClose: "目前沒有可推近保底的子種類庫存。",
     noUnlockClose: "目前沒有接近解鎖的稀有子種類。",
-    toNextUnit: "距下級",
-    afterVirtualUnit: "虛差",
+    toNextUnit: "距保底",
+    afterVirtualUnit: "仍差",
     regularUnit: "普通",
     colorGapUnit: "缺色",
     statusLabel: "狀態",
     scoreLabel: "實分",
-    nextLabel: "下級",
+    nextLabel: "距保底",
     virtualLabel: "虛分",
     missingColorsLabel: "缺少顏色",
     unlockedStatus: (level: number) => `Lv. ${level}`,
     lockedStatus: (missing: number) => `差 ${missing} 色`,
     nextText: (points: number) => `${points} pt`,
     noNextText: "尚未解鎖",
-    realAction: (actions: number) => `拿裝飾(含大盆) ${actions} 次可升級`,
-    virtualReady: "轉完虛分可到下一級",
+    realAction: (actions: number) => `再拿裝飾(含大盆) ${actions} 次可達保底積分`,
+    virtualReady: "培養完目前庫存，可達保底積分",
     virtualAction: (remaining: number) => `轉完後還差 ${remaining} pt`,
     unlockAction: (colors: string) => `先補 ${colors}，解鎖後才開始算稀有積分。`,
-    analysisUnlockedAction: (actions: number) => `建議：拿裝飾(含大盆) ${actions} 次可升級。`,
-    analysisVirtualReady: "建議：先把目前庫存轉成分數，可直接到下一級。",
+    analysisUnlockedAction: (actions: number) => `建議：再拿裝飾(含大盆) ${actions} 次可達保底積分。`,
+    analysisVirtualReady: "建議：先培養目前庫存，累積積分即可達到金盆栽保底門檻。",
     analysisVirtualShort: (remaining: number) => `建議：先轉目前庫存，再補 ${remaining} pt。`,
     analysisLockedAction: (colors: string) => `建議：先補齊 ${colors}，才能開始衝稀有積分。`,
   };
@@ -1694,6 +1702,22 @@ const selectedRareAnalysis = computed(() =>
 
 const rareDashboardHasContent = computed(() => rareCategoryInsights.value.length > 0);
 
+const radarEntrySummary = computed(() => {
+  const hasRecords = rareCategoryInsights.value.some(item => item.regularCollected > 0 || item.points > 0 || item.virtualPoints > 0);
+  if (!hasRecords) return locale.value === 'en'
+    ? 'Record your collection or inventory to compare progress.'
+    : '先記下收藏或庫存，就能比較保底進度。';
+  const nearest = rareLevelUpRecommendations.value[0];
+  if (nearest) return locale.value === 'en'
+    ? `${nearest.name} · ${nearest.pointsToNext} pt to a guaranteed Gold Seedling`
+    : `${nearest.name} · 距保底 ${nearest.pointsToNext} pt`;
+  const unlock = rareUnlockRecommendations.value[0];
+  if (unlock) return locale.value === 'en'
+    ? `${unlock.name} · ${unlock.missingRegular} colors to unlock`
+    : `${unlock.name} · 再補 ${unlock.missingRegular} 色可解鎖`;
+  return locale.value === 'en' ? 'Open to compare Gold Seedling progress across types.' : '展開比較各種類的金盆栽保底進度。';
+});
+
 const pikminColorClass = (pikminType: PikminType): string => PIKMIN_TYPE_COLORS[pikminType];
 
 const focusRecommendedCategory = async (categoryId: string) => {
@@ -2252,7 +2276,25 @@ const handleCollectAll = (categoryId: string, categoryName: string) => {
 .collection-journal-tabs button[aria-pressed="true"] { background: #10b981; border-color: #10b981; color: #fff; }
 .collection-journal-tabs button:focus-visible { outline: 3px solid #07835c; outline-offset: 2px; }
 .collection-results { position: relative; margin-top: 1rem; padding: .8rem; border: 1px solid #e0e3d7; border-radius: 1rem; background: #fffdf7; box-shadow: 0 3px 0 #e8ecdf; }
-.capture-dashboard { background: #f7f8ef; box-shadow: none; border-color: #e1e4d7; }
+.capture-dashboard { background: #fffdf7; box-shadow: 0 3px 0 #dbece2; border-color: #b8decb; border-radius: 1.1rem; }
+.radar-tool-entry { position: relative; isolation: isolate; overflow: hidden; padding: 1rem; background: radial-gradient(ellipse at 100% 0%, #c8f4df80, transparent 60%), linear-gradient(135deg, #fafff8, #f0faf2); border-radius: inherit; }
+.radar-tool-heading { position: relative; display: flex; justify-content: space-between; align-items: center; gap: .5rem; }
+.radar-tool-copy { min-width: 0; }
+.radar-tool-eyebrow { margin-bottom: .4rem; color: #568671; font-size: .58rem; letter-spacing: .15em; font-weight: 700; }
+.radar-tool-copy h2 { color: #174e3c; font-size: 1.1rem; font-weight: 800; letter-spacing: -.025em; line-height: 1.4; }
+.radar-tool-question { margin-top: .2rem; color: #427561; font-size: .77rem; font-weight: 650; }
+.radar-tool-description { position: relative; margin-top: .35rem; color: #597568; font-size: .72rem; line-height: 1.6; }
+.radar-tool-actions { position: relative; display: flex; align-items: center; gap: .6rem; margin-top: .8rem; }
+.radar-tool-open { position: relative; isolation: isolate; overflow: hidden; display: inline-flex; align-items: center; justify-content: space-between; gap: .8rem; min-height: 44px; padding: .4rem .45rem .4rem .85rem; border: 1px solid #0aab75; border-radius: 999px; background: linear-gradient(110deg, #059669, #10b981 65%, #20ca91); color: #fff; box-shadow: 0 2px 0 #079b6c, inset 0 1px 0 #ffffff38; font-size: .8rem; font-weight: 750; }
+.radar-tool-open > span:not(.collection-particle-border) { position: relative; }
+.radar-tool-knob { display: grid; place-items: center; width: 30px; height: 30px; flex-shrink: 0; border-radius: 50%; background: #f2fff9; color: #07966c; box-shadow: 0 1px 4px #03543b30; }
+.radar-tool-open:hover { background: linear-gradient(110deg, #05855e, #0eae79 65%, #10b981); }
+.radar-tool-open:active { transform: translateY(1px); }
+.radar-tool-open:focus-visible { outline: 3px solid #047857; outline-offset: 3px; }
+.radar-tool-summary { position: relative; display: flex; align-items: baseline; gap: .4rem; margin-top: .8rem; padding-top: .6rem; border-top: 1px solid #cde7d6; color: #55715d; font-size: .65rem; line-height: 1.5; }
+.radar-tool-summary > span { flex: 0 0 5px; width: 5px; height: 5px; border-radius: 50%; background: #10b981; }
+@media (min-width: 768px) { .radar-tool-entry { padding: 1.1rem 1.25rem; }.radar-tool-copy h2 { font-size: 1.2rem; }.radar-tool-description { font-size: .78rem; } }
+@media (max-width: 360px) { .radar-tool-entry { padding: .8rem; }.radar-tool-copy h2 { font-size: 1rem; }.radar-tool-open { font-size: .75rem; gap: .5rem; } }
 .collection-section-card { flex-wrap: nowrap; gap: .5rem; padding: .4rem 0 .75rem; margin-bottom: .2rem; border-color: #e0e3d7; }
 .collection-section-icon { display: none; }.collection-section-card > .flex-1 { flex-basis: auto; min-width: 0; }
 .collection-section-title { font-size: 1.25rem; font-weight: 800; }.collection-section-desc { font-size: .72rem; }
