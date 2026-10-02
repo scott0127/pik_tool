@@ -32,18 +32,20 @@
     }
   }
 
-  /* Custom scrollbar */
-  ::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
-  }
+  /* Sized custom scrollbars can reserve layout space on mobile Chrome. */
+  @media (min-width: 768px) {
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
 
-  ::-webkit-scrollbar-track {
-    @apply bg-white/30 rounded-full;
-  }
+    ::-webkit-scrollbar-track {
+      @apply bg-white/30 rounded-full;
+    }
 
-  ::-webkit-scrollbar-thumb {
-    @apply bg-emerald-400/60 rounded-full hover:bg-emerald-500/80;
+    ::-webkit-scrollbar-thumb {
+      @apply bg-emerald-400/60 rounded-full hover:bg-emerald-500/80;
+    }
   }
 }
 

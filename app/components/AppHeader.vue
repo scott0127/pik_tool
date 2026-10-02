@@ -194,7 +194,7 @@
           <div
             v-if="showMobileMenu"
             id="mobile-navigation-panel"
-            class="mobile-menu-panel md:hidden space-y-4"
+            class="mobile-menu-panel scrollbar-hide md:hidden space-y-4"
             @keydown.esc.stop="closeMobileMenu"
           >
             <!-- Mobile Progress -->
