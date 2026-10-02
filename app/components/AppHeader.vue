@@ -778,7 +778,8 @@ onUnmounted(() => {
     position: absolute;
     top: 100%; left: 0; right: 0;
     max-height: calc(100dvh - 88px - env(safe-area-inset-top, 0px));
-    overflow-y: auto; overscroll-behavior: contain;
+    /* Entry transforms may extend beyond the panel for a frame. Keep only vertical scrolling. */
+    overflow-x: hidden; overflow-y: auto; overscroll-behavior: contain;
     padding: 12px 16px max(20px, env(safe-area-inset-bottom, 0px));
     background: #f5fcf8;
     border-bottom: 1px solid #d9e9df;

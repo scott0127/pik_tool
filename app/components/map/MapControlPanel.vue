@@ -290,6 +290,9 @@ onUnmounted(() => {
 .map-filter-list-heading > div { display: flex; align-items: center; gap: 0.25rem; color: #9aa48c; }
 .map-panel-action { min-height: 44px; padding: 0 0.65rem; margin: 4px 0; background: var(--map-action); color: #fff; border-radius: 6px; }
 .map-filter-list { display: grid; grid-template-columns: minmax(0, 1fr); align-content: start; row-gap: 32px; overflow-y: auto; min-height: 0; padding: 48px 1rem 1rem; overscroll-behavior: contain; scrollbar-width: thin; scrollbar-color: #b7c3a4 transparent; }
+.map-filter-sheet-mobile .map-filter-list { row-gap: 16px; padding-top: 32px; }
+/* Keep deliveries above the label and checkmark as the mobile rows move closer. */
+.map-filter-sheet-mobile :deep(.category-scene) { top: -32px; transform: scale(.72); transform-origin: top right; }
 .map-filter-item { position: relative; display: flex; align-items: center; gap: 0.8rem; min-width: 0; min-height: 64px; padding: 0.65rem 1rem; background: #fffdf5; border: 1px solid #d8ddce; border-radius: 1rem; box-shadow: inset 0 1px 0 #fff, 0 3px 0 #d5dbcc, 0 7px 14px #304a3908; cursor: pointer; touch-action: pan-y; user-select: none; -webkit-user-select: none; -webkit-tap-highlight-color: transparent; transition: border-color 160ms; }
 .map-filter-item.is-selected { border-color: #0ca778; background: var(--map-accent, #10B981); color: #fff; box-shadow: inset 0 1px 0 #ffffff40, inset 0 -1px 0 #04785726, 0 3px 0 #07865f, 0 7px 14px #04785712; }
 .is-selected .map-filter-count { color: #ffffffb3; }

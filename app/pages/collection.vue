@@ -2215,7 +2215,7 @@ const handleCollectAll = (categoryId: string, categoryName: string) => {
 .collection-collect-button:active { transform: translateY(2px); box-shadow: 0 1px 0 #078966; }
 .collection-category-content-inner { padding: .2rem .1rem .6rem; }
 @media (max-width: 767px) {
-  .collection-page { margin-inline: 0; }
+  .collection-page { margin-inline: 0; padding: 0 1rem 5rem; }
   .collection-section-card { flex-wrap: wrap; gap: .7rem; }
   .collection-section-card > .flex-1 { flex-basis: calc(100% - 60px); }
   .collection-section-actions { width: 100%; justify-content: flex-end; padding-top: .1rem; }
@@ -2231,6 +2231,7 @@ const handleCollectAll = (categoryId: string, categoryName: string) => {
   .rare-analysis-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 @media (max-width: 360px) {
+  .collection-page { padding-inline: .75rem; }
   .collection-filter-panel { padding: .8rem; }
   .collection-filter-kicker { font-size: .6rem; }
   .collection-filter-open { padding: .65rem; }
