@@ -345,7 +345,6 @@
           aria-live="off"
           @scroll.passive="handleRecommendationScroll"
           @touchstart.passive="beginRecommendationTouch"
-          @touchmove.passive="moveRecommendationTouch"
           @touchend.passive="endRecommendationTouch"
           @touchcancel.passive="endRecommendationTouch"
           @wheel.passive="handleRecommendationWheel"
@@ -959,6 +958,7 @@ const formatFriendCode = (e: Event) => {
 onMounted(async () => {
   if (import.meta.client) {
     reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    recommendationViewportWidth = window.innerWidth;
     recommendationAutoplay.value = !reducedMotionQuery.matches;
     reducedMotionQuery.addEventListener('change', handleReducedMotionChange);
     document.addEventListener('visibilitychange', handleRecommendationVisibility);
@@ -1241,10 +1241,11 @@ const recommendationTrack = ref<HTMLElement | null>(null);
 const recommendationProgress = ref<HTMLElement | null>(null);
 const activeRecommendationIndex = ref(0);
 const recommendationAutoplay = ref(true);
+const mobileMenuOpen = useState<boolean>('mobile-navigation-open', () => false);
 let recommendationDragging = false;
-let recommendationTouchOrigin: { x: number; y: number } | null = null;
 let recommendationScrollDirection: 1 | -1 = 1;
-let recommendationWheelTimer: ReturnType<typeof setTimeout> | null = null;
+let recommendationResumeTimer: ReturnType<typeof setTimeout> | null = null;
+let recommendationViewportWidth = 0;
 let recommendationScrollFrame: number | null = null;
 let reducedMotionQuery: MediaQueryList | null = null;
 let filterFetchTimer: ReturnType<typeof setTimeout> | null = null;
@@ -1458,6 +1459,8 @@ const scrollRecommendation = (direction: -1 | 1) => {
 };
 
 const handleRecommendationScroll = () => {
+  // Native momentum continues after touchend; wait for the last scroll event.
+  if (recommendationResumeTimer !== null) scheduleRecommendationResume();
   if (recommendationMoving) return;
   if (recommendationScrollFrame !== null) {
     cancelAnimationFrame(recommendationScrollFrame);
@@ -1494,7 +1497,9 @@ const startRecommendationAutoscroll = () => {
   if (
     !recommendationAutoplay.value
     || recommendationDragging
-    || recommendationWheelTimer
+    || recommendationResumeTimer !== null
+    || mobileMenuOpen.value
+    || reducedMotionQuery?.matches
     || document.visibilityState !== 'visible'
     || recommendationMoving
     || recommendedPosts.value.length <= 1
@@ -1527,43 +1532,42 @@ const handleRecommendationVisibility = () => {
 };
 
 const handleRecommendationResize = () => {
+  // Mobile address bars resize the height without changing card geometry.
+  if (window.innerWidth === recommendationViewportWidth) return;
+  recommendationViewportWidth = window.innerWidth;
   if (recommendationPaperReady) measureRecommendationPaper();
   startRecommendationAutoscroll();
   handleRecommendationScroll();
 };
 
-const beginRecommendationTouch = (event: TouchEvent) => {
-  const touch = event.touches[0];
-  recommendationTouchOrigin = touch ? { x: touch.clientX, y: touch.clientY } : null;
+const scheduleRecommendationResume = () => {
+  if (recommendationResumeTimer !== null) clearTimeout(recommendationResumeTimer);
+  recommendationResumeTimer = setTimeout(() => {
+    recommendationResumeTimer = null;
+    startRecommendationAutoscroll();
+  }, 1500);
 };
 
-const moveRecommendationTouch = (event: TouchEvent) => {
-  const touch = event.touches[0];
-  if (!touch || !recommendationTouchOrigin || recommendationDragging) return;
-  const dx = Math.abs(touch.clientX - recommendationTouchOrigin.x);
-  const dy = Math.abs(touch.clientY - recommendationTouchOrigin.y);
-  if (dx > 8 && dx > dy) {
-    recommendationDragging = true;
-    stopRecommendationAutoscroll();
-    cancelRecommendationMotion();
+const beginRecommendationTouch = () => {
+  recommendationDragging = true;
+  if (recommendationResumeTimer !== null) {
+    clearTimeout(recommendationResumeTimer);
+    recommendationResumeTimer = null;
   }
+  stopRecommendationAutoscroll();
+  cancelRecommendationMotion();
 };
 
-const endRecommendationTouch = () => {
-  recommendationTouchOrigin = null;
-  if (!recommendationDragging) return;
+const endRecommendationTouch = (event: TouchEvent) => {
+  if (!recommendationDragging || event.touches.length > 0) return;
   recommendationDragging = false;
-  startRecommendationAutoscroll();
+  scheduleRecommendationResume();
 };
 
 const handleRecommendationWheel = () => {
   stopRecommendationAutoscroll();
   cancelRecommendationMotion();
-  if (recommendationWheelTimer) clearTimeout(recommendationWheelTimer);
-  recommendationWheelTimer = setTimeout(() => {
-    recommendationWheelTimer = null;
-    startRecommendationAutoscroll();
-  }, 120);
+  scheduleRecommendationResume();
 };
 
 const toggleRecommendationAutoplay = () => {
@@ -1597,6 +1601,14 @@ const handleReducedMotionChange = (event: MediaQueryListEvent) => {
 };
 
 watch(activeRecommendationIndex, focusRecommendation);
+watch(mobileMenuOpen, (isOpen) => {
+  if (isOpen) {
+    stopRecommendationAutoscroll();
+    cancelRecommendationMotion();
+  } else {
+    scheduleRecommendationResume();
+  }
+});
 
 const refreshShowcaseMotion = async () => {
   await nextTick();
@@ -1721,9 +1733,9 @@ onUnmounted(() => {
   showcaseMotionContext = null;
   motionContext = null;
   stopRecommendationAutoscroll();
-  if (recommendationWheelTimer) {
-    clearTimeout(recommendationWheelTimer);
-    recommendationWheelTimer = null;
+  if (recommendationResumeTimer !== null) {
+    clearTimeout(recommendationResumeTimer);
+    recommendationResumeTimer = null;
   }
   if (recommendationScrollFrame !== null) {
     cancelAnimationFrame(recommendationScrollFrame);
@@ -1978,7 +1990,7 @@ onUnmounted(() => {
   gap: 0.7rem;
   overflow-x: auto;
   padding: 0.25rem 0.1rem 0.6rem;
-  scroll-behavior: smooth;
+  scroll-behavior: auto;
   scroll-padding-inline: 0.1rem;
   scroll-snap-type: x mandatory;
   overscroll-behavior-inline: contain;

@@ -531,7 +531,7 @@ const activateSupport = (kind: typeof supportKinds[number]) => {
   if (kind === 'coffee') handleCoffeeClick();
   if (kind === 'feedback') showFeedbackModal.value = true;
 };
-const showMobileMenu = ref(false);
+const showMobileMenu = useState<boolean>('mobile-navigation-open', () => false);
 const menuButton = ref<HTMLButtonElement | null>(null);
 const showSearch = ref(false);
 const searchQuery = ref('');
@@ -674,15 +674,58 @@ watch(() => router.currentRoute.value.path, () => {
   showSearch.value = false;
 });
 
+// Keep the document scroll container intact: changing root overflow can jump
+// the visual viewport on phones. Allow scrolling only inside the open panel.
+let menuTouchY = 0;
+const recordMenuTouch = (event: TouchEvent) => {
+  menuTouchY = event.touches[0]?.clientY ?? 0;
+};
+const blockBackgroundTouch = (event: TouchEvent) => {
+  if (event.touches.length !== 1) return;
+  const panel = document.querySelector<HTMLElement>('.mobile-menu-panel');
+  const insidePanel = event.target instanceof Node && panel?.contains(event.target);
+  const currentY = event.touches[0]?.clientY ?? menuTouchY;
+  const deltaY = currentY - menuTouchY;
+  menuTouchY = currentY;
+  if (
+    !panel || !insidePanel
+    || panel.scrollHeight <= panel.clientHeight
+    || (deltaY > 0 && panel.scrollTop <= 0)
+    || (deltaY < 0 && panel.scrollTop + panel.clientHeight >= panel.scrollHeight - 1)
+  ) {
+    if (event.cancelable) event.preventDefault();
+  }
+};
+const blockBackgroundWheel = (event: WheelEvent) => {
+  const panel = document.querySelector<HTMLElement>('.mobile-menu-panel');
+  if (!panel || !(event.target instanceof Node) || !panel.contains(event.target)
+    || panel.scrollHeight <= panel.clientHeight) {
+    if (event.cancelable) event.preventDefault();
+  }
+};
+const closeMenuOnDesktop = () => {
+  if (window.innerWidth >= 768) showMobileMenu.value = false;
+};
+const removeMenuScrollGuards = () => {
+  document.removeEventListener('touchstart', recordMenuTouch);
+  document.removeEventListener('touchmove', blockBackgroundTouch);
+  document.removeEventListener('wheel', blockBackgroundWheel);
+  window.removeEventListener('resize', closeMenuOnDesktop);
+};
 watch(showMobileMenu, (isOpen) => {
   if (typeof document === 'undefined') return;
-  document.documentElement.classList.toggle('mobile-menu-open', isOpen);
+  removeMenuScrollGuards();
+  if (isOpen) {
+    document.addEventListener('touchstart', recordMenuTouch, { passive: true });
+    document.addEventListener('touchmove', blockBackgroundTouch, { passive: false });
+    document.addEventListener('wheel', blockBackgroundWheel, { passive: false });
+    window.addEventListener('resize', closeMenuOnDesktop);
+  }
 });
 
 onUnmounted(() => {
-  if (typeof document !== 'undefined') {
-    document.documentElement.classList.remove('mobile-menu-open');
-  }
+  removeMenuScrollGuards();
+  showMobileMenu.value = false;
 });
 </script>
 
@@ -789,7 +832,6 @@ onUnmounted(() => {
   }
   .mobile-menu-enter-active, .mobile-menu-leave-active { transition: transform 220ms cubic-bezier(.2,.8,.2,1); }
   .mobile-menu-enter-from, .mobile-menu-leave-to { transform: translateY(-8px); }
-  :global(html.mobile-menu-open) { overflow: hidden; }
 
   .mobile-menu-panel .mobile-nav-link {
     min-width: 0;
