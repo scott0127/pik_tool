@@ -63,7 +63,7 @@ const RARE_POINT_ACTION_BY_BUCKET: Partial<Record<CollectionInventoryBucket, Rar
   releaseWithDecor: 'release_with_decor',
 };
 
-const createEmptyInventoryItem = (): CollectionInventoryItem => ({
+export const createEmptyInventoryItem = (): CollectionInventoryItem => ({
   seedlingCount: 0,
   preDecorCount: 0,
   decorCount: 0,
@@ -72,25 +72,25 @@ const createEmptyInventoryItem = (): CollectionInventoryItem => ({
   releaseWithDecorCount: 0,
 });
 
-const createEmptyDetails = (): CollectionDetails => ({
+export const createEmptyDetails = (): CollectionDetails => ({
   inventory: {},
   rareProgress: {},
   events: [],
 });
 
-const createEventId = (): string => {
+export const createEventId = (): string => {
   if (globalThis.crypto?.randomUUID) {
     return globalThis.crypto.randomUUID();
   }
   return `evt-${Date.now()}-${Math.random().toString(36).slice(2)}`;
 };
 
-const normalizeCount = (value: unknown): number => {
+export const normalizeCount = (value: unknown): number => {
   const numeric = Number(value);
   return Number.isFinite(numeric) ? Math.max(0, Math.trunc(numeric)) : 0;
 };
 
-const normalizeInventoryItem = (item?: Partial<CollectionInventoryItem> | null): CollectionInventoryItem => ({
+export const normalizeInventoryItem = (item?: Partial<CollectionInventoryItem> | null): CollectionInventoryItem => ({
   seedlingCount: normalizeCount(item?.seedlingCount),
   preDecorCount: normalizeCount(item?.preDecorCount),
   decorCount: normalizeCount(item?.decorCount),
@@ -100,7 +100,7 @@ const normalizeInventoryItem = (item?: Partial<CollectionInventoryItem> | null):
   updatedAt: typeof item?.updatedAt === 'string' ? item.updatedAt : undefined,
 });
 
-const normalizeRareProgress = (categoryId: string, progress?: Partial<RareDecorProgress> | null): RareDecorProgress => ({
+export const normalizeRareProgress = (categoryId: string, progress?: Partial<RareDecorProgress> | null): RareDecorProgress => ({
   categoryId,
   points: normalizeCount(progress?.points),
   giftsAvailable: normalizeCount(progress?.giftsAvailable),
@@ -108,7 +108,7 @@ const normalizeRareProgress = (categoryId: string, progress?: Partial<RareDecorP
   updatedAt: typeof progress?.updatedAt === 'string' ? progress.updatedAt : undefined,
 });
 
-const normalizeDetails = (details?: Partial<CollectionDetails> | null): CollectionDetails => {
+export const normalizeDetails = (details?: Partial<CollectionDetails> | null): CollectionDetails => {
   const normalized = createEmptyDetails();
 
   if (details?.inventory && typeof details.inventory === 'object') {
@@ -136,7 +136,7 @@ const normalizeDetails = (details?: Partial<CollectionDetails> | null): Collecti
   return normalized;
 };
 
-const hasCollectedDecor = (item: CollectionInventoryItem): boolean =>
+export const hasCollectedDecor = (item: CollectionInventoryItem): boolean =>
   item.decorCount + item.rareCount > 0;
 
 export function useCollection() {
@@ -153,7 +153,7 @@ export function useCollection() {
   }));
 
   // Sync status
-  const isSyncing = useState('collection-syncing', () => false);
+  const isSyncing = useState<boolean>('collection-syncing', () => false);
   const lastSyncTime = useState<string | null>('collection-last-sync', () => null);
 
   // Debounced upload UI state
