@@ -1,6 +1,6 @@
 {
-  "version": 8,
-  "lastUpdated": "2026-01-09",
+  "version": 9,
+  "lastUpdated": "2026-10-07",
   "source": "Generated from app/data/scraped_images.json",
   "definitions": [
     {
@@ -2389,6 +2389,43 @@
         "purple",
         "rock",
         "winged"
+      ]
+    },
+    {
+      "category": {
+        "id": "halloween-stained-glass",
+        "name": "萬聖節彩繪玻璃",
+        "nameEn": "Halloween: Stained Glass",
+        "type": "special",
+        "icon": "noto:jack-o-lantern"
+      },
+      "variants": [
+        {
+          "id": "halloween_stained_glass",
+          "name": "萬聖節彩繪玻璃",
+          "nameEn": "Halloween: Stained Glass",
+          "imageUrl": "https://pikmin.wiki.gallery/images/thumb/e/e5/Decor_Red_Halloween_Stained_Glass.png/200px-Decor_Red_Halloween_Stained_Glass.png",
+          "imageUrls": {
+            "red": "https://pikmin.wiki.gallery/images/thumb/e/e5/Decor_Red_Halloween_Stained_Glass.png/200px-Decor_Red_Halloween_Stained_Glass.png",
+            "yellow": "https://pikmin.wiki.gallery/images/thumb/f/fe/Decor_Yellow_Halloween_Stained_Glass.png/200px-Decor_Yellow_Halloween_Stained_Glass.png",
+            "blue": "https://pikmin.wiki.gallery/images/thumb/d/d3/Decor_Blue_Halloween_Stained_Glass.png/200px-Decor_Blue_Halloween_Stained_Glass.png",
+            "white": "https://pikmin.wiki.gallery/images/7/7f/Decor_White_Halloween_Stained_Glass.png",
+            "purple": "https://pikmin.wiki.gallery/images/thumb/c/c2/Decor_Purple_Halloween_Stained_Glass.png/200px-Decor_Purple_Halloween_Stained_Glass.png",
+            "rock": "https://pikmin.wiki.gallery/images/thumb/2/2d/Decor_Rock_Halloween_Stained_Glass.png/168px-Decor_Rock_Halloween_Stained_Glass.png",
+            "winged": "https://pikmin.wiki.gallery/images/thumb/1/17/Decor_Winged_Halloween_Stained_Glass.png/174px-Decor_Winged_Halloween_Stained_Glass.png",
+            "ice": "https://pikmin.wiki.gallery/images/thumb/5/56/Decor_Ice_Halloween_Stained_Glass.png/200px-Decor_Ice_Halloween_Stained_Glass.png"
+          }
+        }
+      ],
+      "availablePikminTypes": [
+        "red",
+        "yellow",
+        "blue",
+        "white",
+        "purple",
+        "rock",
+        "winged",
+        "ice"
       ]
     },
     {

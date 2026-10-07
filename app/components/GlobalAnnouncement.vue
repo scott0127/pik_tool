@@ -64,13 +64,13 @@
           :aria-hidden="currentTab !== 'update'" :inert="currentTab !== 'update'">
           <ul class="announcement-copy announcement-list text-sm leading-relaxed">
             <li class="announcement-update-item announcement-update-item-feature">
-              <span class="announcement-update-date">9/30</span>
+              <span class="announcement-update-date">10/7</span>
               <span class="announcement-update-icon announcement-update-icon-emerald">
                 <Icon name="lucide:sparkles" class="h-3.5 w-3.5" />
               </span>
               <span class="announcement-update-copy">
                 <span class="announcement-update-kicker">圖鑑更新</span>
-                <span class="announcement-update-highlight">香腸 8 款上線，峇里島雕刻圖片確認</span>
+                <span class="announcement-update-highlight">萬聖節彩繪玻璃 8 款上線</span>
               </span>
             </li>
             <li class="announcement-update-item announcement-update-item-feature">
