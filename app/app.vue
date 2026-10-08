@@ -1,7 +1,8 @@
 <template>
   <div class="min-h-screen relative">
+    <HomeFlowBackground v-if="isHomePage" />
     <!-- Background decorations -->
-    <div class="fixed inset-0 pointer-events-none overflow-hidden z-0 hidden md:block">
+    <div v-if="!isHomePage" class="fixed inset-0 pointer-events-none overflow-hidden z-0 hidden md:block">
       <!-- Floating leaves -->
       <div class="absolute top-20 left-[5%] text-6xl opacity-10 sway">🌿</div>
       <div class="absolute top-40 right-[8%] text-5xl opacity-10 sway" style="animation-delay: 1s">🌱</div>
@@ -13,7 +14,7 @@
       <div class="absolute bottom-1/4 right-1/4 w-80 h-80 bg-teal-300/20 rounded-full blur-3xl"></div>
     </div>
 
-    <div class="fixed inset-0 pointer-events-none overflow-hidden z-0 md:hidden">
+    <div v-if="!isHomePage" class="fixed inset-0 pointer-events-none overflow-hidden z-0 md:hidden">
       <div class="absolute top-[15%] left-[8%] text-6xl opacity-[0.08]">🌿</div>
       <div class="absolute top-[18%] right-[10%] text-5xl opacity-[0.07]">🌱</div>
       <div class="absolute top-[44%] left-[-6%] text-6xl opacity-[0.055]">🍃</div>
@@ -121,6 +122,7 @@
 </template>
 
 <script setup lang="ts">
+import HomeFlowBackground from '~/components/Home/FlowBackground.vue';
 // 使用新的 AuthStore
 const authStore = useAuthStore();
 const { loadCollection, loadFromCloud } = useCollection();
@@ -130,6 +132,7 @@ const isCheckingVersion = useState('isCheckingVersion', () => true);
 const isAppReady = computed(() => !isInitializing.value && !isCheckingVersion.value);
 const hasFinishedLoading = ref(false);
 const route = useRoute();
+const isHomePage = computed(() => route.path === '/');
 const isStandalonePage = computed(() => route.meta.standalone === true);
 const isMapPage = computed(() => route.path === '/map');
 let appInitStarted = false;

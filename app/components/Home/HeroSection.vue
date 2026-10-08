@@ -7,17 +7,13 @@
     @mouseleave="resetTilt"
   >
 
-    <!-- Moving Background Spirits (Organic Blobs) -->
-    <div class="absolute inset-0 pointer-events-none overflow-hidden rounded-[3rem]">
-        <div class="absolute top-[-20%] right-[-10%] w-[600px] h-[600px] bg-gradient-radial from-emerald-300/30 to-transparent blur-[120px] animate-pulse-slow"></div>
-        <div class="absolute bottom-[-10%] left-[-10%] w-[500px] h-[500px] bg-gradient-radial from-teal-300/20 to-transparent blur-[100px] animate-float-slow delay-1000"></div>
-        <div class="absolute top-[20%] left-[30%] w-[300px] h-[300px] bg-gradient-radial from-lime-200/20 to-transparent blur-[80px] animate-float-slow delay-500"></div>
-    </div>
-
     <!-- Left Content: Title & Text (Floats forward slightly) -->
     <div class="home-hero-copy relative z-10 flex-1 text-center md:text-left transition-transform duration-200 ease-out" :style="textStyle">
       <div class="hero-motion-item inline-flex items-center gap-2.5 px-5 py-2 rounded-full bg-white/45 backdrop-blur-md border border-white/80 text-[#0a5c43] text-xs font-display font-bold uppercase tracking-[0.08em] mb-6 shadow-[0_2px_8px_rgba(0,0,0,0.04)] hover:scale-105 transition-transform cursor-default">
-        <span class="w-2.5 h-2.5 rounded-full bg-[#00be83]"></span>
+        <span class="hero-badge-seed w-2.5 h-2.5 rounded-full bg-[#00be83]" aria-hidden="true">
+          <i class="hero-badge-leaf hero-badge-leaf-left"></i>
+          <i class="hero-badge-leaf hero-badge-leaf-right"></i>
+        </span>
         {{ $t('hero.badge') }}
       </div>
 
@@ -411,7 +407,15 @@ const initHeroMotion = () => {
                     from: 'center',
                 },
                 clearProps: 'transform,opacity',
-            }, '-=0.18');
+            }, '-=0.18')
+            .from('.hero-badge-leaf', {
+                scale: 0,
+                opacity: 0,
+                duration: 0.65,
+                stagger: 0.12,
+                ease: 'power2.out',
+                clearProps: 'transform,opacity',
+            }, 0.38);
 
         heroMotionMatchMedia = gsap.matchMedia();
 
@@ -567,6 +571,33 @@ const textStyle = computed(() => ({
 </script>
 
 <style scoped>
+.hero-badge-seed {
+    position: relative;
+    flex-shrink: 0;
+    box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.06);
+}
+
+.hero-badge-leaf {
+    position: absolute;
+    top: -4px;
+    width: 7px;
+    height: 4px;
+    background: linear-gradient(135deg, #9adf91, #22b788);
+}
+
+.hero-badge-leaf-left {
+    right: 5px;
+    border-radius: 1px 7px 1px 7px;
+    transform-origin: bottom right;
+}
+
+.hero-badge-leaf-right {
+    left: 6px;
+    top: -5px;
+    border-radius: 7px 1px 7px 1px;
+    transform-origin: bottom left;
+}
+
 .perspective-1000 {
     perspective: 1000px;
 }
