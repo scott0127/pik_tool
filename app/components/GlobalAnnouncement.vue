@@ -73,14 +73,14 @@
                 <span class="announcement-update-highlight">森林稀有（鍬形蟲・橡實）＆ 麵包店「糕點」</span>
               </span>
             </li>
-            <li class="announcement-update-item announcement-update-item-feature">
-              <span class="announcement-update-date">10/16</span>
-              <span class="announcement-update-icon announcement-update-icon-emerald">
+            <li class="announcement-update-item announcement-update-item-feature announcement-update-item-contrast">
+              <span class="announcement-update-date announcement-update-date-contrast">10/16</span>
+              <span class="announcement-update-icon announcement-update-icon-contrast">
                 <Icon name="lucide:map-pin" class="h-3.5 w-3.5" />
               </span>
               <span class="announcement-update-copy">
-                <span class="announcement-update-kicker">地圖更新</span>
-                <span class="announcement-update-highlight">更新 1,000+ 筆人工純點紀錄</span>
+                <span class="announcement-update-kicker announcement-update-kicker-contrast">地圖更新</span>
+                <span class="announcement-update-highlight announcement-update-highlight-contrast">1,000+ 筆人工純點紀錄</span>
               </span>
             </li>
             <li class="announcement-update-item announcement-update-item-feature">
@@ -613,6 +613,13 @@ onBeforeUnmount(() => {
     linear-gradient(135deg, rgba(236, 253, 245, 0.98), rgba(255, 255, 255, 0.96));
 }
 
+.announcement-update-item-contrast {
+  border-color: rgba(249, 115, 22, 0.28);
+  background:
+    radial-gradient(circle at 16% 0%, rgba(255, 255, 255, 0.96), transparent 42%),
+    linear-gradient(135deg, rgba(255, 247, 237, 0.98), rgba(255, 255, 255, 0.96));
+}
+
 .announcement-update-date {
   position: relative;
   z-index: 1;
@@ -627,6 +634,11 @@ onBeforeUnmount(() => {
   border-radius: 999px;
   background: linear-gradient(135deg, #10b981, #059669);
   box-shadow: 0 2px 5px rgba(5, 150, 105, 0.13);
+}
+
+.announcement-update-date-contrast {
+  background: linear-gradient(135deg, #ea580c, #c2410c);
+  box-shadow: 0 2px 5px rgba(194, 65, 12, 0.22);
 }
 
 .announcement-update-icon {
@@ -655,6 +667,12 @@ onBeforeUnmount(() => {
   background: #253a31;
 }
 
+.announcement-update-icon-contrast {
+  color: rgb(234, 88, 12);
+  background: rgba(254, 237, 213, 0.85);
+  border-color: rgba(253, 186, 116, 0.5);
+}
+
 .announcement-update-flags {
   width: auto;
   min-width: 2.55rem;
@@ -681,6 +699,10 @@ onBeforeUnmount(() => {
   font-weight: 800;
 }
 
+.announcement-update-kicker-contrast {
+  color: #c2410c;
+}
+
 .announcement-update-highlight {
   overflow: hidden;
   color: transparent;
@@ -690,6 +712,15 @@ onBeforeUnmount(() => {
   background: linear-gradient(90deg, #047857, #059669, #0f766e);
   -webkit-background-clip: text;
   background-clip: text;
+}
+
+.announcement-update-highlight-contrast {
+  color: #c2410c;
+  font-weight: 800;
+  background: linear-gradient(90deg, #c2410c 0%, #ea580c 50%, #d97706 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 .announcement-close-button {
