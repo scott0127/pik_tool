@@ -147,8 +147,8 @@ beforeEach(() => {
 // 1. 基礎功能測試
 // =========================================================================
 describe('1. 基礎功能', () => {
-  it('decor.json 應有 101 個分類', () => {
-    expect(decorData.definitions.length).toBe(101);
+  it('decor.json 應有 102 個分類', () => {
+    expect(decorData.definitions.length).toBe(102);
   });
 
   it('getAllDecorItems() 應生成正確數量的 DecorItem', () => {

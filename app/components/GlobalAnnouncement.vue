@@ -64,6 +64,26 @@
           :aria-hidden="currentTab !== 'update'" :inert="currentTab !== 'update'">
           <ul class="announcement-copy announcement-list text-sm leading-relaxed">
             <li class="announcement-update-item announcement-update-item-feature">
+              <span class="announcement-update-date">10/16</span>
+              <span class="announcement-update-icon announcement-update-icon-emerald">
+                <Icon name="lucide:sparkles" class="h-3.5 w-3.5" />
+              </span>
+              <span class="announcement-update-copy">
+                <span class="announcement-update-kicker">圖鑑更新</span>
+                <span class="announcement-update-highlight">森林稀有（鍬形蟲・橡實）＆ 麵包店「糕點」</span>
+              </span>
+            </li>
+            <li class="announcement-update-item announcement-update-item-feature">
+              <span class="announcement-update-date">10/16</span>
+              <span class="announcement-update-icon announcement-update-icon-emerald">
+                <Icon name="lucide:map-pin" class="h-3.5 w-3.5" />
+              </span>
+              <span class="announcement-update-copy">
+                <span class="announcement-update-kicker">地圖更新</span>
+                <span class="announcement-update-highlight">更新 1,000+ 筆人工純點紀錄</span>
+              </span>
+            </li>
+            <li class="announcement-update-item announcement-update-item-feature">
               <span class="announcement-update-date">10/7</span>
               <span class="announcement-update-icon announcement-update-icon-emerald">
                 <Icon name="lucide:sparkles" class="h-3.5 w-3.5" />
@@ -81,16 +101,6 @@
               <span class="announcement-update-copy">
                 <span class="announcement-update-kicker">9月活動</span>
                 <span class="announcement-update-highlight">香腸・月餅・秋季貼紙</span>
-              </span>
-            </li>
-            <li class="announcement-update-item">
-              <span class="announcement-update-date">8月</span>
-              <span class="announcement-update-icon announcement-update-icon-emerald">
-                <Icon name="lucide:sparkles" class="h-3.5 w-3.5" />
-              </span>
-              <span class="announcement-update-copy">
-                <span class="announcement-update-kicker">裝飾更新</span>
-                <span class="announcement-update-highlight">峇里島雕刻</span>
               </span>
             </li>
             <li class="announcement-update-item">

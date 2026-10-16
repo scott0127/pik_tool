@@ -111,58 +111,9 @@
        </div>
     </div>
 
-    <!-- Right Content: Floating 3D Stats Core -->
-    <div class="home-hero-progress relative z-20 w-auto perspective-1000">
-        <div
-            class="relative w-72 h-72 md:w-96 md:h-96 transition-transform duration-100 ease-out preserve-3d cursor-pointer"
-            :style="cardStyle"
-            @click="enableDeviceTilt"
-        >
-            <!-- 1. Back Glow Layer (Furthest back) -->
-            <div class="absolute inset-10 bg-gradient-to-tr from-emerald-400 to-teal-400 rounded-full blur-[60px] opacity-40 animate-pulse-slow translate-z-[-20px]"></div>
-
-            <!-- 2. The Glass Sphere/Container -->
-            <div class="absolute inset-0 bg-white/10 backdrop-blur-md rounded-full border border-white/30 shadow-[0_20px_50px_rgba(0,0,0,0.05)] flex items-center justify-center translate-z-[0px] ring-1 ring-white/40">
-                <div class="absolute inset-0 rounded-full bg-gradient-to-b from-white/40 to-transparent pointer-events-none"></div>
-            </div>
-
-            <!-- 3. Progress Ring (Floating) -->
-            <div class="absolute inset-4 translate-z-[20px]">
-                <svg class="w-full h-full -rotate-90 drop-shadow-xl" viewBox="0 0 100 100">
-                    <!-- Track -->
-                    <circle cx="50" cy="50" r="40" stroke="rgba(255,255,255,0.3)" stroke-width="6" fill="none" />
-                    <!-- Progress -->
-                    <circle cx="50" cy="50" r="40" stroke="url(#progressGradient)" stroke-width="6" fill="none"
-                            stroke-linecap="round"
-                            :stroke-dasharray="251.2"
-                            :stroke-dashoffset="251.2 - (stats.percentage / 100) * 251.2"
-                            class="transition-all duration-1000 ease-out"
-                    />
-                    <defs>
-                        <linearGradient id="progressGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                            <stop offset="0%" stop-color="#34d399" />
-                            <stop offset="100%" stop-color="#059669" />
-                        </linearGradient>
-                    </defs>
-                </svg>
-            </div>
-
-            <!-- 4. Central Data Core (Furthest forward) -->
-            <div class="absolute inset-0 flex flex-col items-center justify-center translate-z-[40px]">
-                <div class="w-32 h-32 rounded-full bg-white/80 backdrop-blur-xl shadow-lg flex flex-col items-center justify-center border border-white/60 mb-2">
-                    <Icon name="lucide:sprout" class="text-4xl text-emerald-500 mb-1 animate-bounce-gentle" />
-                    <span class="text-3xl font-black text-gray-800 tracking-tighter leading-none">{{ stats.percentage }}%</span>
-                </div>
-                <div class="bg-emerald-100/80 backdrop-blur-md text-emerald-800 text-xs font-bold px-4 py-1.5 rounded-full border border-emerald-200/50 shadow-sm mt-4">
-                    {{ stats.collected }} {{ $t('hero.collected') }}
-                </div>
-            </div>
-
-            <!-- 5. Floating Orbs (Decorations) -->
-            <div class="absolute top-0 right-10 w-12 h-12 bg-yellow-300 rounded-full blur-md opacity-60 animate-float translate-z-[30px]"></div>
-            <div class="absolute bottom-10 left-10 w-8 h-8 bg-pink-400 rounded-full blur-md opacity-50 animate-float delay-700 translate-z-[25px]"></div>
-
-        </div>
+    <!-- Original collection layout with an on-demand convex lens. -->
+    <div class="home-hero-progress relative z-20 w-full">
+      <HomeGlassProgress :percentage="stats.percentage" :collected="stats.collected" :collected-label="$t('hero.collected')" />
     </div>
   </div>
 
@@ -269,16 +220,11 @@ const stats = computed(() => getStats());
 const heroContainer = ref<HTMLElement | null>(null);
 const tiltX = ref(0);
 const tiltY = ref(0);
-const deviceTiltEnabled = ref(false);
-let hasDeviceOrientationListener = false;
 let heroMotionContext: ReturnType<typeof gsap.context> | null = null;
 let heroMotionMatchMedia: ReturnType<typeof gsap.matchMedia> | null = null;
 
 onMounted(async () => {
     await fetchHeroConfig();
-    if (typeof window !== 'undefined' && 'DeviceOrientationEvent' in window) {
-        addDeviceOrientationListener();
-    }
     await nextTick();
     initHeroMotion();
 });
@@ -501,7 +447,6 @@ const initHeroMotion = () => {
 };
 
 const handleMouseMove = (e: MouseEvent) => {
-    if (deviceTiltEnabled.value) return;
     if (!heroContainer.value) return;
     const rect = heroContainer.value.getBoundingClientRect();
     const x = e.clientX - rect.left;
@@ -516,38 +461,8 @@ const handleMouseMove = (e: MouseEvent) => {
 };
 
 const resetTilt = () => {
-    if (deviceTiltEnabled.value) return;
     tiltX.value = 0;
     tiltY.value = 0;
-};
-
-const clampTilt = (value: number) => Math.max(-10, Math.min(10, value));
-
-const handleDeviceOrientation = (event: DeviceOrientationEvent) => {
-    if (!deviceTiltEnabled.value) return;
-    const beta = event.beta ?? 0;
-    const gamma = event.gamma ?? 0;
-    tiltX.value = clampTilt((beta - 45) / 4);
-    tiltY.value = clampTilt(gamma / 4);
-};
-
-const addDeviceOrientationListener = () => {
-    if (hasDeviceOrientationListener || typeof window === 'undefined') return;
-    window.addEventListener('deviceorientation', handleDeviceOrientation, true);
-    hasDeviceOrientationListener = true;
-};
-
-const enableDeviceTilt = async () => {
-    if (typeof window === 'undefined' || !('DeviceOrientationEvent' in window)) return;
-    const orientationEvent = window.DeviceOrientationEvent as typeof DeviceOrientationEvent & {
-        requestPermission?: () => Promise<'granted' | 'denied'>;
-    };
-    if (typeof orientationEvent.requestPermission === 'function') {
-        const permission = await orientationEvent.requestPermission();
-        if (permission !== 'granted') return;
-    }
-    deviceTiltEnabled.value = true;
-    addDeviceOrientationListener();
 };
 
 onUnmounted(() => {
@@ -555,14 +470,7 @@ onUnmounted(() => {
     heroMotionMatchMedia = null;
     heroMotionContext?.revert();
     heroMotionContext = null;
-    if (hasDeviceOrientationListener && typeof window !== 'undefined') {
-        window.removeEventListener('deviceorientation', handleDeviceOrientation, true);
-    }
 });
-
-const cardStyle = computed(() => ({
-    transform: `rotateX(${tiltX.value}deg) rotateY(${tiltY.value}deg)`,
-}));
 
 const textStyle = computed(() => ({
     transform: `translateX(${tiltY.value * 0.5}px) translateY(${tiltX.value * 0.5}px)`,
@@ -647,9 +555,8 @@ const textStyle = computed(() => ({
         min-width: 0;
     }
 
-    .home-hero-progress > div {
+    .home-hero-progress {
         width: clamp(16rem, 28vw, 24rem);
-        height: clamp(16rem, 28vw, 24rem);
     }
 }
 

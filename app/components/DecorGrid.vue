@@ -11,7 +11,7 @@
     >
       <div v-if="group.items.length > 1 && (groupedItems.length > 1 || group.isRare)" class="decor-series-heading">
         <span>{{ locale === 'en' ? group.variantNameEn : group.variantName }}</span>
-        <small>{{ group.isRare ? (locale === 'en' ? 'Rare series' : '稀有系列') : String(groupIndex + 1).padStart(2, '0') }}</small>
+        <small>{{ group.isRare ? (locale === 'en' ? 'Rare series' : '稀有系列') : (group.seriesNumber || String(groupIndex + 1).padStart(2, '0')) }}</small>
       </div>
       <!-- Pikmin Row for this Variant -->
         <div
@@ -108,7 +108,14 @@ const groupedItems = computed(() => {
     groups.get(key)!.items.push(item);
   });
   
-  return Array.from(groups.values());
+  let regularCount = 0;
+  return Array.from(groups.values()).map(group => {
+    if (!group.isRare) {
+      regularCount++;
+      return { ...group, seriesNumber: String(regularCount).padStart(2, '0') };
+    }
+    return { ...group, seriesNumber: '' };
+  });
 });
 
 const groupedItemsByKey = computed(() => {

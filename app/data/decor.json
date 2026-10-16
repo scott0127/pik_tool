@@ -291,6 +291,22 @@
       },
       "variants": [
         {
+          "id": "stag_beetle_rare",
+          "name": "稀有鍬形蟲",
+          "nameEn": "Stag Beetle (Rare)",
+          "imageUrl": "https://pikmin.wiki.gallery/images/thumb/8/88/Decor_Red_Stag_Beetle_%28Rare%29.png/199px-Decor_Red_Stag_Beetle_%28Rare%29.png",
+          "imageUrls": {
+            "red": "https://pikmin.wiki.gallery/images/thumb/8/88/Decor_Red_Stag_Beetle_%28Rare%29.png/199px-Decor_Red_Stag_Beetle_%28Rare%29.png",
+            "yellow": "https://pikmin.wiki.gallery/images/thumb/9/99/Decor_Yellow_Stag_Beetle_%28Rare%29.png/200px-Decor_Yellow_Stag_Beetle_%28Rare%29.png",
+            "blue": "https://pikmin.wiki.gallery/images/f/f2/Decor_Blue_Stag_Beetle_%28Rare%29.png",
+            "white": "https://pikmin.wiki.gallery/images/6/62/Decor_White_Stag_Beetle_%28Rare%29.png",
+            "purple": "https://pikmin.wiki.gallery/images/thumb/b/b2/Decor_Purple_Stag_Beetle_%28Rare%29.png/191px-Decor_Purple_Stag_Beetle_%28Rare%29.png",
+            "rock": "https://pikmin.wiki.gallery/images/thumb/4/45/Decor_Rock_Stag_Beetle_%28Rare%29.png/170px-Decor_Rock_Stag_Beetle_%28Rare%29.png",
+            "winged": "https://pikmin.wiki.gallery/images/9/91/Decor_Winged_Stag_Beetle_%28Rare%29.png",
+            "ice": "https://pikmin.wiki.gallery/images/thumb/4/45/Decor_Ice_Stag_Beetle_%28Rare%29.png/159px-Decor_Ice_Stag_Beetle_%28Rare%29.png"
+          }
+        },
+        {
           "id": "stag_beetle",
           "name": "鍬形蟲",
           "nameEn": "Stag Beetle",
@@ -304,6 +320,22 @@
             "rock": "https://pikmin.wiki.gallery/images/thumb/c/c6/Decor_Rock_Stag_Beetle.png/85px-Decor_Rock_Stag_Beetle.png",
             "winged": "https://pikmin.wiki.gallery/images/thumb/4/4c/Decor_Winged_Stag_Beetle.png/100px-Decor_Winged_Stag_Beetle.png",
             "ice": "https://pikmin.wiki.gallery/images/thumb/4/4c/Decor_Ice_Stag_Beetle.png/119px-Decor_Ice_Stag_Beetle.png"
+          }
+        },
+        {
+          "id": "acorn_rare",
+          "name": "稀有橡實",
+          "nameEn": "Acorn (Rare)",
+          "imageUrl": "https://pikmin.wiki.gallery/images/c/ca/Decor_Red_Acorn_%28Rare%29.png",
+          "imageUrls": {
+            "red": "https://pikmin.wiki.gallery/images/c/ca/Decor_Red_Acorn_%28Rare%29.png",
+            "yellow": "https://pikmin.wiki.gallery/images/c/ce/Decor_Yellow_Acorn_%28Rare%29.png",
+            "blue": "https://pikmin.wiki.gallery/images/1/12/Decor_Blue_Acorn_%28Rare%29.png",
+            "white": "https://pikmin.wiki.gallery/images/8/81/Decor_White_Acorn_%28Rare%29.png",
+            "purple": "https://pikmin.wiki.gallery/images/3/34/Decor_Purple_Acorn_%28Rare%29.png",
+            "rock": "https://pikmin.wiki.gallery/images/4/4b/Decor_Rock_Acorn_%28Rare%29.png",
+            "winged": "https://pikmin.wiki.gallery/images/5/54/Decor_Winged_Acorn_%28Rare%29.png",
+            "ice": "https://pikmin.wiki.gallery/images/thumb/6/6f/Decor_Ice_Acorn_%28Rare%29.png/163px-Decor_Ice_Acorn_%28Rare%29.png"
           }
         },
         {
@@ -797,6 +829,22 @@
             "rock": "https://pikmin.wiki.gallery/images/thumb/a/a2/Decor_Rock_Baguette.png/100px-Decor_Rock_Baguette.png",
             "winged": "https://pikmin.wiki.gallery/images/thumb/2/20/Decor_Winged_Baguette.png/100px-Decor_Winged_Baguette.png",
             "ice": "https://pikmin.wiki.gallery/images/thumb/d/d2/Decor_Ice_Baguette.png/200px-Decor_Ice_Baguette.png"
+          }
+        },
+        {
+          "id": "pastry",
+          "name": "糕點",
+          "nameEn": "Pastry",
+          "imageUrl": "https://pikmin.wiki.gallery/images/thumb/e/eb/Decor_Red_Pastry.png/200px-Decor_Red_Pastry.png",
+          "imageUrls": {
+            "red": "https://pikmin.wiki.gallery/images/thumb/e/eb/Decor_Red_Pastry.png/200px-Decor_Red_Pastry.png",
+            "yellow": "https://pikmin.wiki.gallery/images/thumb/2/23/Decor_Yellow_Pastry.png/200px-Decor_Yellow_Pastry.png",
+            "blue": "https://pikmin.wiki.gallery/images/thumb/9/9a/Decor_Blue_Pastry.png/200px-Decor_Blue_Pastry.png",
+            "white": "https://pikmin.wiki.gallery/images/thumb/3/38/Decor_White_Pastry.png/200px-Decor_White_Pastry.png",
+            "purple": "https://pikmin.wiki.gallery/images/thumb/7/73/Decor_Purple_Pastry.png/191px-Decor_Purple_Pastry.png",
+            "rock": "https://pikmin.wiki.gallery/images/thumb/b/b4/Decor_Rock_Pastry.png/200px-Decor_Rock_Pastry.png",
+            "winged": "https://pikmin.wiki.gallery/images/thumb/8/80/Decor_Winged_Pastry.png/200px-Decor_Winged_Pastry.png",
+            "ice": "https://pikmin.wiki.gallery/images/thumb/5/52/Decor_Ice_Pastry.png/200px-Decor_Ice_Pastry.png"
           }
         }
       ],
